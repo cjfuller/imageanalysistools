@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : knownparameters.xml
+    Created on : February 25, 2011, 11:01 AM
+    Author     : cfuller
+    Description:
+        This document tracks all know parameters that will be displayed as options in
+        the analysis parameter setup window.  Parameters must be specified using
+        a <parameter> node and must minimally have at least one of the attributes
+        name or displayname.  Valid types for the type attribute are integer,
+        boolean, floating, or string.
+
+        Optionally, a parameter node may contain a child node <description> that contains
+        a text description of the parameter.
+-->
+
+<root>
+    <parameter name="max_size" displayname="Maximum size" type="integer" defaultvalue="50"/>
+    <parameter name="min_size" displayname="Minimum size" type="integer" defaultvalue="0"/>
+
+    <parameter name="use_clustering" displayname="Cluster centromeres?" type="boolean" defaultvalue="false"/>
+    <parameter name="minimum_cluster_size" displayname="Minimum cluster size" type="integer" defaultvalue="0"/>
+    <parameter name="maximum_clustering_iterations" displayname="Maximum number of clustering iterations" type="integer" defaultvalue="1"/>
+    <parameter name="use_basic_clustering" displayname="Use basic clustering only?" type="boolean" defaultvalue="true"/>
+
+    <parameter name="decrease_speckle_background" displayname="Force compensate for punctate background?" type="boolean" defaultvalue="false"/>
+    <parameter name="maximum_number_of_centromeres" displayname="Compensate for punctate background if more centromeres than" type="integer" defaultvalue="1000"/>
+
+    <parameter name="generate_masks" displayname="Generate masks?" type="boolean" defaultvalue="true"/>
+    <parameter name="generate_values" displayname="Generate values?" type="boolean" defaultvalue="true"/>
+
+    <parameter name="channel_name" displayname="Channel name" type="string" defaultvalue=""/>
+    <parameter name="marker_channel_index" displayname="Marker channel index" type="integer" defaultvalue="0"/>
+    <parameter name="max_threads" displayname="Maximum number of execution threads" type="integer" defaultvalue="1"/>
+    <parameter name="multi_wavelength_file" displayname="Multiple wavelengths in a single file?" type="boolean" defaultvalue = "true"/>
+
+    <parameter displayname="Custom parameter"/>
+
+</root>
