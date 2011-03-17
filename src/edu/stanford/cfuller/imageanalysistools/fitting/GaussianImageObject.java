@@ -138,7 +138,6 @@ public class GaussianImageObject extends ImageObject {
 
             //amplitude and background are in arbitrary intensity units; convert to photon counts
 
-//testing changes.
             fitParameters.setEntry(0, fitParameters.getEntry(0)*ppg);
             fitParameters.setEntry(6, fitParameters.getEntry(6)*ppg);
 
