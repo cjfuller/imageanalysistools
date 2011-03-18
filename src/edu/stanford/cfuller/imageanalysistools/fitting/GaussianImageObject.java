@@ -198,7 +198,7 @@ public class GaussianImageObject extends ImageObject {
 
             double error = Math.sqrt((2*s_xy + s_z)/(n_photons - 1));
 
-            System.out.println(error);
+            //System.out.println(error);
 
             this.fitErrorByChannel.add(error);
 
