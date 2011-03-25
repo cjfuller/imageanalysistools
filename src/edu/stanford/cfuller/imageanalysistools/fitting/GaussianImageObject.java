@@ -133,8 +133,8 @@ public class GaussianImageObject extends ImageObject {
             double sizex = limitedWidthxy / p.getDoubleValueForKey("pixelsize_nm");
             double sizez = limitedWidthz / p.getDoubleValueForKey("z_sectionsize_nm");
 
-            fitParameters.setEntry(1, Math.pow(sizex, 2.0));
-            fitParameters.setEntry(2, Math.pow(sizez, 2.0));
+            fitParameters.setEntry(1, Math.pow(sizex, 2.0)/2);
+            fitParameters.setEntry(2, Math.pow(sizez, 2.0)/2);
 
             //amplitude and background are in arbitrary intensity units; convert to photon counts
 

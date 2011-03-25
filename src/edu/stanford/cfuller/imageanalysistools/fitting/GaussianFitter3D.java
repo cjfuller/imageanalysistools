@@ -64,7 +64,7 @@ public class GaussianFitter3D {
 
 
 
-        return ( A * Math.exp(-(xmx0*xmx0 + ymy0*ymy0)/vxy - zmz0*zmz0/vz) + b);
+        return ( A * Math.exp(-(xmx0*xmx0 + ymy0*ymy0)/(2*vxy) - zmz0*zmz0/(2*vz)) + b);
 
     }
 
