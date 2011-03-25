@@ -206,6 +206,13 @@ public class ImageReader {
 		
 	}
 
+    /**
+     * Locks the file at the specified filename for reading by an ImageReader.
+     * 
+     * @param filename  The file to lock.
+     * @return          The Thread that holds the lock.  This should always be the current thread on normal return.
+     * @throws InterruptedException
+     */
     protected static Thread lock(String filename) throws InterruptedException {
 
 
@@ -240,6 +247,12 @@ public class ImageReader {
 
     }
 
+
+    /**
+     * Releases the lock on the specified file, with the specified Thread that holds the lock.
+     * @param filename      The file to unlock.
+     * @param lockObject    The Thread that holds the lock.
+     */
     protected void release(String filename, Thread lockObject) {
 
         synchronized (ImageReader.class) {

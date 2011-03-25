@@ -2,7 +2,6 @@ package edu.stanford.cfuller.imageanalysistools.image.io;
 
 import Glacier2.CannotCreateSessionException;
 import Glacier2.PermissionDeniedException;
-import com.sun.deploy.ClientContainer;
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import omero.ServerError;
@@ -12,14 +11,9 @@ import omero.api.ServiceFactoryPrx;
 import omero.client;
 
 import java.io.*;
-import java.nio.channels.FileLock;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: 3/4/11
- * Time: 10:03 AM
- * To change this template use File | Settings | File Templates.
+ * An ImageReader that reads images from an OMERO server instead of files on disk.
  */
 public class OmeroServerImageReader extends ImageReader {
 
@@ -36,6 +30,11 @@ public class OmeroServerImageReader extends ImageReader {
         currentConnections =0;
     }
 
+    /**
+     * Adds a connection to the count of current connections to the OMERO server.
+     *
+     * Ensures that the server is not overloaded with connection requests.
+     */
     protected static void incrementConnections() {
         synchronized (OmeroServerImageReader.class) {
 
@@ -45,6 +44,12 @@ public class OmeroServerImageReader extends ImageReader {
         }
     }
 
+
+    /**
+     * Removes a connection from the count of current connections to the OMERO server.
+     *
+     * Ensures that the server is not overloaded with connection requests.
+     */
     protected static void decrementConnections() {
         
         synchronized (OmeroServerImageReader.class) {
@@ -55,6 +60,11 @@ public class OmeroServerImageReader extends ImageReader {
         }
     }
 
+    /**
+     * Gets the number of current connections to the OMERO server.
+     *
+     * @return  The current number of connections.
+     */
     protected static int getNumberOfConnections() {
         
         synchronized (OmeroServerImageReader.class) {
@@ -64,12 +74,25 @@ public class OmeroServerImageReader extends ImageReader {
         }
     }
 
+    /**
+     * Constructs a new OmeroServerImageReader with no specified server.
+     */
     public OmeroServerImageReader() {
         this.serviceFactory = null;
         this.readerClient = null;
         this.gateway = null;
     }
 
+
+    /**
+     * Attempts a connection to the server at the specified address using the provided username and password.
+     *
+     * Logs any errors in connecting, but returns normally regardless of whether the connection succeeded.
+     *
+     * @param address       The IP address or resolvable hostname of the OMERO server.
+     * @param username      The username to use to connect.
+     * @param password      The password for the provided username.
+     */
     protected void connectToServer(String address, String username, String password) {
 
         try {
@@ -87,16 +110,38 @@ public class OmeroServerImageReader extends ImageReader {
 
     }
 
+    /**
+     * Closes the connection to the OMERO server.
+     */
     protected void closeConnection() {
         this.readerClient.closeSession();
     }
 
+    /**
+     * Reads an Image with the specified Id on the OMERO server using the provided address, username, and password.
+     * @param omeroserverImageId    The ID that the OMERO server as assigned to the desired image; this image will be retrieved.
+     * @param serverAddress         The IP address or resolvable hostname of the OMERO server.
+     * @param username              The username to use to connect.
+     * @param password              The password for the provided username.
+     * @return                      An Image containing the data from the Image identified by ID.  It is not guaranteed how much metadata, if any, will be retrieved.  Null if there is a problem retrieving the Image.
+     * @throws IOException          If there is a problem with the temporary disk storage for the retrieved Image.
+     */
     public Image readImageFromOmeroServer(long omeroserverImageId, String serverAddress, String username, String password) throws IOException {
         String[] temporaryImageFilename = this.loadImageFromOmeroServer(omeroserverImageId, serverAddress, username, password);
         if (temporaryImageFilename == null || temporaryImageFilename[1] == null) return null;
         return this.read(temporaryImageFilename[1]);
     }
 
+
+    /**
+     * Asynchronously loads the Image with the specified Id on the OMERO server using the provided address, username, and password, and stores it to a temporary file on disk.
+     * 
+     * @param omeroserverImageId    The ID that the OMERO server as assigned to the desired image; this image will be retrieved.
+     * @param serverAddress         The IP address or resolvable hostname of the OMERO server.
+     * @param username              The username to use to connect.
+     * @param password              The password for the provided username.
+     * @return                      An array containing two elements: first, the original name of the image on the OMERO server; second, the temporary filename to which the image is being stored.
+     */
     public String[] loadImageFromOmeroServer(final long omeroserverImageId, final String serverAddress, final String username, final String password) {
 
         File tempfile = null;
