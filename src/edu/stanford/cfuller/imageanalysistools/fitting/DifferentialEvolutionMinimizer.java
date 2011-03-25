@@ -42,10 +42,21 @@ import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import edu.stanford.cfuller.imageanalysistools.random.RandomGenerator;
 
-
+/**
+ * This class implements the differential evolution algorithm for function minimization.
+ *
+ * @author Colin J. Fuller
+ */
 
 public class DifferentialEvolutionMinimizer {
 
+    /**
+     * Updates the function values for each parameter set in the population only if that parameter set has changed.
+     * @param f             The function being minimized
+     * @param population    The current population of parameters, one parameter set per row.
+     * @param values        The vector of the last computed values for each entry in the population; entries that have changed will be overwritten.
+     * @param valuesChanged An array indicating whether each entry in the population has changed and requires computation of the value.
+     */
     private void computeValues(ObjectiveFunction f, RealMatrix population, RealVector values, boolean[] valuesChanged) {
 
         for (int i =0; i < population.getRowDimension(); i++) {
@@ -57,6 +68,20 @@ public class DifferentialEvolutionMinimizer {
     }
 
 
+    /**
+     * Performs a minimization of a function starting with a given population.
+     * 
+     * @param population            The population of parameters to start from, one population entry per row, one parameter per column.
+     * @param f                     The function to be minimized.
+     * @param parameterLowerBounds  The lower bounds of each parameter.  This must have the same size as the column dimension of the population.  Generated parameter values less than these values will be discarded.
+     * @param parameterUpperBounds  The upper bounds of each paraemter.  This must have the same size as the column dimension of the population.  Generated parameter values greater than these values will be discarded.
+     * @param populationSize        The size of the population of parameters sets.  This must be equal to the row dimension of the population.
+     * @param scaleFactor           Factor controlling the scale of crossed over entries during crossover events.
+     * @param maxIterations         The maximum number of iterations to allow before returning a result.
+     * @param crossoverFrequency    The frequency of crossover from 0 to 1.  At any given parameter, this is the probability of initiating a crossover as well as the probability of ending one after it has started.
+     * @param tol                   Relative function value tolerance controlling termination; if the maximal and minimal population values differ by less than this factor times the maximal value, optimization will terminate.
+     * @return                      The parameter values at the minimal function value found.
+     */
     public RealVector minimizeWithPopulation(RealMatrix population, ObjectiveFunction f, RealVector parameterLowerBounds, RealVector parameterUpperBounds, int populationSize, double scaleFactor, int maxIterations, double crossoverFrequency, double tol) {
 
 
@@ -210,6 +235,21 @@ public class DifferentialEvolutionMinimizer {
 
     }
 
+
+    /**
+     * Performs a minimization of a function starting with an single initial guess; a full population is generated based on this guess and the parameter bounds.
+     *
+     * @param f                     The function to be minimized.
+     * @param parameterLowerBounds  The lower bounds of each parameter.  Generated parameter values less than these values will be discarded.
+     * @param parameterUpperBounds  The upper bounds of each paraemter.  Generated parameter values greater than these values will be discarded.
+     * @param populationSize        The size of the population of parameters sets to use for optimization.
+     * @param scaleFactor           Factor controlling the scale of crossed over entries during crossover events.
+     * @param maxIterations         The maximum number of iterations to allow before returning a result.
+     * @param crossoverFrequency    The frequency of crossover from 0 to 1.  At any given parameter, this is the probability of initiating a crossover as well as the probability of ending one after it has started.
+     * @param tol                   Relative function value tolerance controlling termination; if the maximal and minimal population values differ by less than this factor times the maximal value, optimization will terminate.
+     * @param initialGuess          A guess at the value of each parameter at the optimum.
+     * @return                      The parameter values at the minimal function value found.
+     */
     public RealVector minimizeWithInitial(ObjectiveFunction f, RealVector parameterLowerBounds, RealVector parameterUpperBounds, int populationSize, double scaleFactor, int maxIterations, double crossoverFrequency, double tol, RealVector initialGuess) {
 
         int numberOfParameters = parameterLowerBounds.getDimension();
@@ -234,7 +274,19 @@ public class DifferentialEvolutionMinimizer {
     }
 
 
-
+    /**
+     * Performs a minimization of a function starting with only parameter bounds; a full population is generated based on these bounds.
+     *
+     * @param f                     The function to be minimized.
+     * @param parameterLowerBounds  The lower bounds of each parameter.  Generated parameter values less than these values will be discarded.
+     * @param parameterUpperBounds  The upper bounds of each paraemter.  Generated parameter values greater than these values will be discarded.
+     * @param populationSize        The size of the population of parameters sets to use for optimization.
+     * @param scaleFactor           Factor controlling the scale of crossed over entries during crossover events.
+     * @param maxIterations         The maximum number of iterations to allow before returning a result.
+     * @param crossoverFrequency    The frequency of crossover from 0 to 1.  At any given parameter, this is the probability of initiating a crossover as well as the probability of ending one after it has started.
+     * @param tol                   Relative function value tolerance controlling termination; if the maximal and minimal population values differ by less than this factor times the maximal value, optimization will terminate.
+     * @return                      The parameter values at the minimal function value found.
+     */
     public RealVector minimize(ObjectiveFunction f, RealVector parameterLowerBounds, RealVector parameterUpperBounds, int populationSize, double scaleFactor, int maxIterations, double crossoverFrequency, double tol) {
 
         int numberOfParameters = parameterLowerBounds.getDimension();

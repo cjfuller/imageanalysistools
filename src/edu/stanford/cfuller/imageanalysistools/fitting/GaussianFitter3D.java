@@ -6,11 +6,9 @@ import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;import java.lang.Math;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: 1/4/11
- * Time: 1:33 PM
- * To change this template use File | Settings | File Templates.
+ * Performs a three-dimensional gaussian fit to an object in an image using a maximum likelihood method assuming Poisson
+ * distributed pixel intensities (once converted to units of photons).
+ *
  */
 public class GaussianFitter3D {
 
@@ -28,6 +26,16 @@ public class GaussianFitter3D {
     }
 
 
+    /**
+     * Fits a 3D Gaussian to a supplied object, starting from an initial guess of the parameters of that Gaussian.
+     *
+     * The Gaussian is contrained to be symmetric in the x and y dimensions (that is, it will have equal variance in both dimensions).
+     *
+     * @param toFit         The {@link ImageObject} to be fit to a Gaussian.
+     * @param initialGuess  The initial guess at the parameters of the Gaussian.  These must be supplied in the order: amplitude, x-y variance, z variance, x position, y position, z position, background.  Positions should be supplied in absolute coordinates from the original image, not relative to the box around the object being fit.
+     * @param ppg           The number of photons corresponding to one greylevel in the original image.
+     * @return              The best fit Gaussian parameters, in the same order as the initial guess had to be supplied.
+     */
     public RealVector fit(ImageObject toFit, RealVector initialGuess, double ppg) {
 
         //parameter ordering: amplitude, var x-y, var z, x/y/z coords, background
@@ -117,6 +125,16 @@ public class GaussianFitter3D {
 
     }
 
+
+    /**
+     * Calculates the fit residual between a set of parameters and a value at a supplied point.
+     * @param value         The observed value at the point.
+     * @param x             The x-coordinate of the point (in absolute original image coordinates)
+     * @param y             The y-coordinate of the point (in absolute original image coordinates)
+     * @param z             The z-coordinate of the point (in absolute original image coordinates.
+     * @param parameters    The gaussian parameters in the same order as would be required for or returned from {@link #fit}
+     * @return              The fit residual at the specified point.
+     */
     public double fitResidual(double value, double x, double y, double z, RealVector parameters) {
 
         return value - gaussian(x,y,z,parameters.getData());

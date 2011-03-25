@@ -6,11 +6,7 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.RealVector;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: 1/6/11
- * Time: 1:33 PM
- * To change this template use File | Settings | File Templates.
+ * A function minimizer that implements the Nelder-Mead or Downhill Simplex method.
  */
 public class NelderMeadMinimizer {
 
@@ -20,6 +16,14 @@ public class NelderMeadMinimizer {
     double s;
     double tol;
 
+    /**
+     * Constructs a new minimizer with the specified minimization parameters.
+     * @param a     Reflection factor (default: 1.0).
+     * @param g     Expansion factor (default: 2.0).
+     * @param r     Contraction factor (default: 0.5).
+     * @param s     Reduction factor (default: 0.5).
+     * @param tol   Function value relative tolerance for optimization termination.
+     */
     public NelderMeadMinimizer(double a, double g, double r, double s, double tol) {
 
         this.a = a;
@@ -38,15 +42,28 @@ public class NelderMeadMinimizer {
         this.tol = 1.0e-6;
     }
 
+    /**
+     * Constructs a new minimizer with the default minimization parameters except for tolerance, which is specified.
+     * @param tol   Function value relative tolerance for optimization termination.
+     */
     public NelderMeadMinimizer(double tol) {
         initDefaults();
         this.tol = tol;
     }
 
+    /**
+     * Constructs a new minimizer with the default minimization parameters.
+     */
     public NelderMeadMinimizer() {
         initDefaults();
     }
 
+    /**
+     * Constructs the initial simplex that is the starting point of the optimization given an initial guess at the minimum and a size scale for each parameter.
+     * @param initialPoint      The initial guess at the minimum, one component per parameter.
+     * @param componentScales   A size scale for each parameter that is used to set how large the initial simplex is.
+     * @return                  A matrix containing p + 1 rows, each of which is one set of p parameters, which specify the simplex.
+     */
     public RealMatrix generateInitialSimplex(RealVector initialPoint, RealVector componentScales) {
         RealMatrix initialSimplex = new Array2DRowRealMatrix(initialPoint.getDimension()+1, initialPoint.getDimension());
 
@@ -61,6 +78,15 @@ public class NelderMeadMinimizer {
         return initialSimplex;
     }
 
+    /**
+     * Constructs the initial simplex that is the starting point of the optimization given an initial guess at the minimum.
+     *
+     * This method will attempt to guess the scale of each parameters, but it is preferable to specify this manually using the other form of
+     * generateInitialSimplex if any information about these scales is known.
+     *
+     * @param initialPoint      The initial guess at the minimum, one component per parameter.
+     * @return                  A matrix containing p + 1 rows, each of which is one set of p parameters, which specify the simplex.
+     */
     public RealMatrix generateInitialSimplex(RealVector initialPoint) {
 
         final double constantScale = 0.1;
@@ -71,11 +97,22 @@ public class NelderMeadMinimizer {
 
     }
 
-
+    /**
+     * Runs the minimization of the specified function starting from an initial guess.
+     * @param f                 The ObjectiveFunction to be minimized.
+     * @param initialPoint      The initial guess, one component per parameter.
+     * @return                  The parameters at the function minimum in the same order as specified in the guess.
+     */
     public RealVector optimize(ObjectiveFunction f, RealVector initialPoint) {
         return this.optimize(f, generateInitialSimplex(initialPoint));
     }
 
+    /**
+     * Runs the minimization of the specified function starting from an initial simplex.
+     * @param f                 The ObjectiveFunction to be minimized.
+     * @param initialSimplex    The initial simplex to use to start optimization, as might be returned from {@link #generateInitialSimplex}
+     * @return                  The parameters at the function minimum in the same order as specified for each point on the simplex.
+     */
     public RealVector optimize(ObjectiveFunction f, RealMatrix initialSimplex) {
 
         RealMatrix currentSimplex = initialSimplex.copy();

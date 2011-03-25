@@ -11,23 +11,36 @@ import org.apache.commons.math.optimization.OptimizationException;
 import java.util.Vector;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: 2/11/11
- * Time: 11:55 AM
- * To change this template use File | Settings | File Templates.
+ * An ImageObject that fits to a three-dimensional gaussian.
  */
 public class GaussianImageObject extends ImageObject {
 
+    /**
+     * Creates an empty GaussianImageObject.
+     */
     public GaussianImageObject() {
         init();
     }
 
+    /**
+     * Creates a GaussianImageObject from the specified masked region in an Image.
+     * @param label     The greylevel of the object in the Image mask.
+     * @param mask      The mask of objects in the Image, with a unique greylevel assigned to each object.
+     * @param parent    The Image that the object occurs in and that is masked by mask.
+     * @param p         The parameters associated with this analysis.
+     */
     public GaussianImageObject(int label, Image mask, Image parent, ParameterDictionary p) {
         init(label, mask, parent, p);
 
     }
 
+
+    /**
+     * Fits this object to a 3-dimensional gaussian, and estimates error and goodness of fit.
+     * @param p     The parameters for the current analysis.
+     * @throws FunctionEvaluationException if there is an error evaluating the gaussian function or the likelihood function used to fit the gaussian.
+     * @throws OptimizationException        if the optimizer used to compute the fit raises an exception.
+     */
     public void fitPosition(ParameterDictionary p) throws FunctionEvaluationException, OptimizationException {
 
         this.fitParametersByChannel = new Vector<RealVector>();
