@@ -363,18 +363,37 @@ public class ParameterDictionary implements Serializable {
 
 	}
 
+    /**
+     * Reads a set of parameters from an XML file.
+     * @param filename  The XML file containing the parameter information.
+     * @return          A ParameterDictionary containing the parameters parsed from the specified file.
+     */
     public static ParameterDictionary readParametersFromFile(String filename) {
         return (new ParameterXMLParser()).parseXMLFileToParameterDictionary(filename);
     }
 
+
+    /**
+     * Adds a Parameter object to the parameter dictionary.
+     * @param p     The Parameter to add.
+     */
     public void addParameter(Parameter p) {
         parseSingleParameter(this, p.getName()+ "=" + p.getValue().toString());
     }
 
+    /**
+     * Gets a set containing the names of all the parameters in the ParameterDictionary.
+     * @return  The Set containing the names.
+     */
     public java.util.Set<String> getKeys() {
         return this.parameters.keySet();
     }
 
+    /**
+     * Gets the Parameter type for a given parameter name as one of the values of the static fields in the Parameter class.
+     * @param key   The name of the parameter.
+     * @return      An integer corresponding to the type of the parameter.  In the current implementation, which only uses strings, this will always be Parameter.TYPE_STRING, but may change in the future.
+     */
     public int getTypeForKey(String key) {
         return Parameter.TYPE_STRING;
     }

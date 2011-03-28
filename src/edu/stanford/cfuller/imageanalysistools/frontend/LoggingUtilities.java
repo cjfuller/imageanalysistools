@@ -92,7 +92,7 @@ public class LoggingUtilities {
     }
 
     /**
-     * Causes all messages to
+     * Causes all messages to be logged.
      */
     public static void logDebugMessages() {
 
@@ -100,6 +100,9 @@ public class LoggingUtilities {
         setHandlerLevels(Level.ALL);
     }
 
+    /**
+     * Causes only informational messages and errors/warnings to be logged.
+     */
     public static void hideDebugMessages() {
 
         getLogger().setLevel(Level.INFO);
@@ -108,6 +111,9 @@ public class LoggingUtilities {
 
     }
 
+    /**
+     * Causes informational and debugging messages to be hidden.
+     */
     public static void logWarningsAndErrorsOnly() {
 
         getLogger().setLevel(Level.WARNING);
@@ -115,6 +121,9 @@ public class LoggingUtilities {
 
     }
 
+    /**
+     * Remove all log handlers that have been added.
+     */
     public static void removeAllAddedLoggingStreams() {
 
         for (Handler h : addedHandlers) {
@@ -128,6 +137,11 @@ public class LoggingUtilities {
 
     }
 
+
+    /**
+     * Get a reference to the underlying logger used by this class.
+     * @return  A reference to the logger.
+     */
     public static Logger getLogger() {
         return java.util.logging.Logger.getLogger(LOGGER_NAME);
     }

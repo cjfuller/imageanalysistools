@@ -39,10 +39,20 @@ package edu.stanford.cfuller.imageanalysistools.frontend;
 import edu.stanford.cfuller.imageanalysistools.image.io.OmeroServerImageReader;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 
+
+/**
+ * Utilities for getting files from a directory or OMERO data source and matching them together into sets of the different channels of the same image.
+ */
 public class DirUtils {
 
     private DirUtils() {}
 
+    
+    /**
+     * Gets filenames of the images to be processed (either from a directory or OMERO data source), along with a display name (i.e. name without a full path) for each.
+     * @param params    The ParameterDictionary containing the parameters to be used for the analysis; the data directory or OMERO data source will be pulled from here.
+     * @return          A List containing String arrays, one per file, each with two entries: first, a fully qualified filename, and second a display name (or name without path).
+     */
     public static java.util.List<String[]> makeMultiwavelengthFileSets(ParameterDictionary params) {
 
 
@@ -102,6 +112,14 @@ public class DirUtils {
 
     }
 
+
+    
+    /**
+     * Gets a list of String arrays each containing a set of filenames that correspond to image files for the color channels of a split channel image.
+     *
+     * @param params    The ParameterDictionary containing the parameters for the analysis.  The directory or OMERO source and channel names will be taken from here.
+     * @return          A List containing String arrays of filenames.  Each array contains the filenames for the channels of an image.
+     */
     public static java.util.List<String[]> makeSetsOfMatchingFiles(ParameterDictionary params) {
 
         String[] setTags = params.getValueForKey("channel_name").split(" ");

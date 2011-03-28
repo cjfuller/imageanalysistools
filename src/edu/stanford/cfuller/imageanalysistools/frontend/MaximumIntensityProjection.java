@@ -43,17 +43,19 @@ import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import java.io.File;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: 12/16/10
- * Time: 11:27 AM
- * To change this template use File | Settings | File Templates.
+ * Utilities for creating maximum intensity projections of images.
  */
 public class MaximumIntensityProjection {
 
     final static String directorySuffix = "maxintproj";
     final static String outputSuffix = "_proj.ome.tif";
 
+
+    /**
+     * Makes a maximum intensity projection of an Image and returns it as an Image.
+     * @param im    The Image to be projected.
+     * @return      The projection, as an Image.
+     */
     public static Image projectImage(Image im) {
 
         ImageCoordinate projectionSizes = ImageCoordinate.createCoord(im.getDimensionSizes().getX(), im.getDimensionSizes().getY(), 1, im.getDimensionSizes().getC(), im.getDimensionSizes().getT());
@@ -81,6 +83,11 @@ public class MaximumIntensityProjection {
         return imProj;
     }
 
+    /**
+     * Makes a maximum intensity projection of an image designated by a given filename; writes the projection back out to disk in a subdirectory.
+     * @param filename                  The filename of the image to be projected.
+     * @throws java.io.IOException      if there is a problem reading the image from disk or writing the projection to disk.
+     */
     public static void project(String filename) throws java.io.IOException {
 
         ImageReader imR = new ImageReader();
@@ -117,6 +124,11 @@ public class MaximumIntensityProjection {
         
     }
 
+    /**
+     * Makes maximum intensity projections of all the images in a single directory.
+     * @param directory                 The directory containing the images to project.
+     * @throws java.io.IOException      if there is a problem reading the image from disk or writing the projection to disk.
+     */
     public static void projectDirectory(String directory) throws java.io.IOException {
 
         File dirFile = new File(directory);

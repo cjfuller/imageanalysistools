@@ -36,14 +36,6 @@
 
 package edu.stanford.cfuller.imageanalysistools.method;
 
-/**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: 1/3/11
- * Time: 4:52 PM
- * To change this template use File | Settings | File Templates.
- */
-
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.metric.IntensityPerPixelMetric;
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
