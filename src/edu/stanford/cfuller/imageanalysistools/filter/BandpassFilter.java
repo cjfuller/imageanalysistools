@@ -44,6 +44,9 @@ import org.apache.commons.math.transform.FastFourierTransformer;
 
 /**
  * A filter that removes a section of frequency space from an Image's Fourier transform.
+ *
+ * Note that this is actually the opposite of the usual definition of a bandpass filter, in that the specified band is removed instead of retained.
+ *
  * <p>
  * This filter does not use a reference Image.
  * <p>

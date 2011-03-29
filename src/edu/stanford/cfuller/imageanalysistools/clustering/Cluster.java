@@ -41,11 +41,7 @@ import org.apache.commons.math.geometry.Vector3D;
 import java.util.Set;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: Dec 8, 2010
- * Time: 5:31:07 PM
- * To change this template use File | Settings | File Templates.
+ * A representation of a single Cluster of ClusterObject that might result from applying a clustering algorithm to a collection of objects.
  */
 public class Cluster implements Positioned{
 
@@ -54,6 +50,9 @@ public class Cluster implements Positioned{
     private org.apache.commons.math.geometry.Vector3D centroid;
     private org.apache.commons.math.geometry.Vector3D covariance;
 
+    /**
+     * Constructs an empty cluster.
+     */
     public Cluster() {
 
         objectSet = new java.util.HashSet<ClusterObject>();
@@ -62,46 +61,69 @@ public class Cluster implements Positioned{
         covariance = null;
     }
 
+    /**
+     * Gets references to all the objects contained in the Cluster.
+     * @return      A Set containing a ClusterObject reference for each ClusterObject assigned to the Cluster.
+     */
     public Set<ClusterObject> getObjectSet() {
         return objectSet;
     }
 
+    /**
+     * Sets the ClusterObjects that are assigned to the Cluster.
+     * @param objectSet     The Set of ClusterObjects that are to be assigned to the Cluster; any previous assignment is erased.
+     */
     public void setObjectSet(Set<ClusterObject> objectSet) {
         this.objectSet = objectSet;
     }
 
+    /**
+     * Gets an integer used to uniquely identify the Cluster.
+     * @return  The integer ID.
+     */
     public int getID() {
         return ID;
     }
 
+    /**
+     * Sets the integer used to uniquely identify the Cluster.
+     * @param ID    The integer that will become the ID of the Cluster.
+     */
     public void setID(int ID) {
         this.ID = ID;
     }
 
+    /**
+     * Gets the centroid of the Cluster.
+     *
+     * This is the geometric centroid, assuming equal weight for each ClusterObject in the Cluster.
+     *
+     * @return      A Vector3D containing the geometric centroid.
+     */
     public Vector3D getCentroid() {
         return centroid;
     }
 
+    /**
+     * Sets the centroid of the Cluster to the specified Vector3D.
+     *
+     * No checking is performed to verify that this is actually the centroid.
+     * 
+     * @param centroid  The centroid of the Cluster.
+     */
     public void setCentroid(Vector3D centroid) {
         this.centroid = centroid;
     }
 
-    public Vector3D getCovariance() {
-        return covariance;
-    }
-
-    public void setCovariance(Vector3D covariance) {
-        this.covariance = covariance;
-    }
-
+    /**
+     * Sets the centroid of the Cluster by its individual components.
+     * @param x     The centroid x-coordinate.
+     * @param y     The centroid y-coordinate.
+     * @param z     The centroid z-coordinate.
+     */
     public void setCentroidComponents(double x, double y, double z) {
         this.centroid = new Vector3D(x, y, z);
     }
-
-    public void setCovarianceComponents(double xx, double xy, double yy) {
-        this.covariance = new Vector3D(xx, xy, yy);
-    }
-
 
     //interface Positioned implementations
 
