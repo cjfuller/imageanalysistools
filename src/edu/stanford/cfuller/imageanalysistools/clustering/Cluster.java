@@ -96,8 +96,6 @@ public class Cluster implements Positioned{
     /**
      * Gets the centroid of the Cluster.
      *
-     * This is the geometric centroid, assuming equal weight for each ClusterObject in the Cluster.
-     *
      * @return      A Vector3D containing the geometric centroid.
      */
     public Vector3D getCentroid() {

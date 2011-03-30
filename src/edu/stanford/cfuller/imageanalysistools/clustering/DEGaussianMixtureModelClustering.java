@@ -43,15 +43,19 @@ import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: Dec 9, 2010
- * Time: 2:00:07 PM
- * To change this template use File | Settings | File Templates.
+ * Implements Gaussian mixture model clustering for a set of ClusterObjects using a differential evolution algorithm for the likelihood maximization.
  */
 public class DEGaussianMixtureModelClustering {
 
-
+    /**
+     * Performs Gaussian mixture model clustering on the given inputs using a differential evolution algorithm for maximization of the likelihood of having observed the data.
+     * @param singleCluster     An Image mask with each object to be clustered labeled with a unique greylevel value.  (Note that the name stems from this method's original use to recursively divide existing single clusters; this need not actually correspond to a single cluster).
+     * @param clusterObjects    A Vector containing an initialized ClusterObject for each object present in the Image passed as singleCluster.
+     * @param clusters          A Vector containing an initialized Cluster (guess) for each of the k clusters that will be determined.
+     * @param k                 The number of clusters to end up with.
+     * @param n                 The number of cluster objects.
+     * @return                  The negative log likelihood of observing the objects at their locations, given the maximally likely clustering scheme found.  On return, clusterObjects and clusters will have been updated to reflect this maximally likely scheme.
+     */
     public static double go(Image singleCluster, java.util.Vector<ClusterObject> clusterObjects, java.util.Vector<Cluster> clusters, int k, int n) {
 
         final int numParametersEach = 5;

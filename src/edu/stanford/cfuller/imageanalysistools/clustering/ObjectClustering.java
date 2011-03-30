@@ -49,9 +49,23 @@ import edu.stanford.cfuller.imageanalysistools.random.RandomGenerator;
 
 import java.util.Vector;
 
+/**
+ * Utilites for doing clustering of objects in an Image.
+ */
 
 public class ObjectClustering {
 
+
+    /**
+     * Sets up a set of ClusterObjects and a set of Clusters from two Image masks, one labeled with individual objects, and one labeled with all objects in a single cluster grouped with a single label.
+     *
+     * @param labeledByObject       An Image mask with all objects in the Image labeled with an unique greylevel value.  These labels must start with 1 and be consecutive.
+     * @param labeledByCluster      An Image mask with all the objects in each cluster labeled with the same unique greylevel value.  These labels must start with 1 and be consecutive.
+     * @param clusterObjects        A Vector of ClusterObjects that will contain the initialized ClusterObjects on return; this can be empty, and any contents will be erased.
+     * @param clusters              A Vector of Clusters that will contain the initialized Clusters on return; this can be empty, and any contents will be erased.
+     * @param k                     The number of clusters in the Image.  This must be the same as the number of unique nonzero greylevels in the labeledByCluster Image.
+     * @return                      The number of ClusterObjects in the Image.
+     */
     public static int initializeObjectsAndClustersFromClusterImage(Image labeledByObject, Image labeledByCluster, Vector<ClusterObject> clusterObjects, Vector<Cluster> clusters, int k) {
 
         clusters.clear();
@@ -128,6 +142,15 @@ public class ObjectClustering {
         
     }
 
+    /**
+     * Sets up a set of ClusterObjects and a set of Clusters from an Image mask with each object labeled with a unique greylevel.
+     *
+     * @param im                The Image mask with each cluster object labeled with a unique greylevel.  These must start at 1 and be consecutive.
+     * @param clusterObjects    A Vector of ClusterObjects that will contain the initialized ClusterObjects on return; this may be empty, and any contents will be erased.
+     * @param clusters          A Vector of Clusters that will contain the initialized Clusters on return; this may be empty, and any contents will be erased.
+     * @param k                 The number of Clusters to generate.
+     * @return                  The number of ClusterObjects in the Image.
+     */
     public static int initializeObjectsAndClustersFromImage(Image im, Vector<ClusterObject> clusterObjects, Vector<Cluster> clusters, int k) {
 
         int n = 0;
@@ -389,6 +412,16 @@ public class ObjectClustering {
         return ratios/ratio_counts;
     }
 
+
+    /**
+     * Relabels an Image mask that is labeled with an individual greylevel for each cluster object to have all objects in a single cluster labeled with the same value.
+     *
+     * 
+     * @param output            The Image mask labeled with unique greylevels for each cluster object; this should have regions labeled according to the same scheme used to generate the clusters and objects.  It will be overwritten.
+     * @param clusterObjects    A Vector containing the ClusterObjects corresponding to the labeled objects in the Image mask.
+     * @param clusters          A Vector containing the Clusters comprised of the ClusterObjects that will determine the labels in the output Image.
+     * @param k                 The number of Clusters.
+     */
     public static void clustersToMask(Image output, Vector<ClusterObject> clusterObjects, Vector<Cluster> clusters, int k) {
 
         for (ImageCoordinate i : output) {
@@ -405,6 +438,14 @@ public class ObjectClustering {
 
     }
 
+    /**
+     * Performs a long-range gaussian filtering on an Image mask labeled by ClusterObject.
+     *
+     * This is useful to isolate general areas of an Image that contain objects, and is often an excellent approximation or starting point for the clustering.
+     *
+     * @param input     The Image to be filtered (this will be left unchanged).
+     * @return          The filtered Image.
+     */
     public static Image gaussianFilterMask(Image input) {
 
         Image origCopy = new Image(input);
@@ -428,6 +469,16 @@ public class ObjectClustering {
         
     }
 
+    /**
+     * Applies basic clustering to an Image with objects.
+     *
+     * This will use the long-range gaussian filtering approach to assign clusters; objects sufficiently near to each other will be smeared into a single object and assigned to the same cluster.
+     *
+     * @param input             An Image mask labeled such that each object in the Image is assigned a unique nonzero greylevel value.  These should start at 1 and be consecutive.
+     * @param original          The original 
+     * @param gaussianFiltered
+     * @return
+     */
     public static Image doBasicClustering(Image input, Image original, Image gaussianFiltered) {
 
         RelabelFilter rlf = new RelabelFilter();

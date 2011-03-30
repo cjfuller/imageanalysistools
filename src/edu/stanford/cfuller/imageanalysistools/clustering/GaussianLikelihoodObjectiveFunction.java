@@ -40,11 +40,13 @@ import edu.stanford.cfuller.imageanalysistools.fitting.ObjectiveFunction;
 import org.apache.commons.math.linear.*;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: 12/13/10
- * Time: 10:24 AM
- * To change this template use File | Settings | File Templates.
+ * A function that calculates the likelihood of observing a set of points given a set of Gaussian sources generating them.
+ *
+ * This is used for clustering to determine the likelihood of having observed the ClusterObjects at their locations given the
+ * set of Clusters currently under consideration.
+ *
+ * @author Colin J. Fuller
+ *
  */
 public class GaussianLikelihoodObjectiveFunction implements ObjectiveFunction {
 
@@ -61,6 +63,12 @@ public class GaussianLikelihoodObjectiveFunction implements ObjectiveFunction {
     RealVector det;
     java.util.Vector<ClusterObject> objects;
 
+    /**
+     * Constructs a new GaussianLikelihoodObjectiveFunction that will determine the likelihood of having observed the
+     * supplied ClusterObjects at their locations.
+     *
+     * @param objects   A Vector containing the observed ClusterObjects (with locations already determined and assigned).
+     */
     public GaussianLikelihoodObjectiveFunction(java.util.Vector<ClusterObject> objects) {
         mean = new ArrayRealVector(numDim);
         x = new ArrayRealVector(numDim);
@@ -72,6 +80,14 @@ public class GaussianLikelihoodObjectiveFunction implements ObjectiveFunction {
 
     }
 
+    /**
+     * Evaluates the function with the specified parameters.
+     *
+     * The parameters describe a set of gaussian generators (which are the Clusters).
+     *
+     * @param parameters    A RealVector containing the values of all the parameters of each Gaussian, ordered so that all the parameters of a single gaussian are together, then the next gaussian, etc.
+     * @return              The negative log likelihood of having observed the ClusterObjects at their locations, given the parameters describing the Gaussian clusters.
+     */
     public double evaluate(RealVector parameters) {
 
         double result = 0.0;
