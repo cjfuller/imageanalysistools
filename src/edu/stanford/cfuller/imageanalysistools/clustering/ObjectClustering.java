@@ -303,6 +303,20 @@ public class ObjectClustering {
         return n;
     }
 
+    /**
+     * Calculates a metric of clustering goodness, which is based upon the ratio of the average distance between objects withing a cluster to the maximal distance between objects in two different clusters.
+     *
+     * This is used to determine whether it is actually better to subdivide a cluster into multiple clusters or not; in general having more clusters will
+     * produce a higher likelihood score from the Gaussian mixture model clustering, so some independent metric is needed to guess at what
+     * the best number of clusters is.  Using this metric, clusters are only subdivided if the division can substantially reduce the ratio of
+     * the distances between objects withing a cluster relative to distances of object between clusters.
+     *
+     * @param clusterObjects    A Vector containing the ClusterObjects currently being clustered.
+     * @param clusters          A Vector containing the current cluster assignments on which the metric is to be calculated.
+     * @param k                 The number of clusters.
+     * @param n                 The number of cluster objects.
+     * @return                  The result of applying the metric.  A lower score means the clustering is better.
+     */
     public static double getInterClusterDistances(Vector<ClusterObject> clusterObjects, Vector<Cluster> clusters, int k, int n) {
 
         double[] intraClusterDists = new double[k];
