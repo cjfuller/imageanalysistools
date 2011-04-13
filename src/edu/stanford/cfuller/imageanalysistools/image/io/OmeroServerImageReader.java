@@ -51,6 +51,9 @@ import java.io.*;
 /**
  * An ImageReader that reads images from an OMERO server instead of files on disk.
  */
+
+//TODO: add functionality to have it remember login information, and redefine the read method to use this information, so this can be passed as an ImageReader and still function.
+
 public class OmeroServerImageReader extends ImageReader {
 
     ServiceFactoryPrx serviceFactory;

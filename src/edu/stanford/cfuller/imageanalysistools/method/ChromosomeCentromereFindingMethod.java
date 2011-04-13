@@ -46,10 +46,10 @@ import java.util.Vector;
 
 
 /**
- * A method to find isolated chromsomes using DNA stain (designate using parameter marker_channel_index) as well as
+ * A method to find isolated chromosomes using DNA stain (designate using parameter marker_channel_index) as well as
  * centromeres using a centromere marker (designate using parameter secondary_marker_channel_index).
  *
- * These will be matched up, and for each chromsosome, the centromeric as well as noncentromeric intensities in each channel
+ * These will be matched up, and for each chromososome, the centromeric as well as noncentromeric intensities in each channel
  * will be quantified.
  *
  * @author Colin J. Fuller

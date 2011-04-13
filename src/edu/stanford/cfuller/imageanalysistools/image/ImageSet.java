@@ -1,0 +1,289 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is Colin J. Fuller's code.
+ *
+ * The Initial Developer of the Original Code is
+ * Colin J. Fuller.
+ * Portions created by the Initial Developer are Copyright (C) 2011
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s): Colin J. Fuller
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+package edu.stanford.cfuller.imageanalysistools.image;
+
+import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
+import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
+import edu.stanford.cfuller.imageanalysistools.image.io.OmeroServerImageReader;
+import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A set of related Images that will be processed together for analysis.  For instance, multiple channels of the same Image might be collected
+ * into an ImageSet.  Images in the set can be added by Image object, by filename, or by omero Id.
+ *
+ * Optionally, one Image in the set can be designated as a marker Image, which might have some specific purpose in the analysis.  For
+ * instance, the marker Image might be the Image to use for segmentation, while the others might just be quantified.
+ *
+ * Images added by filename or omero Id must be loaded using {@link #loadAllImages()} before being used or retrieved.
+ *
+ * @author Colin J. Fuller
+ */
+public class ImageSet {
+
+    List<ImageHolder> images;
+
+    ImageHolder markerImage;
+
+    ParameterDictionary parameters;
+
+    /**
+     * Constructs a new, empty ImageSet.
+     */
+    public ImageSet(ParameterDictionary p) {
+        images = new ArrayList<ImageHolder>();
+        markerImage = null;
+        this.parameters = p;
+    }
+
+    /**
+     * Adds an Image to the ImageSet using its filename.
+     * @param filename  The filename of the Image to add.
+     */
+    public void addImageWithFilename(String filename) {
+        this.images.add(new ImageHolder(null, filename, null));
+    }
+
+    /**
+     * Adds an Image to the ImageSet using an already constructed Image object.
+     * @param toAdd     The Image to add to the ImageSet.
+     */
+    public void addImageWithImage(Image toAdd) {
+        this.images.add(new ImageHolder(toAdd, null, null));
+    }
+
+    /**
+     * Adds an Image to the ImageSet using its omero Id.
+     *
+     * The necessary information for connecting to the omero server on which the image resides should be in the
+     * ParameterDictionary used to construct the ImageSet in the parameters "omero_hostname", "omero_username", and "omero_password".
+     *
+     * @param omeroId   The ID of the Image to add to the ImageSet.
+     */
+    public void addImageWithOmeroId(long omeroId) {
+        this.images.add(new ImageHolder(null, null, omeroId));
+    }
+
+    /**
+     * Gets an Image from the set given its exact filename.
+     * @param filename  The filename of the Image to retrieve.
+     * @return          The retrieved Image, or null if no Image with this filename is contained in the ImageSet or the Image has not yet been loaded.
+     */
+    public Image getImageForName(String filename) {
+        for (ImageHolder imh : images) {
+            if (imh.getFilename() != null && imh.getFilename().equals(filename)) {
+                return imh.getImage();
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Gets an Image from the set whose filename matches the supplied regular expression.
+     * @param regexp    The regular expression to match; must follow the syntax in java.util.regex.Pattern.
+     * @return          The retrieved Image, or null if no Image with this filename is contained in the ImageSet or the Image has not yet been loaded.
+     */
+    public Image getImageForNameMatching(String regexp) {
+        for (ImageHolder imh : images) {
+            if (imh.getFilename() != null && imh.getFilename().matches(regexp)) {
+                return imh.getImage();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets an Image from the set whose omero Id matches the supplied Id.
+     * @param id        The omero Id of the Image to retrieve.
+     * @return          The retrieved Image, or null if no Image with this id is contained in the ImageSet or the Image has not yet been loaded.
+     */
+    public Image getImageForOmeroId(long id) {
+        for (ImageHolder imh : images) {
+            if (imh.getOmeroId() != null && imh.getOmeroId() == id) {
+                return imh.getImage();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets the Image specified as the marker Image.
+     *
+     * The marker Image might be the one to use for segmentation, for instance.
+     *
+     * @return  The marker Image, or null if a marker Image has not been specified or it has not yet been loaded.
+     */
+    public Image getMarkerImage() {
+        return this.markerImage.getImage();
+    }
+
+    /**
+     * Checks if the ImageSet has a marker Image specified.
+     * 
+     * @return  true if a valid marker Image has been specified; false otherwise.
+     */
+    public boolean hasMarkerImage() {
+        return this.markerImage != null;
+    }
+
+    /**
+     * Gets the Image at the specified index.
+     *
+     * The index refers to the order in which the Image was added to the ImageSet.  (Starts at 0.)
+     * 
+     *
+     * @param index     The index of the Image to return.
+     * @return          The retrieved Image, or null if the index was not valid.
+     */
+    public Image getImageForIndex(int index) {
+        try{
+            return this.images.get(index).getImage();
+        } catch (IndexOutOfBoundsException e) {
+            LoggingUtilities.getLogger().warning("Request for Image at index " + index + " in ImageSet was out of bounds.");
+            return null;
+        }
+    }
+
+
+    /**
+     * Specifies that the Image at the provided index is the marker Image.
+     *
+     * The index refers to the order in which the Image was added to the ImageSet. (Starts at 0.)
+     *
+     * Supply -1 for the index as a shortcut for the most recently added Image.
+     *
+     * @param index     The index of the Image to designate as the marker Image.
+     */
+    public void setMarkerImage(int index) {
+
+        try {
+            if (index == -1) {
+                this.markerImage = this.images.get(this.images.size() -1);
+                return;
+            }
+        
+            this.markerImage = this.images.get(index);
+            
+        } catch (IndexOutOfBoundsException e) {
+            LoggingUtilities.getLogger().warning("Request to set marker image to index " + index + " in ImageSet was out of bounds.");
+            this.markerImage = null;
+        }
+    }
+
+    /**
+     * Gets the number of Images in the ImageSet.
+     * @return  The number of Images in the ImageSet.
+     */
+    public int getImageCount() {
+        return this.images.size();
+    }
+
+
+    /**
+     * Loads all the Images in the ImageSet.
+     *
+     * This will ensure that any Images that were added by filename or omero Id are retrieved and stored as Image objects,
+     * which can then be processed.
+     *
+     */
+    public void loadAllImages() {
+
+        for (ImageHolder imh : this.images) {
+
+            if (imh.getImage() != null) {
+                continue;
+            }
+
+
+            if (imh.getOmeroId() != null) {
+
+                OmeroServerImageReader osir = new OmeroServerImageReader();
+                try {
+                    imh.setImage(osir.readImageFromOmeroServer(imh.getOmeroId(), this.parameters.getValueForKey("omero_hostname"), this.parameters.getValueForKey("omero_username"), this.parameters.getValueForKey("omero_password")));
+                } catch (java.io.IOException e) {
+                    LoggingUtilities.getLogger().warning("Unable to load image with id " + imh.getOmeroId() + " from omero server: " + e.getMessage());
+                }
+            } else if (imh.getFilename() != null) {
+
+                ImageReader ir = new ImageReader();
+
+                try {
+                    imh.setImage(ir.read(imh.getFilename()));
+                } catch (java.io.IOException e) {
+                    LoggingUtilities.getLogger().warning("Unable to load image with filename " + imh.getFilename() + ": " + e.getMessage());
+                }
+            }
+
+            
+        }
+
+
+
+    }
+    
+
+
+    private static class ImageHolder {
+
+        Image theImage;
+        String filename;
+        Long omeroId;
+
+        public ImageHolder(Image theImage, String filename, Long omeroId) {
+            this.theImage = theImage;
+            this.filename = filename;
+            this.omeroId = omeroId;
+        }
+
+        public void setImage(Image theImage) {this.theImage = theImage;}
+        public void setFilename(String filename) {this.filename = filename;}
+        public void setOmeroId(Long omeroId) {this.omeroId = omeroId;}
+
+        public Image getImage(){return this.theImage;}
+        public String getFilename(){return this.filename;}
+        public Long getOmeroId(){return this.omeroId;}
+
+        
+    }
+
+}

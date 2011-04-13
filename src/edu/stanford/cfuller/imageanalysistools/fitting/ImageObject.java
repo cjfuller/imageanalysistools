@@ -140,7 +140,13 @@ public abstract class ImageObject implements Serializable {
 
         }
 
+        if (this.sizeInPixels == 0) {
+            return;
+        }
+
         this.centroidInMask = this.centroidInMask.scalarMultiply(1.0/sizeInPixels);
+
+        System.out.println("for object " + label + " centroid is: " + this.centroidInMask.toString());
 
         int xcoord = (int) Math.round(this.centroidInMask.getX() - p.getIntValueForKey("half_box_size"));
         int ycoord = (int) Math.round(this.centroidInMask.getY() - p.getIntValueForKey("half_box_size"));

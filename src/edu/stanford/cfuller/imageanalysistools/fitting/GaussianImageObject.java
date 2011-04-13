@@ -79,6 +79,11 @@ public class GaussianImageObject extends ImageObject {
      */
     public void fitPosition(ParameterDictionary p) throws FunctionEvaluationException, OptimizationException {
 
+        if (this.sizeInPixels == 0) {
+            this.nullifyImages();
+            return;
+        }
+
         this.fitParametersByChannel = new Vector<RealVector>();
         this.fitR2ByChannel = new Vector<Double>();
         this.fitErrorByChannel = new Vector<Double>();
@@ -90,7 +95,16 @@ public class GaussianImageObject extends ImageObject {
 
         //System.out.println(this.parent.getDimensionSizes().getZ());
 
-        for (int channelIndex = 0; channelIndex < this.parent.getDimensionSizes().getC(); channelIndex++) {
+        int numChannels = 0;
+
+        if (p.hasKey("num_wavelengths")) {
+            numChannels = p.getIntValueForKey("num_wavelengths");
+        } else {
+            numChannels = this.parent.getDimensionSizes().getC();
+        }
+
+        //for (int channelIndex = 0; channelIndex < this.parent.getDimensionSizes().getC(); channelIndex++) {
+        for (int channelIndex = 0; channelIndex < numChannels; channelIndex++) {
 
             RealVector fitParameters = new ArrayRealVector(7, 0.0);
 
