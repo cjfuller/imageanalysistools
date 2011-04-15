@@ -36,6 +36,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.fitting;
 
+import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
@@ -154,6 +155,27 @@ public class GaussianImageObject extends ImageObject {
             yCentroid /= totalCounts;
             zCentroid /= totalCounts;
 
+            //z sometimes seems to be a bit off... trying (20110415) to go back to max value pixel at x,y centroid
+
+            int xRound = (int) Math.round(xCentroid);
+            int yRound = (int) Math.round(yCentroid);
+
+            double maxVal = 0;
+            int maxInd = 0;
+
+            for (int i =0; i < x.size(); i++) {
+
+                if (xValues[i] == xRound && yValues[i] == yRound) {
+                    if (functionValues[i] > maxVal) {
+                        maxVal = functionValues[i];
+                        maxInd = (int) zValues[i];
+                    }
+                }
+            }
+
+            zCentroid = maxInd;
+
+
             //parameter ordering: amplitude, var x-y, var z, x/y/z coords, background
 
             //amplitude: find the max value; background: find the min value
@@ -172,7 +194,7 @@ public class GaussianImageObject extends ImageObject {
             }
 
 
-            fitParameters.setEntry(0, maxValue*0.9);
+            fitParameters.setEntry(0, maxValue*0.7);
             fitParameters.setEntry(6, minValue+0.05*(maxValue - minValue));
 
             //positions
@@ -210,9 +232,9 @@ public class GaussianImageObject extends ImageObject {
 
             fitParameters = gf.fit(this, fitParameters, ppg);
 //synchronized (this.getClass()) {
-//            Logger.getLogger("edu.stanford.cfuller.Colocalization3D").info("Initial guess: " + initialParams.toString());
+            //LoggingUtilities.getLogger().info("Initial guess for object # " + this.label + ": " + initialParams.toString());
 //
-//            Logger.getLogger("edu.stanford.cfuller.Colocalization3D").info("Fit: " + fitParameters.toString());
+            //LoggingUtilities.getLogger().info("Fit for object # " + this.label + ": " + fitParameters.toString());
 //            }
 
             fitParametersByChannel.add(fitParameters);
@@ -259,7 +281,7 @@ public class GaussianImageObject extends ImageObject {
             double s_xy = fitParameters.getEntry(1) * Math.pow(p.getDoubleValueForKey("pixelsize_nm"), 2);
             double s_z = fitParameters.getEntry(2) * Math.pow(p.getDoubleValueForKey("z_sectionsize_nm"), 2);
 
-            double error = Math.sqrt((2*s_xy + s_z)/(n_photons - 1));
+            double error = Math.sqrt(2*(2*s_xy + s_z)/(n_photons - 1));
 
             //System.out.println(error);
 

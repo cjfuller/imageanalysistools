@@ -76,7 +76,7 @@ public class GaussianFitter3D {
 
         //parameter ordering: amplitude, var x-y, var z, x/y/z coords, background
 
-        System.out.println("for object " + toFit.getLabel() + " initial guess is: " + initialGuess.toString());
+        //System.out.println("for object " + toFit.getLabel() + " initial guess is: " + initialGuess.toString());
 
 
         RealVector parameterLowerBounds = initialGuess.mapMultiply(0.2);
