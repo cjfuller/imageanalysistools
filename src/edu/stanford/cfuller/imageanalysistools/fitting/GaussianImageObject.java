@@ -194,7 +194,7 @@ public class GaussianImageObject extends ImageObject {
             }
 
 
-            fitParameters.setEntry(0, maxValue*0.7);
+            fitParameters.setEntry(0, (maxValue-minValue)*0.95);
             fitParameters.setEntry(6, minValue+0.05*(maxValue - minValue));
 
             //positions
@@ -213,7 +213,7 @@ public class GaussianImageObject extends ImageObject {
             int zBoxSize = this.parentBoxMax.getZ() - this.parentBoxMin.getZ();
 
             final double limitedWidthxy = 200;
-            final double limitedWidthz = 350;
+            final double limitedWidthz = 500;
 
             double sizex = limitedWidthxy / p.getDoubleValueForKey("pixelsize_nm");
             double sizez = limitedWidthz / p.getDoubleValueForKey("z_sectionsize_nm");
@@ -284,7 +284,7 @@ public class GaussianImageObject extends ImageObject {
             double error = Math.sqrt(2*(2*s_xy + s_z)/(n_photons - 1));
 
             //System.out.println(error);
-
+ 
             this.fitErrorByChannel.add(error);
 
         }

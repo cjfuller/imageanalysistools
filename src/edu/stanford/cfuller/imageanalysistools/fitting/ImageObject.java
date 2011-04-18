@@ -264,7 +264,9 @@ public abstract class ImageObject implements Serializable {
      * This should only be called after fitting has been completed, as fitting will no longer be possible without the original image data.
      */
     public void nullifyImages() {
+        this.parent.dispose();
         this.parent = null;
+        this.mask.dispose();
         this.mask = null;
         this.xValues = null;
         this.yValues = null;

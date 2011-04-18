@@ -52,11 +52,17 @@ import java.awt.image.WritableRaster;
  *<p>
  * This class also has the capability of boxing (a single) region of interest in the Image and restricting the foreach-style iteration
  * solely to that box, if only a portion of the Image needs to be processed, viewed, etc.
+ *<p>
+ * A side note to users of this class: it appears that because this uses a finalize method to recycle ImageCoordinates,
+ * it is possible to run out of memory by rapidly creating and destroying many images such that the finalizer queue cannot process
+ * the finalize method as rapidly as objects are being created.  If this is happening, explicitly calling the dispose method
+ * will nullify the memory-intensive fields, allowing those to be garbage collected immediately.
  *
  * @author Colin J. Fuller
  *
  */
 public class Image implements java.io.Serializable, java.util.Collection<ImageCoordinate> {
+
 
 	//fields
 	
@@ -95,6 +101,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		this.pixelData = p;
         this.coordinateArrayStorage = null;
 		this.dimensionSizes = ImageCoordinate.createCoord(p.getSizeX(), p.getSizeY(), p.getSizeZ(), p.getSizeC(), p.getSizeT());
+
 	}
 
     /**
@@ -112,7 +119,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		this.pixelData= (new PixelDataFactory()).createPixelData(toCopy.getDimensionSizes(), toCopy.pixelData.getDataType(), defaultDimensionOrder);
 		setupNewMetadata();
 		this.copy(toCopy);
-		
+
 	}
 
     /**
@@ -138,6 +145,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		for (ImageCoordinate i : this) {
 			this.setValue(i, initialValue);
 		}
+        
 	}
 	
 	//public methods
@@ -586,7 +594,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
     /**
      * Checks to see whether a given object is contained in this Image.  Collection interface method.
      * <p>
-     * This is equivalent to checking that the object is an instance of ImageCoordinate, and then calling {@link #inBounds}.
+     * This is equivalent to checking that the object is an instance of ImageCoordinate, and then calling {@link #inBounds(ImageCoordinate)}.
      *
      *
      * @param o     The object that will be checked.
@@ -608,7 +616,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
     /**
      * Checks to see whether a given collection of objects is contained in this Image.  Collection interface method.
      * <p>
-     * This is equivalent to taking the logical AND of the call to {@link #contains} on each object in the Collection.
+     * This is equivalent to taking the logical AND of the call to {@link #contains(Object)} on each object in the Collection.
      * @param c     The Collection of objects to check.
      * @return      true if every Object in the collection is an ImageCoordinate and inBounds, false otherwise.
      */
@@ -744,8 +752,21 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		
 		
 	}
-		
 
+
+    /**
+     * Immediately nullifies the portions of the image that consume a lot of memory.  This may help programs that rapidly
+     * create and destroy many Images from running out of memory while the Images are being finalized.
+     */
+    public void dispose() {
+        this.pixelData = null;
+        if (this.coordinateArrayStorage != null) {
+            for (ImageCoordinate ic : this.coordinateArrayStorage) {
+                ic.recycle();
+            }
+            this.coordinateArrayStorage = null;
+        }
+    }
 	
 	//recycle image coordinates
 	
@@ -761,6 +782,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
             }
             this.coordinateArrayStorage = null;
         }
+
 		super.finalize();
 	}
 	
