@@ -167,12 +167,15 @@ public abstract class ImageObject implements Serializable {
 
         //find the max intensity pixel in each channel and use this to refine the box
 
+        //System.out.println("for object " + label + " cenX=" + this.centroidInMask.getX() + " cenY=" + this.centroidInMask.getY());
+
         this.maxIntensityZCoordByChannel = new int[parent.getDimensionSizes().getC()];
 
         int minZOverall = parent.getDimensionSizes().getZ();
         int maxZOverall = 0;
 
-        for (int c = 0; c < parent.getDimensionSizes().getC(); c++) {
+        //for (int c = 0; c < parent.getDimensionSizes().getC(); c++) {
+        for (int c = 0; c < p.getIntValueForKey("num_wavelengths"); c++) { // use this so that if there's extra wavelengths not to be quantified at the end, these won't skew the initial guess
             this.parentBoxMin.setC(c);
             this.parentBoxMax.setC(c+1);
 
@@ -182,6 +185,10 @@ public abstract class ImageObject implements Serializable {
             ImageCoordinate maxCoord = null;
 
             for (ImageCoordinate ic : parent) {
+
+                if (! ( ic.getX() == (int) Math.round(this.centroidInMask.getX())) || ! ( ic.getY() == (int) Math.round(this.centroidInMask.getY()))) {
+                    continue;
+                }
 
                 if (parent.getValue(ic) > maxValue) {
                     maxValue = parent.getValue(ic);
@@ -208,15 +215,17 @@ public abstract class ImageObject implements Serializable {
             java.util.logging.Logger.getLogger("edu.stanford.cfuller.colocalization3d").warning("Problem when calculating Z range of image stack.");
         }
 
+        int zAverage = (minZOverall+maxZOverall)/2;
+
         int zcoord = 0;
 
         this.parentBoxMin.setC(0);
-        zcoord = minZOverall - p.getIntValueForKey("half_z_size");
+        zcoord = zAverage - p.getIntValueForKey("half_z_size");
         if (zcoord < 0) zcoord = 0;
         this.parentBoxMin.setZ(zcoord);
 
         this.parentBoxMax.setC(parent.getDimensionSizes().getC());
-        zcoord = maxZOverall + p.getIntValueForKey("half_z_size")+1;
+        zcoord = zAverage + p.getIntValueForKey("half_z_size")+1;
         if (zcoord > parent.getDimensionSizes().getZ()) zcoord = parent.getDimensionSizes().getZ();
         this.parentBoxMax.setZ(zcoord);
     }

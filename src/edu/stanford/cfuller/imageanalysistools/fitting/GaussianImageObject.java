@@ -139,6 +139,9 @@ public class GaussianImageObject extends ImageObject {
             double zCentroid = 0;
             double totalCounts = 0;
 
+
+            
+
             for (int i = 0; i < x.size(); i++) {
                 xValues[i] = x.get(i);
                 yValues[i] = y.get(i);
@@ -163,7 +166,13 @@ public class GaussianImageObject extends ImageObject {
             double maxVal = 0;
             int maxInd = 0;
 
+            double minZ = Double.MAX_VALUE;
+            double maxZ = 0;
+
             for (int i =0; i < x.size(); i++) {
+
+                if (zValues[i] < minZ) minZ = zValues[i];
+                if (zValues[i] > maxZ) maxZ = zValues[i];
 
                 if (xValues[i] == xRound && yValues[i] == yRound) {
                     if (functionValues[i] > maxVal) {
@@ -172,6 +181,8 @@ public class GaussianImageObject extends ImageObject {
                     }
                 }
             }
+
+            //System.out.println("object " + this.label + "  max: " + maxZ + "  min: " + minZ);
 
             zCentroid = maxInd;
 

@@ -253,13 +253,13 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		
 	}
 	
-	private void swap(int first, int second, RealVector toProcess) {
+	private static void swap(int first, int second, RealVector toProcess) {
 		double value = toProcess.getEntry(first);
 		toProcess.setEntry(first, toProcess.getEntry(second));
 		toProcess.setEntry(second, value);
 	}
 	
-	private double quickFindKth(int k, RealVector toFind) {
+	public static double quickFindKth(int k, RealVector toFind) {
 		
 		int n = toFind.getDimension();
 		

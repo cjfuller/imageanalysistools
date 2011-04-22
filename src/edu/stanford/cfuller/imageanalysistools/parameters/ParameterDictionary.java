@@ -246,6 +246,17 @@ public class ParameterDictionary implements Serializable {
     }
 
     /**
+     * Convenience method for checking if the ParameterDictionary has a key and that the corresponding value is true.
+     * 
+     * @param key       The key to be checked.
+     * @return          The logical and of hasKey(key) and getBooleanValueForKey(key).
+     */
+    public boolean hasKeyAndTrue(String key) {
+        return this.hasKey(key) && this.getBooleanValueForKey(key);
+    }
+
+
+    /**
      * Adds a key, value pair to the ParameterDictionary.  Does nothing if the specified key already has an associated
      * value.
      *
