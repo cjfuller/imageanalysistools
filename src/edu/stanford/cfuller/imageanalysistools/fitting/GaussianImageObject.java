@@ -283,6 +283,9 @@ public class GaussianImageObject extends ImageObject {
 
             R2 = 1 - (residualSumSquared/variance);
 
+            //LoggingUtilities.getLogger().info("R^2 for object # " + this.label + ": " +R2);
+
+
             this.fitR2ByChannel.add(R2);
 
             this.unboxImages();
