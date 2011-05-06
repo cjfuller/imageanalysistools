@@ -530,4 +530,10 @@ public class LargePixelData extends PixelData {
         this.mappedData.order(this.byteOrder);
     }
 
+    protected void finalize() throws Throwable {
+
+        this.tempFileStorage.close();
+        super.finalize();
+    }
+
 }

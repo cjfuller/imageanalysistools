@@ -105,6 +105,10 @@ public abstract class ImageObject implements Serializable {
 
     /**
      * Initializes the fields of an ImageObject based on supplied image and parameter data.
+     *
+     * Both the mask and the parent will be unmodified, except for boxing a region of interest, so no other thread should
+     * be using these images at the same time.
+     *
      * @param label     The numerical label of the object in the mask.
      * @param mask      An image mask, containing a unique greylevel for each object; the greylevel of the object being initialized should correspond to the parameter {@link #label}.
      * @param parent    The original imgae that the mask corresponds to.
@@ -116,8 +120,11 @@ public abstract class ImageObject implements Serializable {
         this.fitR2ByChannel = null;
         this.fitErrorByChannel = null;
 
-        this.parent = new Image(parent);
-        this.mask = new Image(mask);
+        //this.parent = new Image(parent);
+        //this.mask = new Image(mask);
+
+        this.parent = parent;
+        this.mask = mask;
 
         this.label = label;
 
@@ -273,9 +280,9 @@ public abstract class ImageObject implements Serializable {
      * This should only be called after fitting has been completed, as fitting will no longer be possible without the original image data.
      */
     public void nullifyImages() {
-        this.parent.dispose();
+        //this.parent.dispose();
         this.parent = null;
-        this.mask.dispose();
+        //this.mask.dispose();
         this.mask = null;
         this.xValues = null;
         this.yValues = null;

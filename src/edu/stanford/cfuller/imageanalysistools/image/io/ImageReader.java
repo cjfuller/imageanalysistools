@@ -134,7 +134,13 @@ public class ImageReader {
 		try {
 		
 			loci.formats.meta.IMetadata meta = (new loci.common.services.ServiceFactory()).getInstance(loci.formats.services.OMEXMLService.class).createOMEXMLMetadata();
-			lociReader.setMetadataStore(meta);
+			try {
+                lociReader.setMetadataStore(meta);
+            } catch (IllegalStateException e) {
+                lociReader.close();
+                lociReader.setMetadataStore(meta);
+            }
+
 
 		} catch (loci.common.services.ServiceException e) {
 			e.printStackTrace();
@@ -150,7 +156,12 @@ public class ImageReader {
         }
 		
 		try {
-			lociReader.setId(filename);
+            try {
+			    lociReader.setId(filename);
+            } catch (IllegalStateException e) {
+                lociReader.close();
+                lociReader.setId(filename);
+            }
 		} catch (loci.formats.FormatException e) {
 			throw new java.io.IOException(e);
 		}
