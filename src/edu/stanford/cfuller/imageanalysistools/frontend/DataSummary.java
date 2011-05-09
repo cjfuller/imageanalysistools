@@ -44,7 +44,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 
-import com.apple.eawt.AppEvent;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 
 /**
