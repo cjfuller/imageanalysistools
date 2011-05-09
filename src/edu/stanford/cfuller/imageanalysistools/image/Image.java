@@ -63,7 +63,6 @@ import java.awt.image.WritableRaster;
  */
 public class Image implements java.io.Serializable, java.util.Collection<ImageCoordinate> {
 
-
 	//fields
 	
 	final static long serialVersionUID=1L;
