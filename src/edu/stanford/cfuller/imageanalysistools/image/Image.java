@@ -68,18 +68,18 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 	final static long serialVersionUID=1L;
 	final String defaultDimensionOrder = "XYZCT";
 	
-	private loci.formats.meta.IMetadata metadata;
+	protected loci.formats.meta.IMetadata metadata;
 	
-	private PixelData pixelData;
+	protected PixelData pixelData;
 	
-	private ImageCoordinate dimensionSizes;
+	protected ImageCoordinate dimensionSizes;
 
-    private ImageCoordinate boxMin;
-    private ImageCoordinate boxMax;
+    protected ImageCoordinate boxMin;
+    protected ImageCoordinate boxMax;
 
-    private boolean isBoxed;
+    protected boolean isBoxed;
 
-    private ImageCoordinate[] coordinateArrayStorage;
+    protected ImageCoordinate[] coordinateArrayStorage;
 
 	//constructors
 
@@ -146,6 +146,11 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		}
         
 	}
+
+    /**
+     * Default constructor that subclasses may use to do the initialization themselves.
+     */
+    protected Image() {}
 	
 	//public methods
 
