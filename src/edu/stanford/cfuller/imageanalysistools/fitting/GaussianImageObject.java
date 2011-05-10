@@ -290,7 +290,8 @@ public class GaussianImageObject extends ImageObject {
 
             this.unboxImages();
 
-            //calculate fit error
+            //calculate fit error	protected void finalize() throws Throwable{
+
 
             double s_xy = fitParameters.getEntry(1) * Math.pow(p.getDoubleValueForKey("pixelsize_nm"), 2);
             double s_z = fitParameters.getEntry(2) * Math.pow(p.getDoubleValueForKey("z_sectionsize_nm"), 2);

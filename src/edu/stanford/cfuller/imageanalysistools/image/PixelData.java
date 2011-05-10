@@ -89,7 +89,6 @@ public class PixelData implements java.io.Serializable {
      */
 
 	public PixelData(ImageCoordinate sizes, int data_type, String dimensionOrder) {
-		
         this.dataType = data_type;
 
 		init(sizes.getX(), sizes.getY(), sizes.getZ(), sizes.getC(), sizes.getT(), dimensionOrder);
@@ -107,7 +106,7 @@ public class PixelData implements java.io.Serializable {
      * @param dimensionOrder    A string made up of the characters "XYZCT" in any order that specifies the order of the dimensions in the on-disk representation.
      */
 	public PixelData(int size_x, int size_y, int size_z, int size_c, int size_t, int data_type, String dimensionOrder) {
-		
+
 		this.dataType = data_type;
 
 		init(size_x, size_y, size_z, size_c, size_t, dimensionOrder);
@@ -127,7 +126,7 @@ public class PixelData implements java.io.Serializable {
      * 
      */
 	protected void init(int size_x, int size_y, int size_z, int size_c, int size_t, String dimensionOrder) {
-				
+
 		dimensionOrder = dimensionOrder.toUpperCase();
 		convertedPixels = new double[size_x*size_y*size_z*size_c*size_t];
 		pixels = null;
@@ -207,7 +206,7 @@ public class PixelData implements java.io.Serializable {
      * @param pixelBytes    A byte array containing the new pixel data.
      */
 	public void setBytes(byte[] pixelBytes) {
-	
+
 		pixels = pixelBytes;
 		
 		updateConvertedPixelsFromBytes();
@@ -221,7 +220,7 @@ public class PixelData implements java.io.Serializable {
      * Pixel values will be represented using the numeric type, byte order, and dimension order specified on initializing the PixelData.
      *<p>
      * Calling this function will encode the byte array data from the internal numerical representation, so in particular, if the byte data
-     * was previously set using {@link #setBytes}, and then changes were made using {@link #setPixel}, for example, these changes will be reflected, and this
+     * was previously set using {@link #setBytes(byte[])}, and then changes were made using {@link #setPixel(int, int, int, int, int, double)}, for example, these changes will be reflected, and this
      * will not return the same byte data originally passed in.
      *
      * @return  A byte array containing the pixel data encoded in the specified format.
@@ -271,6 +270,7 @@ public class PixelData implements java.io.Serializable {
      * @throws UnsupportedOperationException  if the dimension order does not start with XY or YX.
      */
 	public byte[] getPlane(int index) throws UnsupportedOperationException{
+
 		updateBytesFromConvertedPixels();
 
         if (!(this.dimensionOrder.startsWith("XY") || this.dimensionOrder.startsWith("YX"))) {
@@ -310,7 +310,7 @@ public class PixelData implements java.io.Serializable {
      *<p>
      * Likewise, though the value is passed as a double, it will be converted automatically to the underlying byte representation in the correct format.
      * This may lead to the truncation of the passed double value when retrieving the byte array representation.  However, the double passed in can still be retreived
-     * without truncation by calling {@link #getPixel}.
+     * without truncation by calling {@link #getPixel(int, int, int, int, int)}.
      *
      *<p>
      * (All coordinates are zero-indexed.)
@@ -323,6 +323,7 @@ public class PixelData implements java.io.Serializable {
      * @param value The value to which the pixel at the specified coordinates will be set.
      */
 	public void setPixel(int x, int y, int z, int c, int t, double value) {
+
 		convertedPixels[x*x_offset + y*y_offset + z*z_offset + c*c_offset + t*t_offset] = value;
 		return;
 	}
@@ -444,6 +445,7 @@ public class PixelData implements java.io.Serializable {
      * according to the stored byte order, dimension order, and data type.
      */
 	protected void updateBytesFromConvertedPixels() {
+
 
         //converts the internal double representation of the data into the byte array representation
 

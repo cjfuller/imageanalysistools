@@ -81,6 +81,8 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 
     protected ImageCoordinate[] coordinateArrayStorage;
 
+
+
 	//constructors
 
     /**

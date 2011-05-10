@@ -210,7 +210,7 @@ public class LargePixelData extends PixelData {
      *
      * @param pixelBytes    A byte array containing the new pixel data.
      */
-    public void setBytes(byte[] pixelBytes) {
+    public synchronized void setBytes(byte[] pixelBytes) {
 
         mappedData.position(0);
 
@@ -428,7 +428,7 @@ public class LargePixelData extends PixelData {
      *                                          for the LargePixelData, as other dimension orderings are not supported for large images.
      */
 
-    public byte[] getPlane(int index){
+    public synchronized byte[] getPlane(int index){
 
         updateBytesFromConvertedPixels();
 
@@ -470,7 +470,7 @@ public class LargePixelData extends PixelData {
      * @param t     The t-coordinate of the pixel to return.
      * @return      The value of the PixelData at the specified coordinates, as a double.
      */
-    public double getPixel(int x, int y, int z, int c, int t) {
+    public synchronized double getPixel(int x, int y, int z, int c, int t) {
         if (z == current_z && c == current_c && t == current_t) {
             return convertedPixels[x*x_offset + y*y_offset];
         } else {
@@ -508,7 +508,7 @@ public class LargePixelData extends PixelData {
      * @param t     The t-coordinate of the pixel to return.
      * @param value The value to which the pixel at the specified coordinates will be set.
      */
-    public void setPixel(int x, int y, int z, int c, int t, double value) {
+    public synchronized void setPixel(int x, int y, int z, int c, int t, double value) {
         if (z == current_z && c == current_c && t == current_t) {
             convertedPixels[x*x_offset + y*y_offset] = value;
         } else {
@@ -525,7 +525,7 @@ public class LargePixelData extends PixelData {
      * Sets the byte order of the underlying byte array representation to one of the constants specified in {@link java.nio.ByteOrder}
      * @param b     The ByteOrder constant to which the byte order of the PixelData will be set.
      */
-    public void setByteOrder(java.nio.ByteOrder b) {
+    public synchronized void setByteOrder(java.nio.ByteOrder b) {
         this.byteOrder = b;
         this.mappedData.order(this.byteOrder);
     }

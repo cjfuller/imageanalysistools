@@ -54,13 +54,13 @@ public class ReadOnlyImage extends Image {
         super(m, p);
     }
 
+
     /**
      * Copy constructor.  This makes a shallow copy of the Image to copy for pixel data and metadata, but gives independent
      * iteration and boxing mechanisms.
      * @param toCopy        The Image to copy.
      */
     public ReadOnlyImage(Image toCopy) {
-        super();
         this.isBoxed = false;
         this.boxMin = null;
         this.boxMax = null;
@@ -102,6 +102,19 @@ public class ReadOnlyImage extends Image {
     public void setValue(ImageCoordinate coord, double value) {
         throw new UnsupportedOperationException("Setting values is not supported for read-only Images.");
     }
+
+    /**
+     * Finalization.
+     *
+     * Just calls the superclass finalize for now.
+     *
+     * @throws Throwable
+     */
+    protected void finalize() throws Throwable{
+
+        super.finalize();
+    }
+
 
 
     

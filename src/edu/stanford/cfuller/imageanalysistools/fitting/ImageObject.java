@@ -213,6 +213,7 @@ public abstract class ImageObject implements Serializable {
             this.maxIntensityZCoordByChannel[c] = maxCoord.getZ();
 
             maxCoord.recycle();
+
             parent.clearBoxOfInterest();
         }
 
