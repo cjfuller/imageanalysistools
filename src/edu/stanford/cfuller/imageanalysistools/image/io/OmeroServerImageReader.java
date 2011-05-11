@@ -90,7 +90,7 @@ public class OmeroServerImageReader extends ImageReader {
      * Ensures that the server is not overloaded with connection requests.
      */
     protected static void decrementConnections() {
-        
+
         synchronized (OmeroServerImageReader.class) {
 
             OmeroServerImageReader.currentConnections -= 1;
@@ -105,7 +105,7 @@ public class OmeroServerImageReader extends ImageReader {
      * @return  The current number of connections.
      */
     protected static int getNumberOfConnections() {
-        
+
         synchronized (OmeroServerImageReader.class) {
 
             return OmeroServerImageReader.currentConnections;
@@ -152,8 +152,12 @@ public class OmeroServerImageReader extends ImageReader {
     /**
      * Closes the connection to the OMERO server.
      */
-    protected void closeConnection() {
-        this.readerClient.closeSession();
+    public void closeConnection() {
+        if (this.readerClient != null) {
+            this.readerClient.closeSession();
+        }
+        this.serviceFactory = null;
+        this.gateway = null;
     }
 
     /**
@@ -173,8 +177,30 @@ public class OmeroServerImageReader extends ImageReader {
 
 
     /**
+     * Reads the name of an Image on the OMERO server given its Id.
+     * @param omeroserverImageId    The ID that the OMERO server as assigned to the desired image; this image will be retrieved.
+     * @param serverAddress         The IP address or resolvable hostname of the OMERO server.
+     * @param username              The username to use to connect.
+     * @param password              The password for the provided username.
+     * @return                      A String containing the name of the Image.
+     * @throws ServerError          if the Image cannnot be accessed on the server.
+     */
+    public String getImageNameForOmeroId(long omeroserverImageId, final String serverAddress, final String username, final String password) throws ServerError {
+
+        if (this.serviceFactory == null) {
+
+            this.connectToServer(serverAddress, username, password);
+        }
+
+        return gateway.getImage(omeroserverImageId).getName().getValue();
+
+    }
+
+
+
+    /**
      * Asynchronously loads the Image with the specified Id on the OMERO server using the provided address, username, and password, and stores it to a temporary file on disk.
-     * 
+     *
      * @param omeroserverImageId    The ID that the OMERO server as assigned to the desired image; this image will be retrieved.
      * @param serverAddress         The IP address or resolvable hostname of the OMERO server.
      * @param username              The username to use to connect.
@@ -194,7 +220,7 @@ public class OmeroServerImageReader extends ImageReader {
                 this.connectToServer(serverAddress, username, password);
             }
 
-            originalName = gateway.getImage(omeroserverImageId).getName().getValue();
+            originalName = this.getImageNameForOmeroId(omeroserverImageId, serverAddress, username, password);
 
             closeConnection();
             this.serviceFactory = null;
@@ -266,7 +292,7 @@ public class OmeroServerImageReader extends ImageReader {
                         exporter.close();
 
                         release(lockFilename, lockObject);
-                        
+
 
                     } catch (ServerError serverError) {
                         LoggingUtilities.getLogger().severe("Unable to retrieve image from omero server.  " + serverError.getMessage());

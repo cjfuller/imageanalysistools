@@ -42,6 +42,8 @@ import edu.stanford.cfuller.imageanalysistools.image.io.OmeroServerImageReader;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -55,7 +57,9 @@ import java.util.List;
  *
  * @author Colin J. Fuller
  */
-public class ImageSet {
+public class ImageSet implements java.io.Serializable, Collection<Image> {
+
+    final static long serialVersionUID=1L;
 
     List<ImageHolder> images;
 
@@ -218,6 +222,14 @@ public class ImageSet {
         return this.images.size();
     }
 
+    /**
+     * Gets the parameters associated with the ImageSet.
+     * @return  A ParameterDictionary containing the analysis parameters.
+     */
+    public ParameterDictionary getParameters() {
+        return this.parameters;
+    }
+
 
     /**
      * Loads all the Images in the ImageSet.
@@ -231,6 +243,7 @@ public class ImageSet {
         for (ImageHolder imh : this.images) {
 
             if (imh.getImage() != null) {
+                imh.setDisplayName(imh.getImage().getMetadata().getImageName(0));
                 continue;
             }
 
@@ -239,7 +252,9 @@ public class ImageSet {
 
                 OmeroServerImageReader osir = new OmeroServerImageReader();
                 try {
-                    imh.setImage(osir.readImageFromOmeroServer(imh.getOmeroId(), this.parameters.getValueForKey("omero_hostname"), this.parameters.getValueForKey("omero_username"), this.parameters.getValueForKey("omero_password")));
+                    String[] names = osir.loadImageFromOmeroServer(imh.getOmeroId(), this.parameters.getValueForKey("omero_hostname"), this.parameters.getValueForKey("omero_username"), this.parameters.getValueForKey("omero_password"));
+                    imh.setImage(osir.read(names[1]));
+                    imh.setDisplayName(names[0]);
                 } catch (java.io.IOException e) {
                     LoggingUtilities.getLogger().warning("Unable to load image with id " + imh.getOmeroId() + " from omero server: " + e.getMessage());
                 }
@@ -249,6 +264,7 @@ public class ImageSet {
 
                 try {
                     imh.setImage(ir.read(imh.getFilename()));
+                    imh.setDisplayName(imh.getFilename());
                 } catch (java.io.IOException e) {
                     LoggingUtilities.getLogger().warning("Unable to load image with filename " + imh.getFilename() + ": " + e.getMessage());
                 }
@@ -260,7 +276,19 @@ public class ImageSet {
 
 
     }
-    
+
+    /**
+     * Gets the display name associated with the requested Image.
+     * @param index     The index of the Image in the ImageSet to use.
+     * @return          The display name of the requested Image, or null if the Image does not exist.
+     */
+    public String getImageNameForIndex(int index) {
+        if (index >= 0 && index < this.images.size()) {
+            return this.images.get(index).getDisplayName();
+        } else {
+            return null;
+        }
+    }
 
 
     private static class ImageHolder {
@@ -268,6 +296,7 @@ public class ImageSet {
         Image theImage;
         String filename;
         Long omeroId;
+        String displayName;
 
         public ImageHolder(Image theImage, String filename, Long omeroId) {
             this.theImage = theImage;
@@ -278,12 +307,135 @@ public class ImageSet {
         public void setImage(Image theImage) {this.theImage = theImage;}
         public void setFilename(String filename) {this.filename = filename;}
         public void setOmeroId(Long omeroId) {this.omeroId = omeroId;}
+        public void setDisplayName(String displayName) {this.displayName = displayName;}
 
         public Image getImage(){return this.theImage;}
         public String getFilename(){return this.filename;}
         public Long getOmeroId(){return this.omeroId;}
+        public String getDisplayName() {return this.displayName;}
 
         
     }
+
+
+    //collection methods
+
+    public boolean contains(Object o) {
+        if (! (o.getClass() == this.getImageForIndex(0).getClass())) {
+            return false;
+        }
+
+        Image o_im = (Image) o;
+
+        for (int i = 0; i < this.images.size(); i++) {
+
+            if (o_im.equals(this.images.get(i).getImage())) {
+                return true;
+            }
+            
+        }
+
+        return false;
+
+    }
+
+    public boolean containsAll(Collection<?> c) {
+
+        boolean returnValue = true;
+
+        for (Object o : c) {
+            returnValue&= this.contains(o);
+
+            if (!returnValue) return returnValue;
+        }
+
+        return returnValue;
+    }
+
+    public boolean isEmpty() {
+
+        return (this.getImageCount() == 0);
+        
+    }
+
+    public Iterator<Image> iterator() {
+
+        return null;
+        
+    }
+
+    public int size() {
+        return this.getImageCount();
+    }
+
+    public Object[] toArray() {
+
+        this.loadAllImages();
+        
+        Object[] output = new Object[this.size()];
+
+        for (int i = 0; i < this.size(); i++) {
+            output[i] = this.getImageForIndex(i);
+        }
+
+        return output;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] a) {
+
+        try {
+
+            if (a.length < this.size()) {
+                a = (T[]) (new Image[this.size()]);
+            }
+
+            for (int i = 0; i < this.size(); i++) {
+
+                a[i] = (T) this.getImageForIndex(i);
+
+            }
+
+            if (a.length > this.size()) {
+                a[this.size()] = null;
+            }
+
+        } catch (ClassCastException e) {
+            throw new ArrayStoreException("Invalid type for array in toArray(T[])");
+        }
+
+        return a;
+
+    }
+
+
+
+    //unsupported collection methods
+
+    public boolean add(Image e) {
+        throw new UnsupportedOperationException("Add not supported for ImageSets.");
+    }
+
+    public boolean addAll(Collection<? extends Image> c) {
+        throw new UnsupportedOperationException("Add not supported for ImageSets.");
+    }
+
+    public void clear() {
+        throw new UnsupportedOperationException("Clear not supported for ImageSets.");
+    }
+
+    public boolean remove(Object o) {
+        throw new UnsupportedOperationException("Remove not supported for ImageSets.");
+    }
+
+    public boolean removeAll(Collection<?> c) {
+        throw new UnsupportedOperationException("Remove not supported for ImageSets.");
+    }
+
+    public boolean retainAll(Collection<?> c) {
+        throw new UnsupportedOperationException("Remove not supported for ImageSets.");
+    }
+
 
 }

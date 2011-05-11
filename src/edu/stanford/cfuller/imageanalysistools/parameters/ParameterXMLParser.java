@@ -71,7 +71,7 @@ public class ParameterXMLParser {
     final static String KNOWN_PARAMETER_XML_FILE = "resources/knownparameters.xml";
 
     /**
-     * Parses the list of some of the known Parameters from an XML file to a List of Parameters; useful for allowing users to interacitvely
+     * Parses the list of some of the known Parameters from an XML file to a List of Parameters; useful for allowing users to interacitively
      * select from known parameters.
      * @return      A List containing a Parameter object for each Parameter described in the known parameters file.
      */

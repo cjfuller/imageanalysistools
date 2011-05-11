@@ -36,8 +36,11 @@
 
 package edu.stanford.cfuller.imageanalysistools.frontend;
 
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.image.io.OmeroServerImageReader;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.test;
+import omero.ServerError;
 
 
 /**
@@ -51,12 +54,12 @@ public class DirUtils {
     /**
      * Gets filenames of the images to be processed (either from a directory or OMERO data source), along with a display name (i.e. name without a full path) for each.
      * @param params    The ParameterDictionary containing the parameters to be used for the analysis; the data directory or OMERO data source will be pulled from here.
-     * @return          A List containing String arrays, one per file, each with two entries: first, a fully qualified filename, and second a display name (or name without path).
+     * @return          A List containing ImageSets, one per file.
      */
-    public static java.util.List<String[]> makeMultiwavelengthFileSets(ParameterDictionary params) {
+    public static java.util.List<ImageSet> makeMultiwavelengthFileSets(ParameterDictionary params) {
 
 
-        java.util.Vector<String[]> outputSets = new java.util.Vector<String[]>();
+        java.util.Vector<ImageSet> outputSets = new java.util.Vector<ImageSet>();
 
         if (params.hasKey("use_omero") && params.getBooleanValueForKey("use_omero")) {
 
@@ -64,14 +67,12 @@ public class DirUtils {
 
 
             for (String id : imageIds) {
-                
-                OmeroServerImageReader ir = new OmeroServerImageReader();
 
-                String[] names = ir.loadImageFromOmeroServer(Long.parseLong(id), params.getValueForKey("omero_hostname"), params.getValueForKey("omero_username"), params.getValueForKey("omero_password"));
-                String[] set = new String[2];
-                set[0] = names[1];
-                set[1] = names[0];
-                outputSets.add(set);
+                ImageSet currSet = new ImageSet(params);
+
+                currSet.addImageWithOmeroId(Long.parseLong(id));
+
+                outputSets.add(currSet);
             }
 
 
@@ -98,10 +99,11 @@ public class DirUtils {
                     continue;
                 }
 
-                String[] set = new String[2];
+                ImageSet set = new ImageSet(params);
 
-                set[0] = f.getAbsolutePath();
-                set[1] = f.getName();
+                set.addImageWithFilename(f.getAbsolutePath());
+
+            
                 outputSets.add(set);
 
             }
@@ -118,9 +120,9 @@ public class DirUtils {
      * Gets a list of String arrays each containing a set of filenames that correspond to image files for the color channels of a split channel image.
      *
      * @param params    The ParameterDictionary containing the parameters for the analysis.  The directory or OMERO source and channel names will be taken from here.
-     * @return          A List containing String arrays of filenames.  Each array contains the filenames for the channels of an image.
+     * @return          A List containing ImageSets.  Each set can load the Images for the channels of an image.
      */
-    public static java.util.List<String[]> makeSetsOfMatchingFiles(ParameterDictionary params) {
+    public static java.util.List<ImageSet> makeSetsOfMatchingFiles(ParameterDictionary params) {
 
         String[] setTags = params.getValueForKey("channel_name").split(" ");
 
@@ -132,27 +134,40 @@ public class DirUtils {
             params.addIfNotSet("number_of_channels", Integer.toString(numPerSet));
         }
 
-        java.util.Vector<String[]> outputSets = new java.util.Vector<String[]>();
+        java.util.Vector<ImageSet>  outputSets = new java.util.Vector<ImageSet>();
 
 
 
 
         java.io.File directory = new java.io.File(params.getValueForKey("local_directory"));
 
-        java.util.Hashtable<String, String> filenameLookupByName = new java.util.Hashtable<String, String>();
+        java.util.Hashtable<String, Long> idLookupByName = new java.util.Hashtable<String, Long>();
 
         if (params.hasKey("use_omero") && params.getBooleanValueForKey("use_omero")) {
 
             String[] imageIds = params.getValueForKey("omero_image_ids").split(" ");
 
-            for (String id : imageIds) {
+            OmeroServerImageReader ir = new OmeroServerImageReader();
 
-                OmeroServerImageReader ir = new OmeroServerImageReader();
-                
-                String[] names = ir.loadImageFromOmeroServer(Long.parseLong(id), params.getValueForKey("omero_hostname"), params.getValueForKey("omero_username"), params.getValueForKey("omero_password"));
+            try {
 
-                filenameLookupByName.put(names[0], names[1]);
+                for (String id : imageIds) {
 
+                    Long idL = Long.parseLong(id);
+
+                    String name = ir.getImageNameForOmeroId(idL, params.getValueForKey("omero_hostname"), params.getValueForKey("omero_username"), params.getValueForKey("omero_password"));
+
+                    idLookupByName.put(name, idL);
+
+                }
+
+            } catch (ServerError e) {
+
+                LoggingUtilities.getLogger().severe("Exception encountered while accessing image on OMERO server: ");
+                e.printStackTrace();
+
+            } finally {
+                ir.closeConnection();
             }
 
 
@@ -162,29 +177,43 @@ public class DirUtils {
             for (java.io.File f : directory.listFiles()) {
 
                 //added hack here for case insensitive extension
-                if ((! f.getName().matches(".*" + setTags[0] + ".*")) || (f.getName().matches(".*Thumb.*")) || (! f.getName().toLowerCase().matches(".*" + params.getValueForKey("image_extension").toLowerCase() + "$"))) {
+
+                if ((f.getName().matches(".*Thumb.*")) || (! f.getName().toLowerCase().matches(".*" + params.getValueForKey("image_extension").toLowerCase() + "$"))) {
                     continue;
                 }
 
 
-                filenameLookupByName.put(f.getName(), f.getAbsolutePath());
+                idLookupByName.put(f.getAbsolutePath(), null);
             }
 
         }
 
-        for (String name : filenameLookupByName.keySet()) {
+        for (String name : idLookupByName.keySet()) {
 
-            String[] tempSet = new String[numPerSet*2];
+            ImageSet tempSet = new ImageSet(params);
 
             for (int i = 0; i < numPerSet; i++) {
 
                 //tempSet[i] = directory.getAbsolutePath() + java.io.File.separator + f.getName().replaceAll(setTags[0], setTags[i]);
-                tempSet[i] = filenameLookupByName.get(name.replaceAll(setTags[0], setTags[i]));
-                tempSet[numPerSet+i] = name.replaceAll(setTags[0], setTags[i]);
+                if (! name.matches(".*" + setTags[0] + ".*")){
+                    continue;
+                }
+
+                String subName = name.replaceAll(setTags[0], setTags[i]);
+
+                if (! idLookupByName.containsKey(subName)) {
+                    tempSet = null;
+                    break;
+                }
+
+                Long id = idLookupByName.get(subName);
+
+                if (id != null) {
+                    tempSet.addImageWithOmeroId(id);
+                }
             }
 
             outputSets.add(tempSet);
-
         }
 
         return outputSets;

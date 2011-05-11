@@ -36,6 +36,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.frontend;
 
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
@@ -78,14 +79,14 @@ public class LocalAnalysis {
      * The current implementation is multithreaded if specified in the parameter dictionary (and currently the default value
      * specifies as many threads as processor cores on the machine), so analysis methods should be thread safe.
      *
-     * Each thread uses {@link #processFileSet} to do the processing.
+     * Each thread uses {@link #processFileSet(ParameterDictionary,ImageSet)} to do the processing.
      *
      * @param params    The parameter dictionary specifying the options for the analysis.
      */
 
     public static void run(ParameterDictionary params) {
 
-        java.util.List<String[]> namedFileSets = null;
+        java.util.List<ImageSet> namedFileSets = null;
 
         if (Boolean.parseBoolean(params.getValueForKey("multi_wavelength_file"))) {
             namedFileSets = DirUtils.makeMultiwavelengthFileSets(params);
@@ -102,13 +103,13 @@ public class LocalAnalysis {
 
         }
 
-        for (String[] namedFileSet : namedFileSets) {
+        for (ImageSet namedFileSet : namedFileSets) {
 
 
             ImageSetThread nextSet = new ImageSetThread(namedFileSet, new ParameterDictionary(params));
 
             if (threadPool.size() < maxThreads) {
-                LoggingUtilities.getLogger().info("Processing " + namedFileSet[namedFileSet.length/2]);
+                LoggingUtilities.getLogger().info("Processing " + namedFileSet.getImageNameForIndex(0));
 
                 threadPool.add(nextSet);
                 nextSet.start();
@@ -137,7 +138,7 @@ public class LocalAnalysis {
 
                 }
 
-                LoggingUtilities.getLogger().info("Processing " + namedFileSet[namedFileSet.length/2]);
+                LoggingUtilities.getLogger().info("Processing " + namedFileSet.getImageNameForIndex(0));
 
                 threadPool.add(nextSet);
                 nextSet.start();
@@ -165,39 +166,43 @@ public class LocalAnalysis {
      * to subdirectories of the directory containing the images.
      *
      * @param params    The parameter dictionary specifying the options for the analysis.
-     * @param namedFileSet   An array containing the file names of each color channel for a particular image.  The reference image for segmentation must be listed first.  This list of file names must be followed by a list of display names for each file, in order.
+     * @param namedFileSet   An ImageSet containing the images of each color channel for a particular image. If no reference channel is given in the parameters, then the first image will be used as the reference.
      * @throws java.io.IOException  if the images cannot be read or the output cannot be written to disk.
      */
 
-    public static void processFileSet(ParameterDictionary params, String[] namedFileSet) throws java.io.IOException {
+    public static void processFileSet(ParameterDictionary params, ImageSet namedFileSet) throws java.io.IOException {
 
-        String[] fileSet = new String[namedFileSet.length/2];
-        String[] fileDisplayNames = new String[namedFileSet.length/2];
+//        String[] fileSet = new String[namedFileSet.length/2];
+//        String[] fileDisplayNames = new String[namedFileSet.length/2];
+//
+//        for (int s = 0; s < fileSet.length; s++) {
+//            fileSet[s] = namedFileSet[s];
+//            fileDisplayNames[s] = namedFileSet[s + fileSet.length];
+//        }
 
-        for (int s = 0; s < fileSet.length; s++) {
-            fileSet[s] = namedFileSet[s];
-            fileDisplayNames[s] = namedFileSet[s + fileSet.length];
-        }
-
-        params.setValueForKey("filename", (new java.io.File(namedFileSet[0])).getName());
+        params.setValueForKey("filename", namedFileSet.getImageNameForIndex(0));
 
         //generate the images to pass to the analysis routine
 
-        java.util.List<Image> images = null;
+        ImageSet images = null;
 
         if (Boolean.parseBoolean(params.getValueForKey("multi_wavelength_file"))) {
 
             int markerIndex = 0;
 
+            images = loadSplitMutliwavelengthImages(namedFileSet, markerIndex);
+
+
             if (params.hasKey("marker_channel_index")) {
                 markerIndex = params.getIntValueForKey("marker_channel_index");
+                images.setMarkerImage(markerIndex);
+
             }
 
-            images = loadSplitMutliwavelengthImages(fileSet, markerIndex);
 
             //set the numberOfChannels and channelName parameters appropriately for the multi-wavelength file
 
-            params.setValueForKey("number_of_channels", Integer.toString(images.size()));
+            params.setValueForKey("number_of_channels", Integer.toString(images.getImageCount()));
 
             String channelNames = "";
 
@@ -209,7 +214,7 @@ public class LocalAnalysis {
 
         } else {
 
-            images = loadImagesFromFileSet(fileSet);
+            images = loadImagesFromFileSet(namedFileSet);
 
         }
 
@@ -233,45 +238,46 @@ public class LocalAnalysis {
         }
     }
 
-    private static java.util.List<Image> loadImagesFromFileSet(String[] fileSet) throws java.io.IOException {
+    private static ImageSet loadImagesFromFileSet(ImageSet fileSet) throws java.io.IOException {
 
-        java.util.Vector<Image> images = new java.util.Vector<Image>();
 
-        loadImagesFromFileSetWithSeriesCount(fileSet, images);
+        loadImagesFromFileSetWithSeriesCount(fileSet);
 
-        return images;
+        return fileSet;
 
     }
 
     /**
-     * Load the images from a specified set of filenames; if these images contain multiple XYZCT series in one file, the
-     * count of the number of series in the files will be returned, and only the next in the series will be read in.
-     * @param fileSet   An array containing the filenames for each color channel; the reference channel for segmentation must be first.
-     * @param images    A list to which the loaded images are appended in the order of the filenames.  Conventionally this is empty when passed in but need not be.  This should not be null.
-     * @return          The number of series in the reference image file.
+     * Load the images from a specified set of filenames; if these images contain multiple XYZCT series only the first will be read in.
+     * @param fileSet   An ImageSet of the images for each color channel; the reference channel for segmentation must be first (or already specified in the ImageSet).
+     * @return          1.  Currently multi-series image files are not supported.
      * @throws java.io.IOException      if and error is encountered while reading the images from disk.
      */
 
-    public static synchronized int loadImagesFromFileSetWithSeriesCount(String[] fileSet, java.util.List<Image> images) throws java.io.IOException  {
+    public static synchronized int loadImagesFromFileSetWithSeriesCount(ImageSet fileSet) throws java.io.IOException  {
+//
+//        if (reader == null) {
+//            reader = new ImageReader();
+//        }
+//
+//        for (String filename : fileSet) {
+//
+//            Image i = reader.read(filename);
+//
+//
+//            images.add(i);
+//        }
+//
+//        return reader.getSeriesCount(fileSet[0]);
 
-        if (reader == null) {
-            reader = new ImageReader();
-        }
+        fileSet.loadAllImages();
 
-        for (String filename : fileSet) {
-
-            Image i = reader.read(filename);
-
-
-            images.add(i);
-        }
-
-        return reader.getSeriesCount(fileSet[0]);
+        return 1;
 
     }
 
 
-    private static synchronized java.util.List<Image> loadSplitMutliwavelengthImages(String[] fileSet, int markerIndex) throws java.io.IOException {
+    private static synchronized ImageSet loadSplitMutliwavelengthImages(ImageSet fileSet, int markerIndex) throws java.io.IOException {
 
         if (reader == null) {
             reader = new ImageReader();
@@ -279,20 +285,26 @@ public class LocalAnalysis {
 
         java.util.Vector<Image> images = new java.util.Vector<Image>();
 
-        for (String filename : fileSet) {
+        fileSet.loadAllImages();
 
-            Image i = reader.read(filename);
+        Image multiwavelength = fileSet.getImageForIndex(0);
 
-            java.util.List<Image> split = i.splitChannels();
+        java.util.List<Image> split = multiwavelength.splitChannels();
 
-            Image markerImage = split.remove(markerIndex);
+        ImageSet splitSet = new ImageSet(fileSet.getParameters());
 
-            images.add(markerImage);
-
-            images.addAll(split);
+        for (Image i : split) {
+            splitSet.addImageWithImage(i);
         }
 
-        return images;
+        if (fileSet.getParameters().hasKey("marker_channel_index")) {
+            splitSet.setMarkerImage(fileSet.getParameters().getIntValueForKey("marker_channel_index"));
+        } else {
+            splitSet.setMarkerImage(markerIndex);
+        }
+        
+        return splitSet;
+
 
     }
 
@@ -437,10 +449,10 @@ public class LocalAnalysis {
 
     private static class ImageSetThread extends Thread {
 
-        private String[] fileSet;
+        private ImageSet fileSet;
         private ParameterDictionary p;
 
-        public ImageSetThread(String[] fileSet, ParameterDictionary p) {
+        public ImageSetThread(ImageSet fileSet, ParameterDictionary p) {
             this.fileSet = fileSet;
             this.p = p;
         }
@@ -449,7 +461,7 @@ public class LocalAnalysis {
             try {
                 processFileSet(p, fileSet);
             } catch (java.io.IOException e) {
-                LoggingUtilities.getLogger().severe("while processing " + fileSet[0] + ": " + e.toString());
+                LoggingUtilities.getLogger().severe("while processing " + fileSet.getImageNameForIndex(0) + ": " + e.toString());
                 e.printStackTrace();
             }
         }
