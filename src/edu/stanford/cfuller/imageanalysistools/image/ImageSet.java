@@ -41,10 +41,7 @@ import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import edu.stanford.cfuller.imageanalysistools.image.io.OmeroServerImageReader;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * A set of related Images that will be processed together for analysis.  For instance, multiple channels of the same Image might be collected
@@ -73,8 +70,8 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
      * @param p     The parameters for the analysis.
      */
     public ImageSet(ParameterDictionary p) {
-        images = new ArrayList<ImageHolder>();
-        markerIndex = null;
+        this.images = new ArrayList<ImageHolder>();
+        this.markerIndex = null;
         this.parameters = p;
     }
 
@@ -87,9 +84,9 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
      */
     public ImageSet(ImageSet other) {
 
-        images = new ArrayList<ImageHolder>();
-        images.addAll(other.images);
-        markerIndex = other.markerIndex;
+        this.images = new ArrayList<ImageHolder>();
+        this.images.addAll(other.images);
+        this.markerIndex = other.markerIndex;
         this.parameters = other.parameters;
     }
 
@@ -99,7 +96,9 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
      * @param filename  The filename of the Image to add.
      */
     public void addImageWithFilename(String filename) {
-        this.images.add(new ImageHolder(null, filename, null));
+        ImageHolder newImage = new ImageHolder(null, filename, null);
+        newImage.setDisplayName(filename);
+        this.images.add(newImage);
     }
 
     /**
@@ -255,10 +254,11 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
                 return;
             }
 
+            this.markerIndex = index;
+
             this.images.get(this.markerIndex);
         
-            this.markerIndex = index;
-            
+
         } catch (IndexOutOfBoundsException e) {
             LoggingUtilities.getLogger().warning("Request to set marker image to index " + index + " in ImageSet was out of bounds.");
             this.markerIndex = null;
@@ -289,7 +289,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
      * which can then be processed.
      *
      */
-    public void loadAllImages() {
+    public void loadAllImages() throws java.io.IOException {
 
         for (ImageHolder imh : this.images) {
 
@@ -302,28 +302,21 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
             if (imh.getOmeroId() != null) {
 
                 OmeroServerImageReader osir = new OmeroServerImageReader();
-                try {
-                    String[] names = osir.loadImageFromOmeroServer(imh.getOmeroId(), this.parameters.getValueForKey("omero_hostname"), this.parameters.getValueForKey("omero_username"), this.parameters.getValueForKey("omero_password"));
-                    //System.out.println(imh.getOmeroId() + " " +  java.util.Arrays.toString(names));
-                    imh.setImage(osir.read(names[1]));
-                    imh.setDisplayName(names[0]);
-                } catch (java.io.IOException e) {
-                    LoggingUtilities.getLogger().warning("Unable to load image with id " + imh.getOmeroId() + " from omero server: " + e.getMessage());
-                    e.printStackTrace();
-                }
+                String[] names = osir.loadImageFromOmeroServer(imh.getOmeroId(), this.parameters.getValueForKey("omero_hostname"), this.parameters.getValueForKey("omero_username"), this.parameters.getValueForKey("omero_password"));
+                //System.out.println(imh.getOmeroId() + " " +  java.util.Arrays.toString(names));
+                imh.setImage(osir.read(names[1]));
+                imh.setDisplayName(names[0]);
+
             } else if (imh.getFilename() != null) {
 
                 ImageReader ir = new ImageReader();
 
-                try {
-                    imh.setImage(ir.read(imh.getFilename()));
-                    imh.setDisplayName(imh.getFilename());
-                } catch (java.io.IOException e) {
-                    LoggingUtilities.getLogger().warning("Unable to load image with filename " + imh.getFilename() + ": " + e.getMessage());
-                }
+                imh.setImage(ir.read(imh.getFilename()));
+                imh.setDisplayName(imh.getFilename());
+
             }
 
-            
+
         }
 
 
@@ -336,7 +329,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
      * @return          The display name of the requested Image, or null if the Image does not exist.
      */
     public String getImageNameForIndex(int index) {
-        if (index >= 0 && index < this.images.size()) {
+        if (index >= 0 && index < this.size()) {
             return this.images.get(index).getDisplayName();
         } else {
             return null;
@@ -414,7 +407,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
 
     public Iterator<Image> iterator() {
 
-        return null;
+        return new ImageSetIterator(this);
         
     }
 
@@ -424,8 +417,15 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
 
     public Object[] toArray() {
 
-        this.loadAllImages();
-        
+        try {
+
+            this.loadAllImages();
+
+        } catch (java.io.IOException e) {
+            LoggingUtilities.getLogger().warning("Unable to load images for filename: " + this.images.get(0).getFilename() + " or omero id: " + this.images.get(0).getOmeroId() + " " +  e.getMessage());
+            e.printStackTrace();
+        }
+
         Object[] output = new Object[this.size()];
 
         for (int i = 0; i < this.size(); i++) {
@@ -491,5 +491,35 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         throw new UnsupportedOperationException("Remove not supported for ImageSets.");
     }
 
+
+    protected class ImageSetIterator implements Iterator<Image> {
+
+        ImageSet toIterate;
+        int currIndex;
+
+        private ImageSetIterator() {}
+
+        public ImageSetIterator(ImageSet toIterate) {
+            this.toIterate = toIterate;
+            this.currIndex = 0;
+        }
+
+        public boolean hasNext() {
+            if (this.currIndex < toIterate.size()) return true;
+            return false;
+        }
+
+        public Image next() {
+            if (currIndex >= toIterate.size()) {throw new NoSuchElementException("No more Images in ImageSet.  Attempted to access Image at index " + currIndex + ".");}
+            Image toReturn = toIterate.getImageForIndex(currIndex);
+            currIndex++;
+            return toReturn;
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException("Remove not supported for iteration over an ImageSet.");
+        }
+        
+    }
 
 }

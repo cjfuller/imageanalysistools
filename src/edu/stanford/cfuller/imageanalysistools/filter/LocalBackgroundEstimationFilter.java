@@ -83,8 +83,6 @@ public class LocalBackgroundEstimationFilter extends Filter {
 	@Override
 	public void apply(Image im) {
 
-        System.out.println("Dimnensions: " + im.getDimensionSizes().toString());
-
 		if (this.referenceImage == null) return;
 		
 		//RealVector localArea = new org.apache.commons.math.linear.ArrayRealVector();
@@ -114,8 +112,6 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		
 		
 		RealVector overallCounts = new org.apache.commons.math.linear.ArrayRealVector(h.getMaxValue() + 1);
-
-        System.out.println(h.getMaxValue());
 
 		RealMatrix countsByRow = new org.apache.commons.math.linear.Array2DRowRealMatrix(2*boxSize + 1, h.getMaxValue() + 1);
 
