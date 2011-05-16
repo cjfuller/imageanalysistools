@@ -180,6 +180,9 @@ public class LocalAnalysis {
 //            fileDisplayNames[s] = namedFileSet[s + fileSet.length];
 //        }
 
+
+        namedFileSet.loadAllImages();
+
         params.setValueForKey("filename", namedFileSet.getImageNameForIndex(0));
 
         //generate the images to pass to the analysis routine
@@ -218,6 +221,20 @@ public class LocalAnalysis {
 
         }
 
+        if (params.hasKeyAndTrue("process_max_intensity_projections")) {
+
+            ImageSet newImages = new ImageSet(params);
+
+            for (int i = 0; i < images.size(); i++) {
+
+                Image proj = MaximumIntensityProjection.projectImage(images.getImageForIndex(i));
+
+                newImages.addImageWithImageAndName(proj, images.getImageNameForIndex(i));
+
+            }
+
+            images = newImages;
+        }
 
 
         Method methodToRun = getMethod(params);
@@ -227,11 +244,11 @@ public class LocalAnalysis {
 
         methodToRun.go();
 
-        writeDataOutput(methodToRun, params, fileDisplayNames);
+        writeDataOutput(methodToRun, params, images);
 
         try {
-            writeImageOutput(methodToRun,params,fileDisplayNames);
-            writeParameterOutput(params, fileDisplayNames);
+            writeImageOutput(methodToRun,params,images);
+            writeParameterOutput(params, images);
         } catch (java.io.IOException e) {
             LoggingUtilities.getLogger().severe("Error while writing output masks to file; skipping write and continuing.");
             e.printStackTrace();
@@ -294,7 +311,7 @@ public class LocalAnalysis {
         ImageSet splitSet = new ImageSet(fileSet.getParameters());
 
         for (Image i : split) {
-            splitSet.addImageWithImage(i);
+            splitSet.addImageWithImageAndName(i, fileSet.getImageNameForIndex(0));
         }
 
         if (fileSet.getParameters().hasKey("marker_channel_index")) {
@@ -345,7 +362,7 @@ public class LocalAnalysis {
 
     }
 
-    private static void writeDataOutput(Method finishedMethod, ParameterDictionary p, String[] fileSet) throws java.io.IOException {
+    private static void writeDataOutput(Method finishedMethod, ParameterDictionary p, ImageSet fileSet) throws java.io.IOException {
 
         final String output_dir_suffix = DATA_OUTPUT_DIR;
 
@@ -357,7 +374,7 @@ public class LocalAnalysis {
 
         String shortMethodName = splitMethodName[splitMethodName.length - 1];
 
-        String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(fileSet[0])).getName()) + "." + shortMethodName + ".out.txt";
+        String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.txt";
 
         String dataOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
 
@@ -382,7 +399,7 @@ public class LocalAnalysis {
 
     }
 
-    private static void writeImageOutput(Method finishedMethod, ParameterDictionary p, String[] fileSet) throws java.io.IOException {
+    private static void writeImageOutput(Method finishedMethod, ParameterDictionary p, ImageSet fileSet) throws java.io.IOException {
 
         final String output_dir_suffix = IMAGE_OUTPUT_DIR;
 
@@ -394,7 +411,7 @@ public class LocalAnalysis {
 
         String shortMethodName = splitMethodName[splitMethodName.length - 1];
 
-        String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(fileSet[0])).getName()) + "." + shortMethodName + ".out.ome.tif";
+        String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.ome.tif";
 
         String maskOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
 
@@ -421,7 +438,7 @@ public class LocalAnalysis {
 
     }
 
-    private static void writeParameterOutput(ParameterDictionary p, String[] fileSet) throws java.io.IOException{
+    private static void writeParameterOutput(ParameterDictionary p, ImageSet fileSet) throws java.io.IOException{
 
         final String parameterDirectory = PARAMETER_OUTPUT_DIR;
         final String parameterExtension = PARAMETER_EXTENSION;
@@ -436,7 +453,7 @@ public class LocalAnalysis {
 
         String shortMethodName = splitMethodName[splitMethodName.length - 1];
 
-        String parameterOutputFilename = outputPath.getAbsolutePath() + File.separator + (new File(fileSet[0])).getName() + "." + shortMethodName + parameterExtension;
+        String parameterOutputFilename = outputPath.getAbsolutePath() + File.separator + (new File(fileSet.getImageNameForIndex(0))).getName() + "." + shortMethodName + parameterExtension;
 
         //java.io.ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(parameterOutputFilename));
 

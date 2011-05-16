@@ -35,6 +35,8 @@
     <parameter name="max_threads" displayname="Maximum number of execution threads" type="integer" defaultvalue="1"/>
     <parameter name="multi_wavelength_file" displayname="Multiple wavelengths in a single file?" type="boolean" defaultvalue = "true"/>
 
+    <parameter name="process_max_intensity_projections" displayname="Process max intensity projections?" type="boolean" defaultvalue="true"/>
+
     <parameter displayname="Custom parameter"/>
 
 </root>

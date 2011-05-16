@@ -156,7 +156,7 @@ public class DirUtils {
                     Long idL = Long.parseLong(id);
 
                     String name = ir.getImageNameForOmeroId(idL, params.getValueForKey("omero_hostname"), params.getValueForKey("omero_username"), params.getValueForKey("omero_password"));
-
+ 
                     idLookupByName.put(name, idL);
 
                 }
@@ -190,14 +190,15 @@ public class DirUtils {
 
         for (String name : idLookupByName.keySet()) {
 
+            if (! name.matches(".*" + setTags[0] + ".*")){
+                continue;
+            }
+
             ImageSet tempSet = new ImageSet(params);
 
             for (int i = 0; i < numPerSet; i++) {
 
                 //tempSet[i] = directory.getAbsolutePath() + java.io.File.separator + f.getName().replaceAll(setTags[0], setTags[i]);
-                if (! name.matches(".*" + setTags[0] + ".*")){
-                    continue;
-                }
 
                 String subName = name.replaceAll(setTags[0], setTags[i]);
 
@@ -208,8 +209,9 @@ public class DirUtils {
 
                 Long id = idLookupByName.get(subName);
 
+
                 if (id != null) {
-                    tempSet.addImageWithOmeroId(id);
+                    tempSet.addImageWithOmeroIdAndName(id, subName);
                 }
             }
 

@@ -2,6 +2,7 @@ package edu.stanford.cfuller.imageanalysistools.method;
 
 import edu.stanford.cfuller.imageanalysistools.filter.MaskFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 
 import java.util.Vector;
 
@@ -19,20 +20,15 @@ public class TwoChannelSpotColocalizationMethod extends Method {
         CentromereFindingMethod ch0_method = new CentromereFindingMethod();
         CentromereFindingMethod ch1_method = new CentromereFindingMethod();
 
-        ch0_method.setImages(this.images);
+        ch0_method.setImages(this.imageSet);
         ch0_method.setParameters(this.parameters);
 
-        Vector<Image> reordered = new Vector<Image>();
+        ImageSet reordered = new ImageSet(this.imageSet);
 
-        reordered.addAll(this.images);
-
-        Image ch0 =reordered.remove(0);
-        Image ch1 =reordered.remove(0);
-
-        reordered.insertElementAt(ch0, 0);
-        reordered.insertElementAt(ch1, 0);
+        reordered.setMarkerImage(1);
 
         ch1_method.setImages(reordered);
+
         ch1_method.setParameters(this.parameters);
 
         ch0_method.go();

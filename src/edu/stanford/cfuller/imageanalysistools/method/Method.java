@@ -36,6 +36,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.method;
 
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
@@ -56,6 +57,7 @@ public abstract class Method extends Thread{
 	protected ParameterDictionary parameters;
 	protected java.util.Vector<Image> storedImages;
 	protected java.util.Vector<Image> images;
+    protected ImageSet imageSet;
 	protected org.apache.commons.math.linear.RealMatrix storedDataOutput;
 	
 	//protected methods
@@ -156,7 +158,26 @@ public abstract class Method extends Thread{
      *
      * @param images    The List of images to be processed/quantified.
      */
-	public void setImages(java.util.List<Image> images) {this.images.addAll(images);}
+	public void setImages(ImageSet images) {
+
+        Integer marker = images.getMarkerIndex();
+
+        if (marker != null) {
+            this.images.add(images.getMarkerImage());
+
+            for (int i = 0; i < images.size(); i++) {
+                if (i == marker) continue;
+                this.images.add(images.getImageForIndex(i));
+
+            }
+        } else {
+
+            this.images.addAll(images);
+        }
+
+        this.imageSet = images;
+
+    }
 
     /**
      * Gets the stored ParameterDictionary used for this method.

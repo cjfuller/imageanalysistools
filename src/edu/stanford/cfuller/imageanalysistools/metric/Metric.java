@@ -40,6 +40,7 @@ package edu.stanford.cfuller.imageanalysistools.metric;
 
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import org.apache.commons.math.linear.RealMatrix;
 
 /**

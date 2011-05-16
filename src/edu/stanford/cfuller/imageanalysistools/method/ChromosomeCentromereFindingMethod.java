@@ -39,6 +39,7 @@ package edu.stanford.cfuller.imageanalysistools.method;
 import edu.stanford.cfuller.imageanalysistools.filter.MaskFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 import org.apache.commons.math.linear.RealMatrix;
 
@@ -73,18 +74,12 @@ public class ChromosomeCentromereFindingMethod extends Method {
         int secondChannelNumber = this.parameters.getIntValueForKey("secondary_marker_channel_index");
         if (originalChannelNumber >= secondChannelNumber) secondChannelNumber++;
 
-        ch0_method.setImages(this.images);
+        ch0_method.setImages(this.imageSet);
         ch0_method.setParameters(this.parameters);
 
-        Vector<Image> reordered = new Vector<Image>();
+        ImageSet reordered = new ImageSet(this.imageSet);
 
-        reordered.addAll(this.images);
-
-        Image ch0 =reordered.remove(0);
-        Image ch1 =reordered.remove(secondChannelNumber-1 >= 0 ? secondChannelNumber : 0);
-
-        reordered.insertElementAt(ch0, 0);
-        reordered.insertElementAt(ch1, 0);
+        reordered.setMarkerImage(secondChannelNumber);
 
         ch1_method.setImages(reordered);
         ch1_method.setParameters(this.parameters);

@@ -76,7 +76,7 @@ public class SeededWatershedMethod extends Method {
 
         parameters.addIfNotSet("use_clustering", "false");
 
-        rtf.setImages(this.images);
+        rtf.setImages(this.imageSet);
         rtf.setParameters(this.parameters);
         rtf.go();
 

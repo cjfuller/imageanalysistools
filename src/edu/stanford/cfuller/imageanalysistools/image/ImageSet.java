@@ -63,18 +63,36 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
 
     List<ImageHolder> images;
 
-    ImageHolder markerImage;
+    Integer markerIndex;
 
     ParameterDictionary parameters;
 
     /**
      * Constructs a new, empty ImageSet.
+     *
+     * @param p     The parameters for the analysis.
      */
     public ImageSet(ParameterDictionary p) {
         images = new ArrayList<ImageHolder>();
-        markerImage = null;
+        markerIndex = null;
         this.parameters = p;
     }
+
+    /**
+     * Copy constructor.
+     *
+     * Does not make copies of the Images; this method is primarily useful to allow different marker Images or simultaneous iteration.
+     *
+     * @param other     The ImageSet to copy.
+     */
+    public ImageSet(ImageSet other) {
+
+        images = new ArrayList<ImageHolder>();
+        images.addAll(other.images);
+        markerIndex = other.markerIndex;
+        this.parameters = other.parameters;
+    }
+
 
     /**
      * Adds an Image to the ImageSet using its filename.
@@ -82,6 +100,21 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
      */
     public void addImageWithFilename(String filename) {
         this.images.add(new ImageHolder(null, filename, null));
+    }
+
+    /**
+     * Adds an Image to the ImageSet using an already constructed Image object and a filename associated with it.
+     *
+     * This can be used for Images that have already been loaded, in order to keep them associated with some sort of identifier.
+     *
+     * @param toAdd     The (loaded) Image to add to the ImageSet.
+     * @param name      The name to associate with the Image.
+     */
+    public void addImageWithImageAndName(Image toAdd, String name) {
+
+        ImageHolder imh = new ImageHolder(toAdd, null, null);
+        imh.setDisplayName(name);
+        this.images.add(imh);
     }
 
     /**
@@ -102,6 +135,12 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
      */
     public void addImageWithOmeroId(long omeroId) {
         this.images.add(new ImageHolder(null, null, omeroId));
+    }
+
+    public void addImageWithOmeroIdAndName(long omeroId, String name) {
+        ImageHolder imh = new ImageHolder(null, null, omeroId);
+        imh.setDisplayName(name);
+        this.images.add(imh);
     }
 
     /**
@@ -158,7 +197,17 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
      * @return  The marker Image, or null if a marker Image has not been specified or it has not yet been loaded.
      */
     public Image getMarkerImage() {
-        return this.markerImage.getImage();
+        if (markerIndex == null) {return null;}
+        return this.images.get(markerIndex).getImage();
+    }
+
+    /**
+     * Gets the index of the Image specified as the marker Image.
+     *
+     * @return  The index of the marker Image in the set, or null if one has not been specified.
+     */
+    public Integer getMarkerIndex() {
+        return this.markerIndex;
     }
 
     /**
@@ -167,7 +216,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
      * @return  true if a valid marker Image has been specified; false otherwise.
      */
     public boolean hasMarkerImage() {
-        return this.markerImage != null;
+        return this.markerIndex != null;
     }
 
     /**
@@ -202,15 +251,17 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
 
         try {
             if (index == -1) {
-                this.markerImage = this.images.get(this.images.size() -1);
+                this.markerIndex = this.images.size() -1;
                 return;
             }
+
+            this.images.get(this.markerIndex);
         
-            this.markerImage = this.images.get(index);
+            this.markerIndex = index;
             
         } catch (IndexOutOfBoundsException e) {
             LoggingUtilities.getLogger().warning("Request to set marker image to index " + index + " in ImageSet was out of bounds.");
-            this.markerImage = null;
+            this.markerIndex = null;
         }
     }
 
@@ -253,10 +304,12 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
                 OmeroServerImageReader osir = new OmeroServerImageReader();
                 try {
                     String[] names = osir.loadImageFromOmeroServer(imh.getOmeroId(), this.parameters.getValueForKey("omero_hostname"), this.parameters.getValueForKey("omero_username"), this.parameters.getValueForKey("omero_password"));
+                    //System.out.println(imh.getOmeroId() + " " +  java.util.Arrays.toString(names));
                     imh.setImage(osir.read(names[1]));
                     imh.setDisplayName(names[0]);
                 } catch (java.io.IOException e) {
                     LoggingUtilities.getLogger().warning("Unable to load image with id " + imh.getOmeroId() + " from omero server: " + e.getMessage());
+                    e.printStackTrace();
                 }
             } else if (imh.getFilename() != null) {
 
@@ -344,6 +397,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         boolean returnValue = true;
 
         for (Object o : c) {
+            
             returnValue&= this.contains(o);
 
             if (!returnValue) return returnValue;

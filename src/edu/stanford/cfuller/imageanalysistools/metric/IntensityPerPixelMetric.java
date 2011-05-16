@@ -40,6 +40,7 @@ package edu.stanford.cfuller.imageanalysistools.metric;
 
 import java.util.Vector;
 
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import org.apache.commons.math.linear.RealMatrix;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
@@ -80,7 +81,7 @@ public class IntensityPerPixelMetric extends Metric {
      *                  entry will contain the quantification of ROI (i+1) in Image j.
      */
 	@Override
-	public RealMatrix quantify(Image mask, Vector<Image> images) {
+	public RealMatrix quantify(Image mask, java.util.Vector<Image> images) {
 		
 		edu.stanford.cfuller.imageanalysistools.image.Histogram h = new edu.stanford.cfuller.imageanalysistools.image.Histogram(mask);
 		

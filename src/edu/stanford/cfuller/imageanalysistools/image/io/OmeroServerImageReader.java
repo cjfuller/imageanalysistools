@@ -234,18 +234,15 @@ public class OmeroServerImageReader extends ImageReader {
 
             final String lockFilename = tempfile.getAbsolutePath();
 
-            Thread t = null;
+//            Thread t = null;
+//
+//            try {
+//                t = lock(lockFilename);
+//            } catch (InterruptedException e) {
+//                LoggingUtilities.getLogger().severe("interrupted while locking image file");
+//            }
 
-            try {
-                t = lock(lockFilename);
-            } catch (InterruptedException e) {
-                LoggingUtilities.getLogger().severe("interrupted while locking image file");
-            }
-
-
-            final Thread lockObject = t;
-
-            (new Thread(new Runnable() {
+            final Thread lockingThread = (new Thread(new Runnable() {
 
                 public void run() {
 
@@ -291,7 +288,7 @@ public class OmeroServerImageReader extends ImageReader {
 
                         exporter.close();
 
-                        release(lockFilename, lockObject);
+                        release(lockFilename, Thread.currentThread());
 
 
                     } catch (ServerError serverError) {
@@ -306,7 +303,19 @@ public class OmeroServerImageReader extends ImageReader {
                     }
                 }
 
-            })).start();
+            }));
+
+            try {
+                lockWithThread(lockFilename, lockingThread);
+            } catch (InterruptedException e) {
+                LoggingUtilities.getLogger().severe("interrupted while locking image file");
+                return null;
+            }
+
+
+            lockingThread.start();
+
+
 
 
 

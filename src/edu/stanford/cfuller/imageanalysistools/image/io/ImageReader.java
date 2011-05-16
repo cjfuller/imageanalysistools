@@ -260,6 +260,53 @@ public class ImageReader {
 
 
     /**
+     * Locks the file at the specified filename for reading by a specified Thread.
+     *
+     * The current Thread must still be the holder of the lock, or the file must be unlocked, or this method will block.
+     *
+     * @param filename  The file to lock.
+     * @param toHoldLock    The Thread that should hold the lock. 
+     * @return              The Thread that holds the lock.  This should always be the specified thread on normal return.
+     * @throws InterruptedException
+     */
+    protected static Thread lockWithThread(String filename, Thread toHoldLock) throws InterruptedException {
+
+
+        boolean didLock = false;
+
+        synchronized (ImageReader.class) {
+
+            if (!fileLocks.containsKey(filename)) {
+                didLock = true;
+                fileLocks.put(filename, toHoldLock);
+            }
+
+        }
+
+        while(!didLock && !Thread.currentThread().equals(fileLocks.get(filename))) {
+
+            Thread.sleep(LOCK_WAIT_TIME_MS);
+
+            synchronized (ImageReader.class) {
+
+                if (!fileLocks.containsKey(filename)) {
+                    didLock = true;
+                    fileLocks.put(filename, toHoldLock);
+                }
+
+            }
+
+
+
+        }
+
+        return toHoldLock;
+
+
+    }
+
+
+    /**
      * Releases the lock on the specified file, with the specified Thread that holds the lock.
      * @param filename      The file to unlock.
      * @param lockObject    The Thread that holds the lock.
