@@ -37,6 +37,9 @@
 
     <parameter name="process_max_intensity_projections" displayname="Process max intensity projections?" type="boolean" defaultvalue="true"/>
 
+    <parameter name="swap_z_t" displayname="swap z and t dimensions?" type="boolean" defaultvalue="false"/>
+
+
     <parameter displayname="Custom parameter"/>
 
 </root>

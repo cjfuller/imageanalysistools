@@ -294,7 +294,9 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         for (ImageHolder imh : this.images) {
 
             if (imh.getImage() != null) {
-                imh.setDisplayName(imh.getImage().getMetadata().getImageName(0));
+                if (imh.getDisplayName() == null) {
+                    imh.setDisplayName(imh.getImage().getMetadata().getImageName(0));
+                }
                 continue;
             }
 
@@ -336,6 +338,19 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         }
     }
 
+    /**
+     * Disposes of the memory-intensive portions of Images.
+     *
+     * Useful for programs that retain long-term references to the ImageSet for things like naming, but don't need
+     * the pixel data for the full lifetime of the ImageSet.
+     *
+     */
+    public void disposeImages() {
+        for (Image i : this) {
+            i.dispose();
+        }
+    }
+
 
     private static class ImageHolder {
 
@@ -348,6 +363,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
             this.theImage = theImage;
             this.filename = filename;
             this.omeroId = omeroId;
+            this.displayName = null;
         }
 
         public void setImage(Image theImage) {this.theImage = theImage;}

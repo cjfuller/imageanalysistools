@@ -36,6 +36,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.frontend;
 
+import edu.stanford.cfuller.imageanalysistools.image.DimensionFlipper;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
@@ -221,13 +222,22 @@ public class LocalAnalysis {
 
         }
 
+
+
+
         if (params.hasKeyAndTrue("process_max_intensity_projections")) {
 
             ImageSet newImages = new ImageSet(params);
 
             for (int i = 0; i < images.size(); i++) {
 
-                Image proj = MaximumIntensityProjection.projectImage(images.getImageForIndex(i));
+                Image toProject = images.getImageForIndex(i);
+
+                if (params.hasKeyAndTrue("swap_z_t")) {
+                    toProject = DimensionFlipper.flipZT(toProject);
+                }
+
+                Image proj = MaximumIntensityProjection.projectImage(toProject);
 
                 newImages.addImageWithImageAndName(proj, images.getImageNameForIndex(i));
 
@@ -253,6 +263,10 @@ public class LocalAnalysis {
             LoggingUtilities.getLogger().severe("Error while writing output masks to file; skipping write and continuing.");
             e.printStackTrace();
         }
+
+        namedFileSet.disposeImages();
+        images.disposeImages();
+
     }
 
     private static ImageSet loadImagesFromFileSet(ImageSet fileSet) throws java.io.IOException {
@@ -373,6 +387,7 @@ public class LocalAnalysis {
         String[] splitMethodName = finishedMethod.getParameters().getValueForKey("method_name").split("\\.");
 
         String shortMethodName = splitMethodName[splitMethodName.length - 1];
+
 
         String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.txt";
 
