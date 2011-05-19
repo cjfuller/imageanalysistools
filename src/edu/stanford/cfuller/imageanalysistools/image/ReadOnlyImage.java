@@ -49,6 +49,7 @@ package edu.stanford.cfuller.imageanalysistools.image;
  */
 public class ReadOnlyImage extends Image {
 
+	final static long serialVersionUID = 1L;
     
     public ReadOnlyImage(loci.formats.meta.IMetadata m, PixelData p) {
         super(m, p);

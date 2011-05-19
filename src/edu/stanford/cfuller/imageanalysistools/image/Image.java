@@ -411,9 +411,6 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
         boolean useWavelengths = false;
         boolean useID = true;
 
-        int channelCount = this.metadata.getChannelCount(series_number);
-
-
         String name0 = this.metadata.getChannelName(series_number, 0);
         PositiveInteger exW = this.metadata.getChannelExcitationWavelength(series_number, 0);
         PositiveInteger emW = this.metadata.getChannelEmissionWavelength(series_number, 0);

@@ -40,11 +40,9 @@ import edu.stanford.cfuller.imageanalysistools.filter.*;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: 1/26/11
- * Time: 3:16 PM
- * To change this template use File | Settings | File Templates.
+ * A method to find objects based on a gradient histogram thresholding step and a size-exclusion step.
+ * 
+ * @author Colin J. Fuller
  */
 public class ThresholdingSizeMethod extends Method {
 

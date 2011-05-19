@@ -38,7 +38,6 @@ package edu.stanford.cfuller.imageanalysistools.image;
 
 import java.io.Serializable;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
-import org.apache.commons.math.stat.Frequency;
 
 /**
  * This class represents a histogram of intensity values in an Image.  The bin size is 1 (meaning that intensity values are rounded to integers).
@@ -69,7 +68,7 @@ public class Histogram implements Serializable {
 	
 	//constructors
 
-    private Histogram() {}
+	protected Histogram() {}
 
     /**
      * Constructs a new Histogram for a given Image.

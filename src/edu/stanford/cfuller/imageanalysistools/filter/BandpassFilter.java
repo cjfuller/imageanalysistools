@@ -51,6 +51,8 @@ import org.apache.commons.math.transform.FastFourierTransformer;
  * This filter does not use a reference Image.
  * <p>
  * The argument to the apply method should be the Image to be bandpass filtered.
+ * 
+ * @author Colin J. Fuller
  */
 public class BandpassFilter extends Filter {
 
@@ -96,9 +98,6 @@ public class BandpassFilter extends Filter {
             for (ImageCoordinate ic : im) {
                 rowImage[ic.getY()][ic.getX()] = im.getValue(ic);
             }
-
-            ImageCoordinate boxMin = ImageCoordinate.createCoord(0,0,0,0,0);
-            ImageCoordinate boxMax = ImageCoordinate.createCoord(im.getDimensionSizes().getX(), 1,1,1,1);
 
             for (int r = 0; r < rowImage.length; r++) {
                 double[] row = rowImage[r];

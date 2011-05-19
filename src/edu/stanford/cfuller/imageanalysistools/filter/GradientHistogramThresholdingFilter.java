@@ -40,6 +40,13 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 
+
+/**
+ * A thresholding method based upon finding the full-width half-max of the histogram of the gradient of the Image.
+ * 
+ * @author Colin J. Fuller
+ *
+ */
 public class GradientHistogramThresholdingFilter extends Filter {
 
 	@Override

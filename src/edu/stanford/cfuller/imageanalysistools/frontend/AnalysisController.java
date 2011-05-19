@@ -43,6 +43,8 @@ import java.util.logging.Handler;
 /**
  * Master controller of analysis routines.  Sets up critical default parameters if they have not been set up and runs
  * the analysis method.
+ * 
+ * @author Colin J. Fuller
  */
 
 public class AnalysisController {
@@ -58,30 +60,10 @@ public class AnalysisController {
      * @param params    The {@link ParameterDictionary} specifying the options for this analysis run.
      */
 	public void runLocal(ParameterDictionary params) {
-		String[] allowableArgs = {"compile", "localDirectory", "generateMasks", "generateValues", "numberOfChannels", "channelName", "methodName", "tempDir", "imageExtension", "minSize", "maxSize", "useClustering", "maxClusters"};
-		
-		//params.discardIllegalArguments(allowableArgs);
-/*
-		params.addIfNotSet("compile", "false");
-		params.addIfNotSet("localDirectory", System.getProperty("user.dir"));
-		params.addIfNotSet("generateMasks", "true");
-		params.addIfNotSet("generateValues", "true");
-		params.addIfNotSet("numberOfChannels", "1");
-		params.addIfNotSet("channelName", "dapi");
-		params.addIfNotSet("methodName", "RecursiveThreshMethod");
-*/
 		params.addIfNotSet("temp_dir", System.getProperty("user.dir") + java.io.File.separator + "temp");
 		params.addIfNotSet("image_extension", "");
 		params.addIfNotSet("DEBUG", "false");
-/*
-		int numChannels = params.getValueForKey("channelName").split(" ").length;
-		
-		if (Integer.parseInt(params.getValueForKey("numberOfChannels")) != numChannels) {
-					
-			throw new IllegalArgumentException("Error:  number of channel names listed, " + numChannels + ", does not match the specified number of channels, " + Integer.parseInt(params.getValueForKey("numberOfChannels")));
-		
-		}
-*/
+
 		LocalAnalysis.run(params);	
 		
 	}

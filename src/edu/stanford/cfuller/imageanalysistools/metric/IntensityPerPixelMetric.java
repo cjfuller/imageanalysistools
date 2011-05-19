@@ -36,11 +36,6 @@
 
 package edu.stanford.cfuller.imageanalysistools.metric;
 
-
-
-import java.util.Vector;
-
-import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import org.apache.commons.math.linear.RealMatrix;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;

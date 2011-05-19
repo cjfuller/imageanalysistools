@@ -4,6 +4,8 @@ package edu.stanford.cfuller.imageanalysistools.image;
  * A Class that implements methods to flip the Z- and T- dimensions of an Image (these can get swapped, e.g. while reading
  * metamorph stacks).
  * 
+ * @author Colin J. Fuller
+ * 
  */
 public class DimensionFlipper {
 

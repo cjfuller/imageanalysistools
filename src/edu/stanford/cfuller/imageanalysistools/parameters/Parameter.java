@@ -55,7 +55,7 @@ public class Parameter {
     Object value;
     String description;
 
-    private Parameter(){}
+    protected Parameter(){}
 
     /**
      * Constructs a new parameter that is a copy of another parameter.

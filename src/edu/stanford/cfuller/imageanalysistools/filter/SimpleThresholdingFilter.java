@@ -48,6 +48,8 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
  * The argument to the apply method should be set to an Image that will get the output of the thresholding.  This should be the
  * same dimensions as the reference Image.  This Image will be unchanged except that any pixel below the threshold in the reference Image
  * will be set to zero in this Image.
+ * 
+ * @author Colin J. Fuller
  */
 
 public class SimpleThresholdingFilter extends Filter {

@@ -122,7 +122,6 @@ public class ConvexHullByLabelFilter extends Filter {
 			java.util.Vector<Integer> xList = xLists.get(k);
 			java.util.Vector<Integer> yList = yLists.get(k);
 			
-			int minX = (int) minValues.get(k);
 			int minIndex = (int) minIndices.get(k);
 			
 			//start at the leftmost point

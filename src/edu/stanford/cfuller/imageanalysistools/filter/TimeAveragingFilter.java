@@ -11,6 +11,7 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
  * The argument to the apply method should be an Image of all zeros that will be overwritten with the same dimension sizes as the time series,
  * except for only containing a single time point.
  *
+ * @author Colin J. Fuller
  *
  */
 public class TimeAveragingFilter extends Filter{

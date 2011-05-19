@@ -45,6 +45,8 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
  * This filter does not use a reference Image.
  * <p>
  * The argument to the apply method should be the Image to be filtered.
+ * 
+ * @author Colin J. Fuller
  */
 public class LaplacianFilter extends Filter{
 
@@ -85,8 +87,6 @@ public class LaplacianFilter extends Filter{
             double newValue = 0;
 
             ImageCoordinate icTemp = ImageCoordinate.cloneCoord(ic);
-
-            boolean stop = false;
 
             int count = -1; //subtract one for the center pixel
 

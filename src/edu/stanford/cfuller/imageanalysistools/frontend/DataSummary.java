@@ -142,13 +142,9 @@ public class DataSummary {
 
             System.out.println(f.getName());
 
-            int ch1Pos = 0;
-            int ch2Pos = 0;
-            int bothPos = 0;
             Hashtable<Integer, double[]> regions = new Hashtable<Integer, double[]>();
             Hashtable<Integer, int[]> counts = new Hashtable<Integer, int[]>();
-            //Hashtable<Integer, Double> ch0BG = new Hashtable<Integer, Double>();
-            //Hashtable<Integer, Double> ch2BG = new Hashtable<Integer, Double>();
+
             Hashtable<Integer, Double[]> allBG = new Hashtable<Integer, Double[]>();
             Hashtable<Integer, Double> average_sizes = new Hashtable<Integer, Double>();
 

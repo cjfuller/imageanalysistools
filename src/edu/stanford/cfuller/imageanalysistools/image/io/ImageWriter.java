@@ -42,13 +42,16 @@ import edu.stanford.cfuller.imageanalysistools.image.PixelData;
 
 /**
  * This class writes an Image to disk as one of several possible formats.
+ * 
+ * @author Colin J. Fuller
+ * 
  */
 
 public class ImageWriter {
 	
 	Image toWrite;
 
-    private ImageWriter(){}
+	protected ImageWriter(){}
 
     /**
      * Constructs an ImageWriter for a given Image.

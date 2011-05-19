@@ -153,7 +153,6 @@ public class CentromereFindingMethod extends Method {
         ImThF.apply(groupMask);
 
         LF.apply(groupMask);
-        Image gOut = new Image(groupMask);
         Image allCentromeres = new Image(groupMask);
 
         Histogram h = new Histogram(groupMask);

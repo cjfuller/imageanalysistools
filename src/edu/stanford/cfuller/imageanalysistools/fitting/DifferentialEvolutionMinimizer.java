@@ -88,7 +88,6 @@ public class DifferentialEvolutionMinimizer {
         int numberOfParameters = parameterLowerBounds.getDimension();
         
         double currMinValue = Double.MAX_VALUE;
-        double lastMinValue = Double.MAX_VALUE;
         double currMaxValue = -1.0*Double.MAX_VALUE;
         int iterationCounter = maxIterations;
 
@@ -167,16 +166,6 @@ public class DifferentialEvolutionMinimizer {
             }
 
             population = newPopulation;
-
-            lastMinValue = currMinValue;
-
-            String strValues = org.apache.commons.math.linear.RealVectorFormat.formatRealVector(values);
-
-            //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Population values: " + strValues);
-
-
-            double[] sValues = values.toArray();
-
 
             double tempMinValue = Double.MAX_VALUE;
             double tempMaxValue = -1.0*Double.MAX_VALUE;

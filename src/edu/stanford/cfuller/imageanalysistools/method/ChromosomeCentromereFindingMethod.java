@@ -43,8 +43,6 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 import org.apache.commons.math.linear.RealMatrix;
 
-import java.util.Vector;
-
 
 /**
  * A method to find isolated chromosomes using DNA stain (designate using parameter marker_channel_index) as well as
@@ -69,7 +67,6 @@ public class ChromosomeCentromereFindingMethod extends Method {
         CentromereFindingMethod ch0_method = new CentromereFindingMethod();
         CentromereFindingMethod ch1_method = new CentromereFindingMethod();
 
-        int channelNumber = 0; //the image loading code has already ensured that this is the first image
         int originalChannelNumber = this.parameters.getIntValueForKey("marker_channel_index");
         int secondChannelNumber = this.parameters.getIntValueForKey("secondary_marker_channel_index");
         if (originalChannelNumber >= secondChannelNumber) secondChannelNumber++;

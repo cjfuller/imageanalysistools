@@ -41,6 +41,8 @@ import org.apache.commons.math.geometry.Vector3D;
 
 /**
  * Representation of an Object identified in an image with some defined spatial position that can be clustered.
+ * 
+ * @author Colin J. Fuller
  */
 public class ClusterObject implements Positioned{
 

@@ -90,8 +90,6 @@ public class MaximumSeparabilityThresholdingFilter extends Filter {
      */
 	public void apply_ext(Image im, boolean adaptiveincrement, int increment) {
 		
-		boolean doSecondThresh = false;
-		
 		Histogram h = new Histogram(im);
 		
 		int thresholdValue = 0;

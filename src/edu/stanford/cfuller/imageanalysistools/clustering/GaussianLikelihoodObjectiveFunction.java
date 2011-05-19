@@ -90,7 +90,6 @@ public class GaussianLikelihoodObjectiveFunction implements ObjectiveFunction {
      */
     public double evaluate(RealVector parameters) {
 
-        double result = 0.0;
         int nClusters = parameters.getDimension()/nParametersEach;
 
         //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("nClusters: " + nClusters + "  abdMatrices_size: " + abdMatrices.size() + "  det_dim: " + det.getDimension());

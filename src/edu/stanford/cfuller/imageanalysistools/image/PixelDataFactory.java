@@ -39,6 +39,8 @@ package edu.stanford.cfuller.imageanalysistools.image;
 /**
  * A factory to construct PixelData objects; the choice of implementation will be made based on the
  * properties of the data.
+ * 
+ * @author Colin J. Fuller
  *
  */
 public class PixelDataFactory {

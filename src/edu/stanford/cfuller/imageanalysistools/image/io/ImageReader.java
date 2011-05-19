@@ -41,9 +41,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.PixelData;
 import edu.stanford.cfuller.imageanalysistools.image.PixelDataFactory;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileLock;
+
 import java.util.Hashtable;
 
 /**
@@ -170,9 +168,7 @@ public class ImageReader {
 		
 		PixelData p = (new PixelDataFactory()).createPixelData(lociReader.getSizeX(), lociReader.getSizeY(), lociReader.getSizeZ(), lociReader.getSizeC(), lociReader.getSizeT(), lociReader.getPixelType(), lociReader.getDimensionOrder());
 		
-		int datasize_bytes = 0;
-		
-        byte[] pixel_bytes = null;
+		byte[] pixel_bytes = null;
 
 		int byte_position= 0;
 		

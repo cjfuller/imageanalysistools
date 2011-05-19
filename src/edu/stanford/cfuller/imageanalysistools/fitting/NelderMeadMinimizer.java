@@ -43,6 +43,8 @@ import org.apache.commons.math.linear.RealVector;
 
 /**
  * A function minimizer that implements the Nelder-Mead or Downhill Simplex method.
+ * 
+ * @author Colin J. Fuller
  */
 public class NelderMeadMinimizer {
 
@@ -165,8 +167,6 @@ public class NelderMeadMinimizer {
 
             int maxIndex = 0;
             int minIndex = 0;
-            int secondMaxIndex = 0;
-
             double maxValue = -1.0*Double.MAX_VALUE;
             double minValue = Double.MAX_VALUE;
             double secondMaxValue = -1.0*Double.MAX_VALUE;
@@ -190,12 +190,10 @@ public class NelderMeadMinimizer {
                 if (currValue < minValue) {minValue = currValue; minIndex = i;}
                 if (currValue > maxValue) {
                     secondMaxValue = maxValue;
-                    secondMaxIndex = maxIndex;
                     maxValue = currValue;
                     maxIndex = i;
                 } else if (currValue > secondMaxValue) {
                     secondMaxValue = currValue;
-                    secondMaxIndex = i;
                 }
             }
 

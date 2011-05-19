@@ -41,11 +41,9 @@ import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: 1/27/11
- * Time: 11:47 AM
- * To change this template use File | Settings | File Templates.
+ * Implements the commonly used watershed method on the gradient of an Image.
+ * 
+ * @author Colin J. Fuller
  */
 public class WatershedMethod extends Method {
 

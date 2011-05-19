@@ -51,6 +51,8 @@ import java.util.Vector;
 
 /**
  * Utilites for doing clustering of objects in an Image.
+ * 
+ * @author Colin J. Fuller
  */
 
 public class ObjectClustering {
@@ -575,12 +577,14 @@ public class ObjectClustering {
 
         }
 
-        Histogram h_mapped = new Histogram(mapped);
 
         //if a centromere lies across a boundary, some of its pixels might be in different regions-- correct this by simple majority
 
         // hmm... maybe this is not so important... is just choosing the first one encountered faster?
 /*
+
+        Histogram h_mapped = new Histogram(mapped);
+
         org.apache.commons.math.linear.RealMatrix mappingcounts = new Array2DRowRealMatrix(h_individualCentromeres.getMaxValue() + 1, h_mapped.getMaxValue() + 1);
 
         mappingcounts = mappingcounts.scalarMultiply(0.0);
@@ -699,16 +703,9 @@ public class ObjectClustering {
         Vector<Cluster> clusters = new Vector<Cluster>();
 
 
-        double maxRatio = 0;
-
-        int maxIndex = 0;
-
         double bestRatio = 1.0;
 
         int bestK = 0;
-
-        double lastL = -1.0*Double.MAX_VALUE;
-        double lastLDiff = 0;
 
         Image bestImage = null;
 
@@ -735,17 +732,9 @@ public class ObjectClustering {
 
             int orig_k = k;
 
-            int numTrials = 10*k;
-
             double interdist;
 
-            double intradist;
-
             double currMaxL = -1.0*Double.MAX_VALUE;
-
-            int numSingluar = 0;
-
-            if (k == 1) numTrials = 1;
 
             int n=0;
 
@@ -937,17 +926,10 @@ public class ObjectClustering {
 
             double tempL = -1.0*L;
 
-            double Ldiff = 0;
-
             if (numAttempts ==1) {
-                lastL = tempL;
-                lastLDiff = -1;
-                Ldiff = 0;
 
 
             } else {
-            
-                Ldiff = (L - lastL)/Math.abs(lastL);
             }
 
             interdist = getInterClusterDistances(clusterObjects, clusters, clusters.size(), clusterObjects.size());
@@ -975,21 +957,15 @@ public class ObjectClustering {
 
                 repeatThis = 0;
 
-                if (bestImage == null) {
-                    bestImage = new Image(input);
-                } else {
-                    bestImage.copy(input);
-                }
+ 
+                bestImage.copy(input);
+          
 
                 clustersToMask(bestImage, clusterObjects, clusters, bestK);
 
                 rlf.apply(bestImage);
 
                 overallMaxL = tempL;
-
-                lastL = tempL;
-
-                lastLDiff = Ldiff;
 
             }
 

@@ -268,8 +268,6 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		
 		int ir = n-1;
 		
-		int temp = 0;
-		
 		while(true) {
 		
 			if (ir <= l+1) {

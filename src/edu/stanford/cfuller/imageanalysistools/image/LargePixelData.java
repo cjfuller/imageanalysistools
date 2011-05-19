@@ -60,6 +60,8 @@ import java.nio.channels.FileChannel;
 
 public class LargePixelData extends PixelData {
 
+	final static long serialVersionUID = 1L;
+	
     private RandomAccessFile tempFileStorage;
     private FileChannel tempFileStorageChannel;
     private MappedByteBuffer mappedData;

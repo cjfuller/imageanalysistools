@@ -39,11 +39,11 @@ package edu.stanford.cfuller.imageanalysistools.random;
 import java.util.Random;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: Dec 9, 2010
- * Time: 3:22:07 PM
- * To change this template use File | Settings | File Templates.
+ * Wrapper for random number generation to allow substitution of different methods for generating random numbers.
+ * 
+ * The current implementation just wraps the java default random number generator.
+ * 
+ * @author Colin J. Fuller
  */
 public class RandomGenerator {
 

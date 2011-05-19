@@ -46,11 +46,12 @@ import org.apache.commons.math.linear.RealMatrix;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 
 /**
  * Controls analysis done on the local machine, including routines for threading analysis, and data input and output.
+ * 
+ * @author Colin J. Fuller
  */
 
 public class LocalAnalysis {
@@ -313,8 +314,6 @@ public class LocalAnalysis {
         if (reader == null) {
             reader = new ImageReader();
         }
-
-        java.util.Vector<Image> images = new java.util.Vector<Image>();
 
         fileSet.loadAllImages();
 

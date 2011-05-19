@@ -72,8 +72,7 @@ public abstract class Method extends Thread{
      * @param m             The Metric that will be used to quantify the Images.
      */
 	protected void iterateOnFiltersAndStoreResult(java.util.List<Filter> filters, Image toProcess, Metric m) {
-		int c = 0;
-        if (Boolean.parseBoolean(parameters.getValueForKey("DEBUG"))) {
+		if (Boolean.parseBoolean(parameters.getValueForKey("DEBUG"))) {
 //		    toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
         }
 		for (Filter f : filters) {

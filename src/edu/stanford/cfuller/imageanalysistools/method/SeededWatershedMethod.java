@@ -40,11 +40,12 @@ import edu.stanford.cfuller.imageanalysistools.filter.*;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 
 /**
- * Created by IntelliJ IDEA.
- * User: cfuller
- * Date: 1/27/11
- * Time: 4:46 PM
- * To change this template use File | Settings | File Templates.
+ * Implements the a version of the watershed method that is seeded off of supplied regions.
+ * 
+ * The eventual watershed division of the Image will have as many regions as seed regions.
+ * 
+ * @author Colin J. Fuller
+ *
  */
 public class SeededWatershedMethod extends Method {
 
@@ -70,8 +71,6 @@ public class SeededWatershedMethod extends Method {
 
         SeededWatershedFilter swf = new SeededWatershedFilter();
 
-        Image seed = null;
-
         CentromereFindingMethod rtf = new CentromereFindingMethod();
 
         parameters.addIfNotSet("use_clustering", "false");
@@ -81,8 +80,6 @@ public class SeededWatershedMethod extends Method {
         rtf.go();
 
         swf.setSeed(rtf.getStoredImage());
-
-//        filters.add(new WatershedFilter());
 
         filters.add(swf);
         filters.add(new MergeFilter());

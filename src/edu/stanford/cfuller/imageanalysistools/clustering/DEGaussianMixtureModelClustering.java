@@ -44,6 +44,8 @@ import org.apache.commons.math.linear.RealVector;
 
 /**
  * Implements Gaussian mixture model clustering for a set of ClusterObjects using a differential evolution algorithm for the likelihood maximization.
+ * 
+ * @author Colin J. Fuller
  */
 public class DEGaussianMixtureModelClustering {
 

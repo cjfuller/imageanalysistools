@@ -51,6 +51,8 @@ import java.lang.Double;import java.lang.Math;import java.lang.String;import jav
  * An object in an image with some spatial extent that can be fit to some function.
  *
  * Classes that extend ImageObject will supply methods that perform the fit to a specific functional form.
+ * 
+ * @author Colin J. Fuller
  *
  */
 public abstract class ImageObject implements Serializable {

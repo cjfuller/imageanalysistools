@@ -36,7 +36,6 @@
 
 package edu.stanford.cfuller.imageanalysistools.fitting;
 
-import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
@@ -49,9 +48,13 @@ import java.util.Vector;
 
 /**
  * An ImageObject that fits to a three-dimensional gaussian.
+ * 
+ * @author Colin J. Fuller
  */
 public class GaussianImageObject extends ImageObject {
 
+	static final long serialVersionUID =1L;
+	
     /**
      * Creates an empty GaussianImageObject.
      */
@@ -88,9 +91,6 @@ public class GaussianImageObject extends ImageObject {
         this.fitParametersByChannel = new Vector<RealVector>();
         this.fitR2ByChannel = new Vector<Double>();
         this.fitErrorByChannel = new Vector<Double>();
-
-        final int numFitParams = 7;
-
 
         GaussianFitter3D gf = new GaussianFitter3D();
 
@@ -182,8 +182,6 @@ public class GaussianImageObject extends ImageObject {
                 }
             }
 
-            //System.out.println("object " + this.label + "  max: " + maxZ + "  min: " + minZ);
-
             zCentroid = maxInd;
 
 
@@ -210,18 +208,11 @@ public class GaussianImageObject extends ImageObject {
 
             //positions
 
-            //fitParameters.setEntry(3, this.centroidInMask.getX());
-            //fitParameters.setEntry(4, this.centroidInMask.getY());
-            //fitParameters.setEntry(5, this.maxIntensityZCoordByChannel[channelIndex]);
-
             fitParameters.setEntry(3, xCentroid);
             fitParameters.setEntry(4, yCentroid);
             fitParameters.setEntry(5, zCentroid);
 
             //variances
-
-            int xBoxSize = this.parentBoxMax.getX() - this.parentBoxMin.getX();
-            int zBoxSize = this.parentBoxMax.getZ() - this.parentBoxMin.getZ();
 
             final double limitedWidthxy = 200;
             final double limitedWidthz = 500;
@@ -239,14 +230,8 @@ public class GaussianImageObject extends ImageObject {
 
             //do the fit
 
-            RealVector initialParams = fitParameters;
-
             fitParameters = gf.fit(this, fitParameters, ppg);
-//synchronized (this.getClass()) {
-            //LoggingUtilities.getLogger().info("Initial guess for object # " + this.label + ": " + initialParams.toString());
-//
-            //LoggingUtilities.getLogger().info("Fit for object # " + this.label + ": " + fitParameters.toString());
-//            }
+
 
             fitParametersByChannel.add(fitParameters);
 
@@ -269,36 +254,24 @@ public class GaussianImageObject extends ImageObject {
 
             }
 
-            //double n_photons = mean;
-
             mean /= functionValues.length;
 
             for (int i =0; i < this.xValues.length; i++) {
                 variance += Math.pow(functionValues[i] - mean, 2);
             }
 
-            //variance /= functionValues.length;
-
-            //R2 = 1 - (residualSumSquared/(variance * functionValues.length));
-
             R2 = 1 - (residualSumSquared/variance);
-
-            //LoggingUtilities.getLogger().info("R^2 for object # " + this.label + ": " +R2);
-
 
             this.fitR2ByChannel.add(R2);
 
             this.unboxImages();
 
-            //calculate fit error	protected void finalize() throws Throwable{
-
+            //calculate fit error
 
             double s_xy = fitParameters.getEntry(1) * Math.pow(p.getDoubleValueForKey("pixelsize_nm"), 2);
             double s_z = fitParameters.getEntry(2) * Math.pow(p.getDoubleValueForKey("z_sectionsize_nm"), 2);
 
             double error = Math.sqrt(2*(2*s_xy + s_z)/(n_photons - 1));
-
-            //System.out.println(error);
  
             this.fitErrorByChannel.add(error);
 

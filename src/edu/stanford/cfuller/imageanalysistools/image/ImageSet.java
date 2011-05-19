@@ -352,7 +352,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
     }
 
 
-    private static class ImageHolder {
+    protected static class ImageHolder {
 
         Image theImage;
         String filename;
@@ -513,7 +513,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         ImageSet toIterate;
         int currIndex;
 
-        private ImageSetIterator() {}
+        protected ImageSetIterator() {}
 
         public ImageSetIterator(ImageSet toIterate) {
             this.toIterate = toIterate;

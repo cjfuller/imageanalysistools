@@ -39,12 +39,13 @@ package edu.stanford.cfuller.imageanalysistools.frontend;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.image.io.OmeroServerImageReader;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
-import edu.stanford.cfuller.imageanalysistools.test;
 import omero.ServerError;
 
 
 /**
  * Utilities for getting files from a directory or OMERO data source and matching them together into sets of the different channels of the same image.
+ * 
+ * @author Colin J. Fuller
  */
 public class DirUtils {
 

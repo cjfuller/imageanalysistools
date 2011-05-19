@@ -56,7 +56,7 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
 
     boolean isBoxedIterator;
 
-    private ImageIterator() {}
+    protected ImageIterator() {}
 
     /**
      * Constructs a new ImageIterator for a given Image, and initializes it to the 0th coordinate in each dimension.

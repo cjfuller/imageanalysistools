@@ -39,6 +39,8 @@ package edu.stanford.cfuller.imageanalysistools.fitting;
 /**
  *
  * Describes a function that returns a (real) scalar and takes a vector of parameters.
+ * 
+ * @author Colin J. Fuller
  *
  */
 public interface ObjectiveFunction {

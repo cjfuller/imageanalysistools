@@ -36,8 +36,6 @@
 
 package edu.stanford.cfuller.imageanalysistools.image;
 
-import java.util.logging.Logger;
-
 /**
  * Represents an integer-valued coordinate in a 5D image (X, Y, Z, color, time).
  *

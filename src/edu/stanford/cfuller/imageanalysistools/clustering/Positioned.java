@@ -41,6 +41,8 @@ import org.apache.commons.math.geometry.Vector3D;
 /**
  *
  * Describes something that has a 3D position that can calculate its distance to some other object with a 3D position.
+ * 
+ * @author Colin J. Fuller
  *
  */
 public interface Positioned {

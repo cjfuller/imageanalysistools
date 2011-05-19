@@ -38,13 +38,6 @@ package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
-import org.apache.commons.math.complex.Complex;
-import org.apache.commons.math.transform.FastFourierTransformer;
-
-import java.awt.image.BufferedImage;
-import java.awt.image.ConvolveOp;
-import java.awt.image.Kernel;
-import java.awt.image.WritableRaster;
 
 /**
  * A Filter that applies a gaussian blur to an Image.
@@ -80,8 +73,6 @@ public class GaussianFilter extends Filter {
 	@Override
 	public void apply(Image im) {
 
-		int stdDev = this.width;
-		
 		int kernelSize = this.width;
 		
 //		if (stdDev < 12) {

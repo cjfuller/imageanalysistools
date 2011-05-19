@@ -42,13 +42,14 @@ import java.util.Set;
 
 /**
  * A representation of a single Cluster of ClusterObject that might result from applying a clustering algorithm to a collection of objects.
+ * 
+ * @author Colin J. Fuller
  */
 public class Cluster implements Positioned{
 
     private java.util.Set<ClusterObject> objectSet;
     private int ID;
     private org.apache.commons.math.geometry.Vector3D centroid;
-    private org.apache.commons.math.geometry.Vector3D covariance;
 
     /**
      * Constructs an empty cluster.
@@ -58,7 +59,6 @@ public class Cluster implements Positioned{
         objectSet = new java.util.HashSet<ClusterObject>();
         ID = 0;
         centroid = null;
-        covariance = null;
     }
 
     /**

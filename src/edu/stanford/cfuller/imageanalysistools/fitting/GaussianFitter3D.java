@@ -44,6 +44,8 @@ import org.apache.commons.math.linear.RealVector;import java.lang.Math;
 /**
  * Performs a three-dimensional gaussian fit to an object in an image using a maximum likelihood method assuming Poisson
  * distributed pixel intensities (once converted to units of photons).
+ * 
+ * @author Colin J. Fuller
  *
  */
 public class GaussianFitter3D {
@@ -79,17 +81,7 @@ public class GaussianFitter3D {
         //System.out.println("for object " + toFit.getLabel() + " initial guess is: " + initialGuess.toString());
 
 
-        RealVector parameterLowerBounds = initialGuess.mapMultiply(0.2);
-        RealVector parameterUpperBounds = initialGuess.mapMultiply(5);
-
-
-
-        int populationSize = 14;
         double tol = 1.0e-6;
-        double scaleFactor = 0.9;
-        double crFrq = 0.05;
-        int maxIterations = 10;
-
         NelderMeadMinimizer nmm = new NelderMeadMinimizer(tol);
 
         RealVector result = nmm.optimize(new MLObjectiveFunction(toFit, ppg), initialGuess);
@@ -143,12 +135,9 @@ public class GaussianFitter3D {
 
         private ImageObject toFit;
         private double ppg;
-        private RealVector params_temp;
-
         public MLObjectiveFunction(ImageObject toFit, double ppg) {
             this.toFit = toFit;
             this.ppg = ppg;
-            this.params_temp = null;
         }
 
         public double evaluate(RealVector parameters) {

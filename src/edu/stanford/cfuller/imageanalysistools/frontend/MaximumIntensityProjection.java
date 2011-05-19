@@ -44,6 +44,8 @@ import java.io.File;
 
 /**
  * Utilities for creating maximum intensity projections of images.
+ * 
+ * @author Colin J. Fuller
  */
 public class MaximumIntensityProjection {
 
@@ -63,9 +65,6 @@ public class MaximumIntensityProjection {
         Image imProj = new Image(projectionSizes, 0.0);
 
         projectionSizes.recycle();
-
-        int sizeZ = im.getDimensionSizes().getZ();
-
 
         for (ImageCoordinate i : im) {
 
