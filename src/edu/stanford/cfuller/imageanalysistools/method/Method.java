@@ -44,13 +44,13 @@ import edu.stanford.cfuller.imageanalysistools.filter.Filter;
 import org.apache.commons.math.linear.RealMatrix;
 
 /**
- * An analysis method that can be run as an independent thread of execution.
+ * An analysis method that can be run in an independent thread of execution.
  *
  * @author Colin J. Fuller
  */
 
 
-public abstract class Method extends Thread{
+public abstract class Method implements Runnable {
 	
 	//fields
 	

@@ -272,7 +272,6 @@ public class LocalAnalysis {
 
     private static ImageSet loadImagesFromFileSet(ImageSet fileSet) throws java.io.IOException {
 
-
         loadImagesFromFileSetWithSeriesCount(fileSet);
 
         return fileSet;
