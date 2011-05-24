@@ -159,7 +159,7 @@ public class CentromereFindingMethod extends Method {
 
         //clustering
 
-        if(this.parameters.hasKey("use_clustering") && Boolean.parseBoolean(this.parameters.getValueForKey("use_clustering"))) {
+        if(this.parameters.hasKeyAndTrue("use_clustering")) {
             //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Filtering");
 
             Image gaussianFilteredMask = ObjectClustering.gaussianFilterMask(groupMask);
@@ -172,7 +172,7 @@ public class CentromereFindingMethod extends Method {
 
 
             if (!decreaseBackground) {
-                if (this.parameters.hasKey("use_basic_clustering") && this.parameters.getBooleanValueForKey("use_basic_clustering")) {
+                if (this.parameters.hasKeyAndTrue("use_basic_clustering")) {
                     groupMask.copy(ObjectClustering.doBasicClustering(groupMask, normalized, gaussianFilteredMask));
                 } else {
                     ObjectClustering.doComplexClustering(groupMask, normalized, Integer.parseInt(this.parameters.getValueForKey("maximum_clustering_iterations")), gaussianFilteredMask);

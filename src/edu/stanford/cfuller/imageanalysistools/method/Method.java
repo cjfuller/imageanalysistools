@@ -150,10 +150,11 @@ public abstract class Method implements Runnable {
      * Sets the Images to be quantified/processed for this method.
      *
      * If there is one Image that is to receive special treatment (for example, one color channel to be segmented, and this
-     * used to quantify all the channels), then that Image should be the first in the supplied List.
+     * used to quantify all the channels), then that Image should be specified in the ImageSet using its setMarkerImage method.
      *
      * This method will not overwrite any Images already passed using prior calls this method, but rather append the supplied
-     * Images to the list of those already passed in.
+     * Images to the list of those already passed in.  However, if a marker image has already been passed in in a previous ImageSet, it
+     * will not be changed by calling this method.
      *
      * @param images    The List of images to be processed/quantified.
      */
