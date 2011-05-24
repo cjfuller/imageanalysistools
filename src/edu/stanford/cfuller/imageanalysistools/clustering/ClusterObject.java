@@ -156,7 +156,7 @@ public class ClusterObject implements Positioned{
 
     /**
      * Gets the ID of the cluster that is most likely to contain the ClusterObject.
-     * @return
+     * @return  The ID, as an int.
      */
     public int getMostProbableCluster() {
         return mostProbableCluster;
