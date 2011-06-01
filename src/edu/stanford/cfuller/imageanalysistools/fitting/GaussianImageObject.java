@@ -53,7 +53,7 @@ import java.util.Vector;
  */
 public class GaussianImageObject extends ImageObject {
 
-	static final long serialVersionUID =1L;
+	static final long serialVersionUID =2L;
 	
     /**
      * Creates an empty GaussianImageObject.

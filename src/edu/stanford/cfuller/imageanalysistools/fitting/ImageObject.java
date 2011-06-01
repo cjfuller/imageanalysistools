@@ -45,7 +45,8 @@ import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
 
 import java.io.Serializable;
-import java.lang.Double;import java.lang.Math;import java.lang.String;import java.lang.Throwable;import java.util.Vector;
+import java.lang.Double;import java.lang.Math;import java.lang.String;import java.lang.Throwable;import java.util.Hashtable;
+import java.util.Vector;
 
 /**
  * An object in an image with some spatial extent that can be fit to some function.
@@ -57,7 +58,7 @@ import java.lang.Double;import java.lang.Math;import java.lang.String;import jav
  */
 public abstract class ImageObject implements Serializable {
 
-    public static final long serialVersionUID = 1L;
+    public static final long serialVersionUID = 2L;
 
     Vector3D centroidInMask;
 
@@ -71,12 +72,16 @@ public abstract class ImageObject implements Serializable {
     double[] yValues;
     double[] zValues;
     double[] functionValues;
+    
+    int numberOfChannels;
 
     java.util.Vector<RealVector> fitParametersByChannel;
     java.util.Vector<Double> fitR2ByChannel;
     java.util.Vector<Double> fitErrorByChannel;
     
     java.util.Vector<RealVector> positionsByChannel;
+    Hashtable<Integer, RealVector> vectorDifferencesBetweenChannels;
+    Hashtable<Integer, Double> scalarDifferencesBetweenChannels;
 
     ImageCoordinate parentBoxMin;
     ImageCoordinate parentBoxMax;
@@ -104,6 +109,9 @@ public abstract class ImageObject implements Serializable {
         this.fitR2ByChannel = null;
         this.fitErrorByChannel = null;
         this.label = 0;
+        this.vectorDifferencesBetweenChannels = new Hashtable<Integer, RealVector>();
+        this.scalarDifferencesBetweenChannels = new Hashtable<Integer, Double>();
+        this.numberOfChannels = 0;
     }
 
 
@@ -125,6 +133,9 @@ public abstract class ImageObject implements Serializable {
         this.fitErrorByChannel = null;
         
         this.positionsByChannel = new Vector<RealVector>();
+
+        this.vectorDifferencesBetweenChannels = new Hashtable<Integer, RealVector>();
+        this.scalarDifferencesBetweenChannels = new Hashtable<Integer, Double>();
 
         //this.parent = new Image(parent);
         //this.mask = new Image(mask);
@@ -188,7 +199,9 @@ public abstract class ImageObject implements Serializable {
         int maxZOverall = 0;
 
         //for (int c = 0; c < parent.getDimensionSizes().getC(); c++) {
-        for (int c = 0; c < p.getIntValueForKey("num_wavelengths"); c++) { // use this so that if there's extra wavelengths not to be quantified at the end, these won't skew the initial guess
+        this.numberOfChannels = p.getIntValueForKey("num_wavelengths"); // use this so that if there's extra wavelengths not to be quantified at the end, these won't skew the initial guess
+        
+        for (int c = 0; c < this.numberOfChannels; c++) { 
             this.parentBoxMin.setC(c);
             this.parentBoxMax.setC(c+1);
 
@@ -448,12 +461,19 @@ public abstract class ImageObject implements Serializable {
      */
     public RealVector getVectorDifferenceBetweenChannels(int channel0, int channel1) {
     	
-    	RealVector ch0 = this.getPositionForChannel(channel0);
-    	RealVector ch1 = this.getPositionForChannel(channel1);
+    	int key = this.numberOfChannels * channel0 + channel1;
+    	    	
+    	if (! this.vectorDifferencesBetweenChannels.containsKey(key)) {
     	
-    	if (ch0 == null || ch1 == null) {return null;}
+	    	RealVector ch0 = this.getPositionForChannel(channel0);
+	    	RealVector ch1 = this.getPositionForChannel(channel1);
+	    	
+	    	if (ch0 == null || ch1 == null) {return null;}
+	    	
+	    	this.vectorDifferencesBetweenChannels.put(key, ch1.subtract(ch0));
+    	}
     	
-    	return ch1.subtract(ch0);
+    	return this.vectorDifferencesBetweenChannels.get(key);
     	
     }
     
@@ -470,11 +490,19 @@ public abstract class ImageObject implements Serializable {
      */
     public Double getScalarDifferenceBetweenChannels(int channel0, int channel1, RealVector pixelToDistanceConversions) {
     	
-    	RealVector vecDifference = this.getVectorDifferenceBetweenChannels(channel0, channel1);
+    	int key = this.numberOfChannels * channel0 + channel1;
     	
-    	if (vecDifference == null) {return null;}
+    	if (!this.scalarDifferencesBetweenChannels.containsKey(key)) {
+	    	
+	    	RealVector vecDifference = this.getVectorDifferenceBetweenChannels(channel0, channel1);
+	    	
+	    	if (vecDifference == null) {return null;}
+	    	
+	    	this.scalarDifferencesBetweenChannels.put(key, vecDifference.ebeMultiply(pixelToDistanceConversions).getNorm());
+	    	
+    	}
     	
-    	return vecDifference.ebeMultiply(pixelToDistanceConversions).getNorm();
+    	return this.scalarDifferencesBetweenChannels.get(key);
     	
     }
     
