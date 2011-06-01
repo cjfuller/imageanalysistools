@@ -227,7 +227,7 @@ public class GaussianImageObject extends ImageObject {
 
             fitParameters.setEntry(0, fitParameters.getEntry(0)*ppg);
             fitParameters.setEntry(6, fitParameters.getEntry(6)*ppg);
-
+            
             //do the fit
 
             fitParameters = gf.fit(this, fitParameters, ppg);
@@ -274,6 +274,8 @@ public class GaussianImageObject extends ImageObject {
             double error = Math.sqrt(2*(2*s_xy + s_z)/(n_photons - 1));
  
             this.fitErrorByChannel.add(error);
+            
+            this.positionsByChannel.add(fitParameters.getSubVector(3, 3));
 
         }
 

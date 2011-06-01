@@ -75,6 +75,8 @@ public abstract class ImageObject implements Serializable {
     java.util.Vector<RealVector> fitParametersByChannel;
     java.util.Vector<Double> fitR2ByChannel;
     java.util.Vector<Double> fitErrorByChannel;
+    
+    java.util.Vector<RealVector> positionsByChannel;
 
     ImageCoordinate parentBoxMin;
     ImageCoordinate parentBoxMax;
@@ -121,6 +123,8 @@ public abstract class ImageObject implements Serializable {
         this.fitParametersByChannel = null;
         this.fitR2ByChannel = null;
         this.fitErrorByChannel = null;
+        
+        this.positionsByChannel = new Vector<RealVector>();
 
         //this.parent = new Image(parent);
         //this.mask = new Image(mask);
@@ -414,4 +418,64 @@ public abstract class ImageObject implements Serializable {
      */
     public int getLabel() {return this.label;}
 
+    /**
+     * Gets the position of this object in the specified channel.
+     * 
+     * Do not modify the returned RealVector, as it is a reference to the internally stored vector.
+     * 
+     * @param channel	The index of the channel, either by order in the original multiwavelength image, or in the order specified for split wavelength images.
+     * 
+     * @return	A RealVector containing the x,y,and z coordinates of the position, or null if it has not yet been determined, or the channel is out of range.
+     */
+    public RealVector getPositionForChannel(int channel) {
+    	
+    	if (! (channel < this.positionsByChannel.size())) {
+    		return null;
+    	}
+    	
+    	return this.positionsByChannel.get(channel);
+    	
+    }
+    
+    /**
+     * Gets the vector difference between the position of the object in two channels.
+     * 
+     * Note that there is no unit conversion here, and the distance is returned in image units of pixels or sections.
+     * 
+     * @param channel0	The index of one channel to use for the difference.
+     * @param channel1	The index of the other channel to use for the difference.
+     * @return			The vector difference between the two channels, as channel1 - channel0, or null if either channel is out of range or has not yet been fit.
+     */
+    public RealVector getVectorDifferenceBetweenChannels(int channel0, int channel1) {
+    	
+    	RealVector ch0 = this.getPositionForChannel(channel0);
+    	RealVector ch1 = this.getPositionForChannel(channel1);
+    	
+    	if (ch0 == null || ch1 == null) {return null;}
+    	
+    	return ch1.subtract(ch0);
+    	
+    }
+    
+    
+    /**
+     * Gets the scalar difference between the position of the object in two channels.
+     * 
+     * Units are converted from image units to real units using the supplied vector of conversions.
+     * 
+     * @param channel0 	The index of one channel to use for the difference.
+     * @param channel1	The index of the other channel to use for the difference.
+     * @param pixelToDistanceConversions	A vector containing the number of realspace distance units per pixel or section, one element per dimension.
+     * @return			The scalar distance between the position of the object in each channel (that is, the length of the vector representing the vector distance), or null if either channel is out of range or has not yet been fit.
+     */
+    public Double getScalarDifferenceBetweenChannels(int channel0, int channel1, RealVector pixelToDistanceConversions) {
+    	
+    	RealVector vecDifference = this.getVectorDifferenceBetweenChannels(channel0, channel1);
+    	
+    	if (vecDifference == null) {return null;}
+    	
+    	return vecDifference.ebeMultiply(pixelToDistanceConversions).getNorm();
+    	
+    }
+    
 }
