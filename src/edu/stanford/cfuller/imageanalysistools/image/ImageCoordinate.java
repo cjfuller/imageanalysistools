@@ -37,8 +37,11 @@
 package edu.stanford.cfuller.imageanalysistools.image;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Represents an integer-valued coordinate in an n-dimensional image.
@@ -60,7 +63,7 @@ import java.util.Map;
  *
  */
 
-public class ImageCoordinate implements java.io.Serializable{
+public class ImageCoordinate implements java.io.Serializable, Collection<Integer>{
 
 	static final long serialVersionUID = 1L;
 	
@@ -398,7 +401,13 @@ public class ImageCoordinate implements java.io.Serializable{
     	}
     }
     
-    protected void clear() {
+    /**
+     * Clears all stored coordinate dimensions and values.
+     * <p>
+     * After calling this method, the ImageCoordinate will be zero-dimensional.
+     * 
+     */
+    public void clear() {
     	this.dimensionCoordinates.clear();
     	this.indexToStringMapping.clear();
     }
@@ -446,6 +455,157 @@ public class ImageCoordinate implements java.io.Serializable{
      */
 	public void setT(int t) {
 		this.set("t", t);
+	}
+	
+	/**
+	 * Collection interface methods.
+	 */
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#add(java.lang.Object)
+	 */
+	@Override
+	public boolean add(Integer arg0) {
+		throw new UnsupportedOperationException("Add not supported for ImageCoordinates.");
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#addAll(java.util.Collection)
+	 */
+	@Override
+	public boolean addAll(Collection<? extends Integer> arg0) {
+		throw new UnsupportedOperationException("Add not supported for ImageCoordinates.");
+	}
+
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#contains(java.lang.Object)
+	 */
+	@Override
+	public boolean contains(Object arg0) {
+		Integer iArg = (Integer) arg0;
+		for (Integer i : this) {
+			if (i == iArg) return true;
+		}
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#containsAll(java.util.Collection)
+	 */
+	@Override
+	public boolean containsAll(Collection<?> arg0) {
+		for (Object o : arg0) {
+			if (!this.contains(o)) return false;
+		}
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#iterator()
+	 */
+	@Override
+	public Iterator<Integer> iterator() {
+		return new ImageCoordinateIterator();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#remove(java.lang.Object)
+	 */
+	@Override
+	public boolean remove(Object arg0) {
+		throw new UnsupportedOperationException("Remove not supported for ImageCoordinates.");
+
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#removeAll(java.util.Collection)
+	 */
+	@Override
+	public boolean removeAll(Collection<?> arg0) {
+		throw new UnsupportedOperationException("Remove not supported for ImageCoordinates.");
+
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#retainAll(java.util.Collection)
+	 */
+	@Override
+	public boolean retainAll(Collection<?> arg0) {
+		throw new UnsupportedOperationException("Retain not supported for ImageCoordinates.");
+
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#size()
+	 */
+	@Override
+	public int size() {
+		return this.getDimension();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#toArray()
+	 */
+	@Override
+	public Object[] toArray() {
+		return toArray(new Object[0]);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#toArray(T[])
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T[] toArray(T[] arg0) {
+		if (arg0.length < this.size()) {
+			int c = 0; 
+			for (Integer i : this) {
+				arg0[c++] = (T) i;
+			}
+			return arg0;
+		} else {
+			Integer[] toReturn = new Integer[this.size()];
+			int c = 0;
+			for (Integer i : this) {
+				toReturn[c++] = i;
+			}
+			return (T[]) toReturn;
+		}
+	}
+	
+	protected class ImageCoordinateIterator implements Iterator<Integer> {
+		
+		int currentIndex;
+		
+		public ImageCoordinateIterator() {
+			this.currentIndex = 0;
+		}
+		
+		public boolean hasNext() {
+			return (this.currentIndex < getDimension());
+		}
+		
+		public Integer next() {
+			if (this.hasNext()) return get(currentIndex);
+			
+			throw new NoSuchElementException("No more elements in ImageCoordinate.");
+			
+		}
+		
+		public void remove() {
+			throw new UnsupportedOperationException("Remove not supported for ImageCoordinate.");
+		}
+		
+		
 	}
 	
 }
