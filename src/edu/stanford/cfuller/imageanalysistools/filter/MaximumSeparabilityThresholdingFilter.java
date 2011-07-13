@@ -102,7 +102,7 @@ public class MaximumSeparabilityThresholdingFilter extends Filter {
 		int nonzerocounts = h.getTotalCounts() - h.getCounts(0);
 		
 		double meannonzero = h.getMeanNonzero();
-		
+				
 		ArrayRealVector omega_v = new ArrayRealVector(h.getMaxValue());
 		ArrayRealVector mu_v = new ArrayRealVector(h.getMaxValue());
 		
@@ -154,7 +154,6 @@ public class MaximumSeparabilityThresholdingFilter extends Filter {
 		if (thresholdValue == Integer.MAX_VALUE) {
 			thresholdValue = 0;
 		}
-		
 		for (ImageCoordinate coord : im) {
 			if (im.getValue(coord) < thresholdValue) im.setValue(coord, 0);
 		}

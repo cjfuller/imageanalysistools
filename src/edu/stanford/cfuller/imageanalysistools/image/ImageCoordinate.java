@@ -36,6 +36,10 @@
 
 package edu.stanford.cfuller.imageanalysistools.image;
 
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 /**
  * Represents an integer-valued coordinate in a 5D image (X, Y, Z, color, time).
  *
@@ -56,13 +60,13 @@ package edu.stanford.cfuller.imageanalysistools.image;
  *
  */
 
-public class ImageCoordinate implements java.io.Serializable{
+public class ImageCoordinate implements java.io.Serializable, Collection<Integer> {
 
 	static final long serialVersionUID = 1L;
 	
 	static final int initialStaticCoordCount = 8;
 	
-	private static java.util.Deque<ImageCoordinate> availableStaticCoords;
+	private static java.util.ArrayList<ImageCoordinate> availableStaticCoords;
 	private static java.util.Hashtable<ImageCoordinate, Boolean> inUse;
 	
 	private int x;
@@ -70,12 +74,14 @@ public class ImageCoordinate implements java.io.Serializable{
 	private int z;
 	private int c;
 	private int t;
+	
+	private final int dimensionality = 5;
 			
 	static {
 
         synchronized(ImageCoordinate.class) {
 
-            availableStaticCoords = new java.util.LinkedList<ImageCoordinate>();
+            availableStaticCoords = new java.util.ArrayList<ImageCoordinate>();
             inUse = new java.util.Hashtable<ImageCoordinate, Boolean>();
 
             for (int i = 0; i < initialStaticCoordCount; i++) {
@@ -141,7 +147,7 @@ public class ImageCoordinate implements java.io.Serializable{
 
 		if (! availableStaticCoords.isEmpty()) {
 			
-			staticCoord = availableStaticCoords.poll();
+			staticCoord = availableStaticCoords.remove(0);
 			
 //			if (inUse.get(staticCoord)) {
 //				Logger.getLogger("edu.stanford.cfuller.imageanalysistools").warning("WARNING! Image coordinate was likely recycled twice: " + staticCoord.toString() + "  This can only result from a coding bug.");
@@ -290,6 +296,217 @@ public class ImageCoordinate implements java.io.Serializable{
      */
 	public void setT(int t) {
 		this.t = t;
+	}
+	
+	/**
+	 * Gets the coordinate specifies by the supplied index, ordered in the same
+	 * way as when iterating over the coordinates.
+	 * @param index		The index of the coordinate to get.
+	 * @return			The coordinate at the specified index.
+	 * @throws ArrayIndexOutOfBoundsException if the index specified is not >= 0 and less than the dimensionality of the ImageCoordiante.
+	 */
+	public Integer get(int index) {
+		switch (index) {
+		case 0:	return getX();
+		case 1: return getY();
+		case 2: return getZ();
+		case 3: return getC();
+		case 4: return getT();
+		default: break;
+		}
+		throw new ArrayIndexOutOfBoundsException("Invalid coordinate index.  Dimensionality: " + dimensionality);
+	}
+	
+	
+	/**
+	 * Sets the coordinate specifies by the supplied index, ordered in the same
+	 * way as when iterating over the coordinates.
+	 * @param index	The index of the coordinate to get.
+	 * @param value	The value to which the specified coordinate will be set.
+	 * @throws ArrayIndexOutOfBoundsException if the index specified is not >= 0 and less than the dimensionality of the ImageCoordiante.
+	 */
+	public void set(int index, int value) {
+		switch (index) {
+		case 0:	setX(value); return;
+		case 1: setY(value); return;
+		case 2: setZ(value); return;
+		case 3: setC(value); return;
+		case 4: setT(value); return;
+		default: break;
+		}
+		throw new ArrayIndexOutOfBoundsException("Invalid coordinate index.  Dimensionality: " + dimensionality + ".  Index: " + index);
+	}
+	
+	/**
+	 * Gets the dimensionality of the ImageCoordinate (that is, the number of dimensions with coordinates stored).
+	 * @return	The dimensionality, as an int.
+	 */
+	public int getDimensionality() {
+		return this.dimensionality;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#add(java.lang.Object)
+	 */
+	@Override
+	public boolean add(Integer arg0) {
+		throw new UnsupportedOperationException("Add not supported for ImageCoordinates.");
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#addAll(java.util.Collection)
+	 */
+	@Override
+	public boolean addAll(Collection<? extends Integer> arg0) {
+		throw new UnsupportedOperationException("Add not supported for ImageCoordinates.");
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#clear()
+	 */
+	@Override
+	public void clear() {
+		throw new UnsupportedOperationException("Add not supported for ImageCoordinates.");
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#contains(java.lang.Object)
+	 */
+	@Override
+	public boolean contains(Object arg0) {
+		Integer iArg = (Integer) arg0;
+		for (Integer i : this) {
+			if (i == iArg) return true;
+		}
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#containsAll(java.util.Collection)
+	 */
+	@Override
+	public boolean containsAll(Collection<?> arg0) {
+		for (Object o : arg0) {
+			if (!this.contains(o)) return false;
+		}
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#iterator()
+	 */
+	@Override
+	public Iterator<Integer> iterator() {
+		return new ImageCoordinateIterator();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#remove(java.lang.Object)
+	 */
+	@Override
+	public boolean remove(Object arg0) {
+		throw new UnsupportedOperationException("Remove not supported for ImageCoordinates.");
+
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#removeAll(java.util.Collection)
+	 */
+	@Override
+	public boolean removeAll(Collection<?> arg0) {
+		throw new UnsupportedOperationException("Remove not supported for ImageCoordinates.");
+
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#retainAll(java.util.Collection)
+	 */
+	@Override
+	public boolean retainAll(Collection<?> arg0) {
+		throw new UnsupportedOperationException("Retain not supported for ImageCoordinates.");
+
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#size()
+	 */
+	@Override
+	public int size() {
+		return dimensionality;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#toArray()
+	 */
+	@Override
+	public Object[] toArray() {
+		return toArray(new Object[0]);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Collection#toArray(T[])
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T[] toArray(T[] arg0) {
+		if (arg0.length < this.size()) {
+			int c = 0; 
+			for (Integer i : this) {
+				arg0[c++] = (T) i;
+			}
+			return arg0;
+		} else {
+			Integer[] toReturn = new Integer[this.size()];
+			int c = 0;
+			for (Integer i : this) {
+				toReturn[c++] = i;
+			}
+			return (T[]) toReturn;
+		}
+	}
+	
+	protected class ImageCoordinateIterator implements Iterator<Integer> {
+		int currentIndex;
+		
+		public ImageCoordinateIterator() {
+			this.currentIndex = 0;
+		}
+		
+		public boolean hasNext() {
+			if (this.currentIndex < dimensionality) {
+				return true;
+			}
+			return false;
+		}
+		
+		public Integer next() {
+			switch (currentIndex++) {
+			case 0:	return getX();
+			case 1: return getY();
+			case 2: return getZ();
+			case 3: return getC();
+			case 4: return getT();
+			default: break;
+			}
+			
+			throw new NoSuchElementException("No more elements in ImageCoordinate.");
+			
+		}
+		
+		public void remove() {
+			throw new UnsupportedOperationException("Remove not supported for ImageCoordinate.");
+		}
+		
+		
 	}
 	
 }

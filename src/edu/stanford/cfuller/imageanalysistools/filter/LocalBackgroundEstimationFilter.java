@@ -116,7 +116,7 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		RealMatrix countsByRow = new org.apache.commons.math.linear.Array2DRowRealMatrix(2*boxSize + 1, h.getMaxValue() + 1);
 
 
-		//loop over columnsomer
+		//loop over columns
 		
 		for (int i = boxSize; i < im.getDimensionSizes().getX()+boxSize; i++) {
 			
@@ -254,7 +254,7 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		
 	}
 	
-	private static void swap(int first, int second, RealVector toProcess) {
+	protected static void swap(int first, int second, RealVector toProcess) {
 		double value = toProcess.getEntry(first);
 		toProcess.setEntry(first, toProcess.getEntry(second));
 		toProcess.setEntry(second, value);

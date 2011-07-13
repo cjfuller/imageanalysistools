@@ -73,7 +73,7 @@ public class DataSummary {
      *
      * @param directory     The full path to the directory containing the output files to be summarized.
      * @param parameterDirectory       The directory that stores the parameters for the analysis.
-     * @throws java.io.IOException      If any problems reading the analysis output files or writing the summary to disk ar encountered.
+     * @throws java.io.IOException      If any problems reading the analysis output files or writing the summary to disk are encountered.
      */
     public static void SummarizeData(String directory, String parameterDirectory) throws java.io.IOException {
 

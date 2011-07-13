@@ -181,11 +181,11 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
         this.boxMax = ImageCoordinate.cloneCoord(boxMax);
         
         //bounds checking
-        if (this.boxMin.getX() < 0) this.boxMax.setX(0);
-        if (this.boxMin.getY() < 0) this.boxMax.setY(0);
-        if (this.boxMin.getZ() < 0) this.boxMax.setZ(0);
-        if (this.boxMin.getC() < 0) this.boxMax.setC(0);
-        if (this.boxMin.getT() < 0) this.boxMax.setT(0);
+        if (this.boxMin.getX() < 0) this.boxMin.setX(0);
+        if (this.boxMin.getY() < 0) this.boxMin.setY(0);
+        if (this.boxMin.getZ() < 0) this.boxMin.setZ(0);
+        if (this.boxMin.getC() < 0) this.boxMin.setC(0);
+        if (this.boxMin.getT() < 0) this.boxMin.setT(0);
 
         if (this.boxMax.getX() > this.dimensionSizes.getX()) this.boxMax.setX(this.dimensionSizes.getX());
         if (this.boxMax.getY() > this.dimensionSizes.getY()) this.boxMax.setY(this.dimensionSizes.getY());
