@@ -88,7 +88,7 @@ public class Kernel {
 		this.halfKernelDimensions = ImageCoordinate.createCoord(0,0,0,0,0);
 		
 		
-		for (int i =0; i < this.halfKernelDimensions.getDimensionality(); i++) {
+		for (int i =0; i < this.halfKernelDimensions.getDimension(); i++) {
 			this.halfKernelDimensions.set(i, (dimensionSizes.get(i)-1 )/2);
 		}
 		
@@ -137,7 +137,7 @@ public class Kernel {
 		int index = 0;
 		int accumulatedOffset = 1;
 						
-		for (int i =0; i < currentPixel.getDimensionality(); i++) {
+		for (int i =0; i < currentPixel.getDimension(); i++) {
 			int temp = relativePixel.get(i) - currentPixel.get(i);
 			if (temp < -1* halfKernelDimensions.get(i) || temp > halfKernelDimensions.get(i)) {
 				return 0;

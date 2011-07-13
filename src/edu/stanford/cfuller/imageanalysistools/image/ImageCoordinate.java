@@ -191,6 +191,17 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 		}
 		this.dimensionCoordinates.put(dimension, value);
 	}
+	
+	/**
+	 * Sets the specified coordinate component of the ImageCoordinate by its index.
+	 * 
+	 * @param dimension		the index of the dimension to set.
+	 * @param value			the value to which to set the coordinate.
+	 * @deprecated	use {@link #set(String, int)} instead.
+	 */
+	public void set(int dimension, int value) {
+		this.set(this.indexToStringMapping.get(dimension), value);
+	}
 
     /**
      * Factory method that creates a 5D ImageCoordinate with the specified coordinates.
