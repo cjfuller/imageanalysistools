@@ -100,7 +100,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		this.metadata = m;
 		this.pixelData = p;
         this.coordinateArrayStorage = null;
-		this.dimensionSizes = ImageCoordinate.createCoord(p.getSizeX(), p.getSizeY(), p.getSizeZ(), p.getSizeC(), p.getSizeT());
+		this.dimensionSizes = ImageCoordinate.createCoordXYZCT(p.getSizeX(), p.getSizeY(), p.getSizeZ(), p.getSizeC(), p.getSizeT());
 
 	}
 
@@ -115,7 +115,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
         this.boxMax = null;
         this.coordinateArrayStorage = null;
 		PixelData p = toCopy.pixelData;
-		this.dimensionSizes = ImageCoordinate.createCoord(p.getSizeX(), p.getSizeY(), p.getSizeZ(), p.getSizeC(), p.getSizeT());
+		this.dimensionSizes = ImageCoordinate.createCoordXYZCT(p.getSizeX(), p.getSizeY(), p.getSizeZ(), p.getSizeC(), p.getSizeT());
 		this.pixelData= (new PixelDataFactory()).createPixelData(toCopy.getDimensionSizes(), toCopy.pixelData.getDataType(), defaultDimensionOrder);
 		setupNewMetadata();
 		this.copy(toCopy);
@@ -138,7 +138,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
         this.boxMin = null;
         this.boxMax = null;
         this.coordinateArrayStorage = null;
-        this.dimensionSizes = ImageCoordinate.createCoord(dimensionSizes.getX(), dimensionSizes.getY(), dimensionSizes.getZ(), dimensionSizes.getC(), dimensionSizes.getT());
+        this.dimensionSizes = ImageCoordinate.cloneCoord(dimensionSizes);
 		this.pixelData= (new PixelDataFactory()).createPixelData(dimensionSizes, loci.formats.FormatTools.UINT16, "XYZCT");
 		setupNewMetadata();
 		
