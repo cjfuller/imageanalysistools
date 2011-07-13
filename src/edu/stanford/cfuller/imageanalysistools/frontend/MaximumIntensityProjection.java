@@ -132,8 +132,13 @@ public class MaximumIntensityProjection {
 
         File dirFile = new File(directory);
 
+        
+        System.out.println("attempting to project: " + dirFile.getAbsolutePath());
+        
         for (File eachFile : dirFile.listFiles()) {
 
+        	System.out.println("current file: " + eachFile.getAbsolutePath());
+        	
             try {
                 project(eachFile.getAbsolutePath());
             } catch (java.io.IOException e) {

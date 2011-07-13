@@ -37,6 +37,8 @@
 package edu.stanford.cfuller.imageanalysistools.image;
 
 import java.io.Serializable;
+
+import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -96,7 +98,7 @@ public class Histogram implements Serializable {
 		java.util.Arrays.fill(this.cumulativeCounts, 0);
 		
 		for (ImageCoordinate i : im) {
-			if (im.getValue(i) < 0) continue;
+			if (im.getValue(i) < 0) {LoggingUtilities.getLogger().warning("negative image value"); continue;}
 			this.counts[(int) im.getValue(i)]++;
 			this.totalCounts++;
 			this.mean += im.getValue(i);
@@ -125,7 +127,7 @@ public class Histogram implements Serializable {
 		this.modeCounts = 0;
 		this.mode = 0;
 		
-		int sum = 0;
+		double sum = 0;
 		
 		for (int i = 1; i < this.counts.length; i++) {
 			

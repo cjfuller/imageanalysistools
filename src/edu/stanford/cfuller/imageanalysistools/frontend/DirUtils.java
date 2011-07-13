@@ -142,7 +142,7 @@ public class DirUtils {
 
         java.io.File directory = new java.io.File(params.getValueForKey("local_directory"));
 
-        java.util.Hashtable<String, Long> idLookupByName = new java.util.Hashtable<String, Long>();
+        java.util.HashMap<String, Long> idLookupByName = new java.util.HashMap<String, Long>();
 
         if (params.hasKey("use_omero") && params.getBooleanValueForKey("use_omero")) {
 
@@ -183,7 +183,6 @@ public class DirUtils {
                     continue;
                 }
 
-
                 idLookupByName.put(f.getAbsolutePath(), null);
             }
 
@@ -213,6 +212,8 @@ public class DirUtils {
 
                 if (id != null) {
                     tempSet.addImageWithOmeroIdAndName(id, subName);
+                } else {
+                	tempSet.addImageWithFilename(subName);
                 }
             }
 

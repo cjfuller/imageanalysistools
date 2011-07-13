@@ -63,7 +63,7 @@ import java.util.NoSuchElementException;
  *
  */
 
-public class ImageCoordinate implements java.io.Serializable, Collection<Integer>{
+public class ImageCoordinate implements java.io.Serializable, Collection<Integer> {
 
 	static final long serialVersionUID = 1L;
 	

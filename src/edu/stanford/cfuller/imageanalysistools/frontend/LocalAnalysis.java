@@ -428,6 +428,8 @@ public class LocalAnalysis {
 
         String maskOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
 
+        System.out.println("number of stored images: " + finishedMethod.getStoredImages().size());
+        
         if (finishedMethod.getStoredImages().size() == 1) {
 
             finishedMethod.getStoredImage().writeToFile(maskOutputFilename);

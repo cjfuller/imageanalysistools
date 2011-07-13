@@ -52,7 +52,8 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
  * actual size.  Thus, for an Image segmentation method that may not attempt to compensate for objects of differing brightness, which
  * then quantified on integrated intensity would effectively be multiplying differences in intensity: brighter objects would
  * contain more pixels (as they would have larger apparent size), and these pixels would each be brighter.  Measuring intensity per
- * pixel negates this effect.  This is even more effective when combined with something like the {@link edu.stanford.cfuller.imageanalysistools.filter.RenormalizationFilter},
+ * pixel counters this effect (though in many cases where the sample permits using a constant region size, this would be a better choice).
+ * This is even more effective when combined with something like the {@link edu.stanford.cfuller.imageanalysistools.filter.RenormalizationFilter},
  * which tries to locally intensity normalize an image before segmentation, so that differences in brightness will not by themselves
  * lead to changes in apparent object size.
  *

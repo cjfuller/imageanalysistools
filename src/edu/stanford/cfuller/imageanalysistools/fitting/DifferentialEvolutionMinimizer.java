@@ -40,6 +40,8 @@ import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
+
+import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.random.RandomGenerator;
 
 /**
@@ -90,6 +92,8 @@ public class DifferentialEvolutionMinimizer {
         double currMinValue = Double.MAX_VALUE;
         double currMaxValue = -1.0*Double.MAX_VALUE;
         int iterationCounter = maxIterations;
+        
+        double mutationProb = 0.01;
 
         int totalIterations =0;
 
@@ -107,8 +111,7 @@ public class DifferentialEvolutionMinimizer {
 
         while(iterationCounter > 0) {
 
-            //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Iteration counter: " + Integer.toString(iterationCounter));
-
+            
             for (int i =0; i < populationSize; i++) {
 
                 int i1 = RandomGenerator.getGenerator().randInt(populationSize);
@@ -129,11 +132,7 @@ public class DifferentialEvolutionMinimizer {
 
                         newVec.setEntry(j, scaleFactor* (population.getEntry(i2, j) -population.getEntry(i1, j) ) + population.getEntry(i3, j) );
 
-                        if (newVec.getEntry(j) < parameterLowerBounds.getEntry(j) || newVec.getEntry(j) > parameterUpperBounds.getEntry(j)) {
-
-                            inBounds = false;
-
-                        }
+                        
 
                     } else {
 
@@ -141,6 +140,22 @@ public class DifferentialEvolutionMinimizer {
 
                         newVec.setEntry(j, population.getEntry(i,j));
 
+
+                    }
+                    
+                    //random 10% range +/- mutation
+                    
+                    if ((RandomGenerator.rand() < mutationProb)) {
+                    	
+                    	double magnitude = 0.2*(parameterUpperBounds.getEntry(j) - parameterLowerBounds.getEntry(j));
+                    	
+                    	newVec.setEntry(j, newVec.getEntry(j) + (RandomGenerator.rand() -0.5) * magnitude);
+                    	
+                    }
+                    
+                    if (newVec.getEntry(j) < parameterLowerBounds.getEntry(j) || newVec.getEntry(j) > parameterUpperBounds.getEntry(j)) {
+
+                        inBounds = false;
 
                     }
 
@@ -151,6 +166,8 @@ public class DifferentialEvolutionMinimizer {
 
                 if (inBounds) functionValue = f.evaluate(newVec);
 
+                if (inBounds) System.out.printf("in bounds candidate value: %1.2f  old value: %1.2f \n", functionValue, values.getEntry(i));
+                
                 if (functionValue < values.getEntry(i)) {
 
                     newPopulation.setRowVector(i, newVec);
@@ -169,9 +186,12 @@ public class DifferentialEvolutionMinimizer {
 
             double tempMinValue = Double.MAX_VALUE;
             double tempMaxValue = -1.0*Double.MAX_VALUE;
+            
+            double averageValue = 0;
 
             for (int i =0; i < values.getDimension(); i++) {
                 double value = values.getEntry(i);
+                averageValue += value;
                 if (value < tempMinValue) {
                     tempMinValue = value;
                 }
@@ -180,11 +200,15 @@ public class DifferentialEvolutionMinimizer {
                 }
 
             }
+            
+            averageValue /= values.getDimension();
 
             currMinValue = tempMinValue;
             currMaxValue = tempMaxValue;
+            
+            LoggingUtilities.getLogger().info("Iteration counter: " + Integer.toString(totalIterations) + "  best score: " + currMinValue + "  worst score: " + currMaxValue + " average score: " + averageValue);
 
-            if (Math.abs(currMaxValue - currMinValue) < Math.abs(tol*currMaxValue)) {
+            if (Math.abs(currMaxValue - currMinValue) < Math.abs(tol*currMaxValue) + Math.abs(tol*currMinValue)) {
                 iterationCounter--;
             } else {
                 iterationCounter = 1;
