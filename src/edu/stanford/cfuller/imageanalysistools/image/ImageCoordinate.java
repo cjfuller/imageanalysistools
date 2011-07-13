@@ -63,7 +63,7 @@ import java.util.NoSuchElementException;
  *
  */
 
-public class ImageCoordinate implements java.io.Serializable, Collection<Integer> {
+public class ImageCoordinate implements java.io.Serializable, Collection<String> {
 
 	static final long serialVersionUID = 1L;
 	
@@ -476,7 +476,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 	 * @see java.util.Collection#add(java.lang.Object)
 	 */
 	@Override
-	public boolean add(Integer arg0) {
+	public boolean add(String arg0) {
 		throw new UnsupportedOperationException("Add not supported for ImageCoordinates.");
 	}
 
@@ -484,7 +484,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 	 * @see java.util.Collection#addAll(java.util.Collection)
 	 */
 	@Override
-	public boolean addAll(Collection<? extends Integer> arg0) {
+	public boolean addAll(Collection<? extends String> arg0) {
 		throw new UnsupportedOperationException("Add not supported for ImageCoordinates.");
 	}
 
@@ -494,8 +494,8 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 	 */
 	@Override
 	public boolean contains(Object arg0) {
-		Integer iArg = (Integer) arg0;
-		for (Integer i : this) {
+		String iArg = (String) arg0;
+		for (String i : this) {
 			if (i == iArg) return true;
 		}
 		return false;
@@ -524,7 +524,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 	 * @see java.util.Collection#iterator()
 	 */
 	@Override
-	public Iterator<Integer> iterator() {
+	public Iterator<String> iterator() {
 		return new ImageCoordinateIterator();
 	}
 
@@ -579,21 +579,21 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 	public <T> T[] toArray(T[] arg0) {
 		if (arg0.length < this.size()) {
 			int c = 0; 
-			for (Integer i : this) {
+			for (String i : this) {
 				arg0[c++] = (T) i;
 			}
 			return arg0;
 		} else {
-			Integer[] toReturn = new Integer[this.size()];
+			String[] toReturn = new String[this.size()];
 			int c = 0;
-			for (Integer i : this) {
+			for (String i : this) {
 				toReturn[c++] = i;
 			}
 			return (T[]) toReturn;
 		}
 	}
 	
-	protected class ImageCoordinateIterator implements Iterator<Integer> {
+	protected class ImageCoordinateIterator implements Iterator<String> {
 		
 		int currentIndex;
 		
@@ -605,8 +605,8 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 			return (this.currentIndex < getDimension());
 		}
 		
-		public Integer next() {
-			if (this.hasNext()) return get(currentIndex);
+		public String next() {
+			if (this.hasNext()) return indexToStringMapping.get(currentIndex++);
 			
 			throw new NoSuchElementException("No more elements in ImageCoordinate.");
 			

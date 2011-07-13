@@ -76,7 +76,8 @@ public class Kernel {
 	 */
 	public Kernel(double[] weights, ImageCoordinate dimensionSizes) {
 				
-		for (Integer size : dimensionSizes) {
+		for (String dim : dimensionSizes) {
+			int size = dimensionSizes.get(dim);
 			if (size % 2 == 0 || size < 0) {
 				throw new IllegalArgumentException("Kernel size must be odd and positive in all dimensions.");
 			}
@@ -85,13 +86,11 @@ public class Kernel {
 		
 		this.weights = weights;
 		
-		this.halfKernelDimensions = ImageCoordinate.createCoord(0,0,0,0,0);
+		this.halfKernelDimensions = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 		
-		
-		for (int i =0; i < this.halfKernelDimensions.getDimension(); i++) {
-			this.halfKernelDimensions.set(i, (dimensionSizes.get(i)-1 )/2);
+		for (String s : this.halfKernelDimensions) {
+			this.halfKernelDimensions.set(s, (dimensionSizes.get(s)-1 )/2);
 		}
-		
 		
 		this.boundaryType = BOUNDARY_ZERO;
 		
@@ -210,21 +209,21 @@ public class Kernel {
 		
 		int counter= 0;
 		
-		for (int i = 0; i < this.halfKernelDimensions.getY()+1; i++) {
-			for (int j =0; j < this.halfKernelDimensions.getX()+1; j++) {
+		for (int i = 0; i < this.halfKernelDimensions.get("y")+1; i++) {
+			for (int j =0; j < this.halfKernelDimensions.get("x")+1; j++) {
 				preTransform[i][j] = this.weights[counter++];
 			}
 		}
 		
-		for (int i = this.halfKernelDimensions.getY()+1; i < ydimPowOfTwo - this.halfKernelDimensions.getY(); i++) {
-			for (int j = this.halfKernelDimensions.getX()+1; j < xdimPowOfTwo - this.halfKernelDimensions.getX(); j++) {
+		for (int i = this.halfKernelDimensions.get("y")+1; i < ydimPowOfTwo - this.halfKernelDimensions.get("y"); i++) {
+			for (int j = this.halfKernelDimensions.get("x")+1; j < xdimPowOfTwo - this.halfKernelDimensions.get("x"); j++) {
 				preTransform[i][j] = 0;
 			}
 		}
 		
 		
-		for (int i = ydimPowOfTwo - this.halfKernelDimensions.getY(); i < ydimPowOfTwo; i++) {
-			for (int j = xdimPowOfTwo - this.halfKernelDimensions.getX(); j < xdimPowOfTwo; j++) {
+		for (int i = ydimPowOfTwo - this.halfKernelDimensions.get("y"); i < ydimPowOfTwo; i++) {
+			for (int j = xdimPowOfTwo - this.halfKernelDimensions.get("x"); j < xdimPowOfTwo; j++) {
 				preTransform[i][j] = this.weights[counter++];
 			}
 		}
