@@ -112,35 +112,35 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
     /**
      * Gets the x-component of this ImageCoordinate.
      * @return  The x-component as an integer.
-     * @deprecated 	Use {@link #get(String, int)} or {@link #get(int)} instead.
+     * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
      */
 	public int getX(){return this.get("x");}
 
     /**
      * Gets the y-component of this ImageCoordinate.
      * @return  The y-component as an integer.
-     * @deprecated 	Use {@link #get(String, int)} or {@link #get(int)} instead.
+     * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
      */
 	public int getY(){return this.get("y");}
 
     /**
      * Gets the z-component of this ImageCoordinate.
      * @return  The z-component as an integer.
-     * @deprecated 	Use {@link #get(String, int)} or {@link #get(int)} instead.
+     * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
      */
 	public int getZ(){return this.get("z");}
 
     /**
      * Gets the c-component of this ImageCoordinate.
      * @return  The c-component as an integer.
-     * @deprecated 	Use {@link #get(String, int)} or {@link #get(int)} instead.
+     * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
      */
 	public int getC(){return this.get("c");}
 
     /**
      * Gets the t-component of this ImageCoordinate.
      * @return  The t-component as an integer.
-     * @deprecated 	Use {@link #get(String, int)} or {@link #get(int)} instead.
+     * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
      */
 	public int getT(){return this.get("t");}
 	

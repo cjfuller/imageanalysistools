@@ -60,9 +60,9 @@ import java.util.Hashtable;
 
 public class ImageReader {
 
-	private loci.formats.ImageReader lociReader;
-    private java.util.HashMap<String, Integer> seriesCounts;
-    private java.util.HashMap<String, Integer> currentSeries;
+	protected loci.formats.ImageReader lociReader;
+    protected java.util.HashMap<String, Integer> seriesCounts;
+    protected java.util.HashMap<String, Integer> currentSeries;
 
     protected static java.util.Hashtable<String, Thread> fileLocks;
 
