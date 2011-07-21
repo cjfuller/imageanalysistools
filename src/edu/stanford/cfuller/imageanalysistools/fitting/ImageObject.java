@@ -58,6 +58,9 @@ import java.util.Vector;
  */
 public abstract class ImageObject implements Serializable {
 
+	//TODO: maintain the notion that the ImageObject has some location in real space, but reduce
+	//dependence on 5D images.
+	
     public static final long serialVersionUID = 2L;
 
     Vector3D centroidInMask;
@@ -162,7 +165,7 @@ public abstract class ImageObject implements Serializable {
             if (mask.getValue(i) == label) {
                 sizeInPixels++;
 
-                this.centroidInMask = this.centroidInMask.add(new Vector3D(i.getX(), i.getY(), i.getZ()));
+                this.centroidInMask = this.centroidInMask.add(new Vector3D(i.get("x"), i.get("y"), i.get("z")));
 
             }
 
@@ -182,32 +185,30 @@ public abstract class ImageObject implements Serializable {
         if (xcoord < 0) {xcoord = 0;}
         if (ycoord < 0) {ycoord = 0;}
 
-        this.parentBoxMin = ImageCoordinate.createCoord(xcoord, ycoord, 0, 0, 0);
+        this.parentBoxMin = ImageCoordinate.createCoordXYZCT(xcoord, ycoord, 0, 0, 0);
 
         xcoord = (int) Math.round(this.centroidInMask.getX() + p.getIntValueForKey("half_box_size"))+1;
         ycoord = (int) Math.round(this.centroidInMask.getY() + p.getIntValueForKey("half_box_size"))+1;
 
-        if (xcoord > mask.getDimensionSizes().getX()) {xcoord = mask.getDimensionSizes().getX();}
-        if (ycoord > mask.getDimensionSizes().getY()) {ycoord = mask.getDimensionSizes().getY();}
+        if (xcoord > mask.getDimensionSizes().get("x")) {xcoord = mask.getDimensionSizes().get("x");}
+        if (ycoord > mask.getDimensionSizes().get("y")) {ycoord = mask.getDimensionSizes().get("y");}
 
-        this.parentBoxMax = ImageCoordinate.createCoord(xcoord, ycoord, parent.getDimensionSizes().getZ(), parent.getDimensionSizes().getC(), parent.getDimensionSizes().getT());
+        this.parentBoxMax = ImageCoordinate.createCoordXYZCT(xcoord, ycoord, parent.getDimensionSizes().get("z"), parent.getDimensionSizes().get("c"), parent.getDimensionSizes().get("t"));
 
 
         //find the max intensity pixel in each channel and use this to refine the box
 
-        //System.out.println("for object " + label + " cenX=" + this.centroidInMask.getX() + " cenY=" + this.centroidInMask.getY());
+        this.maxIntensityZCoordByChannel = new int[parent.getDimensionSizes().get("c")];
 
-        this.maxIntensityZCoordByChannel = new int[parent.getDimensionSizes().getC()];
-
-        int minZOverall = parent.getDimensionSizes().getZ();
+        int minZOverall = parent.getDimensionSizes().get("z");
         int maxZOverall = 0;
 
         //for (int c = 0; c < parent.getDimensionSizes().getC(); c++) {
         this.numberOfChannels = p.getIntValueForKey("num_wavelengths"); // use this so that if there's extra wavelengths not to be quantified at the end, these won't skew the initial guess
         
         for (int c = 0; c < this.numberOfChannels; c++) { 
-            this.parentBoxMin.setC(c);
-            this.parentBoxMax.setC(c+1);
+            this.parentBoxMin.set("c",c);
+            this.parentBoxMax.set("c",c+1);
 
             parent.setBoxOfInterest(this.parentBoxMin, this.parentBoxMax);
 
@@ -216,7 +217,7 @@ public abstract class ImageObject implements Serializable {
 
             for (ImageCoordinate ic : parent) {
 
-                if (! ( ic.getX() == (int) Math.round(this.centroidInMask.getX())) || ! ( ic.getY() == (int) Math.round(this.centroidInMask.getY()))) {
+                if (! ( ic.get("x") == (int) Math.round(this.centroidInMask.getX())) || ! ( ic.get("y") == (int) Math.round(this.centroidInMask.getY()))) {
                     continue;
                 }
 
@@ -230,10 +231,10 @@ public abstract class ImageObject implements Serializable {
 
             if (maxCoord == null) continue;
 
-            if (maxCoord.getZ() > maxZOverall) maxZOverall = maxCoord.getZ();
-            if (maxCoord.getZ() < minZOverall) minZOverall = maxCoord.getZ();
+            if (maxCoord.get("z") > maxZOverall) maxZOverall = maxCoord.get("z");
+            if (maxCoord.get("z") < minZOverall) minZOverall = maxCoord.get("z");
 
-            this.maxIntensityZCoordByChannel[c] = maxCoord.getZ();
+            this.maxIntensityZCoordByChannel[c] = maxCoord.get("z");
 
             maxCoord.recycle();
 
@@ -250,15 +251,15 @@ public abstract class ImageObject implements Serializable {
 
         int zcoord = 0;
 
-        this.parentBoxMin.setC(0);
+        this.parentBoxMin.set("c",0);
         zcoord = zAverage - p.getIntValueForKey("half_z_size");
         if (zcoord < 0) zcoord = 0;
-        this.parentBoxMin.setZ(zcoord);
+        this.parentBoxMin.set("z",zcoord);
 
-        this.parentBoxMax.setC(parent.getDimensionSizes().getC());
+        this.parentBoxMax.set("c",parent.getDimensionSizes().get("c"));
         zcoord = zAverage + p.getIntValueForKey("half_z_size")+1;
-        if (zcoord > parent.getDimensionSizes().getZ()) zcoord = parent.getDimensionSizes().getZ();
-        this.parentBoxMax.setZ(zcoord);
+        if (zcoord > parent.getDimensionSizes().get("z")) zcoord = parent.getDimensionSizes().get("z");
+        this.parentBoxMax.set("z",zcoord);
     }
 
 

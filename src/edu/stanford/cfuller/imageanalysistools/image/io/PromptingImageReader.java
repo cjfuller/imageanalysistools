@@ -36,7 +36,6 @@
 package edu.stanford.cfuller.imageanalysistools.image.io;
 
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 
@@ -44,7 +43,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
  * A type of ImageReader that has the conventional functionality, but also adds
  * the ability to prompt a user with a file chooser dialog to get a file to read.
  * 
- * @author cfuller
+ * @author Colin J. Fuller
  *
  */
 public class PromptingImageReader extends ImageReader {

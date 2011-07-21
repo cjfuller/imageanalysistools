@@ -35,7 +35,6 @@
  * ***** END LICENSE BLOCK ***** */
 package edu.stanford.cfuller.imageanalysistools.util;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;

@@ -49,9 +49,10 @@ package edu.stanford.cfuller.imageanalysistools.image;
  * @author Colin J. Fuller
  */
 
-
 public class PixelData implements java.io.Serializable {
 
+	//TODO: reimplement to handle images other than 5D.
+	
 	static final long serialVersionUID=1L;
 	
 	int dataType;
@@ -91,7 +92,7 @@ public class PixelData implements java.io.Serializable {
 	public PixelData(ImageCoordinate sizes, int data_type, String dimensionOrder) {
         this.dataType = data_type;
 
-		init(sizes.getX(), sizes.getY(), sizes.getZ(), sizes.getC(), sizes.getT(), dimensionOrder);
+		init(sizes.get("x"), sizes.get("y"), sizes.get("z"), sizes.get("c"), sizes.get("t"), dimensionOrder);
 
 	}
 

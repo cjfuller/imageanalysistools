@@ -67,6 +67,8 @@ import java.util.NoSuchElementException;
 
 public class ImageCoordinate implements java.io.Serializable, Collection<String> {
 
+	//TODO: consider whether coordinates should continue to be discrete as they are in the current implementation.
+	
 	public static final String X = "x";
 	public static final String Y = "y";
 	public static final String Z = "z";

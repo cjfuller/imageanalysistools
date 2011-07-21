@@ -15,18 +15,18 @@ public class DimensionFlipper {
         ImageCoordinate sizes = ImageCoordinate.cloneCoord(flipped.getDimensionSizes());
 
 
-        int temp_t = sizes.getT();
-        sizes.setT(sizes.getZ());
-        sizes.setZ(temp_t);
+        int temp_t = sizes.get("t");
+        sizes.set("t",sizes.get("z"));
+        sizes.set("z",temp_t);
 
         Image newImage = new Image(sizes, 0.0);
 
-        ImageCoordinate flipCoord = ImageCoordinate.createCoord(0,0,0,0,0);
+        ImageCoordinate flipCoord = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 
         for (ImageCoordinate ic : flipped) {
             flipCoord.setCoord(ic);
-            flipCoord.setZ(ic.getT());
-            flipCoord.setT(ic.getZ());
+            flipCoord.set("z",ic.get("t"));
+            flipCoord.set("t",ic.get("z"));
 
             newImage.setValue(flipCoord, flipped.getValue(ic));
         }

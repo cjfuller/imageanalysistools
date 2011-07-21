@@ -55,6 +55,9 @@ import edu.stanford.cfuller.imageanalysistools.filter.LabelFilter;
 
 public class FillFilter extends Filter {
 
+	//TODO: refactor project to call this FillFilter2D.
+	
+	//TODO: remove explicit reference to dimensions not required for this filter.
 
     /**
      * Apply the Filter, filling in any gaps in the supplied mask.
@@ -84,14 +87,14 @@ public class FillFilter extends Filter {
 		
 		//traverse the directional regions manually to ensure defined pixel order
 		
-		ImageCoordinate ic = ImageCoordinate.createCoord(0, 0, 0, 0, 0);
-		ImageCoordinate icmod = ImageCoordinate.createCoord(0, 0, 0, 0, 0);
+		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
+		ImageCoordinate icmod = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 		
-		for (int x = 0; x < im.getDimensionSizes().getX(); x++) {
-			for (int y = 0; y < im.getDimensionSizes().getY(); y++) {
+		for (int x = 0; x < im.getDimensionSizes().get("x"); x++) {
+			for (int y = 0; y < im.getDimensionSizes().get("y"); y++) {
 				
-				ic.setX(x);
-				ic.setY(y);
+				ic.set("x",x);
+				ic.set("y",y);
 				
 				if (x == 0 || y == 0 || im.getValue(ic) > 0) {
 					
@@ -99,36 +102,36 @@ public class FillFilter extends Filter {
 					topRegions.setValue(ic, im.getValue(ic));
 					
 				} else {
-					icmod.setX(x-1);
-					icmod.setY(y);
+					icmod.set("x",x-1);
+					icmod.set("y",y);
 					leftRegions.setValue(ic, leftRegions.getValue(icmod));
 					
-					icmod.setX(x);
-					icmod.setY(y-1);
+					icmod.set("x",x);
+					icmod.set("y",y-1);
 					topRegions.setValue(ic, topRegions.getValue(icmod));
 				}
 				
 			}
 		}
 		
-		for (int x = im.getDimensionSizes().getX()-1; x >=0; x--) {
-			for (int y = im.getDimensionSizes().getY()-1; y >=0; y--) {
+		for (int x = im.getDimensionSizes().get("x")-1; x >=0; x--) {
+			for (int y = im.getDimensionSizes().get("y")-1; y >=0; y--) {
 				
-				ic.setX(x);
-				ic.setY(y);
+				ic.set("x",x);
+				ic.set("y",y);
 				
-				if (x == im.getDimensionSizes().getX()-1 || y == im.getDimensionSizes().getY()-1 || im.getValue(ic) > 0) {
+				if (x == im.getDimensionSizes().get("x")-1 || y == im.getDimensionSizes().get("y")-1 || im.getValue(ic) > 0) {
 					
 					rightRegions.setValue(ic, im.getValue(ic));
 					bottomRegions.setValue(ic, im.getValue(ic));
 					
 				} else {
-					icmod.setX(x+1);
-					icmod.setY(y);
+					icmod.set("x",x+1);
+					icmod.set("y",y);
 					rightRegions.setValue(ic, rightRegions.getValue(icmod));
 					
-					icmod.setX(x);
-					icmod.setY(y+1);
+					icmod.set("x",x);
+					icmod.set("y",y+1);
 					bottomRegions.setValue(ic, bottomRegions.getValue(icmod));
 				}
 				

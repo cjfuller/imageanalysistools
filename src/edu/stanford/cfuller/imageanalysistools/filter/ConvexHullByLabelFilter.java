@@ -85,7 +85,7 @@ public class ConvexHullByLabelFilter extends Filter {
 		java.util.Vector<Integer> minIndices = new java.util.Vector<Integer>(h.getMaxValue() + 1);
 
         for (int i =0; i < h.getMaxValue() + 1; i++) {
-            minValues.add(im.getDimensionSizes().getX());
+            minValues.add(im.getDimensionSizes().get("x"));
             minIndices.add(0);
         }
 
@@ -100,11 +100,11 @@ public class ConvexHullByLabelFilter extends Filter {
 				yLists.put(value, new java.util.Vector<Integer>());
 			}
 			
-			xLists.get(value).add(i.getX());
-			yLists.get(value).add(i.getY());
+			xLists.get(value).add(i.get("x"));
+			yLists.get(value).add(i.get("y"));
 			
-			if (i.getX() < minValues.get(value) ) {
-				minValues.set(value, i.getX());
+			if (i.get("x") < minValues.get(value) ) {
+				minValues.set(value, i.get("x"));
 				minIndices.set(value, xLists.get(value).size()-1);
 			}
 			
@@ -113,7 +113,7 @@ public class ConvexHullByLabelFilter extends Filter {
 		java.util.Vector<Integer> hullPointsX = new java.util.Vector<Integer>();
 		java.util.Vector<Integer> hullPointsY = new java.util.Vector<Integer>();
 
-		ImageCoordinate ic = ImageCoordinate.createCoord(0, 0, 0, 0, 0);
+		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 		
 		for (int k = 1; k < h.getMaxValue() + 1; k++) {
 			hullPointsX.clear();
@@ -223,8 +223,8 @@ public class ConvexHullByLabelFilter extends Filter {
 						double projPoint_y = y1*projLength;
 						
 						if (Math.hypot(rel_x-projPoint_x, rel_y-projPoint_y) < eps) {
-							ic.setX(x);
-							ic.setY(y);
+							ic.set("x",x);
+							ic.set("y",y);
 							im.setValue(ic, k);
 						}
 						
@@ -233,112 +233,10 @@ public class ConvexHullByLabelFilter extends Filter {
 				
 			}
 			
-			
-			
-			
 		}
 		
 		ic.recycle();
-			/*
-
-			ImageCoordinate ic = ImageCoordinate.createCoord(0, 0, 0, 0, 0);
-			
-			for (int n = 0; n < iList.size(); n++) {
-				int c_i = iList.get(n);
-				int c_j = jList.get(n);
-				ic.setX(c_i);
-				ic.setY(c_j);
-				int ind = (int) this.referenceImage.getValue(ic);
-				
-				//find two nearest neighbors
-				
-				int best_i = 0;
-				int best_j = 0;
-				double bestDist = Double.MAX_VALUE;
-				int bestInd = 0;
-				int best2_i = 0;
-				int best2_j = 0;
-				double best2Dist = Double.MAX_VALUE;
-				int best2Ind = 0;
-				
-				for (int m = 0; m < iList.size(); m++) {
-					
-					if (m == n) continue;
-					
-					double dist_2 = Math.pow(iList.get(m) - c_i, 2) + Math.pow(jList.get(m) - c_j, 2);
-					
-					ic.setX(iList.get(m));
-					ic.setY(jList.get(m));
-					
-					int candidateInd = (int) this.referenceImage.getValue(ic);
-					
-					if (candidateInd == ind) continue;
-					
-					if (dist_2 < bestDist && candidateInd != bestInd && candidateInd != best2Ind) {
-						best2Dist = bestDist;
-						bestDist = dist_2;
-						best2_i = best_i;
-						best2_j = best_j;
-						best_i = iList.get(m);
-						best_j = jList.get(m);
-						best2Ind = bestInd;
-						bestInd = candidateInd;
-					} else if (dist_2 < best2Dist && candidateInd != bestInd && candidateInd != best2Ind) {
-						best2Dist = dist_2;
-						best2_i = iList.get(m);
-						best2_j = jList.get(m);
-						best2Ind = candidateInd;
-					}
-					
-				}
-				
-				//draw triangle with two nearest neighbors unless the distance to the nearest neighbors is large compared to the size of the image
-				
-				if (Math.sqrt(best2Dist) < 0.4 * im.getDimensionSizes().getX() && Math.sqrt(best2Dist) < 0.4 * im.getDimensionSizes().getY()) {
-					
-					int min_i = (c_i < best_i)? c_i : best_i;
-					min_i = (min_i < best2_i)? min_i : best2_i;
-					
-					int min_j = (c_j < best_j)? c_j : best_j;
-					min_j = (min_j < best2_j)? min_j : best2_j;
-					
-					int max_i = (c_i > best_i)? c_i : best_i;
-					max_i = (max_i > best2_i)? max_i : best2_i;
-					
-					int max_j = (c_j > best_j)? c_j : best_j;
-					max_j = (max_j < best2_j)? max_j : best2_j;
-					
-				
-				
-					for (int i = min_i; i < max_i; i++) {
-						for (int j = min_j; j < max_j; j++) {
-							
-							
-								
-							if (Math.abs(j - (c_j + (c_j - best_j)*1.0/(c_i - best_i) * (i - c_i))) <= 0.5 
-									 || Math.abs(i - (c_i + (c_i - best_i)*1.0/(c_j - best_j) * (j - c_j))) <= 0.5
-									 ||	Math.abs(j - (c_j + (c_j - best2_j)*1.0/(c_i - best2_i) * (i - c_i))) <= 0.5 
-									 || Math.abs(i - (c_i + (c_i - best2_i)*1.0/(c_j - best2_j) * (j - c_j))) <= 0.5
-									 || Math.abs(j - (best_j + (best_j - best2_j)*1.0/(best_i - best2_i) * (i - best_i))) <= 0.5 
-									 || Math.abs(i - (best_i + (best_i - best2_i)*1.0/(best_j - best2_j) * (j - best_j))) <= 0.5) {
-										
-								ic.setX(i);
-								ic.setY(j);
-										
-								im.setValue(ic, k);
-																	
-							}
-								
-						}
-					}
-				
-				}
-								
-			}
-			
-		}
-		*/
-				
+	
 		FillFilter ff = new FillFilter();
 		
 		ff.apply(im);

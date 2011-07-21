@@ -76,13 +76,13 @@ public class BandpassFilter extends Filter {
 
         FastFourierTransformer fft = new org.apache.commons.math.transform.FastFourierTransformer();
 
-        int ydimPowOfTwo = im.getDimensionSizes().getY();
-        int xdimPowOfTwo = im.getDimensionSizes().getX();
+        int ydimPowOfTwo = im.getDimensionSizes().get("y");
+        int xdimPowOfTwo = im.getDimensionSizes().get("x");
 
         if (!FastFourierTransformer.isPowerOf2(ydimPowOfTwo) || !FastFourierTransformer.isPowerOf2(xdimPowOfTwo)) {
 
-            xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().getX()) / Math.log(2)));
-            ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().getY())/Math.log(2)));
+            xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get("x")) / Math.log(2)));
+            ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get("y"))/Math.log(2)));
         }
 
         for (int p =0; p < im.getPlaneCount(); p++) {
@@ -96,7 +96,7 @@ public class BandpassFilter extends Filter {
             Complex[][] colMajorImage = new Complex[xdimPowOfTwo][ydimPowOfTwo];
 
             for (ImageCoordinate ic : im) {
-                rowImage[ic.getY()][ic.getX()] = im.getValue(ic);
+                rowImage[ic.get("y")][ic.get("x")] = im.getValue(ic);
             }
 
             for (int r = 0; r < rowImage.length; r++) {
@@ -195,7 +195,7 @@ public class BandpassFilter extends Filter {
 
 
             for (ImageCoordinate ic : im) {
-                im.setValue(ic, (rowImage[ic.getY()][ic.getX()] - newMin)*scaleFactor + oldMin);
+                im.setValue(ic, (rowImage[ic.get("y")][ic.get("x")] - newMin)*scaleFactor + oldMin);
             }
 
 

@@ -102,7 +102,7 @@ public class GaussianImageObject extends ImageObject {
         if (p.hasKey("num_wavelengths")) {
             numChannels = p.getIntValueForKey("num_wavelengths");
         } else {
-            numChannels = this.parent.getDimensionSizes().getC();
+            numChannels = this.parent.getDimensionSizes().get("c");
         }
 
         //for (int channelIndex = 0; channelIndex < this.parent.getDimensionSizes().getC(); channelIndex++) {
@@ -112,8 +112,8 @@ public class GaussianImageObject extends ImageObject {
 
             double ppg = p.getDoubleValueForKey("photons_per_greylevel");
 
-            this.parentBoxMin.setC(channelIndex);
-            this.parentBoxMax.setC(channelIndex + 1);
+            this.parentBoxMin.set("c",channelIndex);
+            this.parentBoxMax.set("c",channelIndex + 1);
 
             this.boxImages();
 
@@ -124,9 +124,9 @@ public class GaussianImageObject extends ImageObject {
 
 
             for (ImageCoordinate ic : this.parent) {
-                x.add((double) ic.getX());
-                y.add((double) ic.getY());
-                z.add((double) ic.getZ());
+                x.add((double) ic.get("x"));
+                y.add((double) ic.get("y"));
+                z.add((double) ic.get("z"));
                 f.add(parent.getValue(ic));
             }
 

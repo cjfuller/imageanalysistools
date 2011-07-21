@@ -44,11 +44,21 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
+ * Convolves a 2D x-y Image with a 2D kernel.
+ * <p>
+ * Before calling apply, the kernel must be specified using the {@link #setKernel(Kernel)} method.
+ * <p>
+ * This filter does not use a reference Image.
+ * <p>
+ * After calling the apply method, the image argument to apply will be overwritten by the convolved Image.
+ * 
  * @author Colin J. Fuller
  */
 public class ConvolutionFilter extends Filter {
 
 	//TODO: deal with boundary conditions of types other than zero.
+	
+	//TODO: deal with something other than single image plane transforms.
 	
 	Kernel k;
 	
@@ -56,38 +66,6 @@ public class ConvolutionFilter extends Filter {
 	
 	@Override
 	public void apply(Image im) {
-//		Image original = new Image(im);
-//		Image boxed = new Image(im);
-//		
-//		ImageCoordinate boxMin = ImageCoordinate.createCoord(0,0,0,0,0);
-//		ImageCoordinate boxMax = ImageCoordinate.createCoord(0,0,0,0,0);
-//		
-//		ImageCoordinate halfKernelSize = k.getHalfSize(); //do not recycle
-//				
-//		for (ImageCoordinate ic : original) {
-//			
-//			for (int i = 0; i < boxMin.getDimensionality(); i++) {
-//				boxMin.set(i, ic.get(i) - halfKernelSize.get(i));
-//				boxMax.set(i, ic.get(i) + halfKernelSize.get(i)+1);
-//			}
-//			
-//			boxed.setBoxOfInterest(boxMin, boxMax);
-//			
-//			double tempValue = 0;
-//			
-//			for (ImageCoordinate icBoxed : boxed) {
-//				tempValue += k.getWeight(ic, icBoxed)*boxed.getValue(icBoxed);
-//			}
-//			
-//			boxed.clearBoxOfInterest();
-//						
-//			im.setValue(ic, tempValue);
-//			
-//		}
-//		
-//		boxMin.recycle();
-//		boxMax.recycle();
-		
 		
 		Complex[][] transformed = null;
 		
@@ -105,10 +83,7 @@ public class ConvolutionFilter extends Filter {
 		}
 				
 		Complex[][] kernelTransform = this.k.getTransformed2DKernel(transformed[0].length, transformed.length);
-		
-		
-		//Complex[][] kernel = Kernel.getTransformedRandomSinglePlaneKernelMatrix(transformed[0].length, transformed.length, 5);
-		
+				
 		for (int i = 0; i < transformed.length; i++) {
 			for (int j = 0; j < transformed.length; j++) {
 				transformed[i][j] = transformed[i][j].multiply(kernelTransform[i][j]);
@@ -132,13 +107,13 @@ public class ConvolutionFilter extends Filter {
 
         FastFourierTransformer fft = new org.apache.commons.math.transform.FastFourierTransformer();
 
-        int ydimPowOfTwo = im.getDimensionSizes().getY();
-        int xdimPowOfTwo = im.getDimensionSizes().getX();
+        int ydimPowOfTwo = im.getDimensionSizes().get("y");
+        int xdimPowOfTwo = im.getDimensionSizes().get("x");
 
         if (!FastFourierTransformer.isPowerOf2(ydimPowOfTwo) || !FastFourierTransformer.isPowerOf2(xdimPowOfTwo)) {
 
-            xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().getX()) / Math.log(2)));
-            ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().getY())/Math.log(2)));
+            xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get("x")) / Math.log(2)));
+            ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get("y"))/Math.log(2)));
         }
 
         //for (int p =0; p < im.getPlaneCount(); p++) {
@@ -154,7 +129,7 @@ public class ConvolutionFilter extends Filter {
             Complex[][] colMajorImage = new Complex[xdimPowOfTwo][ydimPowOfTwo];
 
             for (ImageCoordinate ic : im) {
-                rowImage[ic.getY()][ic.getX()] = im.getValue(ic);
+                rowImage[ic.get("y")][ic.get("x")] = im.getValue(ic);
             }
 
             for (int r = 0; r < rowImage.length; r++) {
@@ -216,9 +191,9 @@ public class ConvolutionFilter extends Filter {
 
         double scaleFactor = (oldMax - oldMin)/(newMax - newMin);
 
-        ImageCoordinate minCoord = ImageCoordinate.createCoord(0, 0, z, 0, 0);
+        ImageCoordinate minCoord = ImageCoordinate.createCoordXYZCT(0, 0, z, 0, 0);
         ImageCoordinate maxCoord = ImageCoordinate.cloneCoord(orig.getDimensionSizes());
-        maxCoord.setZ(z+1);
+        maxCoord.set("z",z+1);
         
         orig.setBoxOfInterest(minCoord, maxCoord);
         
@@ -226,7 +201,7 @@ public class ConvolutionFilter extends Filter {
         oldMin  = 0;
 
         for (ImageCoordinate ic : orig) {
-            orig.setValue(ic, (rowImage[ic.getY()][ic.getX()] - newMin)*scaleFactor + oldMin);
+            orig.setValue(ic, (rowImage[ic.get("y")][ic.get("x")] - newMin)*scaleFactor + oldMin);
         }
         
         orig.clearBoxOfInterest();

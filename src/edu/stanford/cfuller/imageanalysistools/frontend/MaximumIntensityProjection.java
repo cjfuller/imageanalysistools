@@ -51,6 +51,8 @@ public class MaximumIntensityProjection {
 
     final static String directorySuffix = "maxintproj";
     final static String outputSuffix = "_proj.ome.tif";
+    
+    //TODO: handle projecting Z dimension (or an arbitrary, specified dimension?) in images other than 5D.
 
 
     /**
@@ -60,7 +62,7 @@ public class MaximumIntensityProjection {
      */
     public static Image projectImage(Image im) {
 
-        ImageCoordinate projectionSizes = ImageCoordinate.createCoord(im.getDimensionSizes().getX(), im.getDimensionSizes().getY(), 1, im.getDimensionSizes().getC(), im.getDimensionSizes().getT());
+        ImageCoordinate projectionSizes = ImageCoordinate.createCoordXYZCT(im.getDimensionSizes().get("x"), im.getDimensionSizes().get("y"), 1, im.getDimensionSizes().get("c"), im.getDimensionSizes().get("t"));
         
         Image imProj = new Image(projectionSizes, 0.0);
 
@@ -69,7 +71,7 @@ public class MaximumIntensityProjection {
         for (ImageCoordinate i : im) {
 
             ImageCoordinate ic = ImageCoordinate.cloneCoord(i);
-            ic.setZ(0);
+            ic.set("z",0);
 
             double origValue = im.getValue(i);
             double projValue = imProj.getValue(ic);

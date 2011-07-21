@@ -45,6 +45,8 @@ package edu.stanford.cfuller.imageanalysistools.image;
  */
 public class PixelDataFactory {
 
+	//TODO: reimplement to handle images other than 5D.
+	
     static final int DEFAULT_MAX_BYTE_SIZE = 20000000;
     //static final int DEFAULT_MAX_BYTE_SIZE = 0;
 
@@ -67,7 +69,7 @@ public class PixelDataFactory {
 
     public PixelData createPixelData(ImageCoordinate sizes, int data_type, String dimensionOrder) {
 
-        return createPixelData(sizes.getX(), sizes.getY(), sizes.getZ(), sizes.getC(), sizes.getT(), data_type, dimensionOrder);
+        return createPixelData(sizes.get("x"), sizes.get("y"), sizes.get("z"), sizes.get("c"), sizes.get("t"), data_type, dimensionOrder);
 
     }
 
