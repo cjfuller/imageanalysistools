@@ -67,7 +67,7 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
      */
 	public ImageIterator(Image im) {
 		toIterate = im;
-		currCoord = ImageCoordinate.createCoord(0, 0, 0, 0, 0);
+		currCoord = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
         isBoxedIterator = false;
         if (im.getIsBoxed()) {
             isBoxedIterator = true;
@@ -88,34 +88,25 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
      */
 	public boolean hasNext() {
 
-        if (this.isBoxedIterator) return this.hasNextBoxed();
 
-		ImageCoordinate sizes = toIterate.getDimensionSizes();
+		ImageCoordinate sizes = null;
 		
-		//if (currCoord.getX() >= sizes.getX() - 1 && currCoord.getY() >= sizes.getY() - 1 && currCoord.getZ() >= sizes.getZ()-1 && currCoord.getT() >= sizes.getT()-1 && currCoord.getC() >= sizes.getC()-1) {
-		if (nextCoord.getX() >= sizes.getX() || nextCoord.getY() >= sizes.getY() || nextCoord.getZ() >= sizes.getZ() || nextCoord.getC() >= sizes.getC() || nextCoord.getT() >= sizes.getT()) {
-            
+        if (this.isBoxedIterator) {
+        	sizes = toIterate.getBoxMax();
+        } else {
+        	sizes = toIterate.getDimensionSizes();
+        }
+        
+        if (sizes == null) return false;
+		
+		for (String dim : nextCoord) {
+			if (nextCoord.get(dim) >= sizes.get(dim)) {
 				return false;
+			}
 		}
+		
 		return true;
 	}
-
-    /**
-     * Queries where there is another {@link ImageCoordinate} that has not yet been visited in the current region of interest in the current Image.
-     *
-     * @deprecated  Use {@link #hasNext} instead, which will automatically determine whether the Image is boxed and respond appropriately.
-     * @return      true if there are more coordinates that have not yet been visited, false otherwise.
-     */
-    public boolean hasNextBoxed() {
-
-        ImageCoordinate sizes = toIterate.getBoxMax();
-
-        if (nextCoord.getX() >= sizes.getX() || nextCoord.getY() >= sizes.getY() || nextCoord.getZ() >= sizes.getZ() || nextCoord.getC() >= sizes.getC() || nextCoord.getT() >= sizes.getT()) {
-			return false;
-		}
-        return true;
-
-    }
 
     /**
      * Gets the next coordinate in the ImageIterator's {@link Image}.
@@ -130,44 +121,31 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
      * @return  An {@link ImageCoordinate} that is the next location in the ImageIterator's Image.
      * @throws NoSuchElementException if there are no more coordinates available.
      */
-	public ImageCoordinate next() throws NoSuchElementException{
+	public ImageCoordinate next() throws NoSuchElementException {
 		if (this.hasNext()) {
 
-            if (this.isBoxedIterator) return this.nextBoxed();
-
-            this.currCoord.setCoord(nextCoord);
-
-			int x = this.nextCoord.getX();
-
-			x+=1;
-			x = x % toIterate.getDimensionSizes().getX();
-            this.nextCoord.setX(x);
-			if (x==0) {
-                int y = this.nextCoord.getY();
-				y+=1;
-				y = y % toIterate.getDimensionSizes().getY();
-                this.nextCoord.setY(y);
-				if (y==0) {
-                    int z = this.nextCoord.getZ();
-					z+=1;
-					z = z % toIterate.getDimensionSizes().getZ();
-                    this.nextCoord.setZ(z);
-					if (z == 0) {
-                        int c = this.nextCoord.getC();
-						c+=1;
-						c = c % toIterate.getDimensionSizes().getC();
-                        this.nextCoord.setC(c);
-						if (c == 0) {
-                            int t = this.nextCoord.getT();
-							t+=1;
-                            this.nextCoord.setT(t);
-						}
-					}
-				}
+			ImageCoordinate sizes = null;
+			
+			if (this.isBoxedIterator) {
+				sizes = this.toIterate.getBoxMax();
+			} else {
+				sizes = this.toIterate.getDimensionSizes();
 			}
 			
-			//this.currCoord.recycle();
-			//this.currCoord = ImageCoordinate.createCoord(x, y, z, c, t);
+			if (sizes == null) throw new NoSuchElementException("Undefined Image size.");
+			
+            this.currCoord.setCoord(nextCoord);
+
+            int currDimValue = 1;
+            
+            for (String dim : this.nextCoord) {
+            	currDimValue = this.nextCoord.get(dim);
+            	currDimValue+=1;
+            	currDimValue = currDimValue % sizes.get(dim);
+            	this.nextCoord.set(dim, currDimValue);
+            	if (currDimValue != 0) break;
+            }
+			
 			return this.currCoord;
 			
 		} else {
@@ -175,66 +153,6 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
 		}
 	}
 
-    /**
-     * Gets the next coordinate in the ImageIterator's {@link Image}'s region of interest.
-     * @deprecated  Use {@link #next} instead, which will automatically determine whether the Image is boxed and respond appropriately.
-     * @return  The next {@link ImageCoordinate} in the Image's region of interest.
-     * @throws NoSuchElementException   if there are no more coordinates remaining in the region of interest.
-     */
-    public ImageCoordinate nextBoxed() throws NoSuchElementException{
-
-        if (this.hasNext()) {
-
-            this.currCoord.setCoord(nextCoord);
-
-			int x = this.nextCoord.getX();
-
-			x+=1;
-			x = x % toIterate.getBoxMax().getX();
-            this.nextCoord.setX(x);
-			if (x==0) {
-                x+= toIterate.getBoxMin().getX();
-                this.nextCoord.setX(x);
-                int y = this.nextCoord.getY();
-				y+=1;
-				y = y % toIterate.getBoxMax().getY();
-                this.nextCoord.setY(y);
-				if (y==0) {
-                    y+= toIterate.getBoxMin().getY();
-                    this.nextCoord.setY(y);
-                    int z = this.nextCoord.getZ();
-					z+=1;
-					z = z % toIterate.getBoxMax().getZ();
-                    this.nextCoord.setZ(z);
-					if (z == 0) {
-                        z+= toIterate.getBoxMin().getZ();
-                        this.nextCoord.setZ(z);
-                        int c = this.nextCoord.getC();
-						c+=1;
-						c = c % toIterate.getBoxMax().getC();
-                        this.nextCoord.setC(c);
-						if (c == 0) {
-                            c+= toIterate.getBoxMin().getC();
-                            this.nextCoord.setC(c);
-                            int t = this.nextCoord.getT();
-							t+=1;
-                            this.nextCoord.setT(t);
-
-						}
-					}
-				}
-			}
-
-			//this.currCoord.recycle();
-			//this.currCoord = ImageCoordinate.createCoord(x, y, z, c, t);
-			return this.currCoord;
-
-		} else {
-			throw new java.util.NoSuchElementException("No more pixels in image!");
-		}
-
-        
-    }
 	
 	public void remove() {
 		throw new UnsupportedOperationException("Remove not supported for images.");
