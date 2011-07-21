@@ -152,14 +152,14 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
 					yList.put(value, new java.util.Vector<Integer>());
 				}
 				
-				xList.get(value).add(c.getX());
-				yList.get(value).add(c.getY());
+				xList.get(value).add(c.get("x"));
+				yList.get(value).add(c.get("y"));
 				
 			}
 			
 			int lastK = 0;
 			
-			ImageCoordinate ic = ImageCoordinate.createCoord(0, 0, 0, 0, 0);
+			ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 			
 			for (int k = 0; k < h.getMaxValue() + 1; k++) {
 				
@@ -170,8 +170,8 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
 					java.util.List<Integer> xKList = xList.get(lastK);
 					java.util.List<Integer> yKList = yList.get(lastK);
 					for (int i =0; i < xKList.size(); i++) {
-						ic.setX(xKList.get(i));
-						ic.setY(yKList.get(i));
+						ic.set("x",xKList.get(i));
+						ic.set("y",yKList.get(i));
 						maskBuffer.setValue(ic, 0);
 					}
 				}
@@ -180,8 +180,8 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
 				
 				divided = true;
 				
-				int lower_width = im.getDimensionSizes().getX();
-				int lower_height = im.getDimensionSizes().getY();
+				int lower_width = im.getDimensionSizes().get("x");
+				int lower_height = im.getDimensionSizes().get("y");
 				int upper_width = 0;
 				int upper_height = 0;
 				
@@ -189,18 +189,18 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
 				java.util.List<Integer> yKList = yList.get(k);
 				
 				for (int i =0; i < xList.get(k).size(); i++) {
-					ic.setX(xKList.get(i));
-					ic.setY(yKList.get(i));
+					ic.set("x",xKList.get(i));
+					ic.set("y",yKList.get(i));
 					maskBuffer.setValue(ic, k);
 					
-					if (ic.getX() < lower_width) lower_width = ic.getX();
-					if (ic.getX() > upper_width - 1) upper_width = ic.getX();
-					if (ic.getY() < lower_height) lower_height = ic.getY();
-					if (ic.getY() > upper_height - 1) upper_height = ic.getY();
+					if (ic.get("x") < lower_width) lower_width = ic.get("x");
+					if (ic.get("x") > upper_width - 1) upper_width = ic.get("x");
+					if (ic.get("y") < lower_height) lower_height = ic.get("y");
+					if (ic.get("y") > upper_height - 1) upper_height = ic.get("y");
 				}
 				
-				ImageCoordinate lowerBound = ImageCoordinate.createCoord(lower_width, lower_height, 0, 0, 0);
-				ImageCoordinate upperBound = ImageCoordinate.createCoord(upper_width + 1, upper_height + 1, 1, 1, 1);
+				ImageCoordinate lowerBound = ImageCoordinate.createCoordXYZCT(lower_width, lower_height, 0, 0, 0);
+				ImageCoordinate upperBound = ImageCoordinate.createCoordXYZCT(upper_width + 1, upper_height + 1, 1, 1, 1);
 
                 maskBuffer.setBoxOfInterest(lowerBound, upperBound);
                 imageBuffer = this.referenceImage;
@@ -222,8 +222,8 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
 				MF.apply(maskBuffer);
 
 				for (int i =0; i < xList.get(k).size(); i++) {
-					ic.setX(xKList.get(i));
-					ic.setY(yKList.get(i));
+					ic.set("x",xKList.get(i));
+					ic.set("y",yKList.get(i));
 				
 					if (maskBuffer.getValue(ic) == 0) {
 						im.setValue(ic, 0);

@@ -69,43 +69,43 @@ public class LabelFilter extends Filter {
 		Image preliminaryLabeledImage = new Image(im.getDimensionSizes(), 0.0);
 		int labelCounter = 1;
 		
-		ImageCoordinate ic = ImageCoordinate.createCoord(0, 0, 0, 0, 0);
+		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 
 		
 		for (ImageCoordinate i : im) {
 			
 			if (Math.floor(im.getValue(i)) > 0) {
 				
-				ic.setX(i.getX()-1);
-				ic.setY(i.getY());
+				ic.set("x",i.get("x")-1);
+				ic.set("y",i.get("y"));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.setX(i.getX()-1);
-				ic.setY(i.getY()-1);
+				ic.set("x",i.get("x")-1);
+				ic.set("y",i.get("y")-1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.setX(i.getX()-1);
-				ic.setY(i.getY()+1);
+				ic.set("x",i.get("x")-1);
+				ic.set("y",i.get("y")+1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.setX(i.getX()+1);
-				ic.setY(i.getY());
+				ic.set("x",i.get("x")+1);
+				ic.set("y",i.get("y"));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.setX(i.getX()+1);
-				ic.setY(i.getY()-1);
+				ic.set("x",i.get("x")+1);
+				ic.set("y",i.get("y")-1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.setX(i.getX()+1);
-				ic.setY(i.getY()+1);
+				ic.set("x",i.get("x")+1);
+				ic.set("y",i.get("y")+1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.setX(i.getX());
-				ic.setY(i.getY()-1);
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y")-1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.setX(i.getX());
-				ic.setY(i.getY()+1);
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y")+1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
 				if (preliminaryLabeledImage.getValue(i) == 0) {preliminaryLabeledImage.setValue(i, labelCounter++);}
@@ -134,36 +134,36 @@ public class LabelFilter extends Filter {
 				}
 				
 				
-				ic.setX(i.getX()-1);
-				ic.setY(i.getY());
+				ic.set("x",i.get("x")-1);
+				ic.set("y",i.get("y"));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.setX(i.getX()-1);
-				ic.setY(i.getY()-1);
+				ic.set("x",i.get("x")-1);
+				ic.set("y",i.get("y")-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.setX(i.getX()-1);
-				ic.setY(i.getY()+1);
+				ic.set("x",i.get("x")-1);
+				ic.set("y",i.get("y")+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.setX(i.getX()+1);
-				ic.setY(i.getY());
+				ic.set("x",i.get("x")+1);
+				ic.set("y",i.get("y"));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.setX(i.getX()+1);
-				ic.setY(i.getY()-1);
+				ic.set("x",i.get("x")+1);
+				ic.set("y",i.get("y")-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.setX(i.getX()+1);
-				ic.setY(i.getY()+1);
+				ic.set("x",i.get("x")+1);
+				ic.set("y",i.get("y")+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.setX(i.getX());
-				ic.setY(i.getY()-1);
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y")-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.setX(i.getX());
-				ic.setY(i.getY()+1);
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y")+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
 			}

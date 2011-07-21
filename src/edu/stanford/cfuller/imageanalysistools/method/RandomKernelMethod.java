@@ -73,7 +73,7 @@ public class RandomKernelMethod extends Method {
 	
 	protected Kernel generateRandomKernel() {
 				
-		ImageCoordinate kernelDimensions = ImageCoordinate.createCoord(kDim, kDim, 1, 1, 1);
+		ImageCoordinate kernelDimensions = ImageCoordinate.createCoordXYZCT(kDim, kDim, 1, 1, 1);
 		
 		double[] kernel = new double[kDim*kDim];
 		
@@ -141,7 +141,7 @@ public class RandomKernelMethod extends Method {
 		ConvolutionFilter cf2 = new ConvolutionFilter();
 		ConvolutionFilter cf3 = new ConvolutionFilter();
 		
-		Kernel k = generateRandomKernel();
+		//Kernel k = generateRandomKernel();
 		
 		cf.setParameters(this.parameters);
 		cf2.setParameters(this.parameters);
@@ -154,7 +154,7 @@ public class RandomKernelMethod extends Method {
 		filters.add(cf2);
 		filters.add(cf3);
 		
-		int count = 0;
+		//int count = 0;
 		
 		Image ref = null;
 		
@@ -168,12 +168,6 @@ public class RandomKernelMethod extends Method {
 		
 		this.transformStorage = ConvolutionFilter.transform(this.images.get(0), 0);
 
-		
-		
-		//double[] scores = new double[count];
-		
-		//int i = 0;
-		
 		DifferentialEvolutionMinimizer min = new DifferentialEvolutionMinimizer();
 		
 		KernelObjectiveFunction kof = new KernelObjectiveFunction(ref);
@@ -190,11 +184,9 @@ public class RandomKernelMethod extends Method {
         int maxIterations = 100;
 		
 		RealVector minParams = min.minimize(kof, parameterLowerBounds, parameterUpperBounds, populationSize, scaleFactor, maxIterations, crossoverFrequency, tol);
+				
 		
-		//while (i < count) {
-		
-		
-		ImageCoordinate dim = ImageCoordinate.createCoord(kDim, kDim, 1, 1, 1);
+		ImageCoordinate dim = ImageCoordinate.createCoordXYZCT(kDim, kDim, 1, 1, 1);
 		
 			Kernel kFinal = new Kernel(minParams.getSubVector(0, minParams.getDimension()/3).getData(), dim);
 			Kernel kFinal2 = new Kernel(minParams.getSubVector(minParams.getDimension()/3, minParams.getDimension()/3).getData(), dim);
@@ -213,24 +205,6 @@ public class RandomKernelMethod extends Method {
 	        
 			dim.recycle();
 
-	        
-	        //scores[i] = score;
-	        
-	        //i++;
-	        	        
-		//}
-		
-		//System.out.println(java.util.Arrays.toString(scores));
-//		
-//		int minIndex = 0;
-//		double minScore = Integer.MAX_VALUE;
-//		
-//		for (int j = 0; j < scores.length; j++) {
-//			if (scores[j] < minScore) {
-//				minIndex = j;
-//				minScore = scores[j];
-//			}
-//		}
 		
 		System.out.println("max score: " + score);
 		System.out.println("best parameters: " + minParams.toString());
@@ -333,27 +307,6 @@ public class RandomKernelMethod extends Method {
 		
 		return score;
 		
-		
-		
-//		
-//		
-//		double sum_out = 0;
-//		double sum_ref = 0;
-//		int count = 0;
-//		double product = 0;
-//		
-//		for (ImageCoordinate ic : output) {
-//			
-//			sum_out += output.getValue(ic);
-//			sum_ref += ref.getValue(ic);
-//			count++;
-//			product += output.getValue(ic)*ref.getValue(ic);
-//			
-//		}
-//		
-//		
-//		return (product* sum_ref/sum_out);
-		
 	}
 	
 	protected class KernelObjectiveFunction implements ObjectiveFunction{
@@ -363,7 +316,7 @@ public class RandomKernelMethod extends Method {
 		
 		public KernelObjectiveFunction(Image ref){
 			
-			this.dim = ImageCoordinate.createCoord(kDim, kDim, 1, 1, 1);
+			this.dim = ImageCoordinate.createCoordXYZCT(kDim, kDim, 1, 1, 1);
 
 			this.ref = ref;
 						

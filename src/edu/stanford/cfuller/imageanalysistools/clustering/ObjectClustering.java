@@ -98,7 +98,7 @@ public class ObjectClustering {
                 int value = (int) (labeledByObject.getValue(i));
 
                 clusterObjects.get(value-1).incrementnPixels();
-                clusterObjects.get(value-1).setCentroid(clusterObjects.get(value-1).getCentroid().add(new Vector3D(i.getX(), i.getY(), i.getZ())));
+                clusterObjects.get(value-1).setCentroid(clusterObjects.get(value-1).getCentroid().add(new Vector3D(i.get("x"), i.get("y"), i.get("z"))));
 
 
             }
@@ -190,7 +190,7 @@ public class ObjectClustering {
 
                 current.incrementnPixels();
 
-                current.setCentroid(current.getCentroid().add(new Vector3D(i.getX(), i.getY(), i.getZ())));
+                current.setCentroid(current.getCentroid().add(new Vector3D(i.get("x"), i.get("y"), i.get("z"))));
 
             }
 
@@ -213,13 +213,6 @@ public class ObjectClustering {
         //choose the initial cluster
 
         int initialClusterObject = (int) Math.floor(n*RandomGenerator.rand());
-
-        //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("initialClusterObject: " + Integer.toString(initialClusterObject));
-
-        //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("k: " + Integer.toString(k));
-
-        //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("n: " + Integer.toString(n));
-
 
         clusters.get(0).setCentroid(clusterObjects.get(initialClusterObject).getCentroid());
 
@@ -475,7 +468,7 @@ public class ObjectClustering {
             }
         }
 
-        gf.setWidth(origCopy.getDimensionSizes().getX()/4);
+        gf.setWidth(origCopy.getDimensionSizes().get("x")/4);
 
 
 
@@ -542,16 +535,16 @@ public class ObjectClustering {
         for (ImageCoordinate i : origCopy){
             if (origCopy.getValue(i) > 0) {
                 int value = (int) origCopy.getValue(i);
-                centroids_x.setEntry(value, centroids_x.getEntry(value) + i.getX());
-                centroids_y.setEntry(value, centroids_y.getEntry(value) + i.getY());
+                centroids_x.setEntry(value, centroids_x.getEntry(value) + i.get("x"));
+                centroids_y.setEntry(value, centroids_y.getEntry(value) + i.get("y"));
                 counts.setEntry(value, counts.getEntry(value) + 1);
             }
         }
         for (int i = 0; i < counts.getDimension(); i++) {
             if (counts.getEntry(i) == 0) {
                 counts.setEntry(i, 1);
-                centroids_x.setEntry(i, -1*origCopy.getDimensionSizes().getX());
-                centroids_y.setEntry(i, -1*origCopy.getDimensionSizes().getY());
+                centroids_x.setEntry(i, -1*origCopy.getDimensionSizes().get("x"));
+                centroids_y.setEntry(i, -1*origCopy.getDimensionSizes().get("y"));
             }
             centroids_x.setEntry(i, centroids_x.getEntry(i)/counts.getEntry(i));
             centroids_y.setEntry(i, centroids_y.getEntry(i)/counts.getEntry(i));
@@ -566,7 +559,7 @@ public class ObjectClustering {
             int minIndex = 0;
 
             for (int j = 0; j < centroids_x.getDimension(); j++) {
-                double dist = Math.hypot(centroids_x.getEntry(j) - i.getX(), centroids_y.getEntry(j) - i.getY());
+                double dist = Math.hypot(centroids_x.getEntry(j) - i.get("x"), centroids_y.getEntry(j) - i.get("y"));
                 if (dist < minDistance) {
                     minDistance = dist;
                     minIndex = j;
@@ -776,7 +769,7 @@ public class ObjectClustering {
                 dividedClusterTemp.copy(singleCluster);
 
                 ImageCoordinate clusterMin = ImageCoordinate.cloneCoord(singleCluster.getDimensionSizes());
-                ImageCoordinate clusterMax = ImageCoordinate.createCoord(0,0,0,0,0);
+                ImageCoordinate clusterMax = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 
                 for (ImageCoordinate i : singleCluster) {
 
@@ -787,18 +780,11 @@ public class ObjectClustering {
                     } else {
 
                         //find the min and max bounds of this cluster
-                        
-                        if (i.getX() < clusterMin.getX() ) {clusterMin.setX(i.getX());}
-                        if (i.getY() < clusterMin.getY() ) {clusterMin.setY(i.getY());}
-                        if (i.getZ() < clusterMin.getZ() ) {clusterMin.setZ(i.getZ());}
-                        if (i.getC() < clusterMin.getC() ) {clusterMin.setC(i.getC());}
-                        if (i.getT() < clusterMin.getT() ) {clusterMin.setT(i.getT());}
-
-                        if (i.getX() >= clusterMax.getX() ) {clusterMax.setX(i.getX()+1);}
-                        if (i.getY() >= clusterMax.getY() ) {clusterMax.setY(i.getY()+1);}
-                        if (i.getZ() >= clusterMax.getZ() ) {clusterMax.setZ(i.getZ()+1);}
-                        if (i.getC() >= clusterMax.getC() ) {clusterMax.setC(i.getC()+1);}
-                        if (i.getT() >= clusterMax.getT() ) {clusterMax.setT(i.getT()+1);}
+                    	
+                    	for (String dim : i) {
+                    		if (i.get(dim) < clusterMin.get(dim)) {clusterMin.set(dim, i.get(dim));}
+                    		if (i.get(dim) >= clusterMax.get(dim)) {clusterMax.set(dim, i.get(dim)+1);}
+                    	}
 
                     }
                 }

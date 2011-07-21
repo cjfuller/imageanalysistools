@@ -24,13 +24,13 @@ public class TimeAveragingFilter extends Filter{
 
         Image im = this.referenceImage;
 
-        int size_t = im.getDimensionSizes().getT();
+        int size_t = im.getDimensionSizes().get("t");
 
         for (ImageCoordinate ic : im) {
             
             ImageCoordinate ic_t = ImageCoordinate.cloneCoord(ic);
 
-            ic_t.setT(0);
+            ic_t.set("t",0);
 
             output.setValue(ic_t, output.getValue(ic_t) + im.getValue(ic)/size_t);
 

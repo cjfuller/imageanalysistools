@@ -67,41 +67,41 @@ public class Label3DFilter extends Filter {
 		Image preliminaryLabeledImage = new Image(im.getDimensionSizes(), 0.0);
 		int labelCounter = 1;
 
-		ImageCoordinate ic = ImageCoordinate.createCoord(0, 0, 0, 0, 0);
+		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 
 
 		for (ImageCoordinate i : im) {
 
 			if (Math.floor(im.getValue(i)) > 0) {
 
-				ic.setX(i.getX()-1);
-				ic.setY(i.getY());
-				ic.setZ(i.getZ());
+				ic.set("x",i.get("x")-1);
+				ic.set("y",i.get("y"));
+				ic.set("z",i.get("z"));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 
-				ic.setX(i.getX()+1);
-				ic.setY(i.getY());
-				ic.setZ(i.getZ());
+				ic.set("x",i.get("x")+1);
+				ic.set("y",i.get("y"));
+				ic.set("z",i.get("z"));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 
-				ic.setX(i.getX());
-				ic.setY(i.getY()-1);
-				ic.setZ(i.getZ());
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y")-1);
+				ic.set("z",i.get("z"));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 
-				ic.setX(i.getX());
-				ic.setY(i.getY()+1);
-				ic.setZ(i.getZ());
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y")+1);
+				ic.set("z",i.get("z"));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.setX(i.getX());
-				ic.setY(i.getY());
-				ic.setZ(i.getZ()-1);
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y"));
+				ic.set("z",i.get("z")-1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 
-				ic.setX(i.getX());
-				ic.setY(i.getY());
-				ic.setZ(i.getZ()+1);
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y"));
+				ic.set("z",i.get("z")+1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 
 				
@@ -130,34 +130,34 @@ public class Label3DFilter extends Filter {
 					mappedCurrValue = labelMapping[currValue];
 				}
 
-				ic.setX(i.getX()-1);
-				ic.setY(i.getY());
-				ic.setZ(i.getZ());
+				ic.set("x",i.get("x")-1);
+				ic.set("y",i.get("y"));
+				ic.set("z",i.get("z"));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 
-				ic.setX(i.getX()+1);
-				ic.setY(i.getY());
-				ic.setZ(i.getZ());
+				ic.set("x",i.get("x")+1);
+				ic.set("y",i.get("y"));
+				ic.set("z",i.get("z"));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 
-				ic.setX(i.getX());
-				ic.setY(i.getY()-1);
-				ic.setZ(i.getZ());
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y")-1);
+				ic.set("z",i.get("z"));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 
-				ic.setX(i.getX());
-				ic.setY(i.getY()+1);
-				ic.setZ(i.getZ());
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y")+1);
+				ic.set("z",i.get("z"));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.setX(i.getX());
-				ic.setY(i.getY());
-				ic.setZ(i.getZ()-1);
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y"));
+				ic.set("z",i.get("z")-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 
-				ic.setX(i.getX());
-				ic.setY(i.getY());
-				ic.setZ(i.getZ()+1);
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y"));
+				ic.set("z",i.get("z")+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 
 			}
@@ -175,9 +175,6 @@ public class Label3DFilter extends Filter {
 			im.setValue(i, finalLabelMapping[(int) preliminaryLabeledImage.getValue(i)]);
 		}
 
-		//edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter rlf = new edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter();
-
-		//rlf.apply(im);
 
 	}
 

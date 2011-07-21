@@ -74,63 +74,63 @@ public class MergeFilter extends Filter {
             mapping[i] = i;
         }
 
-        ImageCoordinate ic2 = ImageCoordinate.createCoord(0,0,0,0,0);
+        ImageCoordinate ic2 = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 
         for (ImageCoordinate ic : im) {
 
-            ic2.setZ(ic.getZ());
-            ic2.setC(ic.getC());
-            ic2.setY(ic.getT());
+            ic2.set("z",ic.get("z"));
+            ic2.set("c",ic.get("c"));
+            ic2.set("y",ic.get("t"));
 
             int currValue = (int) im.getValue(ic);
 
             while(currValue != mapping[currValue]) {currValue = mapping[currValue];}
 
-            int x = ic.getX();
-            int y = ic.getY();
+            int x = ic.get("x");
+            int y = ic.get("y");
 
             if (currValue > 0 ) {
 
 
                 //check 8 connected pixels for other values, update mapping
 
-                ic2.setX(x-1);
-                ic2.setY(y-1);
+                ic2.set("x",x-1);
+                ic2.set("y",y-1);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.setX(x-1);
-                ic2.setY(y);
+                ic2.set("x",x-1);
+                ic2.set("y",y);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.setX(x-1);
-                ic2.setY(y+1);
+                ic2.set("x",x-1);
+                ic2.set("y",y+1);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.setX(x);
-                ic2.setY(y-1);
+                ic2.set("x",x);
+                ic2.set("y",y-1);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.setX(x);
-                ic2.setY(y+1);
+                ic2.set("x",x);
+                ic2.set("y",y+1);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.setX(x+1);
-                ic2.setY(y-1);
+                ic2.set("x",x+1);
+                ic2.set("y",y-1);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.setX(x+1);
-                ic2.setY(y);
+                ic2.set("x",x+1);
+                ic2.set("y",y);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.setX(x+1);
-                ic2.setY(y+1);
+                ic2.set("x",x+1);
+                ic2.set("y",y+1);
 
                 updateMapping(ic2, currValue, im, mapping);
 

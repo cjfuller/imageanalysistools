@@ -43,7 +43,7 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 
 /**
- * A filter that takes the gradient of an Image.
+ * A filter that takes the gradient of a 2D Image.
  * <p>
  * This filter applies a horizontal and vertical (3x3 pixel) Prewitt gradient filter to an Image separately, and then replaces the
  * original Image with the sum of the two directional components in quadrature.
@@ -58,6 +58,7 @@ import org.apache.commons.math.linear.Array2DRowRealMatrix;
 
 public class GradientFilter extends Filter {
 
+	//TODO: deal with more dimensions, or refactor to call GradientFilter2D or something similar.
 
     /**
      * Applies the GradientFilter to the specified Image.
@@ -98,7 +99,7 @@ public class GradientFilter extends Filter {
 		
 		Image copy2 = new Image(im);
 		
-		ImageCoordinate ic = ImageCoordinate.createCoord(0, 0, 0, 0, 0);
+		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 		
 		for (ImageCoordinate i : im) {
 			
@@ -106,13 +107,13 @@ public class GradientFilter extends Filter {
 			double output1 = 0;
 			double output2 = 0;
 			
-			if (i.getX() == 0 || i.getY() == 0 || i.getX() == copy1.getDimensionSizes().getX()-1 || i.getY() == copy1.getDimensionSizes().getY()-1) {
+			if (i.get("x") == 0 || i.get("y") == 0 || i.get("x") == copy1.getDimensionSizes().get("x")-1 || i.get("y") == copy1.getDimensionSizes().get("y")-1) {
 				outputVal = 0;
 			} else {
 				for (int p =-1*halfKernelSize; p < halfKernelSize+1; p++) {
 					for (int q = -1*halfKernelSize; q < halfKernelSize+1; q++) {
-						ic.setX(i.getX()+p);
-						ic.setY(i.getY()+q);
+						ic.set("x",i.get("x")+p);
+						ic.set("y",i.get("y")+q);
 						output1 += kernel1.getEntry(p+halfKernelSize,q+halfKernelSize) *copy1.getValue(ic);
 						output2 += kernel2.getEntry(p+halfKernelSize,q+halfKernelSize) *copy2.getValue(ic);
 					}

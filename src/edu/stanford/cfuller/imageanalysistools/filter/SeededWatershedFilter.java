@@ -86,8 +86,8 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
             this.flaggedForMerge = false;
         }
         
-        int x = ic.getX();
-        int y = ic.getY();
+        int x = ic.get("x");
+        int y = ic.get("y");
 
         double currValue = processing.getValue(ic);
 
@@ -99,8 +99,8 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
 
         ImageCoordinate ic2 = ImageCoordinate.cloneCoord(ic);
 
-        ic2.setX(x - 1);
-        ic2.setY(y - 1);
+        ic2.set("x",x - 1);
+        ic2.set("y",y - 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -109,8 +109,8 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
         
-        ic2.setX(x - 1);
-        ic2.setY(y);
+        ic2.set("x",x - 1);
+        ic2.set("y",y);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -119,8 +119,8 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
-        ic2.setX(x - 1);
-        ic2.setY(y + 1);
+        ic2.set("x",x - 1);
+        ic2.set("y",y + 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -129,8 +129,8 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
-        ic2.setX(x);
-        ic2.setY(y - 1);
+        ic2.set("x",x);
+        ic2.set("y",y - 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -139,8 +139,8 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
-        ic2.setX(x);
-        ic2.setY(y + 1);
+        ic2.set("x",x);
+        ic2.set("y",y + 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -149,8 +149,8 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
         
-        ic2.setX(x + 1);
-        ic2.setY(y - 1);
+        ic2.set("x",x + 1);
+        ic2.set("y",y - 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -159,8 +159,8 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
-        ic2.setX(x + 1);
-        ic2.setY(y);
+        ic2.set("x",x + 1);
+        ic2.set("y",y);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -169,8 +169,8 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
-        ic2.setX(x + 1);
-        ic2.setY(y + 1);
+        ic2.set("x",x + 1);
+        ic2.set("y",y + 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);

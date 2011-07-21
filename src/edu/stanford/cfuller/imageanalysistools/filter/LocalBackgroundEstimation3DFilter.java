@@ -37,10 +37,6 @@ package edu.stanford.cfuller.imageanalysistools.filter;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.PriorityQueue;
-
-import org.apache.commons.math.linear.RealMatrix;
-import org.apache.commons.math.linear.RealVector;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
@@ -129,7 +125,7 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 			
 		}
 		
-		int finalMedianIndex = middleIndex + addedFromRightCount - addedFromLeftCount;
+		//int finalMedianIndex = middleIndex + addedFromRightCount - addedFromLeftCount;
 		
 		return pq;
 		
@@ -147,38 +143,28 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 		
 		//RealVector localArea = new org.apache.commons.math.linear.ArrayRealVector();
 		
-		edu.stanford.cfuller.imageanalysistools.image.Histogram h = new edu.stanford.cfuller.imageanalysistools.image.Histogram(this.referenceImage);
+		//edu.stanford.cfuller.imageanalysistools.image.Histogram h = new edu.stanford.cfuller.imageanalysistools.image.Histogram(this.referenceImage);
 
-		int numPixelsInBox = boxSize*boxSize*boxSize;
+		//int numPixelsInBox = boxSize*boxSize*boxSize;
 		
 		ImageCoordinate ic = this.referenceImage.getDimensionSizes();
 		
-		ImageCoordinate icnew = ImageCoordinate.createCoord(ic.getX()+2*boxSize, ic.getY()+2*boxSize, ic.getZ()+2*boxSize, ic.getC(), ic.getT());
+		ImageCoordinate icnew = ImageCoordinate.createCoordXYZCT(ic.get("x")+2*boxSize, ic.get("y")+2*boxSize, ic.get("z")+2*boxSize, ic.get("c"), ic.get("t"));
 
 		Image padded = new Image(icnew, -1.0);
 		
 		
 		for(ImageCoordinate i : this.referenceImage) {
 		
-			icnew.setX(i.getX()+boxSize);
-			icnew.setY(i.getY()+boxSize);
-			icnew.setZ(i.getZ()+boxSize);
-			icnew.setC(i.getC());
-			icnew.setT(i.getT());
+			icnew.set("x",i.get("x")+boxSize);
+			icnew.set("y",i.get("y")+boxSize);
+			icnew.set("z",i.get("z")+boxSize);
+			icnew.set("c",i.get("c"));
+			icnew.set("t",i.get("t"));
 			
 			padded.setValue(icnew, this.referenceImage.getValue(i));
 			
 		}
-		
-		//for each z-section
-		
-		//if first, calculate median of box
-		
-		
-		
-		
-		
-		
 		
 		icnew.recycle();
 

@@ -76,17 +76,17 @@ public class DEGaussianMixtureModelClustering {
 
         for (int i =0; i < k; i++) {
 
-            parameterLowerBounds.setEntry(numParametersEach*i,    -0.1*singleCluster.getDimensionSizes().getX());
-            parameterLowerBounds.setEntry(numParametersEach*i+1,  -0.1*singleCluster.getDimensionSizes().getY());
+            parameterLowerBounds.setEntry(numParametersEach*i,    -0.1*singleCluster.getDimensionSizes().get("x"));
+            parameterLowerBounds.setEntry(numParametersEach*i+1,  -0.1*singleCluster.getDimensionSizes().get("y"));
             parameterLowerBounds.setEntry(numParametersEach*i+2,  tol);
             parameterLowerBounds.setEntry(numParametersEach*i+3,  -1);
             parameterLowerBounds.setEntry(numParametersEach*i+4,  tol);
 
-            parameterUpperBounds.setEntry(numParametersEach*i,    1.1*singleCluster.getDimensionSizes().getX());
-            parameterUpperBounds.setEntry(numParametersEach*i+1,  1.1*singleCluster.getDimensionSizes().getY());
-            parameterUpperBounds.setEntry(numParametersEach*i+2,  Math.pow(0.05*singleCluster.getDimensionSizes().getX(), 2));
+            parameterUpperBounds.setEntry(numParametersEach*i,    1.1*singleCluster.getDimensionSizes().get("x"));
+            parameterUpperBounds.setEntry(numParametersEach*i+1,  1.1*singleCluster.getDimensionSizes().get("y"));
+            parameterUpperBounds.setEntry(numParametersEach*i+2,  Math.pow(0.05*singleCluster.getDimensionSizes().get("x"), 2));
             parameterUpperBounds.setEntry(numParametersEach*i+3,  1);
-            parameterUpperBounds.setEntry(numParametersEach*i+4,  Math.pow(0.05*singleCluster.getDimensionSizes().getY(), 2));
+            parameterUpperBounds.setEntry(numParametersEach*i+4,  Math.pow(0.05*singleCluster.getDimensionSizes().get("y"), 2));
             
         }
 

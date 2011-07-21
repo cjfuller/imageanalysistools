@@ -40,7 +40,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
- * A Filter that applies a gaussian blur to an Image.
+ * A Filter that applies a gaussian blur to a 2D Image.
  * <p>
  * This Filter does not use a reference Image.
  *<p>
@@ -53,6 +53,10 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 public class GaussianFilter extends Filter {
 
+	//TODO: reimplement using ConvolutionFilter to make use of FFT implementation.
+	
+	//TODO: deal with more than 2 dimensional blur. (Or make that be the job of other filters and rename this one -2D?)
+	
 	int width;
    // boolean precalculatedFFT;
     //Complex[] kernelFFT;
@@ -74,16 +78,7 @@ public class GaussianFilter extends Filter {
 	public void apply(Image im) {
 
 		int kernelSize = this.width;
-		
-//		if (stdDev < 12) {
-//			kernelSize = 3*stdDev + 1- (stdDev%2);
-//		} else {
-//			kernelSize = 2*stdDev - 1;
-//		}
-//
-//        if (kernelSize % 2 == 0) {
-//            kernelSize += 1;
-//        }
+
 
         final int halfKernelSizeCutoff = 8;
         int halfKernelSize = (kernelSize - 1)/2;
@@ -119,51 +114,11 @@ public class GaussianFilter extends Filter {
                 kernelCoeffs[kernelCounter++] = (float) (coeffs[i]*coeffs[j]);
             }
         }
-/*
-        FastFourierTransformer fft = new org.apache.commons.math.transform.FastFourierTransformer();
 
-        if (!this.precalculatedFFT) {
-            this.kernelFFT = fft.transform(kernelCoeffs);
-        }
-
-        //X-pass filtering
-
-        double[][] rowImage = new double[im.getDimensionSizes().getY()][im.getDimensionSizes().getX()];
-        Complex[][] colMajorImage = new Complex[im.getDimensionSizes().getX()][im.getDimensionSizes().getY()];
-
-        for (ImageCoordinate ic : im) {
-            rowImage[ic.getY()][ic.getX()] = im.getValue(ic);
-        }
-
-        ImageCoordinate boxMin = ImageCoordinate.createCoord(0,0,0,0,0);
-        ImageCoordinate boxMax = ImageCoordinate.createCoord(im.getDimensionSizes().getX(), 1,1,1,1);
-
-        for (int r = 0; r < rowImage.length; r++) {
-            double[] row = rowImage[r];
-            Complex[] transformedRow = fft.transform()
-        }
-*/
-        /*
-        Kernel k = new Kernel(kernelSize, kernelSize, kernelCoeffs);
-
-        BufferedImage bufferedImage = im.toBufferedImage();
-
-        ConvolveOp co = new ConvolveOp(k);
-
-        BufferedImage out=  co.createCompatibleDestImage(bufferedImage, null);
-
-        co.filter(bufferedImage, out);
-
-        WritableRaster outRaster = out.getRaster();
-
-        for (ImageCoordinate ic : im) {
-            im.setValue(ic, outRaster.getSample(ic.getX(), ic.getY(), 0));
-        }
-        */
 
 		Image intermediate = new Image(im);
 		
-		ImageCoordinate ic = ImageCoordinate.createCoord(0, 0, 0, 0, 0);
+		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 		
 		for (ImageCoordinate i : intermediate) {
 			double sum = 0;
@@ -171,8 +126,8 @@ public class GaussianFilter extends Filter {
 
 			for (int offset = -1*halfKernelSize; offset <= halfKernelSize; offset++) {
 				double imValue = 0;
-				ic.setX(i.getX());
-				ic.setY(i.getY() + offset);
+				ic.set("x",i.get("x"));
+				ic.set("y",i.get("y") + offset);
 				
 				if (im.inBounds(ic)) {
                     partialCoeffSum += coeffs[halfKernelSize+offset];
@@ -192,8 +147,8 @@ public class GaussianFilter extends Filter {
 
 			for (int offset = -1*halfKernelSize; offset <= halfKernelSize; offset++) {
 				double imValue = 0;
-				ic.setX(i.getX()+offset);
-				ic.setY(i.getY());
+				ic.set("x",i.get("x")+offset);
+				ic.set("y",i.get("y"));
 				
 				if (intermediate.inBounds(ic)) {
                     partialCoeffSum += coeffs[halfKernelSize+offset];
@@ -216,10 +171,7 @@ public class GaussianFilter extends Filter {
      * @param width     The width of the Gaussian to be used for filtering, in pixels.
      */
 	public void setWidth(int width) {
-        //if (this.width != width) {
-            //this.precalculatedFFT = false;
-            //this.kernelFFT = null;
-        //}
+       
 		this.width = width;
 	}
 
