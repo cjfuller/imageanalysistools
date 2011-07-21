@@ -205,10 +205,6 @@ public class LocalAnalysis {
             }
 
 
-            //set the numberOfChannels and channelName parameters appropriately for the multi-wavelength file
-
-            params.setValueForKey("number_of_channels", Integer.toString(images.getImageCount()));
-
             String channelNames = "";
 
             for (Image i : images) {
@@ -223,7 +219,11 @@ public class LocalAnalysis {
 
         }
 
+        //set the numberOfChannels and channelName parameters appropriately for the multi-wavelength file
 
+        if (images == null) {throw new java.io.IOException("Unable to load Image Set: " + namedFileSet.getImageNameForIndex(0));}
+        
+        params.addIfNotSet("number_of_channels", Integer.toString(images.getImageCount()));
 
 
         if (params.hasKeyAndTrue("process_max_intensity_projections")) {
@@ -427,8 +427,6 @@ public class LocalAnalysis {
         String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.ome.tif";
 
         String maskOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
-
-        System.out.println("number of stored images: " + finishedMethod.getStoredImages().size());
         
         if (finishedMethod.getStoredImages().size() == 1) {
 

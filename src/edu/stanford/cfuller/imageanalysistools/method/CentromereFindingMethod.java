@@ -340,6 +340,10 @@ public class CentromereFindingMethod extends Method {
             backgroundResult = backgroundResult.scalarMultiply(0.0);
 
         }
+        
+        if (backgroundResult != null) {
+    		this.parameters.setValueForKey("background_calculated", "true");
+        }
 
 
         RealMatrix masterResult = new org.apache.commons.math.linear.Array2DRowRealMatrix(fullResult.getRowDimension(), fullResult.getColumnDimension() + Integer.parseInt(this.parameters.getValueForKey("number_of_channels")) + 2);

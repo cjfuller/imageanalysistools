@@ -91,6 +91,7 @@ public class GaussianImageObject extends ImageObject {
         this.fitParametersByChannel = new Vector<RealVector>();
         this.fitR2ByChannel = new Vector<Double>();
         this.fitErrorByChannel = new Vector<Double>();
+        this.nPhotonsByChannel = new Vector<Double>();
 
         GaussianFitter3D gf = new GaussianFitter3D();
 
@@ -276,6 +277,8 @@ public class GaussianImageObject extends ImageObject {
             this.fitErrorByChannel.add(error);
             
             this.positionsByChannel.add(fitParameters.getSubVector(3, 3));
+            
+            this.nPhotonsByChannel.add(n_photons);
 
         }
 

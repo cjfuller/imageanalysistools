@@ -58,6 +58,8 @@ import java.util.NoSuchElementException;
  * <p> This class is partly thread-safe in the sense that multiple threads can use the same pool of ImageCoordinates safely.  However, ImageCoordinate objects themselves
  * are not thread-safe and should not be shared between threads.
  *
+ * <p> Note that for the convenience methods for manipulating XYZCT coordinates, the strings used to access these are the lower-case versions of those letters,
+ * which are defined by the static class constants for those dimensions.
  *
  * @author Colin J. Fuller
  *
@@ -65,6 +67,12 @@ import java.util.NoSuchElementException;
 
 public class ImageCoordinate implements java.io.Serializable, Collection<String> {
 
+	public static final String X = "x";
+	public static final String Y = "y";
+	public static final String Z = "z";
+	public static final String C = "c";
+	public static final String T = "t";
+	
 	static final long serialVersionUID = 1L;
 	
 	static final int initialStaticCoordCount = 8;

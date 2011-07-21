@@ -79,6 +79,8 @@ public abstract class ImageObject implements Serializable {
     java.util.Vector<Double> fitR2ByChannel;
     java.util.Vector<Double> fitErrorByChannel;
     
+    java.util.Vector<Double> nPhotonsByChannel; 
+    
     java.util.Vector<RealVector> positionsByChannel;
     Hashtable<Integer, RealVector> vectorDifferencesBetweenChannels;
     Hashtable<Integer, Double> scalarDifferencesBetweenChannels;
@@ -108,6 +110,7 @@ public abstract class ImageObject implements Serializable {
         this.hadFittingError = true;
         this.fitR2ByChannel = null;
         this.fitErrorByChannel = null;
+        this.nPhotonsByChannel = null;
         this.label = 0;
         this.vectorDifferencesBetweenChannels = new Hashtable<Integer, RealVector>();
         this.scalarDifferencesBetweenChannels = new Hashtable<Integer, Double>();
@@ -131,6 +134,7 @@ public abstract class ImageObject implements Serializable {
         this.fitParametersByChannel = null;
         this.fitR2ByChannel = null;
         this.fitErrorByChannel = null;
+        this.nPhotonsByChannel = null;
         
         this.positionsByChannel = new Vector<RealVector>();
 
@@ -423,6 +427,14 @@ public abstract class ImageObject implements Serializable {
      */
     public Vector<Double> getFitErrorByChannel() {
         return fitErrorByChannel;
+    }
+    
+    /**
+     * Gets the number of photons above background from the object in each channel.
+     * @return	a Vector containing the number of photons collected in each channel.
+     */
+    public Vector<Double> getNPhotonsByChannel() {
+    	return this.nPhotonsByChannel;
     }
 
     /**

@@ -87,6 +87,8 @@ public abstract class Method implements Runnable {
 		}
 		this.storeImageOutput(new Image(toProcess));
 		
+		this.parameters.addIfNotSet("background_calculated", "false");
+		
 	}
 
     /**

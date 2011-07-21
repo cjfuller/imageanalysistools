@@ -102,6 +102,8 @@ public class DataSummary {
         for (File f : dir.listFiles()) {
 
 
+        	ParameterDictionary params = null;
+        	
 
             if (! f.getName().matches(".*" + outputFileExtension)) {continue;}
 
@@ -109,7 +111,7 @@ public class DataSummary {
 
                 File parameterFile = new File(parameterDirectory + File.separator + f.getName().replace(outputFileExtension, AnalysisController.PARAMETER_EXTENSION));
 
-                ParameterDictionary params = ParameterDictionary.readParametersFromFile(parameterFile.getAbsolutePath());
+                params = ParameterDictionary.readParametersFromFile(parameterFile.getAbsolutePath());
 
                 numChannels = Integer.parseInt(params.getValueForKey("number_of_channels"));
 
@@ -127,9 +129,9 @@ public class DataSummary {
 
                 }
 
-                output.print("number_of_centromeres_in_cell ");
+                output.print("number_of_regions_in_cluster ");
 
-                output.println("average_centromere_size");
+                output.println("average_region_size");
 
 
 
@@ -180,15 +182,16 @@ public class DataSummary {
 
                 averageCounts[regionType] += 1;
                 Double[] tempBg = new Double[numChannels];
-                for (int i = 0; i < numChannels; i++) {
-                    tempBg[i] = Double.parseDouble(splitline[numChannels+i+1]);
-
+                if (params != null && params.getBooleanValueForKey("background_calculated")) {
+	                for (int i = 0; i < numChannels; i++) {
+	                    tempBg[i] = Double.parseDouble(splitline[numChannels+i+1]);
+	
+	                }
+                } else {
+                	java.util.Arrays.fill(tempBg, 0.0);
                 }
 
                 average_sizes.put(regionID, average_sizes.get(regionID)+ Double.parseDouble(splitline[numChannels]));
-
-                //ch0BG.put(regionID, Double.parseDouble(splitline[numChannels+1]));
-                //ch2BG.put(regionID, Double.parseDouble(splitline[numChannels+2]));
 
                 allBG.put(regionID, tempBg);
 

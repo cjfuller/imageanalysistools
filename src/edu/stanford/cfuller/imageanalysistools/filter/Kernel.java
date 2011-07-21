@@ -48,6 +48,8 @@ public class Kernel {
 	
 	//TODO: implementation of nonzero boundary conditions
 	
+	//TODO: complete documentation
+	
 	ImageCoordinate halfKernelDimensions;
 	
 	double[] weights;
