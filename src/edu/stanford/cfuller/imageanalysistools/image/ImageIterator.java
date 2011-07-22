@@ -133,7 +133,7 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
 			}
 			
 			if (sizes == null) throw new NoSuchElementException("Undefined Image size.");
-			
+						
             this.currCoord.setCoord(nextCoord);
 
             int currDimValue = 1;
@@ -141,7 +141,7 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
             for (String dim : this.nextCoord) {
             	currDimValue = this.nextCoord.get(dim);
             	currDimValue+=1;
-            	currDimValue = currDimValue % sizes.get(dim);
+            	if (!this.nextCoord.isLastIterableDimension(dim)) currDimValue = currDimValue % sizes.get(dim);
             	this.nextCoord.set(dim, currDimValue);
             	if (currDimValue != 0) break;
             }

@@ -41,7 +41,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 /**
  * Represents an integer-valued coordinate in an n-dimensional image.
@@ -79,6 +78,8 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	
 	static final int initialStaticCoordCount = 8;
 	
+	static final int initialDimensionCapacity = 10;
+	
 	private static java.util.Deque<ImageCoordinate> availableStaticCoords;
 	
 	private HashMap<String, Integer> dimensionCoordinates;
@@ -115,8 +116,8 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	}
 	
 	private ImageCoordinate(){
-		this.dimensionCoordinates = new HashMap<String, Integer>();
-		this.indexToStringMapping = new ArrayList<String>();
+		this.dimensionCoordinates = new HashMap<String, Integer>(initialDimensionCapacity);
+		this.indexToStringMapping = new ArrayList<String>(initialDimensionCapacity);
 	}
 
     /**
@@ -185,6 +186,37 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 			return this.get(this.indexToStringMapping.get(dimensionIndex));
 		}
 		return 0;
+	}
+	
+	/**
+	 * Gets the string naming the specified dimension.
+	 * <p>
+	 * The order of coordinates will be the order in which they were set if done manually,
+	 * or the order from the coordinate this ImageCoordinate was cloned from, 
+	 * or otherwise ordered unpredictably (though consistent between calls), probably
+	 * according to hash key.
+	 * <p>
+	 * No bounds checking is performed.
+	 *  
+	 * @param dimensionIndex	The index of the dimension whose value will be retrieved.
+	 * @return					The String naming the specified dimension (suitable for use with {@link #get(String)}).
+	 */
+	public String getDimensionNameByIndex(int dimensionIndex) {
+		return this.indexToStringMapping.get(dimensionIndex);
+	}
+	
+	/**
+	 * Queries whether the named dimension is the last dimension in the iterator or foreach based iteration.
+	 * <p>
+	 * This might be useful when iterating over all dimensions, and some special behavior is required after the
+	 * final dimension.
+	 * <p>
+	 * 
+	 * @param name		the name of the dimension to check.
+	 * @return			true if name is the last dimension of iteration, false otherwise.
+	 */
+	public boolean isLastIterableDimension(String name) {
+		return name == this.indexToStringMapping.get(this.indexToStringMapping.size() - 1);
 	}
 	
 	/**
@@ -416,7 +448,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      */
     public void setCoord(ImageCoordinate other) {
     	this.clear();
-    	for (String s : other.indexToStringMapping) {
+    	for (String s : other) {
     		this.dimensionCoordinates.put(s, other.get(s));
     		this.indexToStringMapping.add(s);
     	}
@@ -535,7 +567,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	 */
 	@Override
 	public Iterator<String> iterator() {
-		return new ImageCoordinateIterator();
+		return new ImageCoordinateIterator(this);
 	}
 
 	/* (non-Javadoc)
@@ -603,30 +635,5 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 		}
 	}
 	
-	protected class ImageCoordinateIterator implements Iterator<String> {
-		
-		int currentIndex;
-		
-		public ImageCoordinateIterator() {
-			this.currentIndex = 0;
-		}
-		
-		public boolean hasNext() {
-			return (this.currentIndex < getDimension());
-		}
-		
-		public String next() {
-			if (this.hasNext()) return indexToStringMapping.get(currentIndex++);
-			
-			throw new NoSuchElementException("No more elements in ImageCoordinate.");
-			
-		}
-		
-		public void remove() {
-			throw new UnsupportedOperationException("Remove not supported for ImageCoordinate.");
-		}
-		
-		
-	}
 	
 }
