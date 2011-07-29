@@ -114,8 +114,8 @@ public class GaussianFilter extends Filter {
 
 			for (int offset = -1*halfKernelSize; offset <= halfKernelSize; offset++) {
 				double imValue = 0;
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y") + offset);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y) + offset);
 				
 				if (im.inBounds(ic)) {
                     partialCoeffSum += coeffs[halfKernelSize+offset];
@@ -135,8 +135,8 @@ public class GaussianFilter extends Filter {
 
 			for (int offset = -1*halfKernelSize; offset <= halfKernelSize; offset++) {
 				double imValue = 0;
-				ic.set("x",i.get("x")+offset);
-				ic.set("y",i.get("y"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+offset);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
 				
 				if (intermediate.inBounds(ic)) {
                     partialCoeffSum += coeffs[halfKernelSize+offset];

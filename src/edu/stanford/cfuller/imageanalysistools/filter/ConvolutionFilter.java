@@ -95,13 +95,13 @@ public class ConvolutionFilter extends Filter {
 
         FastFourierTransformer fft = new org.apache.commons.math.transform.FastFourierTransformer();
 
-        int ydimPowOfTwo = im.getDimensionSizes().get("y");
-        int xdimPowOfTwo = im.getDimensionSizes().get("x");
+        int ydimPowOfTwo = im.getDimensionSizes().get(ImageCoordinate.Y);
+        int xdimPowOfTwo = im.getDimensionSizes().get(ImageCoordinate.X);
 
         if (!FastFourierTransformer.isPowerOf2(ydimPowOfTwo) || !FastFourierTransformer.isPowerOf2(xdimPowOfTwo)) {
 
-            xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get("x")) / Math.log(2)));
-            ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get("y"))/Math.log(2)));
+            xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get(ImageCoordinate.X)) / Math.log(2)));
+            ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get(ImageCoordinate.Y))/Math.log(2)));
         }
 
         //for (int p =0; p < im.getPlaneCount(); p++) {
@@ -117,7 +117,7 @@ public class ConvolutionFilter extends Filter {
             Complex[][] colMajorImage = new Complex[xdimPowOfTwo][ydimPowOfTwo];
 
             for (ImageCoordinate ic : im) {
-                rowImage[ic.get("y")][ic.get("x")] = im.getValue(ic);
+                rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] = im.getValue(ic);
             }
 
             for (int r = 0; r < rowImage.length; r++) {
@@ -181,7 +181,7 @@ public class ConvolutionFilter extends Filter {
 
         ImageCoordinate minCoord = ImageCoordinate.createCoordXYZCT(0, 0, z, 0, 0);
         ImageCoordinate maxCoord = ImageCoordinate.cloneCoord(orig.getDimensionSizes());
-        maxCoord.set("z",z+1);
+        maxCoord.set(ImageCoordinate.Z,z+1);
         
         orig.setBoxOfInterest(minCoord, maxCoord);
         
@@ -189,7 +189,7 @@ public class ConvolutionFilter extends Filter {
         oldMin  = 0;
 
         for (ImageCoordinate ic : orig) {
-            orig.setValue(ic, (rowImage[ic.get("y")][ic.get("x")] - newMin)*scaleFactor + oldMin);
+            orig.setValue(ic, (rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] - newMin)*scaleFactor + oldMin);
         }
         
         orig.clearBoxOfInterest();

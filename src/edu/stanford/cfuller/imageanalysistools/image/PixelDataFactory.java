@@ -57,7 +57,7 @@ public class PixelDataFactory {
 
     public PixelData createPixelData(ImageCoordinate sizes, int data_type, String dimensionOrder) {
 
-        return createPixelData(sizes.get("x"), sizes.get("y"), sizes.get("z"), sizes.get("c"), sizes.get("t"), data_type, dimensionOrder);
+        return createPixelData(sizes.get(ImageCoordinate.X), sizes.get(ImageCoordinate.Y), sizes.get(ImageCoordinate.Z), sizes.get(ImageCoordinate.C), sizes.get(ImageCoordinate.T), data_type, dimensionOrder);
 
     }
 

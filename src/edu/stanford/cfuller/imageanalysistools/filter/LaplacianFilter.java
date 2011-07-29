@@ -81,8 +81,8 @@ public class LaplacianFilter extends Filter{
             for (int i =0; i < kernel.length; i++) {
                 for (int j = 0; j < kernel[0].length; j++) {
 
-                    icTemp.set("x",ic.get("x") + j-kernelHalfSize);
-                    icTemp.set("y",ic.get("y") + i-kernelHalfSize);
+                    icTemp.set(ImageCoordinate.X,ic.get(ImageCoordinate.X) + j-kernelHalfSize);
+                    icTemp.set(ImageCoordinate.Y,ic.get(ImageCoordinate.Y) + i-kernelHalfSize);
 
                     if (! im.inBounds(icTemp)) {
                         continue;

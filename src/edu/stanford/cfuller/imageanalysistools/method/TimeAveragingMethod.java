@@ -48,14 +48,14 @@ public class TimeAveragingMethod extends Method {
 
         ImageCoordinate dimSizes = ImageCoordinate.cloneCoord(this.images.get(0).getDimensionSizes());
 
-        dimSizes.set("c",this.images.size());
+        dimSizes.set(ImageCoordinate.C,this.images.size());
 
         Image reference = new Image(dimSizes, 0.0);
 
         for (ImageCoordinate ic : reference) {
             ImageCoordinate ic_c = ImageCoordinate.cloneCoord(ic);
-            ic_c.set("c",0);
-            reference.setValue(ic, this.images.get(ic.get("c")).getValue(ic_c));
+            ic_c.set(ImageCoordinate.C,0);
+            reference.setValue(ic, this.images.get(ic.get(ImageCoordinate.C)).getValue(ic_c));
             ic_c.recycle();
         }
 
@@ -63,7 +63,7 @@ public class TimeAveragingMethod extends Method {
 
         //now create the output image
 
-        dimSizes.set("t",1);
+        dimSizes.set(ImageCoordinate.T,1);
 
         Image timeAveraged = new Image(dimSizes, 0.0);
 

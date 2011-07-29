@@ -66,59 +66,59 @@ public class MergeFilter extends Filter {
 
         for (ImageCoordinate ic : im) {
 
-            ic2.set("z",ic.get("z"));
-            ic2.set("c",ic.get("c"));
-            ic2.set("y",ic.get("t"));
+            ic2.set(ImageCoordinate.Z,ic.get(ImageCoordinate.Z));
+            ic2.set(ImageCoordinate.C,ic.get(ImageCoordinate.C));
+            ic2.set(ImageCoordinate.Y,ic.get(ImageCoordinate.T));
 
             int currValue = (int) im.getValue(ic);
 
             while(currValue != mapping[currValue]) {currValue = mapping[currValue];}
 
-            int x = ic.get("x");
-            int y = ic.get("y");
+            int x = ic.get(ImageCoordinate.X);
+            int y = ic.get(ImageCoordinate.Y);
 
             if (currValue > 0 ) {
 
 
                 //check 8 connected pixels for other values, update mapping
 
-                ic2.set("x",x-1);
-                ic2.set("y",y-1);
+                ic2.set(ImageCoordinate.X,x-1);
+                ic2.set(ImageCoordinate.Y,y-1);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.set("x",x-1);
-                ic2.set("y",y);
+                ic2.set(ImageCoordinate.X,x-1);
+                ic2.set(ImageCoordinate.Y,y);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.set("x",x-1);
-                ic2.set("y",y+1);
+                ic2.set(ImageCoordinate.X,x-1);
+                ic2.set(ImageCoordinate.Y,y+1);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.set("x",x);
-                ic2.set("y",y-1);
+                ic2.set(ImageCoordinate.X,x);
+                ic2.set(ImageCoordinate.Y,y-1);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.set("x",x);
-                ic2.set("y",y+1);
+                ic2.set(ImageCoordinate.X,x);
+                ic2.set(ImageCoordinate.Y,y+1);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.set("x",x+1);
-                ic2.set("y",y-1);
+                ic2.set(ImageCoordinate.X,x+1);
+                ic2.set(ImageCoordinate.Y,y-1);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.set("x",x+1);
-                ic2.set("y",y);
+                ic2.set(ImageCoordinate.X,x+1);
+                ic2.set(ImageCoordinate.Y,y);
 
                 updateMapping(ic2, currValue, im, mapping);
 
-                ic2.set("x",x+1);
-                ic2.set("y",y+1);
+                ic2.set(ImageCoordinate.X,x+1);
+                ic2.set(ImageCoordinate.Y,y+1);
 
                 updateMapping(ic2, currValue, im, mapping);
 

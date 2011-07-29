@@ -50,7 +50,7 @@ public class MaximumIntensityProjection {
      */
     public static Image projectImage(Image im) {
 
-        ImageCoordinate projectionSizes = ImageCoordinate.createCoordXYZCT(im.getDimensionSizes().get("x"), im.getDimensionSizes().get("y"), 1, im.getDimensionSizes().get("c"), im.getDimensionSizes().get("t"));
+        ImageCoordinate projectionSizes = ImageCoordinate.createCoordXYZCT(im.getDimensionSizes().get(ImageCoordinate.X), im.getDimensionSizes().get(ImageCoordinate.Y), 1, im.getDimensionSizes().get(ImageCoordinate.C), im.getDimensionSizes().get(ImageCoordinate.T));
         
         Image imProj = new Image(projectionSizes, 0.0);
 
@@ -59,7 +59,7 @@ public class MaximumIntensityProjection {
         for (ImageCoordinate i : im) {
 
             ImageCoordinate ic = ImageCoordinate.cloneCoord(i);
-            ic.set("z",0);
+            ic.set(ImageCoordinate.Z,0);
 
             double origValue = im.getValue(i);
             double projValue = imProj.getValue(ic);

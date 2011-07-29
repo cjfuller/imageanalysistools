@@ -64,36 +64,36 @@ public class LabelFilter extends Filter {
 			
 			if (Math.floor(im.getValue(i)) > 0) {
 				
-				ic.set("x",i.get("x")-1);
-				ic.set("y",i.get("y"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.set("x",i.get("x")-1);
-				ic.set("y",i.get("y")-1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.set("x",i.get("x")-1);
-				ic.set("y",i.get("y")+1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.set("x",i.get("x")+1);
-				ic.set("y",i.get("y"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.set("x",i.get("x")+1);
-				ic.set("y",i.get("y")-1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.set("x",i.get("x")+1);
-				ic.set("y",i.get("y")+1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y")-1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y")+1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
 				if (preliminaryLabeledImage.getValue(i) == 0) {preliminaryLabeledImage.setValue(i, labelCounter++);}
@@ -122,36 +122,36 @@ public class LabelFilter extends Filter {
 				}
 				
 				
-				ic.set("x",i.get("x")-1);
-				ic.set("y",i.get("y"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.set("x",i.get("x")-1);
-				ic.set("y",i.get("y")-1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.set("x",i.get("x")-1);
-				ic.set("y",i.get("y")+1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.set("x",i.get("x")+1);
-				ic.set("y",i.get("y"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.set("x",i.get("x")+1);
-				ic.set("y",i.get("y")-1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.set("x",i.get("x")+1);
-				ic.set("y",i.get("y")+1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y")-1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y")+1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
 			}

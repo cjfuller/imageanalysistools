@@ -56,7 +56,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 	//fields
 	
 	final static long serialVersionUID=1L;
-	final String defaultDimensionOrder = "XYZCT";
+	final String defaultDimensionOrder = "xyzct";
 	
 	protected loci.formats.meta.IMetadata metadata;
 	
@@ -317,7 +317,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
      * @return          The value of the Image at the specified location as a double.
      */
 	public double getValue(ImageCoordinate coord) {
-		return pixelData.getPixel(coord.get("x"), coord.get("y"), coord.get("z"), coord.get("c"), coord.get("t"));
+		return pixelData.getPixel(coord.get(ImageCoordinate.X), coord.get(ImageCoordinate.Y), coord.get(ImageCoordinate.Z), coord.get(ImageCoordinate.C), coord.get(ImageCoordinate.T));
 	}
 
     /**
@@ -337,7 +337,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
      * @param value     The value to which to set the Image at the specified coordinate.
      */
 	public void setValue(ImageCoordinate coord, double value) {
-		pixelData.setPixel(coord.get("x"), coord.get("y"), coord.get("z"), coord.get("c"), coord.get("t"), value);
+		pixelData.setPixel(coord.get(ImageCoordinate.X), coord.get(ImageCoordinate.Y), coord.get(ImageCoordinate.Z), coord.get(ImageCoordinate.C), coord.get(ImageCoordinate.T), value);
 	}
 	
 
@@ -411,10 +411,10 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
             useID = false;
         }
 
-        for (int i =0; i < this.dimensionSizes.get("c"); i++) {
+        for (int i =0; i < this.dimensionSizes.get(ImageCoordinate.C); i++) {
             ic.recycle();
             ic = ImageCoordinate.cloneCoord(this.getDimensionSizes());
-            ic.set("c", 1);
+            ic.set(ImageCoordinate.C, 1);
             Image newChannelImage = new Image(ic, 0.0);
             
             //set the channel name for this new single channel image
@@ -441,9 +441,9 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 
             ic = ImageCoordinate.cloneCoord(i);
 
-            ic.set("c", 0);
+            ic.set(ImageCoordinate.C, 0);
 
-            split.get(i.get("c")).setValue(ic, this.getValue(i));
+            split.get(i.get(ImageCoordinate.C)).setValue(ic, this.getValue(i));
 
         }
 
@@ -469,21 +469,21 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
      */
     public java.awt.image.BufferedImage toBufferedImage() {
 
-        BufferedImage toReturn = new BufferedImage(this.getDimensionSizes().get("x"), this.getDimensionSizes().get("y"), BufferedImage.TYPE_USHORT_GRAY);
+        BufferedImage toReturn = new BufferedImage(this.getDimensionSizes().get(ImageCoordinate.X), this.getDimensionSizes().get(ImageCoordinate.Y), BufferedImage.TYPE_USHORT_GRAY);
 
         WritableRaster r = toReturn.getRaster();
 
         ImageCoordinate boxMin = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
         ImageCoordinate boxMax = ImageCoordinate.cloneCoord(this.getDimensionSizes());
-        boxMax.set("c",1);
-        boxMax.set("z",1);
-        boxMax.set("t",1);
+        boxMax.set(ImageCoordinate.C,1);
+        boxMax.set(ImageCoordinate.Z,1);
+        boxMax.set(ImageCoordinate.T,1);
 
         this.setBoxOfInterest(boxMin, boxMax);
 
         for (ImageCoordinate i : this) {
 
-            r.setSample(i.get("x"), i.get("y"), 0, this.getValue(i));
+            r.setSample(i.get(ImageCoordinate.X), i.get(ImageCoordinate.Y), 0, this.getValue(i));
             
         }
 
@@ -502,7 +502,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
      */
     public int getPlaneCount() {
 
-        return this.getDimensionSizes().get("z") * this.getDimensionSizes().get("t") * this.getDimensionSizes().get("c");
+        return this.getDimensionSizes().get(ImageCoordinate.Z) * this.getDimensionSizes().get(ImageCoordinate.T) * this.getDimensionSizes().get(ImageCoordinate.C);
     
     }
 
@@ -519,20 +519,20 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
     public void selectPlane(int i) {
 
         ImageCoordinate tempMin = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
-        ImageCoordinate tempMax = ImageCoordinate.createCoordXYZCT(this.getDimensionSizes().get("x"),this.getDimensionSizes().get("y"),0,0,0);
+        ImageCoordinate tempMax = ImageCoordinate.createCoordXYZCT(this.getDimensionSizes().get(ImageCoordinate.X),this.getDimensionSizes().get(ImageCoordinate.Y),0,0,0);
 
-        int z_index = i % this.getDimensionSizes().get("z");
+        int z_index = i % this.getDimensionSizes().get(ImageCoordinate.Z);
 
-        int c_index = ((i - z_index)/(this.getDimensionSizes().get("z"))) % this.getDimensionSizes().get("c");
+        int c_index = ((i - z_index)/(this.getDimensionSizes().get(ImageCoordinate.Z))) % this.getDimensionSizes().get(ImageCoordinate.C);
 
-        int t_index = ((((i - z_index)/(this.getDimensionSizes().get("z"))) - c_index)/this.getDimensionSizes().get("c"));
+        int t_index = ((((i - z_index)/(this.getDimensionSizes().get(ImageCoordinate.Z))) - c_index)/this.getDimensionSizes().get(ImageCoordinate.C));
 
-        tempMin.set("z",z_index);
-        tempMin.set("c",c_index);
-        tempMin.set("t",t_index);
-        tempMax.set("z",z_index+1);
-        tempMax.set("c",c_index+1);
-        tempMax.set("t",t_index+1);
+        tempMin.set(ImageCoordinate.Z,z_index);
+        tempMin.set(ImageCoordinate.C,c_index);
+        tempMin.set(ImageCoordinate.T,t_index);
+        tempMax.set(ImageCoordinate.Z,z_index+1);
+        tempMax.set(ImageCoordinate.C,c_index+1);
+        tempMax.set(ImageCoordinate.T,t_index+1);
 
         this.setBoxOfInterest(tempMin, tempMax);
         tempMin.recycle();
@@ -796,18 +796,18 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 			e.printStackTrace();
 		}
 		try {
-			this.metadata.setPixelsDimensionOrder(ome.xml.model.enums.DimensionOrder.fromString(this.pixelData.getDimensionOrder()), 0);
+			this.metadata.setPixelsDimensionOrder(ome.xml.model.enums.DimensionOrder.fromString(this.pixelData.getDimensionOrder().toUpperCase()), 0);
 		} catch (ome.xml.model.enums.EnumerationException e) {
 			e.printStackTrace();
 		}
         
-		this.metadata.setPixelsSizeC(new PositiveInteger(dimensionSizes.get("c")), 0);
-		this.metadata.setPixelsSizeT(new PositiveInteger(dimensionSizes.get("t")), 0);
-		this.metadata.setPixelsSizeZ(new PositiveInteger(dimensionSizes.get("z")), 0);
-		this.metadata.setPixelsSizeX(new PositiveInteger(dimensionSizes.get("x")), 0);
-		this.metadata.setPixelsSizeY(new PositiveInteger(dimensionSizes.get("y")), 0);
+		this.metadata.setPixelsSizeC(new PositiveInteger(dimensionSizes.get(ImageCoordinate.C)), 0);
+		this.metadata.setPixelsSizeT(new PositiveInteger(dimensionSizes.get(ImageCoordinate.T)), 0);
+		this.metadata.setPixelsSizeZ(new PositiveInteger(dimensionSizes.get(ImageCoordinate.Z)), 0);
+		this.metadata.setPixelsSizeX(new PositiveInteger(dimensionSizes.get(ImageCoordinate.X)), 0);
+		this.metadata.setPixelsSizeY(new PositiveInteger(dimensionSizes.get(ImageCoordinate.Y)), 0);
 
-        for (int i =0; i < dimensionSizes.get("c"); i++) {
+        for (int i =0; i < dimensionSizes.get(ImageCoordinate.C); i++) {
 		    this.metadata.setChannelID("Channel:0:"+i, 0, i);
 		    this.metadata.setChannelSamplesPerPixel(new PositiveInteger(1), 0, i);
         }

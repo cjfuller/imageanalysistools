@@ -139,9 +139,9 @@ public class RecursiveMaximumSeparability3DFilter extends Filter {
 					zList.put(value, new java.util.Vector<Integer>());
 				}
 				
-				xList.get(value).add(c.get("x"));
-				yList.get(value).add(c.get("y"));
-				zList.get(value).add(c.get("z"));
+				xList.get(value).add(c.get(ImageCoordinate.X));
+				yList.get(value).add(c.get(ImageCoordinate.Y));
+				zList.get(value).add(c.get(ImageCoordinate.Z));
 				
 			}
 			
@@ -159,9 +159,9 @@ public class RecursiveMaximumSeparability3DFilter extends Filter {
 					java.util.List<Integer> yKList = yList.get(lastK);
 					java.util.List<Integer> zKList = zList.get(lastK);
 					for (int i =0; i < xKList.size(); i++) {
-						ic.set("x",xKList.get(i));
-						ic.set("y",yKList.get(i));
-						ic.set("z",zKList.get(i));
+						ic.set(ImageCoordinate.X,xKList.get(i));
+						ic.set(ImageCoordinate.Y,yKList.get(i));
+						ic.set(ImageCoordinate.Z,zKList.get(i));
 						maskBuffer.setValue(ic, 0);
 					}
 				}
@@ -170,9 +170,9 @@ public class RecursiveMaximumSeparability3DFilter extends Filter {
 				
 				divided = true;
 				
-				int lower_width = im.getDimensionSizes().get("x");
-				int lower_height = im.getDimensionSizes().get("y");
-				int lower_z = im.getDimensionSizes().get("z");
+				int lower_width = im.getDimensionSizes().get(ImageCoordinate.X);
+				int lower_height = im.getDimensionSizes().get(ImageCoordinate.Y);
+				int lower_z = im.getDimensionSizes().get(ImageCoordinate.Z);
 				int upper_width = 0;
 				int upper_height = 0;
 				int upper_z = 0;
@@ -183,17 +183,17 @@ public class RecursiveMaximumSeparability3DFilter extends Filter {
 				java.util.List<Integer> zKList = zList.get(k);
 				
 				for (int i =0; i < xList.get(k).size(); i++) {
-					ic.set("x",xKList.get(i));
-					ic.set("y",yKList.get(i));
-					ic.set("z",zKList.get(i));
+					ic.set(ImageCoordinate.X,xKList.get(i));
+					ic.set(ImageCoordinate.Y,yKList.get(i));
+					ic.set(ImageCoordinate.Z,zKList.get(i));
 					maskBuffer.setValue(ic, k);
 					
-					if (ic.get("x") < lower_width) lower_width = ic.get("x");
-					if (ic.get("x") > upper_width - 1) upper_width = ic.get("x");
-					if (ic.get("y") < lower_height) lower_height = ic.get("y");
-					if (ic.get("y") > upper_height - 1) upper_height = ic.get("y");
-					if (ic.get("z") < lower_z) lower_z = ic.get("z");
-					if (ic.get("z") > upper_z - 1) upper_z = ic.get("z");
+					if (ic.get(ImageCoordinate.X) < lower_width) lower_width = ic.get(ImageCoordinate.X);
+					if (ic.get(ImageCoordinate.X) > upper_width - 1) upper_width = ic.get(ImageCoordinate.X);
+					if (ic.get(ImageCoordinate.Y) < lower_height) lower_height = ic.get(ImageCoordinate.Y);
+					if (ic.get(ImageCoordinate.Y) > upper_height - 1) upper_height = ic.get(ImageCoordinate.Y);
+					if (ic.get(ImageCoordinate.Z) < lower_z) lower_z = ic.get(ImageCoordinate.Z);
+					if (ic.get(ImageCoordinate.Z) > upper_z - 1) upper_z = ic.get(ImageCoordinate.Z);
 				}
 				
 				ImageCoordinate lowerBound = ImageCoordinate.createCoordXYZCT(lower_width, lower_height, lower_z, 0, 0);
@@ -219,9 +219,9 @@ public class RecursiveMaximumSeparability3DFilter extends Filter {
 				MF.apply(maskBuffer);
 
 				for (int i =0; i < xList.get(k).size(); i++) {
-					ic.set("x",xKList.get(i));
-					ic.set("y",yKList.get(i));
-					ic.set("z",zKList.get(i));
+					ic.set(ImageCoordinate.X,xKList.get(i));
+					ic.set(ImageCoordinate.Y,yKList.get(i));
+					ic.set(ImageCoordinate.Z,zKList.get(i));
 				
 					if (maskBuffer.getValue(ic) == 0) {
 						im.setValue(ic, 0);

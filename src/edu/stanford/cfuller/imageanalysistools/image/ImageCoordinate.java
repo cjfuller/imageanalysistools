@@ -116,35 +116,35 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      * @return  The x-component as an integer.
      * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
      */
-	public int getX(){return this.get("x");}
+	public int getX(){return this.get(ImageCoordinate.X);}
 
     /**
      * Gets the y-component of this ImageCoordinate.
      * @return  The y-component as an integer.
      * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
      */
-	public int getY(){return this.get("y");}
+	public int getY(){return this.get(ImageCoordinate.Y);}
 
     /**
      * Gets the z-component of this ImageCoordinate.
      * @return  The z-component as an integer.
      * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
      */
-	public int getZ(){return this.get("z");}
+	public int getZ(){return this.get(ImageCoordinate.Z);}
 
     /**
      * Gets the c-component of this ImageCoordinate.
      * @return  The c-component as an integer.
      * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
      */
-	public int getC(){return this.get("c");}
+	public int getC(){return this.get(ImageCoordinate.C);}
 
     /**
      * Gets the t-component of this ImageCoordinate.
      * @return  The t-component as an integer.
      * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
      */
-	public int getT(){return this.get("t");}
+	public int getT(){return this.get(ImageCoordinate.T);}
 	
 	/**
 	 * Gets the specified named coordinate component of the ImageCoordinate.
@@ -264,11 +264,11 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 		
 		ImageCoordinate staticCoord = ImageCoordinate.getNextAvailableCoordinate();
 		
-		staticCoord.set("x", x);
-		staticCoord.set("y", y);
-		staticCoord.set("z", z);
-		staticCoord.set("c", c);
-		staticCoord.set("t", t);
+		staticCoord.set(ImageCoordinate.X, x);
+		staticCoord.set(ImageCoordinate.Y, y);
+		staticCoord.set(ImageCoordinate.Z, z);
+		staticCoord.set(ImageCoordinate.C, c);
+		staticCoord.set(ImageCoordinate.T, t);
 
 		return staticCoord;
 		
@@ -417,11 +417,11 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      * @param t     The new t-component of the ImageCoordinate.
      */
 	public void setCoordXYZCT(int x, int y, int z, int c, int t) {
-		this.set("x", x);
-		this.set("y", x);
-		this.set("z", x);
-		this.set("c", x);
-		this.set("t", x);
+		this.set(ImageCoordinate.X, x);
+		this.set(ImageCoordinate.Y, x);
+		this.set(ImageCoordinate.Z, x);
+		this.set(ImageCoordinate.C, x);
+		this.set(ImageCoordinate.T, x);
 	}
 	
     /**
@@ -435,11 +435,11 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      * @deprecated	use {@link #setCoordXYZCT(int, int, int, int, int)} instead.
      */
 	public void setCoord(int x, int y, int z, int c, int t) {
-		this.set("x", x);
-		this.set("y", x);
-		this.set("z", x);
-		this.set("c", x);
-		this.set("t", x);
+		this.set(ImageCoordinate.X, x);
+		this.set(ImageCoordinate.Y, x);
+		this.set(ImageCoordinate.Z, x);
+		this.set(ImageCoordinate.C, x);
+		this.set(ImageCoordinate.T, x);
 	}
 
     /**
@@ -480,7 +480,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      * @deprecated use {@link #set(String, int)} instead.
      */
 	public void setX(int x) {
-		this.set("x", x);
+		this.set(ImageCoordinate.X, x);
 	}
 
     /**
@@ -489,7 +489,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      * @deprecated use {@link #set(String, int)} instead.
      */
 	public void setY(int y) {
-		this.set("y", y);
+		this.set(ImageCoordinate.Y, y);
 	}
 
     /**
@@ -498,7 +498,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      * @deprecated use {@link #set(String, int)} instead.
      */
 	public void setZ(int z) {
-		this.set("z", z);
+		this.set(ImageCoordinate.Z, z);
 	}
 
     /**
@@ -507,7 +507,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      * @deprecated use {@link #set(String, int)} instead.
      */
 	public void setC(int c) {
-		this.set("c", c);
+		this.set(ImageCoordinate.C, c);
 	}
 
     /**
@@ -516,7 +516,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      * @deprecated use {@link #set(String, int)} instead.
      */
 	public void setT(int t) {
-		this.set("t", t);
+		this.set(ImageCoordinate.T, t);
 	}
 	
 	/**

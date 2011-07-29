@@ -83,7 +83,7 @@ public class WatershedFilter extends Filter {
                 greylevelLookup.put(value, new java.util.Vector<Vector3D>());
             }
 
-            greylevelLookup.get(value).add(new Vector3D(ic.get("x"), ic.get("y"), ic.get("z")));
+            greylevelLookup.get(value).add(new Vector3D(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y), ic.get(ImageCoordinate.Z)));
 
 
         }
@@ -109,9 +109,9 @@ public class WatershedFilter extends Filter {
                 int y = (int) v.getY();
                 int z = (int) v.getZ();
 
-                ic.set("x",x);
-                ic.set("y",y);
-                ic.set("z",z);
+                ic.set(ImageCoordinate.X,x);
+                ic.set(ImageCoordinate.Y,y);
+                ic.set(ImageCoordinate.Z,z);
 
                 int label = getCorrectLabel(ic, processing, nextLabel);
 
@@ -163,9 +163,9 @@ public class WatershedFilter extends Filter {
 
         for (Vector3D v : minPoints) {
 
-            ic.set("x",(int) (v.getX()));
-            ic.set("y",(int) (v.getY()));
-            ic.set("z",(int) (v.getZ()));
+            ic.set(ImageCoordinate.X,(int) (v.getX()));
+            ic.set(ImageCoordinate.Y,(int) (v.getY()));
+            ic.set(ImageCoordinate.Z,(int) (v.getZ()));
 
             tempSeed.setValue(ic, 1);
             
@@ -194,8 +194,8 @@ public class WatershedFilter extends Filter {
      */
     protected int getCorrectLabel(ImageCoordinate ic,  Image processing, int nextLabel) {
 
-        int x = ic.get("x");
-        int y = ic.get("y");
+        int x = ic.get(ImageCoordinate.X);
+        int y = ic.get(ImageCoordinate.Y);
 
         double currValue = processing.getValue(ic);
 
@@ -207,8 +207,8 @@ public class WatershedFilter extends Filter {
 
         ImageCoordinate ic2 = ImageCoordinate.cloneCoord(ic);
 
-        ic2.set("x",x - 1);
-        ic2.set("y",y - 1);
+        ic2.set(ImageCoordinate.X,x - 1);
+        ic2.set(ImageCoordinate.Y,y - 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -216,8 +216,8 @@ public class WatershedFilter extends Filter {
             neighbor = tempNeighbor;
         }
 
-        ic2.set("x",x - 1);
-        ic2.set("y",y);
+        ic2.set(ImageCoordinate.X,x - 1);
+        ic2.set(ImageCoordinate.Y,y);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -225,8 +225,8 @@ public class WatershedFilter extends Filter {
             neighbor = tempNeighbor;
         }
 
-        ic2.set("x",x - 1);
-        ic2.set("y",y + 1);
+        ic2.set(ImageCoordinate.X,x - 1);
+        ic2.set(ImageCoordinate.Y,y + 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -234,8 +234,8 @@ public class WatershedFilter extends Filter {
             neighbor = tempNeighbor;
         }
 
-        ic2.set("x",x);
-        ic2.set("y",y - 1);
+        ic2.set(ImageCoordinate.X,x);
+        ic2.set(ImageCoordinate.Y,y - 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -243,8 +243,8 @@ public class WatershedFilter extends Filter {
             neighbor = tempNeighbor;
         }
 
-        ic2.set("x",x);
-        ic2.set("y",y + 1);
+        ic2.set(ImageCoordinate.X,x);
+        ic2.set(ImageCoordinate.Y,y + 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -252,8 +252,8 @@ public class WatershedFilter extends Filter {
             neighbor = tempNeighbor;
         }
 
-        ic2.set("x",x + 1);
-        ic2.set("y",y - 1);
+        ic2.set(ImageCoordinate.X,x + 1);
+        ic2.set(ImageCoordinate.Y,y - 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -261,8 +261,8 @@ public class WatershedFilter extends Filter {
             neighbor = tempNeighbor;
         }
 
-        ic2.set("x",x + 1);
-        ic2.set("y",y);
+        ic2.set(ImageCoordinate.X,x + 1);
+        ic2.set(ImageCoordinate.Y,y);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);
@@ -270,8 +270,8 @@ public class WatershedFilter extends Filter {
             neighbor = tempNeighbor;
         }
 
-        ic2.set("x",x + 1);
-        ic2.set("y",y + 1);
+        ic2.set(ImageCoordinate.X,x + 1);
+        ic2.set(ImageCoordinate.Y,y + 1);
 
         if (processing.inBounds(ic2)) {
             int tempNeighbor = (int) processing.getValue(ic2);

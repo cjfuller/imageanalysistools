@@ -95,13 +95,13 @@ public class GradientFilter extends Filter {
 			double output1 = 0;
 			double output2 = 0;
 			
-			if (i.get("x") == 0 || i.get("y") == 0 || i.get("x") == copy1.getDimensionSizes().get("x")-1 || i.get("y") == copy1.getDimensionSizes().get("y")-1) {
+			if (i.get(ImageCoordinate.X) == 0 || i.get(ImageCoordinate.Y) == 0 || i.get(ImageCoordinate.X) == copy1.getDimensionSizes().get(ImageCoordinate.X)-1 || i.get(ImageCoordinate.Y) == copy1.getDimensionSizes().get(ImageCoordinate.Y)-1) {
 				outputVal = 0;
 			} else {
 				for (int p =-1*halfKernelSize; p < halfKernelSize+1; p++) {
 					for (int q = -1*halfKernelSize; q < halfKernelSize+1; q++) {
-						ic.set("x",i.get("x")+p);
-						ic.set("y",i.get("y")+q);
+						ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+p);
+						ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+q);
 						output1 += kernel1.getEntry(p+halfKernelSize,q+halfKernelSize) *copy1.getValue(ic);
 						output2 += kernel2.getEntry(p+halfKernelSize,q+halfKernelSize) *copy2.getValue(ic);
 					}

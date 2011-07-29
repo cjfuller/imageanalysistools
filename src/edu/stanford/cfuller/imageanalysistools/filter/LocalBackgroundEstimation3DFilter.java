@@ -68,13 +68,13 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 		
 		for(ImageCoordinate i : im) {
 			
-			boxMin.set("x", i.get("x") - boxSize);
-			boxMin.set("y", i.get("y") - boxSize);
-			boxMin.set("z", i.get("z") - boxSize);
+			boxMin.set(ImageCoordinate.X, i.get(ImageCoordinate.X) - boxSize);
+			boxMin.set(ImageCoordinate.Y, i.get(ImageCoordinate.Y) - boxSize);
+			boxMin.set(ImageCoordinate.Z, i.get(ImageCoordinate.Z) - boxSize);
 			
-			boxMax.set("x", i.get("x") + boxSize+1);
-			boxMax.set("y", i.get("y") + boxSize+1);
-			boxMax.set("z", i.get("z") + boxSize+1);
+			boxMax.set(ImageCoordinate.X, i.get(ImageCoordinate.X) + boxSize+1);
+			boxMax.set(ImageCoordinate.Y, i.get(ImageCoordinate.Y) + boxSize+1);
+			boxMax.set(ImageCoordinate.Z, i.get(ImageCoordinate.Z) + boxSize+1);
 			
 			this.referenceImage.setBoxOfInterest(boxMin, boxMax);
 		

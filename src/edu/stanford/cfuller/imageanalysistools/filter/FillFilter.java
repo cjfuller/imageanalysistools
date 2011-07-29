@@ -78,11 +78,11 @@ public class FillFilter extends Filter {
 		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 		ImageCoordinate icmod = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 		
-		for (int x = 0; x < im.getDimensionSizes().get("x"); x++) {
-			for (int y = 0; y < im.getDimensionSizes().get("y"); y++) {
+		for (int x = 0; x < im.getDimensionSizes().get(ImageCoordinate.X); x++) {
+			for (int y = 0; y < im.getDimensionSizes().get(ImageCoordinate.Y); y++) {
 				
-				ic.set("x",x);
-				ic.set("y",y);
+				ic.set(ImageCoordinate.X,x);
+				ic.set(ImageCoordinate.Y,y);
 				
 				if (x == 0 || y == 0 || im.getValue(ic) > 0) {
 					
@@ -90,36 +90,36 @@ public class FillFilter extends Filter {
 					topRegions.setValue(ic, im.getValue(ic));
 					
 				} else {
-					icmod.set("x",x-1);
-					icmod.set("y",y);
+					icmod.set(ImageCoordinate.X,x-1);
+					icmod.set(ImageCoordinate.Y,y);
 					leftRegions.setValue(ic, leftRegions.getValue(icmod));
 					
-					icmod.set("x",x);
-					icmod.set("y",y-1);
+					icmod.set(ImageCoordinate.X,x);
+					icmod.set(ImageCoordinate.Y,y-1);
 					topRegions.setValue(ic, topRegions.getValue(icmod));
 				}
 				
 			}
 		}
 		
-		for (int x = im.getDimensionSizes().get("x")-1; x >=0; x--) {
-			for (int y = im.getDimensionSizes().get("y")-1; y >=0; y--) {
+		for (int x = im.getDimensionSizes().get(ImageCoordinate.X)-1; x >=0; x--) {
+			for (int y = im.getDimensionSizes().get(ImageCoordinate.Y)-1; y >=0; y--) {
 				
-				ic.set("x",x);
-				ic.set("y",y);
+				ic.set(ImageCoordinate.X,x);
+				ic.set(ImageCoordinate.Y,y);
 				
-				if (x == im.getDimensionSizes().get("x")-1 || y == im.getDimensionSizes().get("y")-1 || im.getValue(ic) > 0) {
+				if (x == im.getDimensionSizes().get(ImageCoordinate.X)-1 || y == im.getDimensionSizes().get(ImageCoordinate.Y)-1 || im.getValue(ic) > 0) {
 					
 					rightRegions.setValue(ic, im.getValue(ic));
 					bottomRegions.setValue(ic, im.getValue(ic));
 					
 				} else {
-					icmod.set("x",x+1);
-					icmod.set("y",y);
+					icmod.set(ImageCoordinate.X,x+1);
+					icmod.set(ImageCoordinate.Y,y);
 					rightRegions.setValue(ic, rightRegions.getValue(icmod));
 					
-					icmod.set("x",x);
-					icmod.set("y",y+1);
+					icmod.set(ImageCoordinate.X,x);
+					icmod.set(ImageCoordinate.Y,y+1);
 					bottomRegions.setValue(ic, bottomRegions.getValue(icmod));
 				}
 				

@@ -63,34 +63,34 @@ public class Label3DFilter extends Filter {
 
 			if (Math.floor(im.getValue(i)) > 0) {
 
-				ic.set("x",i.get("x")-1);
-				ic.set("y",i.get("y"));
-				ic.set("z",i.get("z"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 
-				ic.set("x",i.get("x")+1);
-				ic.set("y",i.get("y"));
-				ic.set("z",i.get("z"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y")-1);
-				ic.set("z",i.get("z"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y")+1);
-				ic.set("z",i.get("z"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z));
 				updateLabeling(preliminaryLabeledImage, i, ic);
 				
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y"));
-				ic.set("z",i.get("z")-1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z)-1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y"));
-				ic.set("z",i.get("z")+1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z)+1);
 				updateLabeling(preliminaryLabeledImage, i, ic);
 
 				
@@ -119,34 +119,34 @@ public class Label3DFilter extends Filter {
 					mappedCurrValue = labelMapping[currValue];
 				}
 
-				ic.set("x",i.get("x")-1);
-				ic.set("y",i.get("y"));
-				ic.set("z",i.get("z"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 
-				ic.set("x",i.get("x")+1);
-				ic.set("y",i.get("y"));
-				ic.set("z",i.get("z"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y")-1);
-				ic.set("z",i.get("z"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y")+1);
-				ic.set("z",i.get("z"));
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 				
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y"));
-				ic.set("z",i.get("z")-1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z)-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 
-				ic.set("x",i.get("x"));
-				ic.set("y",i.get("y"));
-				ic.set("z",i.get("z")+1);
+				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
+				ic.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z)+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
 
 			}

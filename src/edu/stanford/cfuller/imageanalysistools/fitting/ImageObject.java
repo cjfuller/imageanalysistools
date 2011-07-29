@@ -153,7 +153,7 @@ public abstract class ImageObject implements Serializable {
             if (mask.getValue(i) == label) {
                 sizeInPixels++;
 
-                this.centroidInMask = this.centroidInMask.add(new Vector3D(i.get("x"), i.get("y"), i.get("z")));
+                this.centroidInMask = this.centroidInMask.add(new Vector3D(i.get(ImageCoordinate.X), i.get(ImageCoordinate.Y), i.get(ImageCoordinate.Z)));
 
             }
 
@@ -178,25 +178,25 @@ public abstract class ImageObject implements Serializable {
         xcoord = (int) Math.round(this.centroidInMask.getX() + p.getIntValueForKey("half_box_size"))+1;
         ycoord = (int) Math.round(this.centroidInMask.getY() + p.getIntValueForKey("half_box_size"))+1;
 
-        if (xcoord > mask.getDimensionSizes().get("x")) {xcoord = mask.getDimensionSizes().get("x");}
-        if (ycoord > mask.getDimensionSizes().get("y")) {ycoord = mask.getDimensionSizes().get("y");}
+        if (xcoord > mask.getDimensionSizes().get(ImageCoordinate.X)) {xcoord = mask.getDimensionSizes().get(ImageCoordinate.X);}
+        if (ycoord > mask.getDimensionSizes().get(ImageCoordinate.Y)) {ycoord = mask.getDimensionSizes().get(ImageCoordinate.Y);}
 
-        this.parentBoxMax = ImageCoordinate.createCoordXYZCT(xcoord, ycoord, parent.getDimensionSizes().get("z"), parent.getDimensionSizes().get("c"), parent.getDimensionSizes().get("t"));
+        this.parentBoxMax = ImageCoordinate.createCoordXYZCT(xcoord, ycoord, parent.getDimensionSizes().get(ImageCoordinate.Z), parent.getDimensionSizes().get(ImageCoordinate.C), parent.getDimensionSizes().get(ImageCoordinate.T));
 
 
         //find the max intensity pixel in each channel and use this to refine the box
 
-        this.maxIntensityZCoordByChannel = new int[parent.getDimensionSizes().get("c")];
+        this.maxIntensityZCoordByChannel = new int[parent.getDimensionSizes().get(ImageCoordinate.C)];
 
-        int minZOverall = parent.getDimensionSizes().get("z");
+        int minZOverall = parent.getDimensionSizes().get(ImageCoordinate.Z);
         int maxZOverall = 0;
 
         //for (int c = 0; c < parent.getDimensionSizes().getC(); c++) {
         this.numberOfChannels = p.getIntValueForKey("num_wavelengths"); // use this so that if there's extra wavelengths not to be quantified at the end, these won't skew the initial guess
         
         for (int c = 0; c < this.numberOfChannels; c++) { 
-            this.parentBoxMin.set("c",c);
-            this.parentBoxMax.set("c",c+1);
+            this.parentBoxMin.set(ImageCoordinate.C,c);
+            this.parentBoxMax.set(ImageCoordinate.C,c+1);
 
             parent.setBoxOfInterest(this.parentBoxMin, this.parentBoxMax);
 
@@ -205,7 +205,7 @@ public abstract class ImageObject implements Serializable {
 
             for (ImageCoordinate ic : parent) {
 
-                if (! ( ic.get("x") == (int) Math.round(this.centroidInMask.getX())) || ! ( ic.get("y") == (int) Math.round(this.centroidInMask.getY()))) {
+                if (! ( ic.get(ImageCoordinate.X) == (int) Math.round(this.centroidInMask.getX())) || ! ( ic.get(ImageCoordinate.Y) == (int) Math.round(this.centroidInMask.getY()))) {
                     continue;
                 }
 
@@ -219,10 +219,10 @@ public abstract class ImageObject implements Serializable {
 
             if (maxCoord == null) continue;
 
-            if (maxCoord.get("z") > maxZOverall) maxZOverall = maxCoord.get("z");
-            if (maxCoord.get("z") < minZOverall) minZOverall = maxCoord.get("z");
+            if (maxCoord.get(ImageCoordinate.Z) > maxZOverall) maxZOverall = maxCoord.get(ImageCoordinate.Z);
+            if (maxCoord.get(ImageCoordinate.Z) < minZOverall) minZOverall = maxCoord.get(ImageCoordinate.Z);
 
-            this.maxIntensityZCoordByChannel[c] = maxCoord.get("z");
+            this.maxIntensityZCoordByChannel[c] = maxCoord.get(ImageCoordinate.Z);
 
             maxCoord.recycle();
 
@@ -239,15 +239,15 @@ public abstract class ImageObject implements Serializable {
 
         int zcoord = 0;
 
-        this.parentBoxMin.set("c",0);
+        this.parentBoxMin.set(ImageCoordinate.C,0);
         zcoord = zAverage - p.getIntValueForKey("half_z_size");
         if (zcoord < 0) zcoord = 0;
-        this.parentBoxMin.set("z",zcoord);
+        this.parentBoxMin.set(ImageCoordinate.Z,zcoord);
 
-        this.parentBoxMax.set("c",parent.getDimensionSizes().get("c"));
+        this.parentBoxMax.set(ImageCoordinate.C,parent.getDimensionSizes().get(ImageCoordinate.C));
         zcoord = zAverage + p.getIntValueForKey("half_z_size")+1;
-        if (zcoord > parent.getDimensionSizes().get("z")) zcoord = parent.getDimensionSizes().get("z");
-        this.parentBoxMax.set("z",zcoord);
+        if (zcoord > parent.getDimensionSizes().get(ImageCoordinate.Z)) zcoord = parent.getDimensionSizes().get(ImageCoordinate.Z);
+        this.parentBoxMax.set(ImageCoordinate.Z,zcoord);
     }
 
 

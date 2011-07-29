@@ -86,7 +86,7 @@ public class ObjectClustering {
                 int value = (int) (labeledByObject.getValue(i));
 
                 clusterObjects.get(value-1).incrementnPixels();
-                clusterObjects.get(value-1).setCentroid(clusterObjects.get(value-1).getCentroid().add(new Vector3D(i.get("x"), i.get("y"), i.get("z"))));
+                clusterObjects.get(value-1).setCentroid(clusterObjects.get(value-1).getCentroid().add(new Vector3D(i.get(ImageCoordinate.X), i.get(ImageCoordinate.Y), i.get(ImageCoordinate.Z))));
 
 
             }
@@ -178,7 +178,7 @@ public class ObjectClustering {
 
                 current.incrementnPixels();
 
-                current.setCentroid(current.getCentroid().add(new Vector3D(i.get("x"), i.get("y"), i.get("z"))));
+                current.setCentroid(current.getCentroid().add(new Vector3D(i.get(ImageCoordinate.X), i.get(ImageCoordinate.Y), i.get(ImageCoordinate.Z))));
 
             }
 
@@ -456,7 +456,7 @@ public class ObjectClustering {
             }
         }
 
-        gf.setWidth(origCopy.getDimensionSizes().get("x")/4);
+        gf.setWidth(origCopy.getDimensionSizes().get(ImageCoordinate.X)/4);
 
 
 
@@ -523,16 +523,16 @@ public class ObjectClustering {
         for (ImageCoordinate i : origCopy){
             if (origCopy.getValue(i) > 0) {
                 int value = (int) origCopy.getValue(i);
-                centroids_x.setEntry(value, centroids_x.getEntry(value) + i.get("x"));
-                centroids_y.setEntry(value, centroids_y.getEntry(value) + i.get("y"));
+                centroids_x.setEntry(value, centroids_x.getEntry(value) + i.get(ImageCoordinate.X));
+                centroids_y.setEntry(value, centroids_y.getEntry(value) + i.get(ImageCoordinate.Y));
                 counts.setEntry(value, counts.getEntry(value) + 1);
             }
         }
         for (int i = 0; i < counts.getDimension(); i++) {
             if (counts.getEntry(i) == 0) {
                 counts.setEntry(i, 1);
-                centroids_x.setEntry(i, -1*origCopy.getDimensionSizes().get("x"));
-                centroids_y.setEntry(i, -1*origCopy.getDimensionSizes().get("y"));
+                centroids_x.setEntry(i, -1*origCopy.getDimensionSizes().get(ImageCoordinate.X));
+                centroids_y.setEntry(i, -1*origCopy.getDimensionSizes().get(ImageCoordinate.Y));
             }
             centroids_x.setEntry(i, centroids_x.getEntry(i)/counts.getEntry(i));
             centroids_y.setEntry(i, centroids_y.getEntry(i)/counts.getEntry(i));
@@ -547,7 +547,7 @@ public class ObjectClustering {
             int minIndex = 0;
 
             for (int j = 0; j < centroids_x.getDimension(); j++) {
-                double dist = Math.hypot(centroids_x.getEntry(j) - i.get("x"), centroids_y.getEntry(j) - i.get("y"));
+                double dist = Math.hypot(centroids_x.getEntry(j) - i.get(ImageCoordinate.X), centroids_y.getEntry(j) - i.get(ImageCoordinate.Y));
                 if (dist < minDistance) {
                     minDistance = dist;
                     minIndex = j;

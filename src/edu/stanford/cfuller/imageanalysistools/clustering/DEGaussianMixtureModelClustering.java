@@ -27,6 +27,8 @@ package edu.stanford.cfuller.imageanalysistools.clustering;
 import edu.stanford.cfuller.imageanalysistools.fitting.DifferentialEvolutionMinimizer;
 import edu.stanford.cfuller.imageanalysistools.fitting.ObjectiveFunction;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 
@@ -64,17 +66,17 @@ public class DEGaussianMixtureModelClustering {
 
         for (int i =0; i < k; i++) {
 
-            parameterLowerBounds.setEntry(numParametersEach*i,    -0.1*singleCluster.getDimensionSizes().get("x"));
-            parameterLowerBounds.setEntry(numParametersEach*i+1,  -0.1*singleCluster.getDimensionSizes().get("y"));
+            parameterLowerBounds.setEntry(numParametersEach*i,    -0.1*singleCluster.getDimensionSizes().get(ImageCoordinate.X));
+            parameterLowerBounds.setEntry(numParametersEach*i+1,  -0.1*singleCluster.getDimensionSizes().get(ImageCoordinate.Y));
             parameterLowerBounds.setEntry(numParametersEach*i+2,  tol);
             parameterLowerBounds.setEntry(numParametersEach*i+3,  -1);
             parameterLowerBounds.setEntry(numParametersEach*i+4,  tol);
 
-            parameterUpperBounds.setEntry(numParametersEach*i,    1.1*singleCluster.getDimensionSizes().get("x"));
-            parameterUpperBounds.setEntry(numParametersEach*i+1,  1.1*singleCluster.getDimensionSizes().get("y"));
-            parameterUpperBounds.setEntry(numParametersEach*i+2,  Math.pow(0.05*singleCluster.getDimensionSizes().get("x"), 2));
+            parameterUpperBounds.setEntry(numParametersEach*i,    1.1*singleCluster.getDimensionSizes().get(ImageCoordinate.X));
+            parameterUpperBounds.setEntry(numParametersEach*i+1,  1.1*singleCluster.getDimensionSizes().get(ImageCoordinate.Y));
+            parameterUpperBounds.setEntry(numParametersEach*i+2,  Math.pow(0.05*singleCluster.getDimensionSizes().get(ImageCoordinate.X), 2));
             parameterUpperBounds.setEntry(numParametersEach*i+3,  1);
-            parameterUpperBounds.setEntry(numParametersEach*i+4,  Math.pow(0.05*singleCluster.getDimensionSizes().get("y"), 2));
+            parameterUpperBounds.setEntry(numParametersEach*i+4,  Math.pow(0.05*singleCluster.getDimensionSizes().get(ImageCoordinate.Y), 2));
             
         }
 

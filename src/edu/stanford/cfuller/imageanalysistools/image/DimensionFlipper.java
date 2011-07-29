@@ -39,9 +39,9 @@ public class DimensionFlipper {
         ImageCoordinate sizes = ImageCoordinate.cloneCoord(flipped.getDimensionSizes());
 
 
-        int temp_t = sizes.get("t");
-        sizes.set("t",sizes.get("z"));
-        sizes.set("z",temp_t);
+        int temp_t = sizes.get(ImageCoordinate.T);
+        sizes.set(ImageCoordinate.T,sizes.get(ImageCoordinate.Z));
+        sizes.set(ImageCoordinate.Z,temp_t);
 
         Image newImage = new Image(sizes, 0.0);
 
@@ -49,8 +49,8 @@ public class DimensionFlipper {
 
         for (ImageCoordinate ic : flipped) {
             flipCoord.setCoord(ic);
-            flipCoord.set("z",ic.get("t"));
-            flipCoord.set("t",ic.get("z"));
+            flipCoord.set(ImageCoordinate.Z,ic.get(ImageCoordinate.T));
+            flipCoord.set(ImageCoordinate.T,ic.get(ImageCoordinate.Z));
 
             newImage.setValue(flipCoord, flipped.getValue(ic));
         }

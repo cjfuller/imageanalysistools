@@ -122,7 +122,7 @@ public class RenormalizationFilter extends Filter {
 			
 		}
 		
-		sumValue /= (output.getDimensionSizes().get("x") * output.getDimensionSizes().get("y"));
+		sumValue /= (output.getDimensionSizes().get(ImageCoordinate.X) * output.getDimensionSizes().get(ImageCoordinate.Y));
 		
 		for (ImageCoordinate i : output) {
 			double tempValue = output.getValue(i) - sumValue;

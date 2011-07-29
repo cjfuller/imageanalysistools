@@ -73,7 +73,7 @@ public class ConvexHullByLabelFilter extends Filter {
 		java.util.Vector<Integer> minIndices = new java.util.Vector<Integer>(h.getMaxValue() + 1);
 
         for (int i =0; i < h.getMaxValue() + 1; i++) {
-            minValues.add(im.getDimensionSizes().get("x"));
+            minValues.add(im.getDimensionSizes().get(ImageCoordinate.X));
             minIndices.add(0);
         }
 
@@ -88,11 +88,11 @@ public class ConvexHullByLabelFilter extends Filter {
 				yLists.put(value, new java.util.Vector<Integer>());
 			}
 			
-			xLists.get(value).add(i.get("x"));
-			yLists.get(value).add(i.get("y"));
+			xLists.get(value).add(i.get(ImageCoordinate.X));
+			yLists.get(value).add(i.get(ImageCoordinate.Y));
 			
-			if (i.get("x") < minValues.get(value) ) {
-				minValues.set(value, i.get("x"));
+			if (i.get(ImageCoordinate.X) < minValues.get(value) ) {
+				minValues.set(value, i.get(ImageCoordinate.X));
 				minIndices.set(value, xLists.get(value).size()-1);
 			}
 			
@@ -211,8 +211,8 @@ public class ConvexHullByLabelFilter extends Filter {
 						double projPoint_y = y1*projLength;
 						
 						if (Math.hypot(rel_x-projPoint_x, rel_y-projPoint_y) < eps) {
-							ic.set("x",x);
-							ic.set("y",y);
+							ic.set(ImageCoordinate.X,x);
+							ic.set(ImageCoordinate.Y,y);
 							im.setValue(ic, k);
 						}
 						

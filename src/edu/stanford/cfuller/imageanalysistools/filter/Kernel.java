@@ -200,21 +200,21 @@ public class Kernel {
 		
 		int counter= 0;
 		
-		for (int i = 0; i < this.halfKernelDimensions.get("y")+1; i++) {
-			for (int j =0; j < this.halfKernelDimensions.get("x")+1; j++) {
+		for (int i = 0; i < this.halfKernelDimensions.get(ImageCoordinate.Y)+1; i++) {
+			for (int j =0; j < this.halfKernelDimensions.get(ImageCoordinate.X)+1; j++) {
 				preTransform[i][j] = this.weights[counter++];
 			}
 		}
 		
-		for (int i = this.halfKernelDimensions.get("y")+1; i < ydimPowOfTwo - this.halfKernelDimensions.get("y"); i++) {
-			for (int j = this.halfKernelDimensions.get("x")+1; j < xdimPowOfTwo - this.halfKernelDimensions.get("x"); j++) {
+		for (int i = this.halfKernelDimensions.get(ImageCoordinate.Y)+1; i < ydimPowOfTwo - this.halfKernelDimensions.get(ImageCoordinate.Y); i++) {
+			for (int j = this.halfKernelDimensions.get(ImageCoordinate.X)+1; j < xdimPowOfTwo - this.halfKernelDimensions.get(ImageCoordinate.X); j++) {
 				preTransform[i][j] = 0;
 			}
 		}
 		
 		
-		for (int i = ydimPowOfTwo - this.halfKernelDimensions.get("y"); i < ydimPowOfTwo; i++) {
-			for (int j = xdimPowOfTwo - this.halfKernelDimensions.get("x"); j < xdimPowOfTwo; j++) {
+		for (int i = ydimPowOfTwo - this.halfKernelDimensions.get(ImageCoordinate.Y); i < ydimPowOfTwo; i++) {
+			for (int j = xdimPowOfTwo - this.halfKernelDimensions.get(ImageCoordinate.X); j < xdimPowOfTwo; j++) {
 				preTransform[i][j] = this.weights[counter++];
 			}
 		}

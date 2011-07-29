@@ -81,18 +81,18 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		
 		ImageCoordinate ic = this.referenceImage.getDimensionSizes();
 		
-		ImageCoordinate icnew = ImageCoordinate.createCoordXYZCT(ic.get("x")+2*boxSize, ic.get("y")+2*boxSize, ic.get("z"), ic.get("c"), ic.get("t"));
+		ImageCoordinate icnew = ImageCoordinate.createCoordXYZCT(ic.get(ImageCoordinate.X)+2*boxSize, ic.get(ImageCoordinate.Y)+2*boxSize, ic.get(ImageCoordinate.Z), ic.get(ImageCoordinate.C), ic.get(ImageCoordinate.T));
 
 		Image padded = new Image(icnew, -1.0);
 		
 		
 		for(ImageCoordinate i : this.referenceImage) {
 		
-			icnew.set("x",i.get("x")+boxSize);
-			icnew.set("y",i.get("y")+boxSize);
-			icnew.set("z",i.get("z"));
-			icnew.set("c",i.get("c"));
-			icnew.set("t",i.get("t"));
+			icnew.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+boxSize);
+			icnew.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+boxSize);
+			icnew.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z));
+			icnew.set(ImageCoordinate.C,i.get(ImageCoordinate.C));
+			icnew.set(ImageCoordinate.T,i.get(ImageCoordinate.T));
 			
 			padded.setValue(icnew, this.referenceImage.getValue(i));
 			
@@ -106,7 +106,7 @@ public class LocalBackgroundEstimationFilter extends Filter {
 
 		//loop over columns
 		
-		for (int i = boxSize; i < im.getDimensionSizes().get("x")+boxSize; i++) {
+		for (int i = boxSize; i < im.getDimensionSizes().get(ImageCoordinate.X)+boxSize; i++) {
 			
 			overallCounts.mapMultiplyToSelf(0.0);
             double[] overallCounts_a = overallCounts.getData();
@@ -118,8 +118,8 @@ public class LocalBackgroundEstimationFilter extends Filter {
 			
 			for (int m = i-boxSize; m <= i+boxSize; m++) {
 				for (int n = 0; n < 2*boxSize + 1; n++) {
-					icnew.set("x",m);
-					icnew.set("y",n);
+					icnew.set(ImageCoordinate.X,m);
+					icnew.set(ImageCoordinate.Y,n);
 					int value = (int) padded.getValue(icnew);
 
 					if (value == -1) continue;
@@ -147,12 +147,12 @@ public class LocalBackgroundEstimationFilter extends Filter {
 
 			currMedian = k-1;
 			
-			icnew.set("x",i-boxSize);
-			icnew.set("y",0);
+			icnew.set(ImageCoordinate.X,i-boxSize);
+			icnew.set(ImageCoordinate.Y,0);
 			
 			im.setValue(icnew, currMedian);
 			
-			for (int j = boxSize + 1; j < im.getDimensionSizes().get("y")+boxSize; j++) {
+			for (int j = boxSize + 1; j < im.getDimensionSizes().get(ImageCoordinate.Y)+boxSize; j++) {
 				
 				//double[] toRemove = countsByRow.getRow((countsByRow_rowZero_pointer) % countsByRow.getRowDimension());
 
@@ -176,8 +176,8 @@ public class LocalBackgroundEstimationFilter extends Filter {
 				countsByRow_rowZero_pointer++;
 				
 				for (int c = i - boxSize; c <= i+boxSize; c++) {
-					icnew.set("x",c);
-					icnew.set("y",j+boxSize);
+					icnew.set(ImageCoordinate.X,c);
+					icnew.set(ImageCoordinate.Y,j+boxSize);
 					int value = (int) padded.getValue(icnew);
 					
 					if (value == -1) continue;
@@ -224,8 +224,8 @@ public class LocalBackgroundEstimationFilter extends Filter {
 				
 				//cast 3: spot on, do nothing
 				
-				icnew.set("x",i-boxSize);
-				icnew.set("y",j-boxSize);
+				icnew.set(ImageCoordinate.X,i-boxSize);
+				icnew.set(ImageCoordinate.Y,j-boxSize);
 				
 				im.setValue(icnew,currMedian);
 				

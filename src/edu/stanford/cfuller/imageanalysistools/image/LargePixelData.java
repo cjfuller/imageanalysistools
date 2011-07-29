@@ -98,10 +98,10 @@ public class LargePixelData extends PixelData {
      */
     protected void init(int size_x, int size_y, int size_z, int size_c, int size_t, String dimensionOrder) {
 
-        dimensionOrder = dimensionOrder.toUpperCase();
+        dimensionOrder = dimensionOrder.toLowerCase();
         this.dimensionOrder = dimensionOrder;
 
-        if (!(this.dimensionOrder.startsWith("XY") || this.dimensionOrder.startsWith("YX"))) {
+        if (!(this.dimensionOrder.startsWith("xy") || this.dimensionOrder.startsWith("yx"))) {
             throw new UnsupportedOperationException("Large Images are not supported for dimension orders not starting with XY or YX.");
         }
 
@@ -116,11 +116,11 @@ public class LargePixelData extends PixelData {
         this.size_c = size_c;
         this.size_t = size_t;
 
-        dimensionSizes.put("X", size_x);
-        dimensionSizes.put("Y", size_y);
-        dimensionSizes.put("Z", size_z);
-        dimensionSizes.put("C", size_c);
-        dimensionSizes.put("T", size_t);
+        dimensionSizes.put(ImageCoordinate.X, size_x);
+        dimensionSizes.put(ImageCoordinate.Y, size_y);
+        dimensionSizes.put(ImageCoordinate.Z, size_z);
+        dimensionSizes.put(ImageCoordinate.C, size_c);
+        dimensionSizes.put(ImageCoordinate.T, size_t);
 
         offsetSizes = new java.util.Hashtable<String, Integer>();
 
@@ -134,11 +134,11 @@ public class LargePixelData extends PixelData {
             offsetSizes.put(curr, dimensionSizes.get(last)*offsetSizes.get(last));
         }
 
-        x_offset = offsetSizes.get("X");
-        y_offset = offsetSizes.get("Y");
-        z_offset = offsetSizes.get("Z");
-        c_offset = offsetSizes.get("C");
-        t_offset = offsetSizes.get("T");
+        x_offset = offsetSizes.get(ImageCoordinate.X);
+        y_offset = offsetSizes.get(ImageCoordinate.Y);
+        z_offset = offsetSizes.get(ImageCoordinate.Z);
+        c_offset = offsetSizes.get(ImageCoordinate.C);
+        t_offset = offsetSizes.get(ImageCoordinate.T);
 
 
         this.byteOrder = java.nio.ByteOrder.BIG_ENDIAN;
