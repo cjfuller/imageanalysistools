@@ -50,7 +50,7 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
  */
 public class RecursiveMaximumSeparabilityFilter extends Filter {
 
-	final int MAX_RECURSIONS = 3;
+	final int MAX_RECURSIONS = 1;
 	int numRecs;
 	
 	public RecursiveMaximumSeparabilityFilter() {

@@ -29,6 +29,8 @@ import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
+import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
+
 import org.apache.commons.math.linear.RealMatrix;
 
 /**
@@ -60,13 +62,20 @@ public abstract class Method implements Runnable {
      * @param m             The Metric that will be used to quantify the Images.
      */
 	protected void iterateOnFiltersAndStoreResult(java.util.List<Filter> filters, Image toProcess, Metric m) {
+		parameters.setValueForKey("DEBUG", "true");
+		
+		int c = 0;
+		
 		if (Boolean.parseBoolean(parameters.getValueForKey("DEBUG"))) {
+			LoggingUtilities.getLogger().info("starting filters");
 //		    toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
         }
 		for (Filter f : filters) {
 			
 			f.apply(toProcess);
             if (Boolean.parseBoolean(parameters.getValueForKey("DEBUG"))) {
+    			LoggingUtilities.getLogger().info("completed filter #" + c++);
+
 //			   toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
             }
 		}

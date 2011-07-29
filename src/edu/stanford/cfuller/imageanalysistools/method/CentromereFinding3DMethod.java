@@ -26,6 +26,7 @@ package edu.stanford.cfuller.imageanalysistools.method;
 
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
 import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
+//import edu.stanford.cfuller.imageanalysistools.filter.LocalBackgroundEstimation3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
@@ -69,7 +70,13 @@ public class CentromereFinding3DMethod extends Method {
 	protected Image centromereFinding(Image input) {
 
         java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
-
+        
+//        LocalBackgroundEstimation3DFilter LBE3F = new LocalBackgroundEstimation3DFilter();
+//        
+//        LBE3F.setBoxSize((int) Math.ceil(0.5*Math.pow(Integer.parseInt(this.parameters.getValueForKey("max_size")), 1.0/3.0)));
+//
+//        
+//        filters.add(LBE3F);
         filters.add(new MaximumSeparabilityThresholdingFilter());
         filters.add(new Label3DFilter());
         filters.add(new RecursiveMaximumSeparability3DFilter());

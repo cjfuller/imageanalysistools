@@ -161,7 +161,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
      * not retained and recycled by this class.
      *
      * @param boxMin    The (inclusive) lower coordinate bound of the boxed region of interest.
-     * @param boxMax    The (exclusive) upper coodeinate bound of the boxed region of interest.
+     * @param boxMax    The (exclusive) upper coordinate bound of the boxed region of interest.
      */
     public void setBoxOfInterest(ImageCoordinate boxMin, ImageCoordinate boxMax) {
 

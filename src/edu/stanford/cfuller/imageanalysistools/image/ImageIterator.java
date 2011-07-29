@@ -25,7 +25,6 @@
 package edu.stanford.cfuller.imageanalysistools.image;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
@@ -41,6 +40,7 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
 	Image toIterate;
 	ImageCoordinate currCoord;
     ImageCoordinate nextCoord;
+    ImageCoordinate sizes;
 
     boolean isBoxedIterator;
 
@@ -57,10 +57,12 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
 		toIterate = im;
 		currCoord = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
         isBoxedIterator = false;
+    	sizes = toIterate.getDimensionSizes();
         if (im.getIsBoxed()) {
             isBoxedIterator = true;
             currCoord.recycle();
             currCoord = ImageCoordinate.cloneCoord(im.getBoxMin());
+        	sizes = toIterate.getBoxMax();
         }
         nextCoord = ImageCoordinate.cloneCoord(currCoord);
 
@@ -75,23 +77,18 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
      * @return  true if there are more coordinates that have not yet been visited, false otherwise.
      */
 	public boolean hasNext() {
-
-
-		ImageCoordinate sizes = null;
-		
-        if (this.isBoxedIterator) {
-        	sizes = toIterate.getBoxMax();
-        } else {
-        	sizes = toIterate.getDimensionSizes();
-        }
         
         if (sizes == null) return false;
 		
-		for (String dim : nextCoord) {
+        String dim = nextCoord.getLastIterableDimension();
+                
+//		for (String dim : nextCoord) {
+			
+			
 			if (nextCoord.get(dim) >= sizes.get(dim)) {
 				return false;
 			}
-		}
+//		}
 		
 		return true;
 	}
@@ -107,38 +104,47 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
      *
      *
      * @return  An {@link ImageCoordinate} that is the next location in the ImageIterator's Image.
-     * @throws NoSuchElementException if there are no more coordinates available.
      */
-	public ImageCoordinate next() throws NoSuchElementException {
-		if (this.hasNext()) {
+	public ImageCoordinate next() {
+//		if (this.hasNext()) {
 
-			ImageCoordinate sizes = null;
+//			ImageCoordinate sizes = null;
 			
-			if (this.isBoxedIterator) {
-				sizes = this.toIterate.getBoxMax();
-			} else {
-				sizes = this.toIterate.getDimensionSizes();
-			}
+//			if (this.isBoxedIterator) {
+//				sizes = this.toIterate.getBoxMax();
+//			} else {
+//				sizes = this.toIterate.getDimensionSizes();
+//			}
 			
-			if (sizes == null) throw new NoSuchElementException("Undefined Image size.");
+//			if (sizes == null) throw new NoSuchElementException("Undefined Image size.");
 						
-            this.currCoord.setCoord(nextCoord);
+			ImageCoordinate temp = this.currCoord;
+			this.currCoord = nextCoord;
+			this.nextCoord = temp;
+			
+            //this.currCoord.setCoord(nextCoord);
 
             int currDimValue = 1;
             
-            for (String dim : this.nextCoord) {
-            	currDimValue = this.nextCoord.get(dim);
-            	currDimValue+=1;
-            	if (!this.nextCoord.isLastIterableDimension(dim)) currDimValue = currDimValue % sizes.get(dim);
-            	this.nextCoord.set(dim, currDimValue);
-            	if (currDimValue != 0) break;
+            boolean flag = true;
+            
+            for (String dim : this.currCoord) {
+            	if (flag) {
+	            	currDimValue = this.currCoord.get(dim);
+	            	currDimValue+=1;
+	            	if (!this.nextCoord.isLastIterableDimension(dim)) currDimValue = currDimValue % sizes.get(dim);
+	            	this.nextCoord.set(dim, currDimValue);
+	            	if (currDimValue != 0) flag = false;
+            	} else {
+            		this.nextCoord.set(dim, this.currCoord.get(dim));
+            	}
             }
 			
 			return this.currCoord;
 			
-		} else {
-			throw new java.util.NoSuchElementException("No more pixels in image!");
-		}
+//		} else {
+//			throw new java.util.NoSuchElementException("No more pixels in image!");
+//		}
 	}
 
 	

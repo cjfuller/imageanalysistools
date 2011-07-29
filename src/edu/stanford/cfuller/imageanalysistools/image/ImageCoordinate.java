@@ -66,7 +66,9 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	
 	static final int initialStaticCoordCount = 8;
 	
-	static final int initialDimensionCapacity = 10;
+	static final int initialDimensionCapacity = 40;
+	
+	static final float loadFactor = 0.2F;
 	
 	private static java.util.Deque<ImageCoordinate> availableStaticCoords;
 	
@@ -104,7 +106,8 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	}
 	
 	private ImageCoordinate(){
-		this.dimensionCoordinates = new HashMap<String, Integer>(initialDimensionCapacity);
+		this.dimensionCoordinates = new HashMap<String, Integer>(initialDimensionCapacity, loadFactor);
+		
 		this.indexToStringMapping = new ArrayList<String>(initialDimensionCapacity);
 	}
 
@@ -205,6 +208,15 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	 */
 	public boolean isLastIterableDimension(String name) {
 		return name == this.indexToStringMapping.get(this.indexToStringMapping.size() - 1);
+	}
+	
+	/**
+	 * Gets the name of the last dimension in the iterator or foreach based iteration.
+	 * 
+	 * @return	the String naming the last dimension.
+	 */
+	public String getLastIterableDimension() {
+		return this.indexToStringMapping.get(this.indexToStringMapping.size() - 1);
 	}
 	
 	/**
@@ -432,10 +444,19 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 
     /**
      * Sets the components of the ImageCoordinate to the values of the components of another ImageCoordinate.
+     * <p>
+     * Use with caution when the two ImageCoordinates do not have the same set 
+     * of dimensions.  All the dimensions in the other coordinate will 
+     * overwrite those in the current coordinate, but any other dimensions that
+     * may be present will not be fully erased (though they will not be iterated
+     * over using foreach-style iteration).  Call {@link #clear()} if this is
+     * a problem.
+     * 
      * @param other     The ImageCoordinate whose component values will be copied.
      */
     public void setCoord(ImageCoordinate other) {
-    	this.clear();
+    	//this.clear();
+    	this.indexToStringMapping.clear();
     	for (String s : other) {
     		this.dimensionCoordinates.put(s, other.get(s));
     		this.indexToStringMapping.add(s);
