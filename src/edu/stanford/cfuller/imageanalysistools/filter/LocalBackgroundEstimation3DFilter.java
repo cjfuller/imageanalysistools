@@ -60,7 +60,7 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 		//TODO: smarter implementation where just adding/subtracting the values being added/removed to/from the box.
 		
 		ImageCoordinate boxMin = ImageCoordinate.cloneCoord(this.referenceImage.getDimensionSizes());
-		for (String s : boxMin) {
+		for (Integer s : boxMin) {
 			boxMin.set(s, 0);
 		}
 		

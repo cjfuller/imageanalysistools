@@ -24,11 +24,9 @@
 
 package edu.stanford.cfuller.imageanalysistools.image;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.NoSuchElementException;
 
 /**
  * Represents an integer-valued coordinate in an n-dimensional image.
@@ -52,28 +50,30 @@ import java.util.Map;
  *
  */
 
-public class ImageCoordinate implements java.io.Serializable, Collection<String> {
+public class ImageCoordinate implements java.io.Serializable, Collection<Integer> {
 
 	//TODO: consider whether coordinates should continue to be discrete as they are in the current implementation.
 	
-	public static final String X = "x";
-	public static final String Y = "y";
-	public static final String Z = "z";
-	public static final String C = "c";
-	public static final String T = "t";
+	public static final int X = 0;
+	public static final int Y = 1;
+	public static final int Z = 2;
+	public static final int C = 3;
+	public static final int T = 4;
 	
 	static final long serialVersionUID = 1L;
 	
 	static final int initialStaticCoordCount = 8;
 	
-	static final int initialDimensionCapacity = 40;
-	
-	static final float loadFactor = 0.2F;
-	
+	static final int initialDimensionCapacity = 10;
+		
 	private static java.util.Deque<ImageCoordinate> availableStaticCoords;
 	
-	private HashMap<String, Integer> dimensionCoordinates;
-	private ArrayList<String> indexToStringMapping;
+	private int[] dimensionCoordinates;
+	private byte[] undefinedCoordinates;
+	private int coordinateCount;
+	
+	private static final byte one = 1;
+	private static final byte zero = 0;
 			
 	static {
 
@@ -106,9 +106,11 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	}
 	
 	private ImageCoordinate(){
-		this.dimensionCoordinates = new HashMap<String, Integer>(initialDimensionCapacity, loadFactor);
+		this.dimensionCoordinates = new int[initialDimensionCapacity];
+		this.undefinedCoordinates = new byte[this.dimensionCoordinates.length];
+		java.util.Arrays.fill(this.undefinedCoordinates, ImageCoordinate.one);
+		this.coordinateCount = 0;
 		
-		this.indexToStringMapping = new ArrayList<String>(initialDimensionCapacity);
 	}
 
     /**
@@ -146,17 +148,6 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      */
 	public int getT(){return this.get(ImageCoordinate.T);}
 	
-	/**
-	 * Gets the specified named coordinate component of the ImageCoordinate.
-	 * @param dimension		the name of the coordinate component to retrieve.
-	 * @return				the component in the named direction, or 0 if the component has not been specified.
-	 */
-	public int get(String dimension) {
-		if (this.dimensionCoordinates.containsKey(dimension)) {
-			return this.dimensionCoordinates.get(dimension);
-		}
-		return 0;
-	}
 	
 	/**
 	 * Gets the specified coordinate by index.
@@ -172,78 +163,46 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	 * @return					the value of the specified dimension component, or 0 if the index was out of bounds.
 	 * 
 	 */
-	public int get(int dimensionIndex) {
-		if (dimensionIndex >= 0 && dimensionIndex < this.indexToStringMapping.size()) {
-			return this.get(this.indexToStringMapping.get(dimensionIndex));
+	public int get(int dimensionConstant) {
+		if (dimensionConstant < this.dimensionCoordinates.length){
+			return this.dimensionCoordinates[dimensionConstant];
 		}
 		return 0;
 	}
-	
-	/**
-	 * Gets the string naming the specified dimension.
-	 * <p>
-	 * The order of coordinates will be the order in which they were set if done manually,
-	 * or the order from the coordinate this ImageCoordinate was cloned from, 
-	 * or otherwise ordered unpredictably (though consistent between calls), probably
-	 * according to hash key.
-	 * <p>
-	 * No bounds checking is performed.
-	 *  
-	 * @param dimensionIndex	The index of the dimension whose value will be retrieved.
-	 * @return					The String naming the specified dimension (suitable for use with {@link #get(String)}).
-	 */
-	public String getDimensionNameByIndex(int dimensionIndex) {
-		return this.indexToStringMapping.get(dimensionIndex);
-	}
-	
-	/**
-	 * Queries whether the named dimension is the last dimension in the iterator or foreach based iteration.
-	 * <p>
-	 * This might be useful when iterating over all dimensions, and some special behavior is required after the
-	 * final dimension.
-	 * <p>
-	 * 
-	 * @param name		the name of the dimension to check.
-	 * @return			true if name is the last dimension of iteration, false otherwise.
-	 */
-	public boolean isLastIterableDimension(String name) {
-		return name == this.indexToStringMapping.get(this.indexToStringMapping.size() - 1);
-	}
-	
-	/**
-	 * Gets the name of the last dimension in the iterator or foreach based iteration.
-	 * 
-	 * @return	the String naming the last dimension.
-	 */
-	public String getLastIterableDimension() {
-		return this.indexToStringMapping.get(this.indexToStringMapping.size() - 1);
-	}
-	
-	/**
-	 * Sets the specified named coordinate component of the ImageCoordinate.
-	 * <p>
-	 * If the named component does not yet exist in the ImageCoordinate, it will be added.
-	 * 
-	 * @param dimension		the name of the coordinate component to set.
-	 * @param value			the value to which the named component will be set.
-	 */
-	public void set(String dimension, int value) {
-		if (! this.dimensionCoordinates.containsKey(dimension)) {
-			this.indexToStringMapping.add(dimension);
-		}
-		this.dimensionCoordinates.put(dimension, value);
-	}
+
 	
 	/**
 	 * Sets the specified coordinate component of the ImageCoordinate by its index.
 	 * 
 	 * @param dimension		the index of the dimension to set.
 	 * @param value			the value to which to set the coordinate.
-	 * @deprecated	use {@link #set(String, int)} instead.
 	 */
-	public void set(int dimension, int value) {
-		this.set(this.indexToStringMapping.get(dimension), value);
+	public void set(int dimensionConstant, int value) {
+		
+	
+		if (dimensionConstant >= this.dimensionCoordinates.length) {
+			int[] oldCoords = this.dimensionCoordinates;
+			byte[] oldUndefined = this.undefinedCoordinates;
+			int newSize = (dimensionConstant+1 > 2*this.dimensionCoordinates.length) ? dimensionConstant + 1 : 2*this.dimensionCoordinates.length;
+			this.dimensionCoordinates = new int[newSize];
+			this.undefinedCoordinates = new byte[newSize];
+						
+			java.util.Arrays.fill(this.dimensionCoordinates, 0);
+			java.util.Arrays.fill(this.undefinedCoordinates, ImageCoordinate.one);
+			
+			for (int i = 0; i < oldCoords.length; i++) {
+				this.dimensionCoordinates[i]= oldCoords[i];
+				this.undefinedCoordinates[i]= oldUndefined[i];
+			}
+		
+		}
+		
+		this.coordinateCount += this.undefinedCoordinates[dimensionConstant];
+		this.undefinedCoordinates[dimensionConstant] = ImageCoordinate.zero;
+		this.dimensionCoordinates[dimensionConstant] = value;
+
 	}
+	
 
     /**
      * Factory method that creates a 5D ImageCoordinate with the specified coordinates.
@@ -309,28 +268,6 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	public static ImageCoordinate createCoord() {
 		return ImageCoordinate.getNextAvailableCoordinate();
 	}
-	
-	/**
-     * Factory method that creates an n-dimensional ImageCoordinate whose dimensions and values
-     * are specified by the supplied Map, where n is the count of keys in the Map.
-     *
-     * This method will attempt to recycle an existing ImageCoordinate if any are available, or create a new one if none are available.
-     *
-     * Users of this method should call {@link #recycle} on the ImageCoordinate returned by this method when finished with it in order to
-     * make the coordinate available for reuse on other calls of this method.
-     *
-     * @param dimensionValues	A Map containing the name of each dimension as a String and each dimension's mapped value.
-     * @return      An ImageCoordinate with the specified dimensions and values.
-     */
-	public static ImageCoordinate createCoord(Map<String, Integer> dimensionValues) {
-		ImageCoordinate coord = ImageCoordinate.getNextAvailableCoordinate();
-		
-		for (String s : dimensionValues.keySet()) {
-			coord.set(s, dimensionValues.get(s));
-		}
-		
-		return coord;
-	}
 
 
     /**
@@ -380,31 +317,40 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	 * @return		the dimension of the ImageCoordinate.
 	 */
 	public int getDimension() {
-		return this.indexToStringMapping.size();
+		return this.coordinateCount;
+	}
+	
+	/**
+	 * Gets the defined index of the specified coordinate.
+	 * @param i		The coordinate to retrieve (i.e. the value i such that the ith index that has been assigned a value will be returned.)
+	 * @return		The index of the ith component.
+	 */
+	public Integer getDefinedIndex(int i) {
+		int c = -1;
+		for (int j = 0; j < this.undefinedCoordinates.length; j++) {
+			c+= 1-this.undefinedCoordinates[j];
+			if (c == i) return j;
+		}
+		throw new NoSuchElementException("The specified coordinate is not defined: " + i + ".  Number of defined coordinates: " + this.coordinateCount);
 	}
 
     /**
      * Converts the ImageCoordinate to a string representation.
      * <p>
-     * The returned string will be "(x,y,z,c,t) = (a,b,c,d,e)", where a through e 
-     * are placeholders for the actual coordinates of the ImageCoordinate, and x
-     * through t will be replaced by the defined named coordinates of the ImageCoordinate.
+     * The returned string will be "(a,b,c,d,e)", where a through e 
+     * are placeholders for the actual coordinates of the ImageCoordinate.
      * @return  The string representation of the ImageCoordinate.
      */
 	public String toString() {
 		if (this.getDimension() == 0) {
-			return "() = ()";
+			return "()";
 		}
-		String keyString = "(" + this.indexToStringMapping.get(0);
 		String valueString = "(" + this.get(0);
 		for (int i = 1; i < this.getDimension(); i++) {
-			keyString+= "," + this.indexToStringMapping.get(i);
 			valueString+= "," + this.get(i);
 		}
-		keyString += ")";
 		valueString += ")";
-		String result = keyString + " = " + valueString;
-		return result;
+		return valueString;
 	}
 
     /**
@@ -455,11 +401,9 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      * @param other     The ImageCoordinate whose component values will be copied.
      */
     public void setCoord(ImageCoordinate other) {
-    	//this.clear();
-    	this.indexToStringMapping.clear();
-    	for (String s : other) {
-    		this.dimensionCoordinates.put(s, other.get(s));
-    		this.indexToStringMapping.add(s);
+    	this.clear();
+    	for (Integer i : other) {
+    		this.set(i, other.get(i));
     	}
     }
     
@@ -470,8 +414,8 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
      * 
      */
     public void clear() {
-    	this.dimensionCoordinates.clear();
-    	this.indexToStringMapping.clear();
+    	java.util.Arrays.fill(this.undefinedCoordinates, ImageCoordinate.one);
+    	this.coordinateCount = 0;
     }
 
     /**
@@ -527,7 +471,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	 * @see java.util.Collection#add(java.lang.Object)
 	 */
 	@Override
-	public boolean add(String arg0) {
+	public boolean add(Integer arg0) {
 		throw new UnsupportedOperationException("Add not supported for ImageCoordinates.");
 	}
 
@@ -535,7 +479,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	 * @see java.util.Collection#addAll(java.util.Collection)
 	 */
 	@Override
-	public boolean addAll(Collection<? extends String> arg0) {
+	public boolean addAll(Collection<? extends Integer> arg0) {
 		throw new UnsupportedOperationException("Add not supported for ImageCoordinates.");
 	}
 
@@ -545,8 +489,8 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	 */
 	@Override
 	public boolean contains(Object arg0) {
-		String iArg = (String) arg0;
-		for (String i : this) {
+		Integer iArg = (Integer) arg0;
+		for (Integer i : this) {
 			if (i == iArg) return true;
 		}
 		return false;
@@ -575,7 +519,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	 * @see java.util.Collection#iterator()
 	 */
 	@Override
-	public Iterator<String> iterator() {
+	public Iterator<Integer> iterator() {
 		return new ImageCoordinateIterator(this);
 	}
 
@@ -628,20 +572,58 @@ public class ImageCoordinate implements java.io.Serializable, Collection<String>
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T[] toArray(T[] arg0) {
-		if (arg0.length < this.size()) {
-			int c = 0; 
-			for (String i : this) {
-				arg0[c++] = (T) i;
-			}
-			return arg0;
+		
+		T[] toFill = null;
+		
+		if (arg0.length >= this.coordinateCount) {
+			toFill = arg0;
 		} else {
-			String[] toReturn = new String[this.size()];
-			int c = 0;
-			for (String i : this) {
-				toReturn[c++] = i;
-			}
-			return (T[]) toReturn;
+			toFill = (T[]) new Integer[this.coordinateCount];
 		}
+		int c = 0;
+		for (Integer i : this) {
+			arg0[c++] = (T) (Integer) this.get(i);
+		}
+		return toFill;
+		
+	}
+	
+	private static class ImageCoordinateIterator implements Iterator<Integer> {
+		
+		int currentIndex;
+		int currentDefinedCount;
+		ImageCoordinate ic;
+				
+		public ImageCoordinateIterator(ImageCoordinate ic) {
+			this.currentIndex = 0;
+			this.currentDefinedCount = 0;
+			this.ic = ic;
+		}
+		
+		public boolean hasNext() {
+			return (this.currentDefinedCount < this.ic.getDimension());
+		}
+		
+		public Integer next() {	
+			
+					
+			while(this.hasNext()) {
+				
+				if (ic.undefinedCoordinates[this.currentIndex++] == 0) {
+					this.currentDefinedCount+=1;
+					return this.currentIndex-1;
+				}
+				
+			}
+			
+			throw new NoSuchElementException("No more elements in ImageCoordinate.");
+			
+		}
+		
+		public void remove() {
+			throw new UnsupportedOperationException("Remove not supported for ImageCoordinate.");
+		}
+		
 	}
 	
 	

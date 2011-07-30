@@ -769,7 +769,7 @@ public class ObjectClustering {
 
                         //find the min and max bounds of this cluster
                     	
-                    	for (String dim : i) {
+                    	for (Integer dim : i) {
                     		if (i.get(dim) < clusterMin.get(dim)) {clusterMin.set(dim, i.get(dim));}
                     		if (i.get(dim) >= clusterMax.get(dim)) {clusterMax.set(dim, i.get(dim)+1);}
                     	}

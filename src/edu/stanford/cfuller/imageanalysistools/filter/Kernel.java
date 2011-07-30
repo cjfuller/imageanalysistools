@@ -67,7 +67,7 @@ public class Kernel {
 	 */
 	public Kernel(double[] weights, ImageCoordinate dimensionSizes) {
 				
-		for (String dim : dimensionSizes) {
+		for (Integer dim : dimensionSizes) {
 			int size = dimensionSizes.get(dim);
 			if (size % 2 == 0 || size < 0) {
 				throw new IllegalArgumentException("Kernel size must be odd and positive in all dimensions.");
@@ -79,7 +79,7 @@ public class Kernel {
 		
 		this.halfKernelDimensions = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 		
-		for (String s : this.halfKernelDimensions) {
+		for (Integer s : this.halfKernelDimensions) {
 			this.halfKernelDimensions.set(s, (dimensionSizes.get(s)-1 )/2);
 		}
 		

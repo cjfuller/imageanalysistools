@@ -62,6 +62,7 @@ public abstract class Method implements Runnable {
      * @param m             The Metric that will be used to quantify the Images.
      */
 	protected void iterateOnFiltersAndStoreResult(java.util.List<Filter> filters, Image toProcess, Metric m) {
+		
 		parameters.setValueForKey("DEBUG", "true");
 		
 		int c = 0;

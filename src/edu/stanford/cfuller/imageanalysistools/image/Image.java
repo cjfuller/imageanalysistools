@@ -172,11 +172,11 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
         
         //bounds checking
         
-        for (String dim : this.boxMin) {
+        for (Integer dim : this.boxMin) {
         	if (this.boxMin.get(dim) < 0) this.boxMin.set(dim, 0);
         }
 
-        for (String dim : this.boxMax) {
+        for (Integer dim : this.boxMax) {
         	if (this.boxMax.get(dim) > this.dimensionSizes.get(dim)) this.boxMax.set(dim, this.dimensionSizes.get(dim));
         }
 
@@ -265,7 +265,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		
 		for (ImageCoordinate i : toReturn) {
 			
-			for (String dim : ic) {
+			for (Integer dim : ic) {
 				ic.set(dim, startPoint.get(dim) + i.get(dim));
 			}
 
@@ -350,7 +350,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 
 		ImageCoordinate sizes = this.getDimensionSizes();
 		
-		for (String s : c) {
+		for (Integer s : c) {
 			if (c.get(s) < 0) return false;
 			if (c.get(s) >= sizes.get(s)) return false;
 		}
@@ -620,7 +620,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
      */
 	public boolean isEmpty() {
 		ImageCoordinate dimSizes = this.getDimensionSizes();
-		for (String s : dimSizes) {
+		for (Integer s : dimSizes) {
 			if (dimSizes.get(s) == 0) return true;
 		}
 
@@ -679,7 +679,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 	public int size() {
 		ImageCoordinate c = this.getDimensionSizes();
 		int total = 1;
-		for (String s : c) {
+		for (Integer s : c) {
 			total*= c.get(s);
 		}
 		return total;

@@ -80,7 +80,7 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
         
         if (sizes == null) return false;
 		
-        String dim = nextCoord.getLastIterableDimension();
+        Integer dim = nextCoord.getDefinedIndex(nextCoord.getDimension()-1);
                 
 //		for (String dim : nextCoord) {
 			
@@ -128,11 +128,11 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
             
             boolean flag = true;
             
-            for (String dim : this.currCoord) {
+            for (Integer dim : this.currCoord) {
             	if (flag) {
 	            	currDimValue = this.currCoord.get(dim);
 	            	currDimValue+=1;
-	            	if (!this.nextCoord.isLastIterableDimension(dim)) currDimValue = currDimValue % sizes.get(dim);
+	            	if (!(dim == nextCoord.getDefinedIndex(nextCoord.getDimension()-1))) currDimValue = currDimValue % sizes.get(dim);
 	            	this.nextCoord.set(dim, currDimValue);
 	            	if (currDimValue != 0) flag = false;
             	} else {
