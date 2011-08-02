@@ -116,35 +116,35 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
     /**
      * Gets the x-component of this ImageCoordinate.
      * @return  The x-component as an integer.
-     * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
+     * @deprecated 	Use {@link #get(int)} instead.
      */
 	public int getX(){return this.get(ImageCoordinate.X);}
 
     /**
      * Gets the y-component of this ImageCoordinate.
      * @return  The y-component as an integer.
-     * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
+     * @deprecated 	Use {@link #get(int)} instead.
      */
 	public int getY(){return this.get(ImageCoordinate.Y);}
 
     /**
      * Gets the z-component of this ImageCoordinate.
      * @return  The z-component as an integer.
-     * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
+     * @deprecated 	Use {@link #get(int)} instead.
      */
 	public int getZ(){return this.get(ImageCoordinate.Z);}
 
     /**
      * Gets the c-component of this ImageCoordinate.
      * @return  The c-component as an integer.
-     * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
+     * @deprecated 	Use {@link #get(int)} instead.
      */
 	public int getC(){return this.get(ImageCoordinate.C);}
 
     /**
      * Gets the t-component of this ImageCoordinate.
      * @return  The t-component as an integer.
-     * @deprecated 	Use {@link #get(String)} or {@link #get(int)} instead.
+     * @deprecated 	Use {@link #get(int)} instead.
      */
 	public int getT(){return this.get(ImageCoordinate.T);}
 	
@@ -159,7 +159,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 	 * <p>
 	 * If the coordinate index is out of bounds, returns 0 instead of throwing an exception.
 	 * 
-	 * @param dimensionIndex	the index of the dimension whose value will be retrieved.
+	 * @param dimensionConstant	the constant corresponding to the dimension whose value will be retrieved.
 	 * @return					the value of the specified dimension component, or 0 if the index was out of bounds.
 	 * 
 	 */
@@ -174,8 +174,8 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 	/**
 	 * Sets the specified coordinate component of the ImageCoordinate by its index.
 	 * 
-	 * @param dimension		the index of the dimension to set.
-	 * @param value			the value to which to set the coordinate.
+	 * @param dimensionConstant		the constant corresponding to the dimension to set.
+	 * @param value					the value to which to set the coordinate.
 	 */
 	public void set(int dimensionConstant, int value) {
 		
@@ -421,7 +421,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
     /**
      * Sets the x-component of the ImageCoordinate to the specified value.
      * @param x The new x-component of the ImageCoordinate.
-     * @deprecated use {@link #set(String, int)} instead.
+     * @deprecated use {@link #set(int, int)} instead.
      */
 	public void setX(int x) {
 		this.set(ImageCoordinate.X, x);
@@ -430,7 +430,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
     /**
      * Sets the y-component of the ImageCoordinate to the specified value.
      * @param y The new y-component of the ImageCoordinate.
-     * @deprecated use {@link #set(String, int)} instead.
+     * @deprecated use {@link #set(int, int)} instead.
      */
 	public void setY(int y) {
 		this.set(ImageCoordinate.Y, y);
@@ -439,7 +439,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
     /**
      * Sets the z-component of the ImageCoordinate to the specified value.
      * @param z The new z-component of the ImageCoordinate.
-     * @deprecated use {@link #set(String, int)} instead.
+     * @deprecated use {@link #set(int, int)} instead.
      */
 	public void setZ(int z) {
 		this.set(ImageCoordinate.Z, z);
@@ -448,7 +448,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
     /**
      * Sets the c-component of the ImageCoordinate to the specified value.
      * @param c The new c-component of the ImageCoordinate.
-     * @deprecated use {@link #set(String, int)} instead.
+     * @deprecated use {@link #set(int, int)} instead.
      */
 	public void setC(int c) {
 		this.set(ImageCoordinate.C, c);
@@ -457,7 +457,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
     /**
      * Sets the t-component of the ImageCoordinate to the specified value.
      * @param t The new t-component of the ImageCoordinate.
-     * @deprecated use {@link #set(String, int)} instead.
+     * @deprecated use {@link #set(int, int)} instead.
      */
 	public void setT(int t) {
 		this.set(ImageCoordinate.T, t);
