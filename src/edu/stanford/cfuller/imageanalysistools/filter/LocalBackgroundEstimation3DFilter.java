@@ -68,6 +68,8 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 		
 		for(ImageCoordinate i : im) {
 			
+			System.out.println(i);
+			
 			boxMin.set(ImageCoordinate.X, i.get(ImageCoordinate.X) - boxSize);
 			boxMin.set(ImageCoordinate.Y, i.get(ImageCoordinate.Y) - boxSize);
 			boxMin.set(ImageCoordinate.Z, i.get(ImageCoordinate.Z) - boxSize);

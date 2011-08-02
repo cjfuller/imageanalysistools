@@ -41,6 +41,9 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
 	ImageCoordinate currCoord;
     ImageCoordinate nextCoord;
     ImageCoordinate sizes;
+    ImageCoordinate lowerBounds;
+    
+    private static final ImageCoordinate zeroCoord = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 
     boolean isBoxedIterator;
 
@@ -58,11 +61,13 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
 		currCoord = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
         isBoxedIterator = false;
     	sizes = toIterate.getDimensionSizes();
+    	lowerBounds = ImageIterator.zeroCoord;
         if (im.getIsBoxed()) {
             isBoxedIterator = true;
             currCoord.recycle();
             currCoord = ImageCoordinate.cloneCoord(im.getBoxMin());
         	sizes = toIterate.getBoxMax();
+        	lowerBounds = im.getBoxMin();
         }
         nextCoord = ImageCoordinate.cloneCoord(currCoord);
 
@@ -133,8 +138,13 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
 	            	currDimValue = this.currCoord.get(dim);
 	            	currDimValue+=1;
 	            	if (!(dim == nextCoord.getDefinedIndex(nextCoord.getDimension()-1))) currDimValue = currDimValue % sizes.get(dim);
+	            	if (currDimValue != 0) {
+	            		flag = false;
+	            	} else {
+	            		currDimValue+= this.lowerBounds.get(dim);
+	            	}
 	            	this.nextCoord.set(dim, currDimValue);
-	            	if (currDimValue != 0) flag = false;
+
             	} else {
             		this.nextCoord.set(dim, this.currCoord.get(dim));
             	}

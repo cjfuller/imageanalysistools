@@ -64,6 +64,8 @@ public class CentromereFinding3DMethod extends Method {
     */
     @Override
 	public void go() {
+		this.parameters.setValueForKey("DEBUG", "true");
+
 		this.centromereFinding(this.images.get(0));
 	}
 	
@@ -73,7 +75,7 @@ public class CentromereFinding3DMethod extends Method {
         
 //        LocalBackgroundEstimation3DFilter LBE3F = new LocalBackgroundEstimation3DFilter();
 //        
-//        LBE3F.setBoxSize((int) Math.ceil(0.5*Math.pow(Integer.parseInt(this.parameters.getValueForKey("max_size")), 1.0/3.0)));
+//        LBE3F.setBoxSize(3);
 //
 //        
 //        filters.add(LBE3F);

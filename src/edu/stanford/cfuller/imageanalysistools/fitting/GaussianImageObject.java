@@ -235,7 +235,7 @@ public class GaussianImageObject extends ImageObject {
 
             for (int i =0; i < this.xValues.length; i++) {
 
-                residualSumSquared += Math.pow(gf.fitResidual(functionValues[i], xValues[i], yValues[i], zValues[i], fitParameters), 2);
+                residualSumSquared += Math.pow(GaussianFitter3D.fitResidual(functionValues[i], xValues[i], yValues[i], zValues[i], fitParameters), 2);
 
                 mean += functionValues[i];
 

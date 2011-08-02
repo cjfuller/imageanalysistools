@@ -43,8 +43,8 @@ import java.util.NoSuchElementException;
  * <p> This class is partly thread-safe in the sense that multiple threads can use the same pool of ImageCoordinates safely.  However, ImageCoordinate objects themselves
  * are not thread-safe and should not be shared between threads.
  *
- * <p> Note that for the convenience methods for manipulating XYZCT coordinates, the strings used to access these are the lower-case versions of those letters,
- * which are defined by the static class constants for those dimensions.
+ * <p> Arbitrary dimensions are defined by an int identifier, which can be any valid int.  This class defines constants for X,Y,Z,C,T as 0 to 4.
+ * When defining additional dimensions, using lower numbers and not leaving gaps will improve performance.
  *
  * @author Colin J. Fuller
  *

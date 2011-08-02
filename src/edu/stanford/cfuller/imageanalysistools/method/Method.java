@@ -63,7 +63,6 @@ public abstract class Method implements Runnable {
      */
 	protected void iterateOnFiltersAndStoreResult(java.util.List<Filter> filters, Image toProcess, Metric m) {
 		
-		parameters.setValueForKey("DEBUG", "true");
 		
 		int c = 0;
 		

@@ -37,12 +37,13 @@ import org.apache.commons.math.linear.RealVector;import java.lang.Math;
  *
  */
 public class GaussianFitter3D {
-
+	
     static RealVector logFactorialLookups;
 
     static int maxLogFactorialPrecalculated;
 
     static {
+    	    	
         synchronized (GaussianFitter3D.class) {
 
             logFactorialLookups = new ArrayRealVector(65536, 0.0);
@@ -66,7 +67,7 @@ public class GaussianFitter3D {
 
         //parameter ordering: amplitude, var x-y, var z, x/y/z coords, background
 
-        //System.out.println("for object " + toFit.getLabel() + " initial guess is: " + initialGuess.toString());
+        //System.out.println("for object " + toFit.getLabel() + " in image: " + toFit.getImageID() + " initial guess is: " + initialGuess.toString());
 
 
         double tol = 1.0e-6;
@@ -78,7 +79,7 @@ public class GaussianFitter3D {
 
     }
 
-    private double gaussian(double x, double y, double z, double[] parameters) {
+    private static double gaussian(double x, double y, double z, double[] parameters) {
 
         double xmx0 = x-parameters[3];
         double ymy0 = y-parameters[4];
@@ -94,21 +95,22 @@ public class GaussianFitter3D {
 
     }
 
-    private double poissonProb(double x, double y, double z, double[] parameters, double n) {
+    private static double poissonProb(double x, double y, double z, double[] parameters, double n) {
+    	
         double mean = gaussian(x,y,z,parameters);
 
         return (n*Math.log(mean) - mean - logFactorial((int) Math.round(n)+1));
             
     }
 
-    private double logLikelihood(ImageObject toFit, double[] parameters, double ppg) {
+    private static double logLikelihood(ImageObject toFit, double[] parameters, double ppg) {
         double logLikelihood = 0;
 
         double[] x = toFit.getxValues();
         double[] y = toFit.getyValues();
         double[] z = toFit.getzValues();
         double[] f = toFit.getFunctionValues();
-
+         
         for (int i = 0; i < x.length; i++) {
 
             logLikelihood -= poissonProb(x[i], y[i], z[i], parameters, f[i]);
@@ -117,7 +119,7 @@ public class GaussianFitter3D {
 
         return logLikelihood;
     }
-
+    
     private class MLObjectiveFunction implements ObjectiveFunction, MultivariateRealFunction {
 
 
@@ -150,12 +152,12 @@ public class GaussianFitter3D {
      * @param parameters    The gaussian parameters in the same order as would be required for or returned from {@link #fit}
      * @return              The fit residual at the specified point.
      */
-    public double fitResidual(double value, double x, double y, double z, RealVector parameters) {
+    public static double fitResidual(double value, double x, double y, double z, RealVector parameters) {
 
         return value - gaussian(x,y,z,parameters.getData());
     }
 
-    private double logFactorial(int n) {
+    private static double logFactorial(int n) {
 
         if (n < 0) return 0;
 
