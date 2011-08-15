@@ -36,7 +36,9 @@ import java.awt.image.WritableRaster;
  *<p>
  * This class implements the Collection<ImageCoordinate> interface, which allows for foreach-style iteration through
  * all the coordinates in the Image, without having users need to explicitly worry about things like number of dimensions or
- * bounds, etc.  This foreach-style iteration is the preferred method for operating on the pixel values of the Image.
+ * bounds, etc.  This foreach-style iteration is the preferred method for operating on the pixel values of the Image.  No guarantee is made
+ * about which dimension will be iterated over in which order, though this will remain constant for a given Image, and coordinates will always
+ * be supplied in increasing order for a given dimension (until the maximum of that dimension is reached and it loops back to zero).
  *<p>
  * This class also has the capability of boxing (a single) region of interest in the Image and restricting the foreach-style iteration
  * solely to that box, if only a portion of the Image needs to be processed, viewed, etc.

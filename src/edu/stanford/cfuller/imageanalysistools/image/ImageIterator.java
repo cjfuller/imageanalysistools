@@ -70,6 +70,17 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
         	lowerBounds = im.getBoxMin();
         }
         nextCoord = ImageCoordinate.cloneCoord(currCoord);
+        
+        //deal with the possibility of a dimension of size zero or an initial coordinate at the box size
+        
+        for (Integer i : sizes) {
+        	if (sizes.get(i) == 0 || currCoord.get(i) >= sizes.get(i)) {
+        		nextCoord.recycle();
+        		nextCoord = ImageCoordinate.cloneCoord(sizes);
+        		
+        		break;
+        	}
+        }
 
 	}
 
@@ -88,7 +99,6 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
         Integer dim = nextCoord.getDefinedIndex(nextCoord.getDimension()-1);
                 
 //		for (String dim : nextCoord) {
-			
 			
 			if (nextCoord.get(dim) >= sizes.get(dim)) {
 				return false;
@@ -133,11 +143,20 @@ public class ImageIterator implements Iterator<ImageCoordinate> {
             
             boolean flag = true;
             
+            
             for (Integer dim : this.currCoord) {
             	if (flag) {
 	            	currDimValue = this.currCoord.get(dim);
 	            	currDimValue+=1;
-	            	if (!(dim == nextCoord.getDefinedIndex(nextCoord.getDimension()-1))) currDimValue = currDimValue % sizes.get(dim);
+	            	try {
+	            		if (!(dim == nextCoord.getDefinedIndex(nextCoord.getDimension()-1))) currDimValue = currDimValue % sizes.get(dim);
+	            	} catch (ArithmeticException e) {
+	            		System.out.println("Sizes: " + sizes);
+	            		System.out.println("has next? " + this.hasNext());
+	            		System.out.println("Dimension: " + dim);
+	            		System.out.println("Current coordinate: " + currCoord);
+	            		throw e;
+	            	}
 	            	if (currDimValue != 0) {
 	            		flag = false;
 	            	} else {

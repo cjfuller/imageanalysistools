@@ -56,9 +56,7 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 	public void apply(Image im) {
 
 		if (this.referenceImage == null) return;
-		
-		//TODO: smarter implementation where just adding/subtracting the values being added/removed to/from the box.
-		
+				
 		ImageCoordinate boxMin = ImageCoordinate.cloneCoord(this.referenceImage.getDimensionSizes());
 		for (Integer s : boxMin) {
 			boxMin.set(s, 0);
@@ -66,45 +64,129 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 		
 		ImageCoordinate boxMax = ImageCoordinate.cloneCoord(this.referenceImage.getDimensionSizes());
 		
-		for(ImageCoordinate i : im) {
-			
-			System.out.println(i);
-			
-			boxMin.set(ImageCoordinate.X, i.get(ImageCoordinate.X) - boxSize);
-			boxMin.set(ImageCoordinate.Y, i.get(ImageCoordinate.Y) - boxSize);
-			boxMin.set(ImageCoordinate.Z, i.get(ImageCoordinate.Z) - boxSize);
-			
-			boxMax.set(ImageCoordinate.X, i.get(ImageCoordinate.X) + boxSize+1);
-			boxMax.set(ImageCoordinate.Y, i.get(ImageCoordinate.Y) + boxSize+1);
-			boxMax.set(ImageCoordinate.Z, i.get(ImageCoordinate.Z) + boxSize+1);
-			
-			this.referenceImage.setBoxOfInterest(boxMin, boxMax);
-		
-			double total = 0;
-			int count = 0;
-			
-			for (ImageCoordinate iBox : this.referenceImage) {
+		//boolean first = true;
 				
-				total += this.referenceImage.getValue(iBox);
-				count++;
+		Image counts = new Image(this.referenceImage.getDimensionSizes(), 0.0);
+		
+		ImageCoordinate lastCoordinate = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
+		
+		for(ImageCoordinate i : im) {
+						
+			//if (first) {
+			
+			if (i.get(ImageCoordinate.X) == 0 ) {
+			
+				boxMin.set(ImageCoordinate.X, i.get(ImageCoordinate.X) - boxSize);
+				boxMin.set(ImageCoordinate.Y, i.get(ImageCoordinate.Y) - boxSize);
+				boxMin.set(ImageCoordinate.Z, i.get(ImageCoordinate.Z) - boxSize);
+				
+				boxMax.set(ImageCoordinate.X, i.get(ImageCoordinate.X) + boxSize+1);
+				boxMax.set(ImageCoordinate.Y, i.get(ImageCoordinate.Y) + boxSize+1);
+				boxMax.set(ImageCoordinate.Z, i.get(ImageCoordinate.Z) + boxSize+1);
+				
+				this.referenceImage.setBoxOfInterest(boxMin, boxMax);
+			
+				double total = 0;
+				int count = 0;
+				
+				for (ImageCoordinate iBox : this.referenceImage) {
+					
+					total += this.referenceImage.getValue(iBox);
+					count++;
+					
+				}
+				
+				im.setValue(i, total/count);
+				counts.setValue(i, count);
+				
+				this.referenceImage.clearBoxOfInterest();
+				
+				//first = false;
+								
+			} else {
+				
+				lastCoordinate.setCoord(i);
+				
+				int x = i.get(ImageCoordinate.X);
+				int y = i.get(ImageCoordinate.Y);
+				int z = i.get(ImageCoordinate.Z);
+								
+				double sum = 0;
+				
+				int count = 0;
+				
+				if (x > 0) {
+										
+					lastCoordinate.set(ImageCoordinate.X, x-1);
+					
+					count = (int) counts.getValue(lastCoordinate);
+					
+					sum = im.getValue(lastCoordinate) * count;
+					
+					boxMin.set(ImageCoordinate.X, x - boxSize-1);
+					boxMin.set(ImageCoordinate.Y, y - boxSize);
+					boxMin.set(ImageCoordinate.Z, z - boxSize);
+					
+					boxMax.set(ImageCoordinate.X, x-boxSize);
+					boxMax.set(ImageCoordinate.Y, i.get(ImageCoordinate.Y) + boxSize+1);
+					boxMax.set(ImageCoordinate.Z, i.get(ImageCoordinate.Z) + boxSize+1);
+					
+					this.referenceImage.setBoxOfInterest(boxMin, boxMax);
+										
+					for (ImageCoordinate iBox : this.referenceImage) {
+												
+						sum -= this.referenceImage.getValue(iBox);
+						count--;
+						
+					}
+					
+					this.referenceImage.clearBoxOfInterest();
+					
+					boxMin.set(ImageCoordinate.X, x+boxSize);
+					boxMax.set(ImageCoordinate.X, x+boxSize+1);
+					
+					this.referenceImage.setBoxOfInterest(boxMin, boxMax);
+
+					for (ImageCoordinate iBox : this.referenceImage) {
+						try {
+						sum += this.referenceImage.getValue(iBox);
+						count++;
+						} catch (ArrayIndexOutOfBoundsException e) {
+							System.err.println(iBox);
+							System.err.println(this.referenceImage.getDimensionSizes());
+							System.err.println(this.referenceImage.getBoxMax());
+							System.err.println(this.referenceImage.getBoxMin());
+							throw e;
+						}
+						
+					}
+					
+					im.setValue(i, sum/count);
+					counts.setValue(i, count);
+					
+					this.referenceImage.clearBoxOfInterest();
+					
+				} else if (y > 0) {
+					
+					//TODO implement this instead of complete calculation for the first column
+					
+				} else if (z > 0) {
+					
+					//TODO implement this instead of complete calculation for the first column
+
+				}
+				
 				
 			}
 			
-			im.setValue(i, total/count);
-			
-			this.referenceImage.clearBoxOfInterest();
-			
 		}
 		
+		lastCoordinate.recycle();
 		boxMin.recycle();
 		boxMax.recycle();
-		
-		
-		
+
 		
 	}
-
-	
 	
 	
 }

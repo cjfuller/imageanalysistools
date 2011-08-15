@@ -171,8 +171,7 @@ public class GaussianImageObject extends ImageObject {
                 }
             }
 
-            zCentroid = maxInd;
-
+            zCentroid = maxInd;  
 
             //parameter ordering: amplitude, var x-y, var z, x/y/z coords, background
 
@@ -223,6 +222,8 @@ public class GaussianImageObject extends ImageObject {
 
 
             fitParametersByChannel.add(fitParameters);
+            
+            System.out.println(fitParameters);
 
             //calculate R2
 

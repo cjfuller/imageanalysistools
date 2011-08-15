@@ -29,7 +29,6 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 
-import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.random.RandomGenerator;
 
 /**
@@ -154,7 +153,7 @@ public class DifferentialEvolutionMinimizer {
 
                 if (inBounds) functionValue = f.evaluate(newVec);
 
-                if (inBounds) System.out.printf("in bounds candidate value: %1.2f  old value: %1.2f \n", functionValue, values.getEntry(i));
+                //if (inBounds) System.out.printf("in bounds candidate value: %1.2f  old value: %1.2f \n", functionValue, values.getEntry(i));
                 
                 if (functionValue < values.getEntry(i)) {
 
@@ -194,7 +193,7 @@ public class DifferentialEvolutionMinimizer {
             currMinValue = tempMinValue;
             currMaxValue = tempMaxValue;
             
-            LoggingUtilities.getLogger().info("Iteration counter: " + Integer.toString(totalIterations) + "  best score: " + currMinValue + "  worst score: " + currMaxValue + " average score: " + averageValue);
+            //LoggingUtilities.getLogger().info("Iteration counter: " + Integer.toString(totalIterations) + "  best score: " + currMinValue + "  worst score: " + currMaxValue + " average score: " + averageValue);
 
             if (Math.abs(currMaxValue - currMinValue) < Math.abs(tol*currMaxValue) + Math.abs(tol*currMinValue)) {
                 iterationCounter--;
@@ -242,7 +241,7 @@ public class DifferentialEvolutionMinimizer {
      *
      * @param f                     The function to be minimized.
      * @param parameterLowerBounds  The lower bounds of each parameter.  Generated parameter values less than these values will be discarded.
-     * @param parameterUpperBounds  The upper bounds of each paraemter.  Generated parameter values greater than these values will be discarded.
+     * @param parameterUpperBounds  The upper bounds of each parameter.  Generated parameter values greater than these values will be discarded.
      * @param populationSize        The size of the population of parameters sets to use for optimization.
      * @param scaleFactor           Factor controlling the scale of crossed over entries during crossover events.
      * @param maxIterations         The maximum number of iterations to allow before returning a result.
@@ -280,7 +279,7 @@ public class DifferentialEvolutionMinimizer {
      *
      * @param f                     The function to be minimized.
      * @param parameterLowerBounds  The lower bounds of each parameter.  Generated parameter values less than these values will be discarded.
-     * @param parameterUpperBounds  The upper bounds of each paraemter.  Generated parameter values greater than these values will be discarded.
+     * @param parameterUpperBounds  The upper bounds of each parameter.  Generated parameter values greater than these values will be discarded.
      * @param populationSize        The size of the population of parameters sets to use for optimization.
      * @param scaleFactor           Factor controlling the scale of crossed over entries during crossover events.
      * @param maxIterations         The maximum number of iterations to allow before returning a result.

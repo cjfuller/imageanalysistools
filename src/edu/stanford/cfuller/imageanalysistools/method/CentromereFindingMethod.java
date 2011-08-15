@@ -230,7 +230,7 @@ public class CentromereFindingMethod extends Method {
             MF.apply(allCentromeres);
             RLF.apply(allCentromeres);
 
-            if (Integer.parseInt(parameters.getValueForKey("minimum_cluster_size")) > 0) {
+            if (parameters.hasKey("minimum_cluster_size") && Integer.parseInt(parameters.getValueForKey("minimum_cluster_size")) > 0) {
 
                 Histogram h_clustered = new Histogram(groupMask);
 
