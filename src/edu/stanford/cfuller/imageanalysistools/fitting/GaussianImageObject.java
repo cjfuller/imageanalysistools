@@ -223,7 +223,7 @@ public class GaussianImageObject extends ImageObject {
 
             fitParametersByChannel.add(fitParameters);
             
-            System.out.println(fitParameters);
+//            System.out.println(fitParameters);
 
             //calculate R2
 

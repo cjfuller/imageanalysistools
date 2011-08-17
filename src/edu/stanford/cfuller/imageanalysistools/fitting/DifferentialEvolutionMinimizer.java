@@ -82,7 +82,7 @@ public class DifferentialEvolutionMinimizer {
         
         double mutationProb = 0.01;
 
-        int totalIterations =0;
+//        int totalIterations =0;
 
         RealVector values = new ArrayRealVector(populationSize);
 
@@ -174,11 +174,11 @@ public class DifferentialEvolutionMinimizer {
             double tempMinValue = Double.MAX_VALUE;
             double tempMaxValue = -1.0*Double.MAX_VALUE;
             
-            double averageValue = 0;
+//            double averageValue = 0;
 
             for (int i =0; i < values.getDimension(); i++) {
                 double value = values.getEntry(i);
-                averageValue += value;
+//                averageValue += value;
                 if (value < tempMinValue) {
                     tempMinValue = value;
                 }
@@ -188,7 +188,7 @@ public class DifferentialEvolutionMinimizer {
 
             }
             
-            averageValue /= values.getDimension();
+//            averageValue /= values.getDimension();
 
             currMinValue = tempMinValue;
             currMaxValue = tempMaxValue;
@@ -201,7 +201,7 @@ public class DifferentialEvolutionMinimizer {
                 iterationCounter = 1;
             }
 
-            totalIterations++;
+//            totalIterations++;
 
         }
 

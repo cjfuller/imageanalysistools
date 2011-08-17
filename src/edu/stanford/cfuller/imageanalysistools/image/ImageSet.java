@@ -26,7 +26,8 @@ package edu.stanford.cfuller.imageanalysistools.image;
 
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
-import edu.stanford.cfuller.imageanalysistools.image.io.OmeroServerImageReader;
+import edu.stanford.cfuller.imageanalysistools.image.io.omero.OmeroServerImageReader;
+import edu.stanford.cfuller.imageanalysistools.image.io.omero.OmeroServerInfo;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 
 import java.util.*;
@@ -292,7 +293,10 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
             if (imh.getOmeroId() != null) {
 
                 OmeroServerImageReader osir = new OmeroServerImageReader();
-                String[] names = osir.loadImageFromOmeroServer(imh.getOmeroId(), this.parameters.getValueForKey("omero_hostname"), this.parameters.getValueForKey("omero_username"), this.parameters.getValueForKey("omero_password"));
+                
+                OmeroServerInfo osi = new OmeroServerInfo(this.parameters.getValueForKey("omero_hostname"), this.parameters.getValueForKey("omero_username"), this.parameters.getValueForKey("omero_password").toCharArray());
+
+                String[] names = osir.loadImageFromOmeroServer(imh.getOmeroId(), osi);
                 //System.out.println(imh.getOmeroId() + " " +  java.util.Arrays.toString(names));
                 imh.setImage(osir.read(names[1]));
                 imh.setDisplayName(names[0]);

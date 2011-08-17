@@ -22,17 +22,13 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.image.io;
+package edu.stanford.cfuller.imageanalysistools.image.io.omero;
 
-import Glacier2.CannotCreateSessionException;
-import Glacier2.PermissionDeniedException;
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import omero.ServerError;
 import omero.api.ExporterPrx;
-import omero.api.GatewayPrx;
-import omero.api.ServiceFactoryPrx;
-import omero.client;
 
 import java.io.*;
 
@@ -46,10 +42,12 @@ import java.io.*;
 
 public class OmeroServerImageReader extends ImageReader {
 
-    ServiceFactoryPrx serviceFactory;
-    client readerClient;
-    GatewayPrx gateway;
+//    ServiceFactoryPrx serviceFactory;
+//    client readerClient;
+//    GatewayPrx gateway;
 
+	OmeroServerConnection connection;
+	
     static final int MAX_CONNECTIONS = 10;
     static final long SLEEP_TIME_MS = 10000;
     static volatile int currentConnections;
@@ -107,9 +105,7 @@ public class OmeroServerImageReader extends ImageReader {
      * Constructs a new OmeroServerImageReader with no specified server.
      */
     public OmeroServerImageReader() {
-        this.serviceFactory = null;
-        this.readerClient = null;
-        this.gateway = null;
+        this.connection = null;
     }
 
 
@@ -118,49 +114,31 @@ public class OmeroServerImageReader extends ImageReader {
      *
      * Logs any errors in connecting, but returns normally regardless of whether the connection succeeded.
      *
-     * @param address       The IP address or resolvable hostname of the OMERO server.
-     * @param username      The username to use to connect.
-     * @param password      The password for the provided username.
+     * @param info     An OmeroServerInfo object containing the hostname, usenname, and password to use for the connection.  
      */
-    protected void connectToServer(String address, String username, String password) {
+    protected void connectToServer(OmeroServerInfo info) {
 
-        try {
-            this.readerClient = new client(address);
-            this.serviceFactory = this.readerClient.createSession(username, password);
-            this.gateway = this.serviceFactory.createGateway();
-        } catch(ServerError e) {
-            LoggingUtilities.getLogger().severe("Exception while connecting to omero server");
-        } catch (CannotCreateSessionException e) {
-            LoggingUtilities.getLogger().severe("Exception while connecting to omero server");
-        } catch (PermissionDeniedException e) {
-            LoggingUtilities.getLogger().severe("Invalid username or password.");
-        }
-
-
+        	this.connection = new OmeroServerConnection(info);
+            this.connection.connect();
+      
     }
 
     /**
      * Closes the connection to the OMERO server.
      */
     public void closeConnection() {
-        if (this.readerClient != null) {
-            this.readerClient.closeSession();
-        }
-        this.serviceFactory = null;
-        this.gateway = null;
+    	this.connection.disconnect();
     }
 
     /**
      * Reads an Image with the specified Id on the OMERO server using the provided address, username, and password.
      * @param omeroserverImageId    The ID that the OMERO server as assigned to the desired image; this image will be retrieved.
-     * @param serverAddress         The IP address or resolvable hostname of the OMERO server.
-     * @param username              The username to use to connect.
-     * @param password              The password for the provided username.
+     * @param info					An OmeroServerInfo object containing the hostname, usenname, and password to use for the connection.  
      * @return                      An Image containing the data from the Image identified by ID.  It is not guaranteed how much metadata, if any, will be retrieved.  Null if there is a problem retrieving the Image.
      * @throws IOException          If there is a problem with the temporary disk storage for the retrieved Image.
      */
-    public Image readImageFromOmeroServer(long omeroserverImageId, String serverAddress, String username, String password) throws IOException {
-        String[] temporaryImageFilename = this.loadImageFromOmeroServer(omeroserverImageId, serverAddress, username, password);
+    public Image readImageFromOmeroServer(long omeroserverImageId, OmeroServerInfo info) throws IOException {
+        String[] temporaryImageFilename = this.loadImageFromOmeroServer(omeroserverImageId, info);
         if (temporaryImageFilename == null || temporaryImageFilename[1] == null) return null;
         return this.read(temporaryImageFilename[1]);
     }
@@ -169,20 +147,18 @@ public class OmeroServerImageReader extends ImageReader {
     /**
      * Reads the name of an Image on the OMERO server given its Id.
      * @param omeroserverImageId    The ID that the OMERO server as assigned to the desired image; this image will be retrieved.
-     * @param serverAddress         The IP address or resolvable hostname of the OMERO server.
-     * @param username              The username to use to connect.
-     * @param password              The password for the provided username.
+     * @param info					An OmeroServerInfo object containing the hostname, usenname, and password to use for the connection.  
      * @return                      A String containing the name of the Image.
      * @throws ServerError          if the Image cannnot be accessed on the server.
      */
-    public String getImageNameForOmeroId(long omeroserverImageId, final String serverAddress, final String username, final String password) throws ServerError {
+    public String getImageNameForOmeroId(long omeroserverImageId, OmeroServerInfo info) throws ServerError {
 
-        if (this.serviceFactory == null) {
+        if (this.connection == null || ! this.connection.isConnected()) {
 
-            this.connectToServer(serverAddress, username, password);
+            this.connectToServer(info);
         }
 
-        return gateway.getImage(omeroserverImageId).getName().getValue();
+        return this.connection.getGateway().getImage(omeroserverImageId).getName().getValue();
 
     }
 
@@ -192,12 +168,10 @@ public class OmeroServerImageReader extends ImageReader {
      * Asynchronously loads the Image with the specified Id on the OMERO server using the provided address, username, and password, and stores it to a temporary file on disk.
      *
      * @param omeroserverImageId    The ID that the OMERO server as assigned to the desired image; this image will be retrieved.
-     * @param serverAddress         The IP address or resolvable hostname of the OMERO server.
-     * @param username              The username to use to connect.
-     * @param password              The password for the provided username.
+     * @param info					An OmeroServerInfo object containing the hostname, usenname, and password to use for the connection.  
      * @return                      An array containing two elements: first, the original name of the image on the OMERO server; second, the temporary filename to which the image is being stored.
      */
-    public String[] loadImageFromOmeroServer(final long omeroserverImageId, final String serverAddress, final String username, final String password) {
+    public String[] loadImageFromOmeroServer(final long omeroserverImageId, final OmeroServerInfo info) {
 
         File tempfile = null;
 
@@ -205,15 +179,14 @@ public class OmeroServerImageReader extends ImageReader {
 
         try {
 
-            if (this.serviceFactory == null) {
+            if (this.connection == null || !this.connection.isConnected()) {
 
-                this.connectToServer(serverAddress, username, password);
+                this.connectToServer(info);
             }
 
-            originalName = this.getImageNameForOmeroId(omeroserverImageId, serverAddress, username, password);
+            originalName = this.getImageNameForOmeroId(omeroserverImageId, info);
 
-            closeConnection();
-            this.serviceFactory = null;
+            this.closeConnection();
 
             tempfile = File.createTempFile("omerodownload", ".ome.tif");
             tempfile.deleteOnExit();
@@ -224,21 +197,13 @@ public class OmeroServerImageReader extends ImageReader {
 
             final String lockFilename = tempfile.getAbsolutePath();
 
-//            Thread t = null;
-//
-//            try {
-//                t = lock(lockFilename);
-//            } catch (InterruptedException e) {
-//                LoggingUtilities.getLogger().severe("interrupted while locking image file");
-//            }
-
             final Thread lockingThread = (new Thread(new Runnable() {
 
                 public void run() {
 
                     try {
 
-                        if (serviceFactory == null) {
+                        if (connection == null || ! connection.isConnected()) {
                             try {
                                 while (OmeroServerImageReader.getNumberOfConnections() >= MAX_CONNECTIONS) {
                                     Thread.sleep(SLEEP_TIME_MS);
@@ -251,11 +216,11 @@ public class OmeroServerImageReader extends ImageReader {
 
                             OmeroServerImageReader.incrementConnections();
 
-                            connectToServer(serverAddress, username, password);
+                            connectToServer(info);
                         }
 
 
-                        ExporterPrx exporter = serviceFactory.createExporter();
+                        ExporterPrx exporter = connection.getServiceFactory().createExporter();
 
 
                         exporter.addImage(omeroserverImageId);
@@ -289,7 +254,7 @@ public class OmeroServerImageReader extends ImageReader {
                     } finally {
                         closeConnection();
                         OmeroServerImageReader.decrementConnections();
-                        serviceFactory = null;
+                        connection = null;
                     }
                 }
 

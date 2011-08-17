@@ -35,7 +35,7 @@ import java.util.Random;
  */
 public class RandomGenerator {
 
-    private long randState = 4101842887655102017L;
+//    private long randState = 4101842887655102017L;
 
     private Random r;
 
@@ -67,8 +67,8 @@ public class RandomGenerator {
     }
 
     public void seed(long seed) {
-        randState ^= seed;
-        randState = randLong();
+//        randState ^= seed;
+//        randState = randLong();
     }
 
     private static RandomGenerator gen;

@@ -25,7 +25,8 @@
 package edu.stanford.cfuller.imageanalysistools.frontend;
 
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
-import edu.stanford.cfuller.imageanalysistools.image.io.OmeroServerImageReader;
+import edu.stanford.cfuller.imageanalysistools.image.io.omero.OmeroServerImageReader;
+import edu.stanford.cfuller.imageanalysistools.image.io.omero.OmeroServerInfo;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import omero.ServerError;
 
@@ -144,7 +145,9 @@ public class DirUtils {
 
                     Long idL = Long.parseLong(id);
 
-                    String name = ir.getImageNameForOmeroId(idL, params.getValueForKey("omero_hostname"), params.getValueForKey("omero_username"), params.getValueForKey("omero_password"));
+                    OmeroServerInfo osi = new OmeroServerInfo(params.getValueForKey("omero_hostname"), params.getValueForKey("omero_username"), params.getValueForKey("omero_password").toCharArray());
+                    
+                    String name = ir.getImageNameForOmeroId(idL, osi);
  
                     idLookupByName.put(name, idL);
 
