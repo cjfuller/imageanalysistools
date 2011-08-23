@@ -28,6 +28,7 @@ import org.apache.commons.math.linear.RealMatrix;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 
 /**
  * A simple Metric that quantifies the total intensity in a region of interest divided by the size of that region of interest.
@@ -60,32 +61,32 @@ public class IntensityPerPixelMetric extends Metric {
      *
      * @param mask      A mask that specifies the region of interest.  This should have regions of interest uniquely labeled consecutively, starting with the value 1,
      *                  as might be produced by a {@link edu.stanford.cfuller.imageanalysistools.filter.LabelFilter}.
-     * @param images    A Vector of Images to be quantified using the same masks (perhaps corresponding to different color channels, for example).
+     * @param images    An ImageSet of Images to be quantified using the same masks (perhaps corresponding to different color channels, for example).
      * @return          A RealMatrix containing the average intensity value for each region of interest in each input Image.  The (i,j)th
      *                  entry will contain the quantification of ROI (i+1) in Image j.
      */
 	@Override
-	public RealMatrix quantify(Image mask, java.util.Vector<Image> images) {
+	public RealMatrix quantify(Image mask, ImageSet images) {
 		
 		edu.stanford.cfuller.imageanalysistools.image.Histogram h = new edu.stanford.cfuller.imageanalysistools.image.Histogram(mask);
 		
 		if (h.getMaxValue() == 0) return null;
 		
-		RealMatrix channelIntensities = (new org.apache.commons.math.linear.Array2DRowRealMatrix(images.size()+1, h.getMaxValue())).scalarMultiply(0);
+		RealMatrix channelIntensities = (new org.apache.commons.math.linear.Array2DRowRealMatrix(images.getImageCount()+1, h.getMaxValue())).scalarMultiply(0);
 		
 		for (ImageCoordinate i : mask) {
 			int regionNum = (int) mask.getValue(i);
 			
 			if (regionNum > 0) {
-				for (int c = 0; c < images.size(); c++) {
-					channelIntensities.addToEntry(c, regionNum-1, images.get(c).getValue(i));
+				for (int c = 0; c < images.getImageCount(); c++) {
+					channelIntensities.addToEntry(c, regionNum-1, images.getImageForIndex(c).getValue(i));
 				}
 			}
 		}
 		
 		for (int i = 0; i < h.getMaxValue(); i++) {
-			channelIntensities.setEntry(images.size(), i, h.getCounts(i+1));
-			for (int c = 0; c < images.size(); c++) {
+			channelIntensities.setEntry(images.getImageCount(), i, h.getCounts(i+1));
+			for (int c = 0; c < images.getImageCount(); c++) {
 				channelIntensities.setEntry(c, i, channelIntensities.getEntry(c,i)/h.getCounts(i+1));
 			}
 		}

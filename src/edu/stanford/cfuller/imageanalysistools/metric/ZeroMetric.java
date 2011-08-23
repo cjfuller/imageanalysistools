@@ -27,6 +27,7 @@ package edu.stanford.cfuller.imageanalysistools.metric;
 import org.apache.commons.math.linear.RealMatrix;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 
 /**
  * @author cfuller
@@ -38,7 +39,7 @@ public class ZeroMetric extends Metric {
 	 * @see edu.stanford.cfuller.imageanalysistools.metric.Metric#quantify(edu.stanford.cfuller.imageanalysistools.image.Image, java.util.Vector)
 	 */
 	@Override
-	public RealMatrix quantify(Image mask, java.util.Vector<Image> images) {
+	public RealMatrix quantify(Image mask, ImageSet images) {
 
 
 		RealMatrix channelIntensities = (new org.apache.commons.math.linear.Array2DRowRealMatrix(images.size()+1, 1)).scalarMultiply(0);

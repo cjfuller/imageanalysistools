@@ -306,7 +306,7 @@ public class CentromereFindingMethod extends Method {
         //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Quantification");
 
 
-        RealMatrix fullResult = metric.quantify(allCentromeres, this.images);
+        RealMatrix fullResult = metric.quantify(allCentromeres, this.imageSet);
 
         if (fullResult == null) {
             this.storedDataOutput = null;
@@ -317,7 +317,7 @@ public class CentromereFindingMethod extends Method {
 
         if (this.parameters.hasKey("use_clustering") && Boolean.parseBoolean(this.parameters.getValueForKey("use_clustering"))) {
 
-            backgroundResult = metric.quantify(backgroundMask, this.images);
+            backgroundResult = metric.quantify(backgroundMask, this.imageSet);
 
         }
 

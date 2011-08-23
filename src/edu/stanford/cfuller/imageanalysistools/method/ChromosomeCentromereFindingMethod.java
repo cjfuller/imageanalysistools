@@ -111,9 +111,9 @@ public class ChromosomeCentromereFindingMethod extends Method {
 
         }
 
-        RealMatrix fullResult = metric.quantify(chromosomeCentromereMask, this.images);
+        RealMatrix fullResult = metric.quantify(chromosomeCentromereMask, this.imageSet);
 
-        RealMatrix backgroundResult = metric.quantify(chromosomeNonCentromereMask, this.images);
+        RealMatrix backgroundResult = metric.quantify(chromosomeNonCentromereMask, this.imageSet);
 
         if (fullResult != null && backgroundResult != null) {
 

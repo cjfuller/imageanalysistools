@@ -25,6 +25,8 @@
 package edu.stanford.cfuller.imageanalysistools.metric;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
+
 import org.apache.commons.math.linear.RealMatrix;
 
 /**
@@ -46,9 +48,9 @@ public abstract class Metric {
      *
      * @param mask      A mask that specifies the region of interest.  Subclasses should specify whether this should be binary or
      *                  have a unique identifier for each region of interest.
-     * @param images    A Vector of Images to be quantified using the same masks (perhaps corresponding to different color channels, for example).
+     * @param images    An ImageSet of Images to be quantified using the same masks (perhaps corresponding to different color channels, for example).
      * @return          A RealMatrix containing all the quantified values; rows correspond to ROIs, columns to input Images.
      */
-	public abstract RealMatrix quantify(Image mask, java.util.Vector<Image> images);
+	public abstract RealMatrix quantify(Image mask, ImageSet images);
 	
 }
