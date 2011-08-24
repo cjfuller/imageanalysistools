@@ -153,7 +153,7 @@ public class ImageReader {
 		}
 		
 		loci.formats.MetadataTools.populatePixels(lociReader.getMetadataStore(), lociReader);
-		
+				
 		PixelData p = (new PixelDataFactory()).createPixelData(lociReader.getSizeX(), lociReader.getSizeY(), lociReader.getSizeZ(), lociReader.getSizeC(), lociReader.getSizeT(), lociReader.getPixelType(), lociReader.getDimensionOrder());
 		
 		byte[] pixel_bytes = null;
@@ -187,10 +187,9 @@ public class ImageReader {
 		}
 		
 		p.setBytes(pixel_bytes);
-		
-				
+						
 		Image toReturn = new Image((loci.formats.meta.IMetadata) lociReader.getMetadataStore(), p);
-		
+				
 		lociReader.close();
 
         currentSeries.put(filename, currentSeries.get(filename) + 1);

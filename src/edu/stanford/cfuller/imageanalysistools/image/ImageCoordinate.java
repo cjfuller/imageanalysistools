@@ -223,11 +223,12 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 		
 		ImageCoordinate staticCoord = ImageCoordinate.getNextAvailableCoordinate();
 		
+		//setting T first avoids multiple allocations of internal storage for new coordinates 
+		staticCoord.set(ImageCoordinate.T, t);
 		staticCoord.set(ImageCoordinate.X, x);
 		staticCoord.set(ImageCoordinate.Y, y);
 		staticCoord.set(ImageCoordinate.Z, z);
 		staticCoord.set(ImageCoordinate.C, c);
-		staticCoord.set(ImageCoordinate.T, t);
 
 		return staticCoord;
 		

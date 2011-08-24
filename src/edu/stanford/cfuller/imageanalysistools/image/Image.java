@@ -272,7 +272,10 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 			}
 
             if (this.inBounds(ic)) {
+            	//System.out.println("in bounds");
 			    toReturn.setValue(i, this.getValue(ic));
+            } else {
+            	//System.out.println(ic);
             }
 		}
 		
