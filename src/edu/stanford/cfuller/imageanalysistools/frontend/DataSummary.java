@@ -95,13 +95,14 @@ public class DataSummary {
 
             if (! f.getName().matches(".*" + outputFileExtension)) {continue;}
 
+            File parameterFile = new File(parameterDirectory + File.separator + f.getName().replace(outputFileExtension, AnalysisController.PARAMETER_EXTENSION));
+
+            params = ParameterDictionary.readParametersFromFile(parameterFile.getAbsolutePath());
+
+            numChannels = Integer.parseInt(params.getValueForKey("number_of_channels"));
+            
             if (! headerRowWritten) {
 
-                File parameterFile = new File(parameterDirectory + File.separator + f.getName().replace(outputFileExtension, AnalysisController.PARAMETER_EXTENSION));
-
-                params = ParameterDictionary.readParametersFromFile(parameterFile.getAbsolutePath());
-
-                numChannels = Integer.parseInt(params.getValueForKey("number_of_channels"));
 
                 // column headers
 

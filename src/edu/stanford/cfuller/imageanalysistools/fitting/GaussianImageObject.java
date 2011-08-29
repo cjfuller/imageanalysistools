@@ -132,6 +132,7 @@ public class GaussianImageObject extends ImageObject {
             
 
             for (int i = 0; i < x.size(); i++) {
+            	
                 xValues[i] = x.get(i);
                 yValues[i] = y.get(i);
                 zValues[i] = z.get(i);
@@ -170,9 +171,10 @@ public class GaussianImageObject extends ImageObject {
                     }
                 }
             }
-
+                        
             zCentroid = maxInd;  
-
+            
+            
             //parameter ordering: amplitude, var x-y, var z, x/y/z coords, background
 
             //amplitude: find the max value; background: find the min value
@@ -216,9 +218,14 @@ public class GaussianImageObject extends ImageObject {
             fitParameters.setEntry(0, fitParameters.getEntry(0)*ppg);
             fitParameters.setEntry(6, fitParameters.getEntry(6)*ppg);
             
+            //System.out.println("guess: " + fitParameters);
+            
             //do the fit
 
             fitParameters = gf.fit(this, fitParameters, ppg);
+            
+            //System.out.println("fit: " + fitParameters);
+
 
 
             fitParametersByChannel.add(fitParameters);
@@ -268,7 +275,7 @@ public class GaussianImageObject extends ImageObject {
             this.positionsByChannel.add(fitParameters.getSubVector(3, 3));
             
             this.nPhotonsByChannel.add(n_photons);
-
+            
         }
 
         this.hadFittingError = false;
