@@ -56,7 +56,7 @@ public class ParameterXMLParser {
     final static String FLOAT_TYPE_NAME = "floating";
     final static String STRING_TYPE_NAME = "string";
 
-    final static String KNOWN_PARAMETER_XML_FILE = "resources/knownparameters.xml";
+    final static String KNOWN_PARAMETER_XML_FILE = "edu/stanford/cfuller/imageanalysistools/resources/knownparameters.xml";
 
     /**
      * Parses the list of some of the known Parameters from an XML file to a List of Parameters; useful for allowing users to interacitively

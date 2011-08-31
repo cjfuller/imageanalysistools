@@ -84,11 +84,13 @@ public class DirUtils {
             for (java.io.File f : directory.listFiles()) {
 
 
-
                 if ((f.getName().matches(".*Thumb.*")) || (! f.getName().toLowerCase().matches(".*" + imageExtension.toLowerCase() + "$")) || (! f.getName().matches(".*" + commonFilenameTag + ".*"))) {
                     continue;
                 }
 
+            	System.out.println(f.getAbsolutePath());
+
+                
                 ImageSet set = new ImageSet(params);
 
                 set.addImageWithFilename(f.getAbsolutePath());
@@ -169,8 +171,20 @@ public class DirUtils {
             for (java.io.File f : directory.listFiles()) {
 
                 //added hack here for case insensitive extension
+            	
+            	String commonFilenameTag = "";
+                String imageExtension = "";
 
-                if ((f.getName().matches(".*Thumb.*")) || (! f.getName().toLowerCase().matches(".*" + params.getValueForKey("image_extension").toLowerCase() + "$"))) {
+                if (params.hasKey("image_extension")) {
+                    imageExtension = params.getValueForKey("image_extension");
+                }
+
+                if (params.hasKey("common_filename_tag")) {
+                    commonFilenameTag = params.getValueForKey("common_filename_tag");
+                }
+            	
+
+                if ((f.getName().matches(".*Thumb.*")) || (! f.getName().toLowerCase().matches(".*" + imageExtension.toLowerCase() + "$")) || (! f.getName().matches(".*" + commonFilenameTag + ".*"))) {
                     continue;
                 }
 
