@@ -59,21 +59,24 @@ public class GaussianFitter3D {
      * The Gaussian is contrained to be symmetric in the x and y dimensions (that is, it will have equal variance in both dimensions).
      *
      * @param toFit         The {@link ImageObject} to be fit to a Gaussian.
-     * @param initialGuess  The initial guess at the parameters of the Gaussian.  These must be supplied in the order: amplitude, x-y variance, z variance, x position, y position, z position, background.  Positions should be supplied in absolute coordinates from the original image, not relative to the box around the object being fit.
+     * @param initialGuess  The initial guess at the parameters of the Gaussian.  These must be supplied in the order: amplitude, x-y stddev, z stddev, x position, y position, z position, background.  Positions should be supplied in absolute coordinates from the original image, not relative to the box around the object being fit.
      * @param ppg           The number of photons corresponding to one greylevel in the original image.
      * @return              The best fit Gaussian parameters, in the same order as the initial guess had to be supplied.
      */
     public RealVector fit(ImageObject toFit, RealVector initialGuess, double ppg) {
 
-        //parameter ordering: amplitude, var x-y, var z, x/y/z coords, background
+        //parameter ordering: amplitude, stddev x-y, stddev z, x/y/z coords, background
 
         //System.out.println("for object " + toFit.getLabel() + " in image: " + toFit.getImageID() + " initial guess is: " + initialGuess.toString());
 
 
         double tol = 1.0e-6;
         NelderMeadMinimizer nmm = new NelderMeadMinimizer(tol);
-
+        
         RealVector result = nmm.optimize(new MLObjectiveFunction(toFit, ppg), initialGuess);
+        
+        result = nmm.optimize(new MLObjectiveFunction(toFit, ppg), result);
+        //System.out.println("for object " + toFit.getLabel() + " in image: " + toFit.getImageID() + " result is: " + result.toString());
 
         return result;
 
@@ -91,7 +94,7 @@ public class GaussianFitter3D {
 
 
 
-        return ( A * Math.exp(-(xmx0*xmx0 + ymy0*ymy0)/(2*vxy) - zmz0*zmz0/(2*vz)) + b);
+        return ( A * Math.exp(-(xmx0*xmx0 + ymy0*ymy0)/(2*vxy*vxy) - zmz0*zmz0/(2*vz*vz)) + b);
 
     }
 

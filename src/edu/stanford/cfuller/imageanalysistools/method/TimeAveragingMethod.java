@@ -51,11 +51,11 @@ public class TimeAveragingMethod extends Method {
         dimSizes.set(ImageCoordinate.C,this.images.size());
 
         Image reference = new Image(dimSizes, 0.0);
-
+        
         for (ImageCoordinate ic : reference) {
             ImageCoordinate ic_c = ImageCoordinate.cloneCoord(ic);
             ic_c.set(ImageCoordinate.C,0);
-            reference.setValue(ic, this.images.get(ic.get(ImageCoordinate.C)).getValue(ic_c));
+            reference.setValue(ic, this.imageSet.getImageForIndex(ic.get(ImageCoordinate.C)).getValue(ic_c));
             ic_c.recycle();
         }
 

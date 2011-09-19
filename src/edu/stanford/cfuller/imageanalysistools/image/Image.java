@@ -373,6 +373,56 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
      */
 	public ImageCoordinate getDimensionSizes(){return this.dimensionSizes;}
 
+	/**
+     * Convenience method for converting a single Image with non-singleton specified dimension into a List of Images with
+     * singleton specified dimension, each containing the Image for a single point along that dimension.
+     * <p>
+     * Images will be returned in the List in the order of their dimension index in the original Image.
+     * @return      A List of Images, each with one point from the original Image.
+     */
+	public java.util.List<Image> split(int dimension) {
+		
+		//handle special case of color, where we need to rename channels in the metadata
+		
+		if (dimension == ImageCoordinate.C) {
+			return this.splitChannels();
+		}
+		
+		final int series_number = 0; // if this Image was created from a multi-series image, this will get metadata from the first series.
+
+        java.util.Vector<Image> split = new java.util.Vector<Image>();
+
+        ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
+
+        for (int i =0; i < this.dimensionSizes.get(dimension); i++) {
+            ic.recycle();
+            ic = ImageCoordinate.cloneCoord(this.getDimensionSizes());
+            ic.set(dimension, 1);
+            Image newChannelImage = new Image(ic, 0.0);
+
+            split.add(newChannelImage);
+        }
+
+        for (ImageCoordinate i : this) {
+
+            ic.recycle();
+
+            ic = ImageCoordinate.cloneCoord(i);
+
+            ic.set(dimension, 0);
+
+            split.get(i.get(dimension)).setValue(ic, this.getValue(i));
+
+        }
+
+        ic.recycle();
+
+        return split;
+		
+		
+	}
+	
+	
     /**
      * Convenience method for converting a single Image with non-singleton color dimension into a List of Images with
      * singleton color dimension, each containing the Image for a single color channel.

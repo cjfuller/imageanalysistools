@@ -114,11 +114,13 @@ public class NelderMeadMinimizer {
      * @return                  A matrix containing p + 1 rows, each of which is one set of p parameters, which specify the simplex.
      */
     public RealMatrix generateInitialSimplex(RealVector initialPoint) {
-
+    	
         final double constantScale = 0.1;
-
+        
         RealVector componentScales = initialPoint.mapMultiply(constantScale);
 
+        
+        
         return generateInitialSimplex(initialPoint, componentScales);
 
     }
@@ -151,8 +153,12 @@ public class NelderMeadMinimizer {
 
         boolean shouldEvaluate = false;
 
+        long iterCounter = 0;
+        
         while (Math.abs(currTolVal) > this.tol) {
 
+        	
+        	
             int maxIndex = 0;
             int minIndex = 0;
             double maxValue = -1.0*Double.MAX_VALUE;
@@ -264,6 +270,10 @@ public class NelderMeadMinimizer {
             currTolVal = 2.0*(redValue - maxValue)/(1.0e-20 + redValue + maxValue);
 
             shouldEvaluate = true;
+            
+            if (iterCounter++ > 1000) {
+        		System.out.println("tol: " + currTolVal + "  minValue: " + minValue);
+        	}
 
         }
 

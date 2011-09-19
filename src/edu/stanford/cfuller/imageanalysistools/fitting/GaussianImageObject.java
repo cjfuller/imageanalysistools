@@ -210,8 +210,8 @@ public class GaussianImageObject extends ImageObject {
             double sizex = limitedWidthxy / p.getDoubleValueForKey("pixelsize_nm");
             double sizez = limitedWidthz / p.getDoubleValueForKey("z_sectionsize_nm");
 
-            fitParameters.setEntry(1, Math.pow(sizex, 2.0)/2);
-            fitParameters.setEntry(2, Math.pow(sizez, 2.0)/2);
+            fitParameters.setEntry(1, sizex/2);
+            fitParameters.setEntry(2, sizez/2);
 
             //amplitude and background are in arbitrary intensity units; convert to photon counts
 
@@ -265,11 +265,15 @@ public class GaussianImageObject extends ImageObject {
 
             //calculate fit error
 
-            double s_xy = fitParameters.getEntry(1) * Math.pow(p.getDoubleValueForKey("pixelsize_nm"), 2);
-            double s_z = fitParameters.getEntry(2) * Math.pow(p.getDoubleValueForKey("z_sectionsize_nm"), 2);
+            double s_xy = fitParameters.getEntry(1)*fitParameters.getEntry(1) * Math.pow(p.getDoubleValueForKey("pixelsize_nm"), 2);
+            double s_z = fitParameters.getEntry(2)*fitParameters.getEntry(2) * Math.pow(p.getDoubleValueForKey("z_sectionsize_nm"), 2);
 
-            double error = Math.sqrt(2*(2*s_xy + s_z)/(n_photons - 1));
+            //s_z = 0; //remove!!
+            
+            double error = (2*s_xy + s_z)/(n_photons-1);// + 4*Math.sqrt(Math.PI) * Math.pow(2*s_xy,1.5)*Math.pow(fitParameters.getEntry(6),2)/(p.getDoubleValueForKey("pixelsize_nm")*n_photons*n_photons);
  
+            error = Math.sqrt(2*error);
+            
             this.fitErrorByChannel.add(error);
             
             this.positionsByChannel.add(fitParameters.getSubVector(3, 3));
