@@ -391,13 +391,6 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 
     /**
      * Sets the components of the ImageCoordinate to the values of the components of another ImageCoordinate.
-     * <p>
-     * Use with caution when the two ImageCoordinates do not have the same set 
-     * of dimensions.  All the dimensions in the other coordinate will 
-     * overwrite those in the current coordinate, but any other dimensions that
-     * may be present will not be fully erased (though they will not be iterated
-     * over using foreach-style iteration).  Call {@link #clear()} if this is
-     * a problem.
      * 
      * @param other     The ImageCoordinate whose component values will be copied.
      */

@@ -248,6 +248,17 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		toProcess.setEntry(second, value);
 	}
 	
+	
+	/**
+	 * Finds the kth item sorted by increasing value in a possibly unsorted vector.
+	 * <p>
+	 * This will likely not completely sort the vector, but will almost certainly
+	 * change the order of the items in the vector in place.
+	 * 
+	 * @param k			The index of the item (in the sorted vector) to find.
+	 * @param toFind	The RealVector in which to find the kth item.
+	 * @return			The value of the kth item (in the sorted vector).
+	 */
 	public static double quickFindKth(int k, RealVector toFind) {
 		
 		int n = toFind.getDimension();

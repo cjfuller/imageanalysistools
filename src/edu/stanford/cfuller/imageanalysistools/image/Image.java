@@ -43,7 +43,7 @@ import java.awt.image.WritableRaster;
  * This class also has the capability of boxing (a single) region of interest in the Image and restricting the foreach-style iteration
  * solely to that box, if only a portion of the Image needs to be processed, viewed, etc.
  *<p>
- * A side note to users of this class: it appears that because this uses a finalize method to recycle ImageCoordinates,
+ * A note to users of this class: it appears that because this uses a finalize method to recycle ImageCoordinates,
  * it is possible to run out of memory by rapidly creating and destroying many images such that the finalizer queue cannot process
  * the finalize method as rapidly as objects are being created.  If this is happening, explicitly calling the dispose method
  * will nullify the memory-intensive fields, allowing those to be garbage collected immediately.
@@ -53,7 +53,7 @@ import java.awt.image.WritableRaster;
  */
 public class Image implements java.io.Serializable, java.util.Collection<ImageCoordinate> {
 
-	//TODO: handle Images with dimensions other than 5.
+	//TODO: add support for Images with dimensions other than 5.
 	
 	//fields
 	
@@ -388,8 +388,6 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 			return this.splitChannels();
 		}
 		
-		final int series_number = 0; // if this Image was created from a multi-series image, this will get metadata from the first series.
-
         java.util.Vector<Image> split = new java.util.Vector<Image>();
 
         ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
