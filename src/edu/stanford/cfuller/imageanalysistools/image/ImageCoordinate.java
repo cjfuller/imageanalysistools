@@ -346,10 +346,11 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 		if (this.getDimension() == 0) {
 			return "()";
 		}
-		String valueString = "(" + this.get(0);
-		for (int i = 1; i < this.getDimension(); i++) {
-			valueString+= "," + this.get(i);
+		String valueString = "(";
+		for (Integer i : this) {
+			valueString+= this.get(i) + ", ";
 		}
+		valueString = valueString.substring(0, valueString.length() - 2); // strip off the last ", "
 		valueString += ")";
 		return valueString;
 	}
