@@ -33,7 +33,7 @@ import java.util.NoSuchElementException;
  *
  * <p>
  * To avoid unnecessary object allocation when iterating over large images, this class provides basic object pooling capabilities.
- * ImageCoordinates can only be created using this class's static factory methods ({@link #createCoord}, {@link #cloneCoord}), which will reuse ImageCoordinates if there are any
+ * ImageCoordinates can only be created using this class's static factory methods ({@link #createCoord()}, {@link #createCoordXYZCT(int, int, int, int, int)}, {@link #cloneCoord}), which will reuse ImageCoordinates if there are any
  * available or allocate more as necessary.
  *
  * <p> Users of this class are responsible for calling {@link #recycle} on any ImageCoordinate they explicitly create using one of the static factory methods

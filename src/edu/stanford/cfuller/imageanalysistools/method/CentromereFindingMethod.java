@@ -169,8 +169,6 @@ public class CentromereFindingMethod extends Method {
 
                 Image output = ObjectClustering.doBasicClustering(groupMask, normalized, new Image(gaussianFilteredMask));
 
-                //output.writeToFile("/Users/cfuller/Desktop/filter_intermediates/basic.ome.tif");
-
                 RegionThresholdingFilter rtf = new RegionThresholdingFilter();
                 MaximumSeparabilityThresholdingFilter mstf_clustering = new MaximumSeparabilityThresholdingFilter();
 
@@ -209,8 +207,6 @@ public class CentromereFindingMethod extends Method {
                 }
 
                 LF.apply(output);
-
-                //output.writeToFile("/Users/cfuller/Desktop/filter_intermediates/afterspeckle.ome.tif");
 
                 MF.setReferenceImage(output);
 
@@ -271,18 +267,15 @@ public class CentromereFindingMethod extends Method {
 
         RLF.apply(groupMask);
 
-        //groupMask.writeToFile("/Users/cfuller/Desktop/filter_intermediates/post-cluster.ome.tif");
-
         this.storeImageOutput(groupMask);
 
         Image allCentromeresCopy = new Image(allCentromeres);
 
         this.storeImageOutput(allCentromeresCopy);
 
-        //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Background correction");
-
+        //background estimation
+        
         Image backgroundMask = new Image(groupMask);
-
 
         ConvexHullByLabelFilter chblf = new ConvexHullByLabelFilter();
 
@@ -302,9 +295,8 @@ public class CentromereFindingMethod extends Method {
             BEF.apply(backgroundMask);
 
         }
-
-        //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Quantification");
-
+        
+        //generate output
 
         RealMatrix fullResult = metric.quantify(allCentromeres, this.imageSet);
 
@@ -321,7 +313,7 @@ public class CentromereFindingMethod extends Method {
 
         }
 
-        if (backgroundResult == null) { // either not using clustering of the quantification failed due to no ROIs
+        if (backgroundResult == null) { // either not using clustering or the quantification failed due to no ROIs
 
             backgroundResult = new Array2DRowRealMatrix(fullResult.getRowDimension(), fullResult.getColumnDimension());
 
@@ -339,7 +331,7 @@ public class CentromereFindingMethod extends Method {
         int[] resultMap = new int[fullResult.getRowDimension()];
 
 
-        //TODO: consider new return type for the quantification (XML document?  How to read info?)
+        //TODO: consider new return type for the quantification (XML document?)
 
 
         for (ImageCoordinate i : allCentromeres) {
