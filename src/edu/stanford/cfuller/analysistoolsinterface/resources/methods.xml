@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : methods.xml.xml
+    Created on : February 26, 2011, 1:29 PM
+    Author     : cfuller
+    Description:
+        Purpose of the document follows.
+-->
+
+<root>
+    <method displayname="Centromere finding method" class="edu.stanford.cfuller.imageanalysistools.method.CentromereFindingMethod"/>
+    <method displayname="Recursive thresholding method" class="edu.stanford.cfuller.imageanalysistools.method.RecursiveThresholdingMethod"/>
+    <method displayname="Chromosome centromere finding method" class="edu.stanford.cfuller.imageanalysistools.method.ChromosomeCentromereFindingMethod"/>
+    <method displayname="Timepoint splitting method" class="edu.stanford.cfuller.imageanalysistools.method.TimepointSplittingMethod"></method>
+    <method displayname="Custom method (specify manually)"/>
+    <method displayname="Test method" class="edu.stanford.cfuller.imageanalysistools.method.TestMethod"/>
+</root>

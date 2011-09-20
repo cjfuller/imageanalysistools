@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : tasks.xml
+    Created on : February 24, 2011, 5:18 PM
+    Author     : cfuller
+    Description:
+        This document tracks all analysis tasks for which this package has an interface.
+        All tasks must be specified by a <task> node, and must minimally contain
+        attributes name and controllerclass, which are the display name of the task
+        and the fully qualified class of the controller for the task, which should
+        be a subclass of edu.stanford.cfuller.imageanalysistools.TaskController.
+-->
+
+<root>
+    <task   name="Segment and quantify images"
+            controllerclass="edu.stanford.cfuller.analysistoolsinterface.SegmentationController">
+    </task>
+    <task   name="Specify analysis parameters"
+            controllerclass="edu.stanford.cfuller.analysistoolsinterface.ParameterSetupController">
+    </task>
+    <task   name="Make maximum intensity projections"
+            controllerclass="edu.stanford.cfuller.analysistoolsinterface.MaximumIntensityProjectionController">
+                
+    </task>
+    <task   name="Deschmutzerize"
+            controllerclass="edu.stanford.cfuller.analysistoolsinterface.DeschmutzerizerController">
+    </task>
+    
+
+</root>
