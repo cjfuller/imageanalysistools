@@ -35,7 +35,7 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
  * <p>
  * A side note on using intensity per pixel as a metric rather than integrated intensity:
  * <p>
- * When observing objects much smaller than the diffraction limit of light, and increase in brightness of a point source will appear
+ * When observing objects much smaller than the diffraction limit of light, an increase in brightness of a point source will appear
  * almost the same as multiple point sources of equivalent total brightness close together in that same diffraction-limited volume.  For this reason,
  * the apparent size of objects below the diffraction limit is often solely dependent on the brightess of objects, and not their
  * actual size.  Thus, for an Image segmentation method that may not attempt to compensate for objects of differing brightness, which

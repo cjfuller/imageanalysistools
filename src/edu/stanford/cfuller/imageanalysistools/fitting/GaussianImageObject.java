@@ -25,9 +25,14 @@
 package edu.stanford.cfuller.imageanalysistools.fitting;
 
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+
+import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
+import org.apache.commons.math.analysis.UnivariateRealFunction;
+import org.apache.commons.math.analysis.integration.LegendreGaussIntegrator;
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
@@ -42,7 +47,7 @@ import java.util.Vector;
 public class GaussianImageObject extends ImageObject {
 
 	static final long serialVersionUID =2L;
-	
+		
     /**
      * Creates an empty GaussianImageObject.
      */
@@ -272,7 +277,51 @@ public class GaussianImageObject extends ImageObject {
             
             double error = (2*s_xy + s_z)/(n_photons-1);// + 4*Math.sqrt(Math.PI) * Math.pow(2*s_xy,1.5)*Math.pow(fitParameters.getEntry(6),2)/(p.getDoubleValueForKey("pixelsize_nm")*n_photons*n_photons);
  
-            error = Math.sqrt(2*error);
+            double b = fitParameters.getEntry(6);
+            double a = p.getDoubleValueForKey("pixelsize_nm");
+            double alpha=  p.getDoubleValueForKey("z_sectionsize_nm");
+            double sa_x = s_xy + Math.pow(a,2)/12;
+            double sa_z = s_z + Math.pow(alpha, 2)/12;
+            double error_x = sa_x/n_photons * (16.0/9.0 + 8*Math.PI*sa_x*b*b/(n_photons*Math.pow(p.getDoubleValueForKey("pixelsize_nm"), 2)));
+            double error_z = sa_z/n_photons * (16.0/9.0 + 8*Math.PI*sa_z*b*b/(n_photons*Math.pow(p.getDoubleValueForKey("z_sectionsize_nm"), 2)));
+            
+            double A = 1.0/(2*Math.sqrt(2)*Math.pow(Math.PI,1.5) * Math.sqrt(sa_z)*sa_x);
+            
+            ErrIntFunc eif = new ErrIntFunc();
+            
+            eif.setParams(b, n_photons, A, sa_z, sa_x, a, alpha);
+            
+            LegendreGaussIntegrator lgi = new LegendreGaussIntegrator(5, 1000);
+            
+            //integrate over 10*width of PSF in z 
+            
+            double size = 10*Math.sqrt(sa_z);
+            
+            double intpart = 0;
+            try {
+            	intpart = lgi.integrate(eif, -size, size);
+            	
+            	double fullIntPart = intpart + Math.pow(2*Math.PI, 1.5)*sa_x*A/Math.sqrt(sa_z);
+            	
+            	error_x = Math.sqrt(2/(n_photons*sa_z/(2*sa_z + sa_x)*fullIntPart));
+            	error_z = Math.sqrt(2/(n_photons*sa_x/(2*sa_z + sa_x)*fullIntPart));
+            	
+            } catch (FunctionEvaluationException e) {
+            	LoggingUtilities.getLogger().severe("Integration error: " + e.getMessage());
+            	error_x = -1;
+            	error_z = -1;
+            } catch (ConvergenceException e) {
+            	LoggingUtilities.getLogger().severe("Integration error: " + e.getMessage());
+            	error_x = -1;
+            	error_z = -1;
+            }
+            
+                        
+            error = Math.sqrt(2*error_x*error_x + error_z*error_z);
+            
+            //System.out.printf("%f, %f, %f, %f, %f, %f, %f\n", n_photons, b, Math.sqrt(sa_x), Math.sqrt(sa_z), error_x, error_z, error);            
+
+            
             
             this.fitErrorByChannel.add(error);
             
@@ -284,6 +333,80 @@ public class GaussianImageObject extends ImageObject {
 
         this.hadFittingError = false;
         this.nullifyImages();
+    }
+    
+    protected class DI1Func implements UnivariateRealFunction {
+    	
+    	private double z;
+    	private double b;
+    	private double n;
+    	private double A;
+    	private double sa_z;
+    	private double a;
+    	private double alpha;
+    	
+    	public double value(double t) {
+    		
+    		double tau = b/(n*a*a*alpha*A*Math.exp(-z*z/(2*sa_z)));
+    		
+    		return (-1.0*t*Math.log(t)/(t+tau));
+    	}
+    	
+    	public void setZ(double z) {
+    		this.z = z;
+    	}
+    	
+    	public void setParams(double b, double n, double A, double sa_z, double a, double alpha) {
+    		this.b = b; this.n = n; this.A = A; this.sa_z = sa_z; this.a = a; this.alpha = alpha;
+    	}
+    	
+    }
+    
+    protected class ErrIntFunc implements UnivariateRealFunction {
+    	private double b;
+    	private double n;
+    	private double A;
+    	private double sa_z;
+    	private double sa_x;
+    	private double a;
+    	private double alpha;
+    	
+    	private LegendreGaussIntegrator lgi;
+    	private DI1Func di1;
+    	
+    	public ErrIntFunc() {
+    		this.lgi = new LegendreGaussIntegrator(5,1000);
+    		this.di1 = new DI1Func();
+    	}
+    	
+    	public void setParams(double b, double n, double A, double sa_z, double sa_x, double a, double alpha) {
+    		this.b = b; this.n = n; this.A = A; this.sa_z = sa_z; this.sa_x = sa_x; this.a = a; this.alpha = alpha;
+    		this.di1.setParams(b,n,A,sa_z,a,alpha);
+    	}
+    	
+    	public double value(double z) throws FunctionEvaluationException {
+    		
+    		this.di1.setZ(z);
+    		
+    		double I1 = 0;
+    		
+    		try {
+    			I1 = lgi.integrate(di1,0,1);
+    		} catch (ConvergenceException e) {
+    			throw new FunctionEvaluationException(e, z);
+    		}
+    		
+    		double part1 = 4*Math.PI*A*Math.exp(-z*z/(2*sa_z))*I1;
+    		
+    		double part2 = 2*Math.PI*sa_x*b/(sa_z*sa_z*n*a*a*alpha)*z*z*Math.log(1/(1+n*A*a*a*alpha*Math.exp(-z*z/(2*sa_z))/b));
+    		
+    		return part1+part2;
+
+    	}
+    	
+    	
+    	
+    	
     }
 
 }

@@ -169,8 +169,6 @@ public class ConvexHullByLabelFilter extends Filter {
 				
 			} while (!visited.contains(currentIndex));
 
-            //System.out.println(angles.toString());
-
 			//hull vertices have now been determined .. need to fill in the lines
 			//between them so I can apply a fill filter
 			

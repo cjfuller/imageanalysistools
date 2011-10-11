@@ -37,6 +37,8 @@ package edu.stanford.cfuller.imageanalysistools.image;
  */
 public class ReadOnlyImage extends Image {
 
+	//TODO: consider whether this class should be a superclass of Image (or whether some other arrangement of the heirarchy might be better? both extend AbstractImage, for example? Or explicitly call Image WritableImage?)
+	
 	final static long serialVersionUID = 1L;
     
     public ReadOnlyImage(loci.formats.meta.IMetadata m, PixelData p) {

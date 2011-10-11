@@ -848,6 +848,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		} catch (ome.xml.model.enums.EnumerationException e) {
 			e.printStackTrace();
 		}
+		
 		try {
 			this.metadata.setPixelsDimensionOrder(ome.xml.model.enums.DimensionOrder.fromString(this.pixelData.getDimensionOrder().toUpperCase()), 0);
 		} catch (ome.xml.model.enums.EnumerationException e) {
