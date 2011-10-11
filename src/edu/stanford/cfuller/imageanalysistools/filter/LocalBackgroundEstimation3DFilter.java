@@ -168,7 +168,54 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 					
 				} else if (y > 0) {
 					
-					//TODO implement this instead of complete calculation for the first column
+					lastCoordinate.set(ImageCoordinate.Y, y-1);
+					
+					count = (int) counts.getValue(lastCoordinate);
+					
+					sum = im.getValue(lastCoordinate) * count;
+					
+					boxMin.set(ImageCoordinate.X, x - boxSize);
+					boxMin.set(ImageCoordinate.Y, y - boxSize - 1);
+					boxMin.set(ImageCoordinate.Z, z - boxSize);
+					
+					boxMax.set(ImageCoordinate.X, i.get(ImageCoordinate.X) + boxSize+1);
+					boxMax.set(ImageCoordinate.Y, y-boxSize);
+					boxMax.set(ImageCoordinate.Z, i.get(ImageCoordinate.Z) + boxSize+1);
+					
+					this.referenceImage.setBoxOfInterest(boxMin, boxMax);
+										
+					for (ImageCoordinate iBox : this.referenceImage) {
+												
+						sum -= this.referenceImage.getValue(iBox);
+						count--;
+						
+					}
+					
+					this.referenceImage.clearBoxOfInterest();
+					
+					boxMin.set(ImageCoordinate.X, x+boxSize);
+					boxMax.set(ImageCoordinate.X, x+boxSize+1);
+					
+					this.referenceImage.setBoxOfInterest(boxMin, boxMax);
+
+					for (ImageCoordinate iBox : this.referenceImage) {
+						try {
+						sum += this.referenceImage.getValue(iBox);
+						count++;
+						} catch (ArrayIndexOutOfBoundsException e) {
+							System.err.println(iBox);
+							System.err.println(this.referenceImage.getDimensionSizes());
+							System.err.println(this.referenceImage.getBoxMax());
+							System.err.println(this.referenceImage.getBoxMin());
+							throw e;
+						}
+						
+					}
+					
+					im.setValue(i, sum/count);
+					counts.setValue(i, count);
+					
+					this.referenceImage.clearBoxOfInterest();
 					
 				} else if (z > 0) {
 					

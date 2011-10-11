@@ -32,7 +32,9 @@ import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresho
 import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
+import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 
 /**
@@ -67,7 +69,74 @@ public class CentromereFinding3DMethod extends Method {
 	public void go() {
 		this.parameters.setValueForKey("DEBUG", "true");
 
-		this.centromereFinding(this.images.get(0));
+		int referenceChannel = 0;
+		
+		if (this.parameters.hasKey("marker_channel_index")) {
+			referenceChannel = this.parameters.getIntValueForKey("marker_channel_index");
+		}
+		
+		this.centromereFinding(this.images.get(referenceChannel));
+		
+		//try grouping all objects, finding average intensity, segmenting into categories based on average intensity of objects
+		//(akin to reduce punctate background of the original centromere finder)
+		
+		Image result = this.getStoredImage();
+		Image reference = this.images.get(referenceChannel);
+		
+		Histogram h = new Histogram(result);
+		
+		int numRegions = h.getMaxValue();
+		
+		double[] sums = new double[numRegions];
+		
+		java.util.Arrays.fill(sums, 0.0);
+				
+		for (ImageCoordinate ic : result) {
+			
+			int value = (int) result.getValue(ic);
+			
+			if (value == 0) continue;
+			
+			sums[value-1] += reference.getValue(ic);
+			
+		}
+		
+		//construct an image, one pixel per region, containing each region's average value
+		
+		ImageCoordinate dimensionSizes = ImageCoordinate.createCoordXYZCT(numRegions, 1,1,1,1);
+		
+		Image meanValues = new Image(dimensionSizes, 0.0);
+		
+		for (ImageCoordinate ic : meanValues) {
+			meanValues.setValue(ic, sums[ic.get(ImageCoordinate.X)]/h.getCounts(ic.get(ImageCoordinate.X) + 1));
+		}
+		
+		dimensionSizes.recycle();
+		
+		//segment the image
+		
+		MaximumSeparabilityThresholdingFilter MSTF = new MaximumSeparabilityThresholdingFilter();
+		
+		MSTF.apply(meanValues);
+		
+		//filter based on the average value segmentation
+		
+		for (ImageCoordinate ic : result) {
+			
+			ImageCoordinate ic2 = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
+			
+			int value = (int) result.getValue(ic);
+			
+			if (value == 0) continue;
+			
+			ic2.set(ImageCoordinate.X, value - 1);
+			
+			if (meanValues.getValue(ic2) == 0.0) {
+				result.setValue(ic, 0);
+			}
+			
+		}
+		
 	}
 	
 	protected Image centromereFinding(Image input) {
