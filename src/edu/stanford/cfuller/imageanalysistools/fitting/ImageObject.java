@@ -190,87 +190,106 @@ public abstract class ImageObject implements Serializable {
 
 		//System.out.println("for object " + label + " centroid is: " + this.centroidInMask.toString());
 
-				int xcoord = (int) Math.round(this.centroidInMask.getX() - p.getIntValueForKey("half_box_size"));
-				int ycoord = (int) Math.round(this.centroidInMask.getY() - p.getIntValueForKey("half_box_size"));
+		int xcoord = (int) Math.round(this.centroidInMask.getX() - p.getIntValueForKey("half_box_size"));
+		int ycoord = (int) Math.round(this.centroidInMask.getY() - p.getIntValueForKey("half_box_size"));
 
-				if (xcoord < 0) {xcoord = 0;}
-				if (ycoord < 0) {ycoord = 0;}
+		if (xcoord < 0) {xcoord = 0;}
+		if (ycoord < 0) {ycoord = 0;}
 
-				this.parentBoxMin = ImageCoordinate.createCoordXYZCT(xcoord, ycoord, 0, 0, 0);
+		this.parentBoxMin = ImageCoordinate.createCoordXYZCT(xcoord, ycoord, 0, 0, 0);
 
-				xcoord = (int) Math.round(this.centroidInMask.getX() + p.getIntValueForKey("half_box_size"))+1;
-				ycoord = (int) Math.round(this.centroidInMask.getY() + p.getIntValueForKey("half_box_size"))+1;
+		xcoord = (int) Math.round(this.centroidInMask.getX() + p.getIntValueForKey("half_box_size"))+1;
+		ycoord = (int) Math.round(this.centroidInMask.getY() + p.getIntValueForKey("half_box_size"))+1;
 
-				if (xcoord > mask.getDimensionSizes().get(ImageCoordinate.X)) {xcoord = mask.getDimensionSizes().get(ImageCoordinate.X);}
-				if (ycoord > mask.getDimensionSizes().get(ImageCoordinate.Y)) {ycoord = mask.getDimensionSizes().get(ImageCoordinate.Y);}
+		if (xcoord > mask.getDimensionSizes().get(ImageCoordinate.X)) {xcoord = mask.getDimensionSizes().get(ImageCoordinate.X);}
+		if (ycoord > mask.getDimensionSizes().get(ImageCoordinate.Y)) {ycoord = mask.getDimensionSizes().get(ImageCoordinate.Y);}
 
-				this.parentBoxMax = ImageCoordinate.createCoordXYZCT(xcoord, ycoord, parent.getDimensionSizes().get(ImageCoordinate.Z), parent.getDimensionSizes().get(ImageCoordinate.C), parent.getDimensionSizes().get(ImageCoordinate.T));
+		this.parentBoxMax = ImageCoordinate.createCoordXYZCT(xcoord, ycoord, parent.getDimensionSizes().get(ImageCoordinate.Z), parent.getDimensionSizes().get(ImageCoordinate.C), parent.getDimensionSizes().get(ImageCoordinate.T));
+
+		//handle either 2D or 3D masks
+
+		//2D case:
+
+		if (mask.getDimensionSizes().get(ImageCoordinate.Z) == 1) {
 
 
-				//find the max intensity pixel in each channel and use this to refine the box
+			//find the max intensity pixel in each channel and use this to refine the box
 
-				this.maxIntensityZCoordByChannel = new int[parent.getDimensionSizes().get(ImageCoordinate.C)];
+			this.maxIntensityZCoordByChannel = new int[parent.getDimensionSizes().get(ImageCoordinate.C)];
 
-				int minZOverall = parent.getDimensionSizes().get(ImageCoordinate.Z);
-				int maxZOverall = 0;
+			int minZOverall = parent.getDimensionSizes().get(ImageCoordinate.Z);
+			int maxZOverall = 0;
 
-				//for (int c = 0; c < parent.getDimensionSizes().getC(); c++) {
-				this.numberOfChannels = p.getIntValueForKey("num_wavelengths"); // use this so that if there's extra wavelengths not to be quantified at the end, these won't skew the initial guess
+			//for (int c = 0; c < parent.getDimensionSizes().getC(); c++) {
+			this.numberOfChannels = p.getIntValueForKey("num_wavelengths"); // use this so that if there's extra wavelengths not to be quantified at the end, these won't skew the initial guess
 
-				for (int c = 0; c < this.numberOfChannels; c++) { 
-					this.parentBoxMin.set(ImageCoordinate.C,c);
-					this.parentBoxMax.set(ImageCoordinate.C,c+1);
+			for (int c = 0; c < this.numberOfChannels; c++) { 
+				this.parentBoxMin.set(ImageCoordinate.C,c);
+				this.parentBoxMax.set(ImageCoordinate.C,c+1);
 
-					parent.setBoxOfInterest(this.parentBoxMin, this.parentBoxMax);
+				parent.setBoxOfInterest(this.parentBoxMin, this.parentBoxMax);
 
-					double maxValue = 0;
-					ImageCoordinate maxCoord = null;
+				double maxValue = 0;
+				ImageCoordinate maxCoord = null;
 
-					for (ImageCoordinate ic : parent) {
+				for (ImageCoordinate ic : parent) {
 
-						if (! ( ic.get(ImageCoordinate.X) == (int) Math.round(this.centroidInMask.getX())) || ! ( ic.get(ImageCoordinate.Y) == (int) Math.round(this.centroidInMask.getY()))) {
-							continue;
-						}
-
-						if (parent.getValue(ic) > maxValue) {
-							maxValue = parent.getValue(ic);
-							if (maxCoord != null) maxCoord.recycle();
-							maxCoord = ImageCoordinate.cloneCoord(ic);
-						}
-
+					if (! ( ic.get(ImageCoordinate.X) == (int) Math.round(this.centroidInMask.getX())) || ! ( ic.get(ImageCoordinate.Y) == (int) Math.round(this.centroidInMask.getY()))) {
+						continue;
 					}
 
-					if (maxCoord == null) continue;
+					if (parent.getValue(ic) > maxValue) {
+						maxValue = parent.getValue(ic);
+						if (maxCoord != null) maxCoord.recycle();
+						maxCoord = ImageCoordinate.cloneCoord(ic);
+					}
 
-					if (maxCoord.get(ImageCoordinate.Z) > maxZOverall) maxZOverall = maxCoord.get(ImageCoordinate.Z);
-					if (maxCoord.get(ImageCoordinate.Z) < minZOverall) minZOverall = maxCoord.get(ImageCoordinate.Z);
-
-					this.maxIntensityZCoordByChannel[c] = maxCoord.get(ImageCoordinate.Z);
-
-					maxCoord.recycle();
-
-					parent.clearBoxOfInterest();
 				}
 
-				if (minZOverall > maxZOverall){
-					minZOverall = 0;
-					maxZOverall = 0;
-					java.util.logging.Logger.getLogger("edu.stanford.cfuller.colocalization3d").warning("Problem when calculating Z range of image stack.");
-				}
+				if (maxCoord == null) continue;
 
-				int zAverage = (minZOverall+maxZOverall)/2;
+				if (maxCoord.get(ImageCoordinate.Z) > maxZOverall) maxZOverall = maxCoord.get(ImageCoordinate.Z);
+				if (maxCoord.get(ImageCoordinate.Z) < minZOverall) minZOverall = maxCoord.get(ImageCoordinate.Z);
 
-				int zcoord = 0;
+				this.maxIntensityZCoordByChannel[c] = maxCoord.get(ImageCoordinate.Z);
 
-				this.parentBoxMin.set(ImageCoordinate.C,0);
-				zcoord = zAverage - p.getIntValueForKey("half_z_size");
-				if (zcoord < 0) zcoord = 0;
-				this.parentBoxMin.set(ImageCoordinate.Z,zcoord);
+				maxCoord.recycle();
 
-				this.parentBoxMax.set(ImageCoordinate.C,parent.getDimensionSizes().get(ImageCoordinate.C));
-				zcoord = zAverage + p.getIntValueForKey("half_z_size")+1;
-				if (zcoord > parent.getDimensionSizes().get(ImageCoordinate.Z)) zcoord = parent.getDimensionSizes().get(ImageCoordinate.Z);
-				this.parentBoxMax.set(ImageCoordinate.Z,zcoord);
+				parent.clearBoxOfInterest();
+			}
+
+			if (minZOverall > maxZOverall){
+				minZOverall = 0;
+				maxZOverall = 0;
+				java.util.logging.Logger.getLogger("edu.stanford.cfuller.colocalization3d").warning("Problem when calculating Z range of image stack.");
+			}
+
+			int zAverage = (minZOverall+maxZOverall)/2;
+
+			int zcoord = 0;
+
+			this.parentBoxMin.set(ImageCoordinate.C,0);
+			zcoord = zAverage - p.getIntValueForKey("half_z_size");
+			if (zcoord < 0) zcoord = 0;
+			this.parentBoxMin.set(ImageCoordinate.Z,zcoord);
+
+			this.parentBoxMax.set(ImageCoordinate.C,parent.getDimensionSizes().get(ImageCoordinate.C));
+			zcoord = zAverage + p.getIntValueForKey("half_z_size")+1;
+			if (zcoord > parent.getDimensionSizes().get(ImageCoordinate.Z)) zcoord = parent.getDimensionSizes().get(ImageCoordinate.Z);
+			this.parentBoxMax.set(ImageCoordinate.Z,zcoord);
+
+		} else { //3D mask
+			
+			int zcoord = (int) Math.round(this.centroidInMask.getZ() - p.getIntValueForKey("half_z_size"));
+			if (zcoord < 0) {zcoord = 0;}
+			
+			this.parentBoxMin.set(ImageCoordinate.Z, zcoord);
+			
+			zcoord = (int) Math.round(this.centroidInMask.getZ() + p.getIntValueForKey("half_z_size") + 1);
+			
+			this.parentBoxMax.set(ImageCoordinate.Z, zcoord);
+			
+		}
 	}
 
 
@@ -529,7 +548,7 @@ public abstract class ImageObject implements Serializable {
 		return this.scalarDifferencesBetweenChannels.get(key);
 
 	}
-	
+
 	public String writeToXMLString() {
 		StringWriter sw = new StringWriter();
 		try {
@@ -540,7 +559,7 @@ public abstract class ImageObject implements Serializable {
 		}
 		return sw.toString();
 	}
-	
+
 	public void writeToXML(XMLStreamWriter xsw) {
 
 		try {
@@ -549,7 +568,7 @@ public abstract class ImageObject implements Serializable {
 			xsw.writeAttribute(LABEL_ATTR, Integer.toString(this.label));
 			xsw.writeAttribute(IMAGE_ATTR, this.imageID);
 			xsw.writeCharacters("\n");
-			
+
 			for (int i = 0; i < this.numberOfChannels; i++) {
 				xsw.writeStartElement(CHANNEL_ELEMENT);
 				xsw.writeAttribute(CH_ID_ATTR, Integer.toString(i));
@@ -574,7 +593,7 @@ public abstract class ImageObject implements Serializable {
 			}
 			xsw.writeStartElement(SERIAL_ELEMENT);
 			xsw.writeAttribute(ENCODING_ATTR, ENCODING_NAME);
-			
+
 			ByteArrayOutputStream bytesOutput = new ByteArrayOutputStream();
 
 			try {
@@ -595,9 +614,9 @@ public abstract class ImageObject implements Serializable {
 
 
 			xsw.writeCharacters("\n");
-			
+
 			xsw.writeEndElement(); //object
-			
+
 			xsw.writeCharacters("\n");
 
 

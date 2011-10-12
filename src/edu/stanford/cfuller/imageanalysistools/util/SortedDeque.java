@@ -46,7 +46,7 @@ import java.util.NoSuchElementException;
  * end and element is removed; addFirst pushes an element off the end; addLast pushes an element off the front.
  * 
  * 
- * @author cfuller
+ * @author Colin J. Fuller
  *
  */
 public class SortedDeque<E extends Comparable<E> > implements Deque<E>, List<E> {
