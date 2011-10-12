@@ -30,6 +30,7 @@ import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.LocalBackgroundEstimation3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.RegionMaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
@@ -77,66 +78,6 @@ public class CentromereFinding3DMethod extends Method {
 		
 		this.centromereFinding(this.images.get(referenceChannel));
 		
-		//try grouping all objects, finding average intensity, segmenting into categories based on average intensity of objects
-		//(akin to reduce punctate background of the original centromere finder)
-		
-		Image result = this.getStoredImage();
-		Image reference = this.images.get(referenceChannel);
-		
-		Histogram h = new Histogram(result);
-		
-		int numRegions = h.getMaxValue();
-		
-		double[] sums = new double[numRegions];
-		
-		java.util.Arrays.fill(sums, 0.0);
-				
-		for (ImageCoordinate ic : result) {
-			
-			int value = (int) result.getValue(ic);
-			
-			if (value == 0) continue;
-			
-			sums[value-1] += reference.getValue(ic);
-			
-		}
-		
-		//construct an image, one pixel per region, containing each region's average value
-		
-		ImageCoordinate dimensionSizes = ImageCoordinate.createCoordXYZCT(numRegions, 1,1,1,1);
-		
-		Image meanValues = new Image(dimensionSizes, 0.0);
-		
-		for (ImageCoordinate ic : meanValues) {
-			meanValues.setValue(ic, sums[ic.get(ImageCoordinate.X)]/h.getCounts(ic.get(ImageCoordinate.X) + 1));
-		}
-		
-		dimensionSizes.recycle();
-		
-		//segment the image
-		
-		MaximumSeparabilityThresholdingFilter MSTF = new MaximumSeparabilityThresholdingFilter();
-		
-		MSTF.apply(meanValues);
-		
-		//filter based on the average value segmentation
-		
-		for (ImageCoordinate ic : result) {
-			
-			ImageCoordinate ic2 = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
-			
-			int value = (int) result.getValue(ic);
-			
-			if (value == 0) continue;
-			
-			ic2.set(ImageCoordinate.X, value - 1);
-			
-			if (meanValues.getValue(ic2) == 0.0) {
-				result.setValue(ic, 0);
-			}
-			
-		}
-		
 	}
 	
 	protected Image centromereFinding(Image input) {
@@ -154,6 +95,8 @@ public class CentromereFinding3DMethod extends Method {
         filters.add(new RecursiveMaximumSeparability3DFilter());
         filters.add(new RelabelFilter());
         filters.add(new SizeAbsoluteFilter());
+        filters.add(new RelabelFilter());
+        filters.add(new RegionMaximumSeparabilityThresholdingFilter());
         filters.add(new RelabelFilter());
 
         for (Filter i : filters){
