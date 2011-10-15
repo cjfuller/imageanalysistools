@@ -139,6 +139,41 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		}
         
 	}
+	
+	/**
+	 * Constructs a new Image from a java standard BufferedImage.
+	 * 
+	 * @param bufferedImage		The BufferedImage to convert to an Image.
+	 */
+	public Image(BufferedImage bufferedImage) {
+		
+		int size_x = bufferedImage.getWidth();
+		int size_y = bufferedImage.getHeight();
+		int size_z = 1;
+		int size_c = bufferedImage.getRaster().getNumBands();
+		int size_t = 1;
+		
+		ImageCoordinate dimensionSizes = ImageCoordinate.createCoordXYZCT(size_x, size_y, size_z, size_c, size_t);
+		
+		this.isBoxed = false;
+        this.boxMin = null;
+        this.boxMax = null;
+        this.coordinateArrayStorage = null;
+        this.dimensionSizes = ImageCoordinate.cloneCoord(dimensionSizes);
+		this.pixelData= (new PixelDataFactory()).createPixelData(dimensionSizes, loci.formats.FormatTools.UINT16, "XYZCT");
+		setupNewMetadata();
+		
+		dimensionSizes.recycle();
+		
+		for (ImageCoordinate i : this) {
+			int x = i.get(ImageCoordinate.X);
+			int y = i.get(ImageCoordinate.Y);
+			int c = i.get(ImageCoordinate.C);
+			
+			this.setValue(i, bufferedImage.getRaster().getSample(x, y, c));
+		}
+		
+	}
 
     /**
      * Default constructor that subclasses may use to do the initialization themselves.
@@ -472,14 +507,23 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
             
             //set the channel name for this new single channel image
             String channelName = "";
-            if (useID) {
-                channelName = this.metadata.getChannelID(series_number, i);
-            }
-            if (useWavelengths) {
-                channelName = this.metadata.getChannelExcitationWavelength(series_number, i) + "/" + this.metadata.getChannelEmissionWavelength(series_number, i);
-            }
-            if (useName) {
-                channelName = this.metadata.getChannelName(series_number, i);
+            
+            try {
+	            if (useID) {
+	                channelName = this.metadata.getChannelID(series_number, i);
+	            }
+	            if (useWavelengths) {
+	                channelName = this.metadata.getChannelExcitationWavelength(series_number, i) + "/" + this.metadata.getChannelEmissionWavelength(series_number, i);
+	            }
+	            if (useName) {
+	                channelName = this.metadata.getChannelName(series_number, i);
+	            }
+            } catch (IndexOutOfBoundsException e) {
+            	try {
+	                channelName = this.metadata.getChannelName(series_number, i);
+            	} catch (IndexOutOfBoundsException e2) {
+            		channelName = Integer.toString(i);
+            	}
             }
 
             newChannelImage.getMetadata().setChannelName(channelName, 0, 0);
