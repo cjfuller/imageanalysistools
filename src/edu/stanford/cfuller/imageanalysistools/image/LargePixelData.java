@@ -115,14 +115,6 @@ public class LargePixelData extends PixelData {
 		this.size_c = size_c;
 		this.size_t = size_t;
 
-		//while converting to images of arbitrary dimension, some of these could be zero.  A temporary fix, making sure each dimension is at least 1
-		//TODO: remove
-		if (this.size_x == 0) this.size_x = 1;
-		if (this.size_y == 0) this.size_y = 1;
-		if (this.size_z == 0) this.size_z = 1;
-		if (this.size_c == 0) this.size_c = 1;
-		if (this.size_t == 0) this.size_t = 1;
-
 		convertedPixels = new double[size_x*size_y];
 
 

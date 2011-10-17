@@ -50,9 +50,7 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 	 */
 	@Override
 	public void apply(Image im) {
-		
-		System.out.println(im.getDimensionSizes());
-		
+				
 		//need a heuristic to figure out whether this is in fact necessary (due to a lot of noise) or not, and will discard a lot
 		//of good regions.
 		
@@ -234,23 +232,18 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		
 		Image result = im;
 		
-		System.out.println("start");
 		
-		System.out.println(result.getDimensionSizes());
 		
 		Image reference = this.referenceImage;
 		
-		System.out.println(result.getDimensionSizes());
 
 		
 		Histogram h = new Histogram(result);
 
-		System.out.println(result.getDimensionSizes());
 
 		
 		int numRegions = h.getMaxValue();
 		
-		System.out.println(result.getDimensionSizes());
 
 		
 		double[] sums = new double[numRegions];
@@ -267,7 +260,6 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 			
 		}
 		
-		System.out.println(result.getDimensionSizes());
 
 		
 		//construct an image, one pixel per region, containing each region's average value
@@ -276,7 +268,6 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		
 		Image meanValues = new Image(dimensionSizes, 0.0);
 		
-		System.out.println(result.getDimensionSizes());
 
 		
 		for (ImageCoordinate ic : meanValues) {
@@ -285,7 +276,6 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		
 		dimensionSizes.recycle();
 		
-		System.out.println(result.getDimensionSizes());
 
 		
 		//segment the image
@@ -294,7 +284,6 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		
 		MSTF.apply(meanValues);
 		
-		System.out.println(result.getDimensionSizes());
 
 		
 		//filter based on the average value segmentation
@@ -315,7 +304,6 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 			
 		}
 		
-		System.out.println(result.getDimensionSizes());
 
 	}
 

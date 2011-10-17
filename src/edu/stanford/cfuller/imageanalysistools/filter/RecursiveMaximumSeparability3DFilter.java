@@ -114,6 +114,7 @@ public class RecursiveMaximumSeparability3DFilter extends Filter {
 			
 			for (ImageCoordinate c : im) {
 				if (remove[(int) im.getValue(c)]) {
+					
 					im.setValue(c, 0);
 				}
 			}

@@ -189,7 +189,7 @@ public class VariableSizeMeanFilter extends Filter {
 			
 		}
 		
-		residual.writeToFile("/Users/cfuller/Desktop/residual.ome.tif");
+		//residual.writeToFile("/Users/cfuller/Desktop/residual.ome.tif");
 		
 		//perform an octtree segmentation of the Image, using a criterion based on relative variance of image and noise
 		
@@ -247,7 +247,7 @@ public class VariableSizeMeanFilter extends Filter {
 			
 		}
 		
-		im.writeToFile("/Users/cfuller/Desktop/filtered.ome.tif");
+		//im.writeToFile("/Users/cfuller/Desktop/filtered.ome.tif");
 		
 		
 	}
