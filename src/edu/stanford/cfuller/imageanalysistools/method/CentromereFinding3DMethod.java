@@ -32,10 +32,10 @@ import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresho
 import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RegionMaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
-import edu.stanford.cfuller.imageanalysistools.image.Histogram;
+import edu.stanford.cfuller.imageanalysistools.filter.VariableSizeMeanFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
-import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 
 /**
@@ -84,10 +84,10 @@ public class CentromereFinding3DMethod extends Method {
 
         java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
         
-        LocalBackgroundEstimation3DFilter LBE3F = new LocalBackgroundEstimation3DFilter();
+        //LocalBackgroundEstimation3DFilter LBE3F = new LocalBackgroundEstimation3DFilter();
         
-        LBE3F.setBoxSize(5);
-
+        Renormalization3DFilter LBE3F = new Renormalization3DFilter();
+       
         
         filters.add(LBE3F);
         filters.add(new MaximumSeparabilityThresholdingFilter());
@@ -101,7 +101,7 @@ public class CentromereFinding3DMethod extends Method {
 
         for (Filter i : filters){
             i.setParameters(this.parameters);
-            i.setReferenceImage(this.images.get(0));
+            i.setReferenceImage(this.images.get(1));
         }
 
         Image toProcess = new Image(input);

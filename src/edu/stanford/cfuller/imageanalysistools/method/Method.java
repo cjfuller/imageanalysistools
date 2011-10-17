@@ -82,6 +82,9 @@ public abstract class Method implements Runnable {
 		if (m != null) {
 			this.storedDataOutput = m.quantify(toProcess, this.imageSet);
 		}
+		
+		System.out.println(toProcess.getDimensionSizes());
+		
 		this.storeImageOutput(new Image(toProcess));
 		
 		this.parameters.addIfNotSet("background_calculated", "false");

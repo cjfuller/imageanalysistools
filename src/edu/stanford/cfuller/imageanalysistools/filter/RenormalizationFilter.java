@@ -65,7 +65,7 @@ public class RenormalizationFilter extends Filter {
 		Image input = this.referenceImage;
 		Image output = im;
 
-		LocalBackgroundEstimationFilter LBEF = new LocalBackgroundEstimationFilter();
+		LocalBackgroundEstimationFilter LBEF = new LocalBackgroundEstimationFilter();		
 		
 		LBEF.setParameters(this.params);
 		LBEF.setReferenceImage(input);
