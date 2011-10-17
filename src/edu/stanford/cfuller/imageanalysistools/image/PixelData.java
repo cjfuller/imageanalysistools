@@ -117,7 +117,6 @@ public class PixelData implements java.io.Serializable {
 	protected void init(int size_x, int size_y, int size_z, int size_c, int size_t, String dimensionOrder) {
 
 		dimensionOrder = dimensionOrder.toUpperCase();
-		convertedPixels = new double[size_x*size_y*size_z*size_c*size_t];
 		pixels = null;
 		
 		dimensionSizes = new java.util.Hashtable<String, Integer>();
@@ -127,6 +126,8 @@ public class PixelData implements java.io.Serializable {
 		this.size_z = size_z;
 		this.size_c = size_c;
 		this.size_t = size_t;
+		
+		convertedPixels = new double[this.size_x*this.size_y*this.size_z*this.size_c*this.size_t];
 		
 		dimensionSizes.put("X", size_x);
 		dimensionSizes.put("Y", size_y);

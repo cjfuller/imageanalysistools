@@ -50,7 +50,7 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 	 */
 	@Override
 	public void apply(Image im) {
-		
+				
 		//need a heuristic to figure out whether this is in fact necessary (due to a lot of noise) or not, and will discard a lot
 		//of good regions.
 		
@@ -81,9 +81,9 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 //			}
 //		}
 		
-		java.util.Map<Integer, ImageCoordinate> lowerCoordinates = new java.util.HashMap<Integer, ImageCoordinate>();
-		java.util.Map<Integer, ImageCoordinate> upperCoordinates = new java.util.HashMap<Integer, ImageCoordinate>();
-		
+//		java.util.Map<Integer, ImageCoordinate> lowerCoordinates = new java.util.HashMap<Integer, ImageCoordinate>();
+//		java.util.Map<Integer, ImageCoordinate> upperCoordinates = new java.util.HashMap<Integer, ImageCoordinate>();
+//		
 		double fgAvg = 0;
 		double bgAvg = 0;
 		int fgCount = 0;
@@ -141,82 +141,82 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		
 		
 		
-		for (Integer key : lowerCoordinates.keySet()) {
-			
-			lowerCoordinates.get(key).set(ImageCoordinate.X, lowerCoordinates.get(key).get(ImageCoordinate.X) - 5);
-			lowerCoordinates.get(key).set(ImageCoordinate.Y, lowerCoordinates.get(key).get(ImageCoordinate.Y) - 5);
-			lowerCoordinates.get(key).set(ImageCoordinate.Z, lowerCoordinates.get(key).get(ImageCoordinate.Z) - 5);
-			
-			upperCoordinates.get(key).set(ImageCoordinate.X, upperCoordinates.get(key).get(ImageCoordinate.X) + 6);
-			upperCoordinates.get(key).set(ImageCoordinate.Y, upperCoordinates.get(key).get(ImageCoordinate.Y) + 6);
-			upperCoordinates.get(key).set(ImageCoordinate.Z, upperCoordinates.get(key).get(ImageCoordinate.Z) + 6);
-			upperCoordinates.get(key).set(ImageCoordinate.C, upperCoordinates.get(key).get(ImageCoordinate.C) + 1);
-			upperCoordinates.get(key).set(ImageCoordinate.T, upperCoordinates.get(key).get(ImageCoordinate.T) + 1);
-
-		}
-
-		int count = 0;
-		double average = 0;
+//		for (Integer key : lowerCoordinates.keySet()) {
+//			
+//			lowerCoordinates.get(key).set(ImageCoordinate.X, lowerCoordinates.get(key).get(ImageCoordinate.X) - 5);
+//			lowerCoordinates.get(key).set(ImageCoordinate.Y, lowerCoordinates.get(key).get(ImageCoordinate.Y) - 5);
+//			lowerCoordinates.get(key).set(ImageCoordinate.Z, lowerCoordinates.get(key).get(ImageCoordinate.Z) - 5);
+//			
+//			upperCoordinates.get(key).set(ImageCoordinate.X, upperCoordinates.get(key).get(ImageCoordinate.X) + 6);
+//			upperCoordinates.get(key).set(ImageCoordinate.Y, upperCoordinates.get(key).get(ImageCoordinate.Y) + 6);
+//			upperCoordinates.get(key).set(ImageCoordinate.Z, upperCoordinates.get(key).get(ImageCoordinate.Z) + 6);
+//			upperCoordinates.get(key).set(ImageCoordinate.C, upperCoordinates.get(key).get(ImageCoordinate.C) + 1);
+//			upperCoordinates.get(key).set(ImageCoordinate.T, upperCoordinates.get(key).get(ImageCoordinate.T) + 1);
+//
+//		}
+//
+//		int count = 0;
+//		double average = 0;
+//		
+//		for (Integer key : lowerCoordinates.keySet()) {
+//			
+//			ImageCoordinate firstCorner = lowerCoordinates.get(key);
+//			ImageCoordinate secondCorner = upperCoordinates.get(key);
+//			
+//			im.setBoxOfInterest(firstCorner, secondCorner);
+//			
+//			for (ImageCoordinate ic : im) {
+//				if (((int) im.getValue(ic)) == 0) {
+//					average += this.referenceImage.getValue(ic);
+//					count++;
+//				}
+//			}
+//			
+//			im.clearBoxOfInterest();
+//			
+//		}
+//		
+//		for (Integer key : lowerCoordinates.keySet()) {
+//			lowerCoordinates.get(key).recycle();
+//			upperCoordinates.get(key).recycle();
+//		}
+//		
+//		lowerCoordinates = null;
+//		upperCoordinates = null;
+//
+//		
+//		average/=count;
+//		
+//		Histogram href = new Histogram(this.referenceImage);
+//		
+//		int breakpoint = 0;
+//		
+//		int totalPixels = href.getTotalCounts() + href.getCounts(0);
+//		
+//		double average_1_10th = 0;
+//		
+//		for (int i = 0; i < href.getMaxValue(); i++) {
+//						
+//			if (href.getCumulativeCounts(i) > 0.1*totalPixels) {
+//				breakpoint = i-1;
+//				break;
+//			}
+//			
+//			average_1_10th += href.getCounts(i)*i;
+//			
+//		}
+//		
+//		int counts = href.getCumulativeCounts(breakpoint);
+//
+//		System.out.println("breakpoint: " + breakpoint + "   total pixels: " + totalPixels);
+//		
+//		average_1_10th += (((int) (0.1*totalPixels)) - counts)*(breakpoint + 1);
+//		
+//		average_1_10th /= ((int) (0.1*totalPixels));
+//		
+		double thresholdMultiplier = 5;
 		
-		for (Integer key : lowerCoordinates.keySet()) {
-			
-			ImageCoordinate firstCorner = lowerCoordinates.get(key);
-			ImageCoordinate secondCorner = upperCoordinates.get(key);
-			
-			im.setBoxOfInterest(firstCorner, secondCorner);
-			
-			for (ImageCoordinate ic : im) {
-				if (((int) im.getValue(ic)) == 0) {
-					average += this.referenceImage.getValue(ic);
-					count++;
-				}
-			}
-			
-			im.clearBoxOfInterest();
-			
-		}
-		
-		for (Integer key : lowerCoordinates.keySet()) {
-			lowerCoordinates.get(key).recycle();
-			upperCoordinates.get(key).recycle();
-		}
-		
-		lowerCoordinates = null;
-		upperCoordinates = null;
-
-		
-		average/=count;
-		
-		Histogram href = new Histogram(this.referenceImage);
-		
-		int breakpoint = 0;
-		
-		int totalPixels = href.getTotalCounts() + href.getCounts(0);
-		
-		double average_1_10th = 0;
-		
-		for (int i = 0; i < href.getMaxValue(); i++) {
-						
-			if (href.getCumulativeCounts(i) > 0.1*totalPixels) {
-				breakpoint = i-1;
-				break;
-			}
-			
-			average_1_10th += href.getCounts(i)*i;
-			
-		}
-		
-		int counts = href.getCumulativeCounts(breakpoint);
-
-		System.out.println("breakpoint: " + breakpoint + "   total pixels: " + totalPixels);
-		
-		average_1_10th += (((int) (0.1*totalPixels)) - counts)*(breakpoint + 1);
-		
-		average_1_10th /= ((int) (0.1*totalPixels));
-		
-		//double thresholdMultiplier = 5;
-		
-		double thresholdMultiplier = 0;
+		//double thresholdMultiplier = 0;
 		
 		boolean shouldApplyFilter = fgAvg < thresholdMultiplier*bgAvg;
 		
@@ -231,11 +231,20 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		//(akin to reduce punctate background of the original centromere finder)
 		
 		Image result = im;
+		
+		
+		
 		Image reference = this.referenceImage;
 		
+
+		
 		Histogram h = new Histogram(result);
+
+
 		
 		int numRegions = h.getMaxValue();
+		
+
 		
 		double[] sums = new double[numRegions];
 		
@@ -251,11 +260,15 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 			
 		}
 		
+
+		
 		//construct an image, one pixel per region, containing each region's average value
 		
 		ImageCoordinate dimensionSizes = ImageCoordinate.createCoordXYZCT(numRegions, 1,1,1,1);
 		
 		Image meanValues = new Image(dimensionSizes, 0.0);
+		
+
 		
 		for (ImageCoordinate ic : meanValues) {
 			meanValues.setValue(ic, sums[ic.get(ImageCoordinate.X)]/h.getCounts(ic.get(ImageCoordinate.X) + 1));
@@ -263,11 +276,15 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		
 		dimensionSizes.recycle();
 		
+
+		
 		//segment the image
 		
 		MaximumSeparabilityThresholdingFilter MSTF = new MaximumSeparabilityThresholdingFilter();
 		
 		MSTF.apply(meanValues);
+		
+
 		
 		//filter based on the average value segmentation
 		
@@ -286,6 +303,7 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 			}
 			
 		}
+		
 
 	}
 

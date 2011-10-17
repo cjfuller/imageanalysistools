@@ -27,6 +27,11 @@ package edu.stanford.cfuller.imageanalysistools.filter;
 import java.util.Deque;
 import java.util.List;
 
+import org.apache.commons.math.MathException;
+import org.apache.commons.math.distribution.FDistribution;
+import org.apache.commons.math.distribution.FDistributionImpl;
+
+import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -36,6 +41,12 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
  */
 public class VariableSizeMeanFilter extends Filter {
 
+	private int minBoxSize;
+	
+	public void setBoxSize(int size) {
+		this.minBoxSize = 2*size; //factor of 2 is because it may subdivide once beyond this
+	}
+	
 	protected class OcttreeNode {
 		
 		ImageCoordinate boxMin;
@@ -57,9 +68,11 @@ public class VariableSizeMeanFilter extends Filter {
 			
 			boolean succeeded = false;
 			
-			for (int dim = ImageCoordinate.X; dim <= ImageCoordinate.Z; dim++) { //TODO: fix this
+			//continue as long as we can subdivide at least on dimension
+			
+			for (int dim = ImageCoordinate.X; dim <= ImageCoordinate.Z; dim++) { //	TODO: fix this
 				
-				if (this.boxMin.get(dim) + 1 < this.boxMax.get(dim)) {
+				if (this.boxMin.get(dim) + minBoxSize < this.boxMax.get(dim)) {
 					succeeded = true;
 					break;
 				}
@@ -67,6 +80,8 @@ public class VariableSizeMeanFilter extends Filter {
 			}
 			
 			if (!succeeded) return succeeded;
+			
+			// loop over each dimension, dividing it into two
 			
 			for (int x = 0; x < 2; x++) {
 				
@@ -81,12 +96,29 @@ public class VariableSizeMeanFilter extends Filter {
 						ImageCoordinate boxMin_new = ImageCoordinate.cloneCoord(this.boxMin);
 						ImageCoordinate boxMax_new = ImageCoordinate.cloneCoord(this.boxMax);
 						
+						//continue if we can't divide this dimension and would otherwise put in two children with the same range
 						
+						boolean skip = false;
 						
 						for (int dim = ImageCoordinate.X; dim <= ImageCoordinate.Z; dim++) { //TODO: fix this
 						
-							if (this.boxMin.get(dim) + 1 >= this.boxMax.get(dim) && dim_mults[dim] == 0) continue;
-														
+							if (this.boxMin.get(dim) + minBoxSize >= this.boxMax.get(dim) && dim_mults[dim] == 0) {skip = true; break;}
+						
+						}
+						
+						if (skip) continue;
+						
+						//otherwise, divide
+						
+						for (int dim = ImageCoordinate.X; dim <= ImageCoordinate.Z; dim++) { //TODO: fix this
+						
+							//if we shouldn't divide this dimension, leave it the same size
+							if (this.boxMin.get(dim) + minBoxSize >= this.boxMax.get(dim)) {
+								continue;
+							}
+							
+							//divide the dimension
+							
 							boxMin_new.set(dim, this.boxMin.get(dim) + dim_mults[dim]*((this.boxMax.get(dim) - this.boxMin.get(dim))/2));
 							boxMax_new.set(dim, dim_mults[dim]*this.boxMax.get(dim) + (1-dim_mults[dim])*(this.boxMin.get(dim) + (1-dim_mults[dim])*((this.boxMax.get(dim) - this.boxMin.get(dim))/2)));
 							
@@ -94,7 +126,7 @@ public class VariableSizeMeanFilter extends Filter {
 						
 						//System.out.println("divided size: " + boxMin_new.toString() + " to " + boxMax_new.toString());
 
-						
+						//add new nodes for the divided children
 						children.add(new OcttreeNode(boxMin_new, boxMax_new));
 						
 					}
@@ -149,7 +181,7 @@ public class VariableSizeMeanFilter extends Filter {
 		
 		//for 2D, residual is sqrt(30)
 		
-		norm = Math.sqrt(30);
+		//norm = Math.sqrt(30);
 		
 		for (ImageCoordinate ic : residual) {
 			
@@ -157,11 +189,11 @@ public class VariableSizeMeanFilter extends Filter {
 			
 		}
 		
-		residual.writeToFile("/Users/cfuller/Desktop/residual.ome.tif");
+		//residual.writeToFile("/Users/cfuller/Desktop/residual.ome.tif");
 		
 		//perform an octtree segmentation of the Image, using a criterion based on relative variance of image and noise
 		
-		OcttreeNode root = new OcttreeNode(ImageCoordinate.createCoordXYZCT(0,0,0,0,0), im.getDimensionSizes());
+		OcttreeNode root = new OcttreeNode(ImageCoordinate.createCoordXYZCT(0,0,0,0,0), ImageCoordinate.cloneCoord(im.getDimensionSizes()));
 		
 		root.subDivide();
 		
@@ -211,9 +243,11 @@ public class VariableSizeMeanFilter extends Filter {
 				
 			}
 			
+			im.clearBoxOfInterest();
+			
 		}
 		
-		im.writeToFile("/Users/cfuller/Desktop/filtered.ome.tif");
+		//im.writeToFile("/Users/cfuller/Desktop/filtered.ome.tif");
 		
 		
 	}
@@ -259,8 +293,24 @@ public class VariableSizeMeanFilter extends Filter {
 		//System.out.print("coordinate from: " + node.getBoxMin().toString() + " to " + node.getBoxMax().toString() + "     ");
 		//System.out.printf("var: %f, l_var: %f\n", var, l_var);
 		
-		return (var > l_var*5 + 1e-3);
+		FDistribution f = new FDistributionImpl(count-1, count-1);
 		
+		double cutoff = 0.001;
+		
+		double smallerVar = var < l_var ? var : l_var;
+		double largerVar = var > l_var ? var : l_var;
+		try {
+			double valueAtLowerCutoff = f.inverseCumulativeProbability(cutoff);
+			double valueAtUpperCutoff = f.inverseCumulativeProbability(1-cutoff);
+			boolean result =  (smallerVar/largerVar > valueAtUpperCutoff || smallerVar/largerVar < valueAtLowerCutoff);
+			
+			//System.out.println("ratio: " + (smallerVar/largerVar) + "   cutoff: " + valueAtLowerCutoff + "     result: " + result);
+			return result;
+
+		} catch (MathException e) {
+			LoggingUtilities.getLogger().severe("Exception while calculating variable size mean QO partition: " + e.getMessage());
+			return false;
+		}
 	}
 
 }

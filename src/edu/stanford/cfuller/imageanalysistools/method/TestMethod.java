@@ -26,6 +26,7 @@ package edu.stanford.cfuller.imageanalysistools.method;
 
 
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
+import edu.stanford.cfuller.imageanalysistools.filter.RenormalizationFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.VariableSizeMeanFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 
@@ -42,20 +43,21 @@ public class TestMethod extends Method {
 	public void go() {
 
         java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
-//
-//        filters.add(new VariableSizeMeanFilter());
-//		
-//        for (Filter f : filters) {
-//            f.setParameters(this.parameters);
-//            f.setReferenceImage(this.images.get(0));
-//        }
+
+        filters.add(new RenormalizationFilter());
+		
+        for (Filter f : filters) {
+            f.setParameters(this.parameters);
+            f.setReferenceImage(this.images.get(0));
+        }
 
         Image toProcess = new Image(this.images.get(0));
-        java.awt.image.BufferedImage buffered = toProcess.toBufferedImage();
+        //java.awt.image.BufferedImage buffered = toProcess.toBufferedImage();
         
-        Image converted = new Image(buffered);
+        //Image converted = new Image(buffered);
 
-        iterateOnFiltersAndStoreResult(filters, converted, new edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric());
+        
+        iterateOnFiltersAndStoreResult(filters, new Image(toProcess), new edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric());
 
 	}
 
