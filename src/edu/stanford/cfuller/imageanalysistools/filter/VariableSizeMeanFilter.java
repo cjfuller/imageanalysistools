@@ -171,7 +171,9 @@ public class VariableSizeMeanFilter extends Filter {
 		
 		Image residual = new Image(im);
 		
-		LaplacianFilter LF = new LaplacianFilter();
+		LaplacianFilterND LF = new LaplacianFilterND();
+		
+		//LaplacianFilter LF = new LaplacianFilter();
 		
 		LF.apply(residual);
 		
@@ -188,10 +190,8 @@ public class VariableSizeMeanFilter extends Filter {
 			residual.setValue(ic, residual.getValue(ic)/norm);
 			
 		}
-		
-		//residual.writeToFile("/Users/cfuller/Desktop/residual.ome.tif");
-		
-		//perform an octtree segmentation of the Image, using a criterion based on relative variance of image and noise
+				
+		//perform an octtree segmentation of the Image, using a criterion based on relative variance of image and noise (as in Boulanger, 2010)
 		
 		OcttreeNode root = new OcttreeNode(ImageCoordinate.createCoordXYZCT(0,0,0,0,0), ImageCoordinate.cloneCoord(im.getDimensionSizes()));
 		
@@ -246,16 +246,12 @@ public class VariableSizeMeanFilter extends Filter {
 			im.clearBoxOfInterest();
 			
 		}
-		
-		//im.writeToFile("/Users/cfuller/Desktop/filtered.ome.tif");
-		
+				
 		
 	}
 	
 	protected boolean shouldSubDivide(OcttreeNode node, Image im, Image laplacianFiltered) {
-		
-		//TODO: implement this other than as simple comparison of magnitude
-		
+				
 		im.setBoxOfInterest(node.getBoxMin(), node.getBoxMax());
 		laplacianFiltered.setBoxOfInterest(node.getBoxMin(), node.getBoxMax());
 		
@@ -290,8 +286,6 @@ public class VariableSizeMeanFilter extends Filter {
 		im.clearBoxOfInterest();
 		laplacianFiltered.clearBoxOfInterest();
 		
-		//System.out.print("coordinate from: " + node.getBoxMin().toString() + " to " + node.getBoxMax().toString() + "     ");
-		//System.out.printf("var: %f, l_var: %f\n", var, l_var);
 		
 		FDistribution f = new FDistributionImpl(count-1, count-1);
 		
@@ -303,8 +297,6 @@ public class VariableSizeMeanFilter extends Filter {
 			double valueAtLowerCutoff = f.inverseCumulativeProbability(cutoff);
 			double valueAtUpperCutoff = f.inverseCumulativeProbability(1-cutoff);
 			boolean result =  (smallerVar/largerVar > valueAtUpperCutoff || smallerVar/largerVar < valueAtLowerCutoff);
-			
-			//System.out.println("ratio: " + (smallerVar/largerVar) + "   cutoff: " + valueAtLowerCutoff + "     result: " + result);
 			return result;
 
 		} catch (MathException e) {

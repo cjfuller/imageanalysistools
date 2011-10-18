@@ -115,7 +115,6 @@ public class CentromereFinding3DMethod extends Method {
         
         filters.add(LBE3F);
         LBE3F.setParameters(this.parameters);
-        LBE3F.setReferenceImage(this.images.get(1));
         
         Image QOSeg = new Image(input);
         LBE3F.apply(QOSeg);
