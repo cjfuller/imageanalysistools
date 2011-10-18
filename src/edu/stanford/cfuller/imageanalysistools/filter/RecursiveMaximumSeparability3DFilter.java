@@ -46,6 +46,8 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
  */
 public class RecursiveMaximumSeparability3DFilter extends Filter {
 
+	//TODO: this is slow; switch to be able to process a QOTree representation of an image directly.
+	
 	final int MAX_RECURSIONS = 3;
 	int numRecs;
 	
