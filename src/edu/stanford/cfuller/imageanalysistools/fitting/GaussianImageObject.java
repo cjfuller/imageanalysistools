@@ -299,6 +299,9 @@ public class GaussianImageObject extends ImageObject {
             
             double intpart = 0;
             try {
+            	
+            	if (b < 0) throw new FunctionEvaluationException(b, "negative background!"); // a negative value for b seems to cause the integration to hang, preventing the program from progressing
+            	
             	intpart = lgi.integrate(eif, -size, size);
             	
             	double fullIntPart = intpart + Math.pow(2*Math.PI, 1.5)*sa_x*A/Math.sqrt(sa_z);
@@ -316,12 +319,14 @@ public class GaussianImageObject extends ImageObject {
             	error_z = -1;
             }
             
-                        
-            error = Math.sqrt(2*error_x*error_x + error_z*error_z);
-            
-            //System.out.printf("%f, %f, %f, %f, %f, %f, %f\n", n_photons, b, Math.sqrt(sa_x), Math.sqrt(sa_z), error_x, error_z, error);            
 
+            if (error_x > 0 && error_z > 0) {
             
+            	error = Math.sqrt(2*error_x*error_x + error_z*error_z);
+            	
+            } else {
+            	error = Double.NaN;
+            }
             
             this.fitErrorByChannel.add(error);
             

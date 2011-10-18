@@ -74,9 +74,10 @@ public class GaussianFitter3D {
         NelderMeadMinimizer nmm = new NelderMeadMinimizer(tol);
         
         RealVector result = nmm.optimize(new MLObjectiveFunction(toFit, ppg), initialGuess);
-        
+        //System.out.println("for object " + toFit.getLabel() + " in image: " + toFit.getImageID() + " result iter 1 is: " + result.toString());
+
         result = nmm.optimize(new MLObjectiveFunction(toFit, ppg), result);
-        //System.out.println("for object " + toFit.getLabel() + " in image: " + toFit.getImageID() + " result is: " + result.toString());
+        //System.out.println("for object " + toFit.getLabel() + " in image: " + toFit.getImageID() + " result iter 2 is: " + result.toString());
 
         return result;
 
