@@ -24,12 +24,19 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
-import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
- * @author cfuller
+ * A filter that performs prefiltering on a 3D image to aid in segmentation.
+ * <p>
+ * Currently, this is just a wrapper around a box-size-1 {@link VariableSizeMeanFilter}.
+ * <p>
+ * The argument to the apply method should be the image to be filtered.
+ * <p>
+ * This filter does not use a reference Image.
+ * 
+ * 
+ * @author Colin J. Fuller
  *
  */
 public class Renormalization3DFilter extends Filter {
@@ -43,46 +50,6 @@ public class Renormalization3DFilter extends Filter {
 		VariableSizeMeanFilter VSMF = new VariableSizeMeanFilter();
 		VSMF.setBoxSize(1);
 		VSMF.apply(im);
-//		
-//		double minValue = Double.MAX_VALUE;
-//		double maxValue = 0;
-//		
-//		Histogram h = new Histogram(this.referenceImage);
-//				
-//		for (ImageCoordinate ic : im) {
-//			
-//			double value = this.referenceImage.getValue(ic)/(1+ im.getValue(ic));
-//			
-//			if (value < minValue) minValue = value;
-//			if (value > maxValue) maxValue = value;
-//			
-//			im.setValue(ic, value);
-//			
-//		}
-//		
-//		for (ImageCoordinate ic : im) {
-//			im.setValue(ic, ((im.getValue(ic) - minValue)/(maxValue - minValue))*(h.getMaxValue()));
-//		}
-//		
-//		im.writeToFile("/Users/cfuller/Desktop/normalized1.ome.tif");
-//		
-//		
-//		for (ImageCoordinate ic : im) {
-//			
-//			double value = this.referenceImage.getValue(ic)/(1+ im.getValue(ic));
-//			
-//			if (value < minValue) minValue = value;
-//			if (value > maxValue) maxValue = value;
-//			
-//			im.setValue(ic, value);
-//			
-//		}
-//		
-//		for (ImageCoordinate ic : im) {
-//			im.setValue(ic, ((im.getValue(ic) - minValue)/(maxValue - minValue))*(h.getMaxValue()));
-//		} 
-//		
-//		im.writeToFile("/Users/cfuller/Desktop/normalized2.ome.tif");
 
 		
 	}
