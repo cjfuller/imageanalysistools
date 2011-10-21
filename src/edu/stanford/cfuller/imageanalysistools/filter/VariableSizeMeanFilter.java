@@ -36,13 +36,33 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
- * @author cfuller
+ * Applies a QO-tree segmentation to an image and replaces pixel values with the
+ * mean over the leaf of the tree containing each pixel.  The size of the leaf
+ * is determined by comparing the variance of the noise to the variance of the
+ * pixel values.  (See the reference for the exact method.)
+ * <p>
+ * Reference: Boulanger et al., doi:10.1109/TMI.2009.2033991
+ * <p>
+ * The argument to the apply method should be the Image to which to apply the
+ * QOtree segmentation and mean filtering.
+ * <p>
+ * This filter does not use a reference Image.
+ * 
+ * @author Colin J. Fuller
  *
  */
 public class VariableSizeMeanFilter extends Filter {
 
 	private int minBoxSize;
 	
+	/**
+	 * Sets the minimum box size of the resulting segmentation.
+	 * <p>
+	 * The box size is the linear dimension of the smalles possible volume from
+	 * the QOTree segmentation.
+	 * 
+	 * @param size		The linear dimension of the box size.
+	 */
 	public void setBoxSize(int size) {
 		this.minBoxSize = 2*size; //factor of 2 is because it may subdivide once beyond this
 	}
@@ -61,9 +81,7 @@ public class VariableSizeMeanFilter extends Filter {
 		}
 		
 		public boolean subDivide() {
-			
-			//System.out.println("initial size: " + this.boxMin.toString() + " to " + this.boxMax.toString());
-						
+									
 			int[] dim_mults = new int[3];
 			
 			boolean succeeded = false;
@@ -124,8 +142,6 @@ public class VariableSizeMeanFilter extends Filter {
 							
 						}
 						
-						//System.out.println("divided size: " + boxMin_new.toString() + " to " + boxMax_new.toString());
-
 						//add new nodes for the divided children
 						children.add(new OcttreeNode(boxMin_new, boxMax_new));
 						
@@ -172,9 +188,7 @@ public class VariableSizeMeanFilter extends Filter {
 		Image residual = new Image(im);
 		
 		LaplacianFilterND LF = new LaplacianFilterND();
-		
-		//LaplacianFilter LF = new LaplacianFilter();
-		
+				
 		LF.apply(residual);
 		
 		//for 3D, residual is Laplacian divided by sqrt(56)

@@ -22,36 +22,12 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.filter;
-
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+package edu.stanford.cfuller.imageanalysistools.matching;
 
 /**
- * A filter that performs prefiltering on a 3D image to aid in segmentation.
- * <p>
- * Currently, this is just a wrapper around a box-size-1 {@link VariableSizeMeanFilter}.
- * <p>
- * The argument to the apply method should be the image to be filtered.
- * <p>
- * This filter does not use a reference Image.
- * 
- * 
- * @author Colin J. Fuller
+ * @author cfuller
  *
  */
-public class Renormalization3DFilter extends Filter {
-
-	/* (non-Javadoc)
-	 * @see edu.stanford.cfuller.imageanalysistools.filter.Filter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
-	 */
-	@Override
-	public void apply(Image im) {
-
-		VariableSizeMeanFilter VSMF = new VariableSizeMeanFilter();
-		VSMF.setBoxSize(1);
-		VSMF.apply(im);
-
-		
-	}
+public class KinetochoreMatcher {
 
 }
