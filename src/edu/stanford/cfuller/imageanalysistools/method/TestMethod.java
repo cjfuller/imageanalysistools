@@ -110,7 +110,7 @@ public class TestMethod extends Method {
         		if (i == j) {
         			weightMatrix.setEntry(i,j,0);
         		} else {
-        			weightMatrix.setEntry(i,j,getWeight(imageObjects.get(i).getPositionForChannel(0), imageObjects.get(j).getPositionForChannel(0), matchingChannel));
+        			weightMatrix.setEntry(i,j,getWeight(imageObjects.get(i).getPositionForChannel(0), imageObjects.get(j).getPositionForChannel(0), matchingChannel, mask, i+1, j+1));
         		}
         		
         		System.out.printf("%d --> %d: %f\n", i+1, j+1, weightMatrix.getEntry(i,j));
@@ -123,7 +123,7 @@ public class TestMethod extends Method {
         	System.out.print((i+1) + "--> " );
         	for (int j = 0; j < h.getMaxValue(); j++) {
         		if (distanceMatrix.getEntry(i,j) < cutoff) {
-        			System.out.printf("%d (%0.2f), ", (j+1), weightMatrix.getEntry(i,j));
+        			System.out.printf("%d (%1.2f), ", (j+1), weightMatrix.getEntry(i,j));
         		}
         	}
         	
@@ -143,7 +143,7 @@ public class TestMethod extends Method {
 
 	}
 	
-	double getWeight(RealVector pos0, RealVector pos1, Image weights) {
+	double getWeight(RealVector pos0, RealVector pos1, Image weights, Image mask, int label0, int label1) {
 		
 		ImageCoordinate boxLower = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 		ImageCoordinate boxUpper = ImageCoordinate.createCoordXYZCT(1,1,1,1,1);
@@ -170,38 +170,74 @@ public class TestMethod extends Method {
 		
 		weights.setBoxOfInterest(boxLower, boxUpper);
 		
-		RealVector currPos = new ArrayRealVector(3, 0.0);
 		RealVector unitVector = pos1.subtract(pos0);
 		unitVector.unitize();
 		
 		double weight = 0;
 		int count = 0;
 		
-		for (ImageCoordinate ic : weights) {
+		//try stepping on x; later, choose the best coordinate
+		
+		int startx = x0 < x1 ? x0 : x1;
+		int finishx = x0 > x1 ? x0 : x1;
+		
+		final int cutoff = 2;
+
+		
+		for (int x = (int) Math.floor(startx); x <= (int) Math.ceil(finishx); x+=2) {
 			
-			currPos.setEntry(0, ic.get(ImageCoordinate.X));
-			currPos.setEntry(1, ic.get(ImageCoordinate.Y));
-			currPos.setEntry(2, ic.get(ImageCoordinate.Z));
+			//calculate y, z at current x
+			
+			double mult = (x - startx)/unitVector.getEntry(0);
+			
+			RealVector currPos =  pos0.add(unitVector.mapMultiply(mult));
+			
+			boxLower.set(ImageCoordinate.X, x - 1);
+			boxUpper.set(ImageCoordinate.X, x + 2);
+			
+			boxLower.set(ImageCoordinate.Y, (int) Math.floor(currPos.getEntry(1)-cutoff));
+			boxUpper.set(ImageCoordinate.Y, (int) Math.ceil(currPos.getEntry(1) + cutoff));
+			
+			boxLower.set(ImageCoordinate.Z, (int) Math.floor(currPos.getEntry(2)-cutoff));
+			boxUpper.set(ImageCoordinate.Z, (int) Math.ceil(currPos.getEntry(2) + cutoff));
+			
+			weights.setBoxOfInterest(boxLower, boxUpper);
 			
 			RealVector posOffset = currPos.subtract(pos0);
 			
-			double dot = unitVector.dotProduct(posOffset);
-			
-			RealVector perpendicular = posOffset.subtract(unitVector.mapMultiply(dot));
-			
-			double distToPixel = perpendicular.getNorm();
-			
-			final double cutoff = 2*Math.sqrt(2);
-			
-			if (distToPixel < cutoff) {
-				weight += weights.getValue(ic);
-				count++;
+			for (ImageCoordinate ic : weights) {
+				
+				int value = (int) mask.getValue(ic);
+				
+				if (value != 0) continue; // don't count if we're still in the centromere or in a different one
+								
+				currPos.setEntry(0, ic.get(ImageCoordinate.X));
+				currPos.setEntry(1, ic.get(ImageCoordinate.Y));
+				currPos.setEntry(2, ic.get(ImageCoordinate.Z));
+				
+				
+				double dot = unitVector.dotProduct(posOffset);
+				
+				RealVector perpendicular = posOffset.subtract(unitVector.mapMultiply(dot));
+				
+				double distToPixel = perpendicular.getNorm();
+				
+				
+				if (distToPixel < cutoff) {
+					weight += weights.getValue(ic);
+					count++;
+				}
+				
+				
 			}
 			
+			weights.clearBoxOfInterest();
+
 			
 		}
 		
-		weights.clearBoxOfInterest();
+		
+		
 		
 		boxLower.recycle();
 		boxUpper.recycle();
