@@ -26,34 +26,43 @@ package edu.stanford.cfuller.imageanalysistools.fitting;
 
 import java.util.Vector;
 
-import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.FunctionEvaluationException;
-import org.apache.commons.math.analysis.integration.LegendreGaussIntegrator;
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
 
-import edu.stanford.cfuller.imageanalysistools.fitting.GaussianImageObject.ErrIntFunc;
-import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 
 /**
- * @author cfuller
+ * An image object of arbitrary shape whose position is determined by the
+ * (intensity-weighted) centroid over its region in a mask.
+ * 
+ * @author Colin J. Fuller
  *
  */
 public class CentroidImageObject extends ImageObject {
 
 	private static final long serialVersionUID = 1L;
 	
+	/**
+     * Creates a GaussianImageObject from the specified masked region in an Image.
+     * @param label     The greylevel of the object in the Image mask.
+     * @param mask      The mask of objects in the Image, with a unique greylevel assigned to each object.
+     * @param parent    The Image that the object occurs in and that is masked by mask.
+     * @param p         The parameters associated with this analysis.
+     */
 	public CentroidImageObject(int label, Image mask, Image parent, ParameterDictionary p) {
 		this.init(label, mask, parent, p);
 	}
 	
-	/* (non-Javadoc)
-	 * @see edu.stanford.cfuller.imageanalysistools.fitting.ImageObject#fitPosition(edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary)
-	 */
+	/**
+     * "Fits" this object to a position by finding its intensity-weighted
+     * centroid.  Does not compute error estimates, numbers of photons, etc.
+     * 
+     * @param p     The parameters for the current analysis.
+     */
 	@Override
 	public void fitPosition(ParameterDictionary p)
 			throws FunctionEvaluationException, OptimizationException {

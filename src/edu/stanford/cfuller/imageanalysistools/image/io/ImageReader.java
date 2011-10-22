@@ -174,6 +174,7 @@ public class ImageReader {
                 System.arraycopy(currPlane, 0, pixel_bytes,byte_position,currPlane.length);
 				byte_position += currPlane.length;
 			}
+			
 		} catch (loci.formats.FormatException e) {
 			e.printStackTrace();
 			return null;
