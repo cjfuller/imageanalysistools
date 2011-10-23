@@ -24,7 +24,19 @@
 
 package edu.stanford.cfuller.imageanalysistools.method;
 
+import edu.stanford.cfuller.imageanalysistools.filter.Filter;
+import edu.stanford.cfuller.imageanalysistools.filter.KernelFilterND;
+import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.LaplacianFilterND;
+import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.ZeroPointFilter;
+import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.matching.KinetochoreMatcher;
+import edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric;
 
 /**
  * A veritable playground of image analysis that will sit in the GUI and allow
@@ -40,11 +52,57 @@ public class TestMethod extends Method {
 	 */
 	@Override
 	public void go() {
+		
+		Image input = new Image(this.images.get(0));
+		KernelFilterND kf = new KernelFilterND();
+		
+		double[] d = {0.1, 0.2, 0.4, 0.2, 0.1};
+				
+		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.X, d);
+		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Y, d);
+		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Z, d);
+		java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
+        		
+        Renormalization3DFilter LBE3F = new Renormalization3DFilter();
+       
         
-        KinetochoreMatcher km = new KinetochoreMatcher();
+//        filters.add(LBE3F);
+//        LBE3F.setParameters(this.parameters);
+//        
+//        Image QOSeg = new Image(input);
+//        LBE3F.apply(QOSeg);
         
-        km.makePairs(this.images.get(0), this.images.get(2));
+        filters.add(kf);
         
+        LaplacianFilterND lf = new LaplacianFilterND();
+        
+        filters.add(lf);
+        
+        filters.add(new ZeroPointFilter());
+        
+        filters.add(new MaximumSeparabilityThresholdingFilter());
+        filters.add(new Label3DFilter());
+        filters.add(new RecursiveMaximumSeparability3DFilter());
+        filters.add(new RelabelFilter());
+        filters.add(new SizeAbsoluteFilter());
+        filters.add(new RelabelFilter());
+
+        for (Filter i : filters){
+            i.setParameters(this.parameters);
+//            i.setReferenceImage(QOSeg);
+            i.setReferenceImage(this.images.get(0));
+        }
+
+//        Image toProcess = new Image(QOSeg);
+
+        iterateOnFiltersAndStoreResult(filters, input, new ZeroMetric());
+		
+//        KinetochoreMatcher km = new KinetochoreMatcher();
+//        
+//        km.setParameters(this.parameters);
+//        
+//        km.makePairs(this.images.get(0), this.images.get(1));
+//        
         
 	}
 

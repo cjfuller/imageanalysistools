@@ -58,7 +58,7 @@ public class VariableSizeMeanFilter extends Filter {
 	/**
 	 * Sets the minimum box size of the resulting segmentation.
 	 * <p>
-	 * The box size is the linear dimension of the smalles possible volume from
+	 * The box size is the linear dimension of the smallest possible volume from
 	 * the QOTree segmentation.
 	 * 
 	 * @param size		The linear dimension of the box size.
