@@ -51,11 +51,13 @@ public class KernelFilterND extends Filter {
 	List<Integer> halfDimensionSizes;
 	
 	public KernelFilterND() {
+		
 		this.dimensionsToFilter = new ArrayList<Integer>();
 		
 		this.kernelByDimension = new HashMap<Integer, double[]>();
 		
 		this.halfDimensionSizes = new ArrayList<Integer>();
+	
 	}
 	
 	

@@ -53,56 +53,62 @@ public class TestMethod extends Method {
 	@Override
 	public void go() {
 		
-		Image input = new Image(this.images.get(0));
-		KernelFilterND kf = new KernelFilterND();
+//		Image input = new Image(this.images.get(2));
+//		KernelFilterND kf = new KernelFilterND();
+//		
+//		double[] d = {0.1, 0.2, 0.4, 0.2, 0.1};
+//				
+//		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.X, d);
+//		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Y, d);
+//		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Z, d);
+//		java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
+//        		
+//        Renormalization3DFilter LBE3F = new Renormalization3DFilter();
+//       
+//        
+////        filters.add(LBE3F);
+////        LBE3F.setParameters(this.parameters);
+////        
+////        Image QOSeg = new Image(input);
+////        LBE3F.apply(QOSeg);
+//        
+//        filters.add(kf);
+//        
+//        LaplacianFilterND lf = new LaplacianFilterND();
+//        
+//        filters.add(lf);
+//        
+//        filters.add(new ZeroPointFilter());
+//        
+//        filters.add(new MaximumSeparabilityThresholdingFilter());
+//        filters.add(new Label3DFilter());
+//        filters.add(new SizeAbsoluteFilter());
+//        filters.add(new RelabelFilter());
+//        
+//        this.parameters.setValueForKey("min_size", "10");
+//        this.parameters.setValueForKey("max_size", "1000000");
+//        
+////        filters.add(new RecursiveMaximumSeparability3DFilter());
+////        filters.add(new RelabelFilter());
+////        filters.add(new SizeAbsoluteFilter());
+////        filters.add(new RelabelFilter());
+//
+//        for (Filter i : filters){
+//            i.setParameters(this.parameters);
+////            i.setReferenceImage(QOSeg);
+//            i.setReferenceImage(this.images.get(0));
+//        }
+//
+////        Image toProcess = new Image(QOSeg);
+//
+//        iterateOnFiltersAndStoreResult(filters, input, new ZeroMetric());
 		
-		double[] d = {0.1, 0.2, 0.4, 0.2, 0.1};
-				
-		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.X, d);
-		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Y, d);
-		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Z, d);
-		java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
-        		
-        Renormalization3DFilter LBE3F = new Renormalization3DFilter();
-       
+        KinetochoreMatcher km = new KinetochoreMatcher();
         
-//        filters.add(LBE3F);
-//        LBE3F.setParameters(this.parameters);
-//        
-//        Image QOSeg = new Image(input);
-//        LBE3F.apply(QOSeg);
+        km.setParameters(this.parameters);
         
-        filters.add(kf);
+        km.makePairs(this.images.get(0), this.images.get(2));
         
-        LaplacianFilterND lf = new LaplacianFilterND();
-        
-        filters.add(lf);
-        
-        filters.add(new ZeroPointFilter());
-        
-        filters.add(new MaximumSeparabilityThresholdingFilter());
-        filters.add(new Label3DFilter());
-        filters.add(new RecursiveMaximumSeparability3DFilter());
-        filters.add(new RelabelFilter());
-        filters.add(new SizeAbsoluteFilter());
-        filters.add(new RelabelFilter());
-
-        for (Filter i : filters){
-            i.setParameters(this.parameters);
-//            i.setReferenceImage(QOSeg);
-            i.setReferenceImage(this.images.get(0));
-        }
-
-//        Image toProcess = new Image(QOSeg);
-
-        iterateOnFiltersAndStoreResult(filters, input, new ZeroMetric());
-		
-//        KinetochoreMatcher km = new KinetochoreMatcher();
-//        
-//        km.setParameters(this.parameters);
-//        
-//        km.makePairs(this.images.get(0), this.images.get(1));
-//        
         
 	}
 
