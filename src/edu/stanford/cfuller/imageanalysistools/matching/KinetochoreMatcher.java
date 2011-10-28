@@ -356,9 +356,11 @@ public class KinetochoreMatcher {
 			int maxIndex = -1;
 			for (int j = 0; j < h.getMaxValue(); j++) {
 				if (distanceMatrix.getEntry(i,j) < cutoff) {
+					double twoSidedWeight = weightMatrix.getEntry(i,j) + weightMatrix.getEntry(j,i);
+					
 					System.out.printf("%d (%1.2f), ", (j+1), weightMatrix.getEntry(i,j));
-					if (weightMatrix.getEntry(i,j) > maxValue) {
-						maxValue = distanceMatrix.getEntry(i,j);
+					if (twoSidedWeight > maxValue) {
+						maxValue = twoSidedWeight;
 						maxIndex = j;
 					}
 				}
@@ -370,7 +372,12 @@ public class KinetochoreMatcher {
 		}
 		
 		for (Integer i : pairs.keySet()) {
-			System.out.println((i+1) + " ---> " + (pairs.get(i)+1));
+			//System.out.println((i+1) + " " + (pairs.get(i)+1));
+			//if (true || pairs.get(i)>=0 && pairs.get(pairs.get(i)) == i) {
+			if (directions.get(i+1) != null) {
+			//System.out.println(imageObjects.get(i).getPositionForChannel(0) + " " + imageObjects.get(pairs.get(i)).getPositionForChannel(0));
+				System.out.println(imageObjects.get(i).getPositionForChannel(0) + " " + imageObjects.get(i).getPositionForChannel(0).add(directions.get(i+1)));
+			}
 		}
 	}
 
