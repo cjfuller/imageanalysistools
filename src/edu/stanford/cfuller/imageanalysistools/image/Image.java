@@ -28,6 +28,11 @@ import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageWriter;
 import ome.xml.model.primitives.PositiveInteger;
 
+import ij.ImagePlus;
+import ij.ImageStack;
+import ij.process.FloatProcessor;
+import ij.process.ImageProcessor;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
@@ -174,6 +179,49 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		}
 		
 	}
+	
+	/**
+	 * Constructs a new Image from an ImageJ ImagePlus.
+	 * 
+	 * @param imPl		The ImgaePlus to convert to an Image.
+	 */
+	public Image(ImagePlus imPl) {
+		
+		int[] dimensions = imPl.getDimensions();
+		
+		ImageCoordinate dimensionSizes = ImageCoordinate.createCoordXYZCT(dimensions[0], dimensions[1], dimensions[3], dimensions[2], dimensions[4]);
+		
+		this.isBoxed = false;
+        this.boxMin = null;
+        this.boxMax = null;
+        this.coordinateArrayStorage = null;
+        this.dimensionSizes = ImageCoordinate.cloneCoord(dimensionSizes);
+		this.pixelData= (new PixelDataFactory()).createPixelData(dimensionSizes, loci.formats.FormatTools.UINT16, "XYZCT");
+		setupNewMetadata();
+		
+		dimensionSizes.recycle();
+		
+		int currSlice = 0;
+		
+		for (ImageCoordinate i : this) {
+			
+			int index = imPl.getStackIndex(i.get(ImageCoordinate.C)+1, i.get(ImageCoordinate.Z)+1, i.get(ImageCoordinate.T)+1); //these are 1-indexed in ImageJ
+			
+			if (currSlice != index) {
+				imPl.setSlice(index);
+				currSlice = index;
+			}
+			
+			ImageProcessor imP = imPl.getProcessor();
+			
+			this.setValue(i, imP.get(i.get(ImageCoordinate.X), i.get(ImageCoordinate.Y)));
+			
+		}
+		
+	}
+	
+	
+	
 
     /**
      * Default constructor that subclasses may use to do the initialization themselves.
@@ -591,6 +639,47 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
         return toReturn;
 
     }
+    
+    
+    /**
+     * Converts the Image to an ImageJ ImagePlus.
+     * 
+     * @return	The converted Image.
+     */
+    public ImagePlus toImagePlus() {
+    	
+    	//TODO: add multiple pixel formats
+    	
+    	int n_planes = this.getPlaneCount();
+    	
+    	ImageStack stack = new ImageStack(this.getDimensionSizes().get(ImageCoordinate.X), this.getDimensionSizes().get(ImageCoordinate.Y), n_planes);
+    	
+    	for (int i = 0; i < n_planes; i++) {
+    		
+    		stack.addSlice("", new FloatProcessor(this.getDimensionSizes().get(ImageCoordinate.X), this.getDimensionSizes().get(ImageCoordinate.Y)));
+    		
+    	}
+    	
+    	ImagePlus imPl = new ImagePlus("", stack);
+    	
+    	imPl.setDimensions(this.getDimensionSizes().get(ImageCoordinate.C), this.getDimensionSizes().get(ImageCoordinate.Z), this.getDimensionSizes().get(ImageCoordinate.T));
+    	
+    	for (ImageCoordinate ic : this) {
+    		
+    		imPl.setPositionWithoutUpdate(ic.get(ImageCoordinate.C), ic.get(ImageCoordinate.Z), ic.get(ImageCoordinate.T));
+    		
+    		ImageProcessor imP = imPl.getProcessor();
+    		
+    		imP.setf(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y), (float) this.getValue(ic));
+    		
+    	}
+    	
+    	return imPl;
+    	
+    	
+    }
+    
+    
 
     /**
      * Gets the number of planes in this Image (that is the number of distinct (z, c, t) coordinates).

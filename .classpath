@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-nop-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/swing-layout-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/ij.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
