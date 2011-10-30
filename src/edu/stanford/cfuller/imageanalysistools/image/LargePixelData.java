@@ -36,7 +36,7 @@ import java.nio.channels.FileChannel;
  * Holds image pixel data in a type-independent manner; handles conversion to the appropriate number format for the data being stored to disk.
  *<p>
  * This implementation uses a smaller memory footprint than a {@link PixelData} object by potentially only keeping a single
- * image plane active at a time.  The remainder of the image is stored in a memory-mapped file and converted to and from the double values
+ * image plane active at a time.  The remainder of the image is stored in a memory-mapped file and converted to and from the float values
  * available to users of this class as needed.  This may lead to extra overhead when repeatedly retrieving pixel values from different planes,
  * so where possible, it is recommended to structure code to do all the single plane processing possible before switching to another plane.
  * <p>
@@ -115,7 +115,7 @@ public class LargePixelData extends PixelData {
 		this.size_c = size_c;
 		this.size_t = size_t;
 
-		convertedPixels = new double[size_x*size_y];
+		convertedPixels = new float[size_x*size_y];
 
 
 		dimensionSizes.put("X", size_x);
@@ -232,14 +232,14 @@ public class LargePixelData extends PixelData {
 
 	/**
 	 * Reads the underlying byte array using the specified byte order, dimension order, and data format and stores the current
-	 * plane from this array as an array of doubles, which is accessed by users of this class.
+	 * plane from this array as an array of floats, which is accessed by users of this class.
 	 * <p>
 	 * This method is called internally whenever switching between image planes to load the currently selected plane
-	 * from the memory mapped file to the double array representation of the current plane.
+	 * from the memory mapped file to the float array representation of the current plane.
 	 */
 	protected void updateConvertedPixelsFromBytes() {
 
-		//converts the byte array representation of the data into the internal double representation of the data
+		//converts the byte array representation of the data into the internal float representation of the data
 
 		int counter = 0;
 
@@ -257,7 +257,7 @@ public class LargePixelData extends PixelData {
 		case loci.formats.FormatTools.INT8:
 
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.get());
+				convertedPixels[counter++] = (float) (in.get());
 			}
 			break;
 
@@ -265,7 +265,7 @@ public class LargePixelData extends PixelData {
 
 			while(in.hasRemaining()) {
 				byte b = in.get();
-				convertedPixels[counter++] = (double) (b & 0xFF); // this will convert b to int by bits, not by value
+				convertedPixels[counter++] = (float) (b & 0xFF); // this will convert b to int by bits, not by value
 			}
 			break;
 
@@ -273,7 +273,7 @@ public class LargePixelData extends PixelData {
 		case loci.formats.FormatTools.INT16:
 
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.getShort());
+				convertedPixels[counter++] = (float) (in.getShort());
 			}
 			break;
 
@@ -281,21 +281,21 @@ public class LargePixelData extends PixelData {
 		case loci.formats.FormatTools.UINT16:
 
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) ((in.getShort()) & 0xFFFF);
+				convertedPixels[counter++] = (float) ((in.getShort()) & 0xFFFF);
 			}
 			break;
 
 		case loci.formats.FormatTools.INT32:
 
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.getInt());
+				convertedPixels[counter++] = (float) (in.getInt());
 			}
 			break;
 
 		case loci.formats.FormatTools.UINT32:
 
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (0xFFFFFFFFL & (in.getInt()));
+				convertedPixels[counter++] = (float) (0xFFFFFFFFL & (in.getInt()));
 			}
 			break;
 
@@ -303,7 +303,7 @@ public class LargePixelData extends PixelData {
 		case loci.formats.FormatTools.FLOAT:
 
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.getFloat());
+				convertedPixels[counter++] = (in.getFloat());
 			}
 			break;
 
@@ -311,14 +311,14 @@ public class LargePixelData extends PixelData {
 		case loci.formats.FormatTools.DOUBLE:
 
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.getDouble());
+				convertedPixels[counter++] = (float) (in.getDouble());
 			}
 			break;
 
 		default:
 
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.get() > 0 ? 1.0 : 0.0);
+				convertedPixels[counter++] = (float) (in.get() > 0 ? 1.0 : 0.0);
 			}
 			break;
 
@@ -329,15 +329,15 @@ public class LargePixelData extends PixelData {
 	}
 
 	/**
-	 * Converts the array of doubles used for access by users of this class back to a byte array representation according
+	 * Converts the array of floats used for access by users of this class back to a byte array representation according
 	 * to the stored byte order, dimension order, and data type.
 	 * <p>
-	 * This method is called internally before switching to a new image plane to write the current double array representation
+	 * This method is called internally before switching to a new image plane to write the current float array representation
 	 * if the current image plane back to the memory-mapped file.
 	 */
 	protected void updateBytesFromConvertedPixels() {
 
-		//converts the internal double representation of the data into the byte array representation
+		//converts the internal float representation of the data into the byte array representation
 
 		mappedData.position(getByteOffsetForCurrentPlane());
 
@@ -352,7 +352,7 @@ public class LargePixelData extends PixelData {
 		case loci.formats.FormatTools.INT8:
 		case loci.formats.FormatTools.UINT8:
 
-			for (double pixel: this.convertedPixels) {
+			for (float pixel: this.convertedPixels) {
 				bytes_out.put((byte) pixel);
 			}
 
@@ -361,7 +361,7 @@ public class LargePixelData extends PixelData {
 		case loci.formats.FormatTools.INT16:
 		case loci.formats.FormatTools.UINT16:
 
-			for (double pixel: this.convertedPixels) {
+			for (float pixel: this.convertedPixels) {
 
 				bytes_out.putShort((short) pixel);
 
@@ -372,27 +372,27 @@ public class LargePixelData extends PixelData {
 		case loci.formats.FormatTools.INT32:
 		case loci.formats.FormatTools.UINT32:
 
-			for (double pixel: this.convertedPixels) {
+			for (float pixel: this.convertedPixels) {
 				bytes_out.putInt((int) pixel);
 			}
 			break;
 
 		case loci.formats.FormatTools.FLOAT:
 
-			for (double pixel: this.convertedPixels) {
-				bytes_out.putFloat((float) pixel);
+			for (float pixel: this.convertedPixels) {
+				bytes_out.putFloat(pixel);
 			}
 
 			break;
 
 		case loci.formats.FormatTools.DOUBLE:
-			for (double pixel: this.convertedPixels) {
-				bytes_out.putDouble(pixel);
+			for (float pixel: this.convertedPixels) {
+				bytes_out.putDouble((double) pixel);
 			}
 			break;
 
 		default:
-			for (double pixel : this.convertedPixels) {
+			for (float pixel : this.convertedPixels) {
 				bytes_out.put((byte) ((pixel > 0) ? 1 : 0));
 			}
 			break;
@@ -460,9 +460,9 @@ public class LargePixelData extends PixelData {
 	 * @param z     The z-coordinate of the pixel to return.
 	 * @param c     The c-coordinate of the pixel to return.
 	 * @param t     The t-coordinate of the pixel to return.
-	 * @return      The value of the PixelData at the specified coordinates, as a double.
+	 * @return      The value of the PixelData at the specified coordinates, as a float.
 	 */
-	public synchronized double getPixel(int x, int y, int z, int c, int t) {
+	public synchronized float getPixel(int x, int y, int z, int c, int t) {
 		if (z == current_z && c == current_c && t == current_t) {
 			return convertedPixels[x*x_offset + y*y_offset];
 		} else {
@@ -484,8 +484,8 @@ public class LargePixelData extends PixelData {
 	 * Note that the parameters are passed in the order x,y,z,c,t regardless of the ordering in the underlying byte array representation and
 	 * will be converted to the correct ordering automatically.
 	 * <p>
-	 * Likewise, though the value is passed as a double, it will be converted automatically to the underlying byte representation in the correct format.
-	 * This may lead to the truncation of the passed double value when retrieving the byte array representation.  However, the double passed in can still be retreived
+	 * Likewise, though the value is passed as a float, it will be converted automatically to the underlying byte representation in the correct format.
+	 * This may lead to the truncation of the passed float value when retrieving the byte array representation.  However, the float passed in can still be retreived
 	 * without truncation by calling {@link #getPixel} if the image plane has not been switched in the intervening time.
 	 * <p>
 	 * This method will have better performance on repeated calls within the same image plane than on repeated calls switching
@@ -500,7 +500,7 @@ public class LargePixelData extends PixelData {
 	 * @param t     The t-coordinate of the pixel to return.
 	 * @param value The value to which the pixel at the specified coordinates will be set.
 	 */
-	public synchronized void setPixel(int x, int y, int z, int c, int t, double value) {
+	public synchronized void setPixel(int x, int y, int z, int c, int t, float value) {
 		if (z == current_z && c == current_c && t == current_t) {
 			convertedPixels[x*x_offset + y*y_offset] = value;
 		} else {

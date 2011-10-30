@@ -62,7 +62,7 @@ public class PixelData implements java.io.Serializable {
 	java.util.Hashtable<String, Integer> offsetSizes;
 	
 	byte[] pixels;
-	double[] convertedPixels;
+	float[] convertedPixels;
 	
 	java.nio.ByteOrder byteOrder;
 	
@@ -127,7 +127,7 @@ public class PixelData implements java.io.Serializable {
 		this.size_c = size_c;
 		this.size_t = size_t;
 		
-		convertedPixels = new double[this.size_x*this.size_y*this.size_z*this.size_c*this.size_t];
+		convertedPixels = new float[this.size_x*this.size_y*this.size_z*this.size_c*this.size_t];
 		
 		dimensionSizes.put("X", size_x);
 		dimensionSizes.put("Y", size_y);
@@ -210,7 +210,7 @@ public class PixelData implements java.io.Serializable {
      * Pixel values will be represented using the numeric type, byte order, and dimension order specified on initializing the PixelData.
      *<p>
      * Calling this function will encode the byte array data from the internal numerical representation, so in particular, if the byte data
-     * was previously set using {@link #setBytes(byte[])}, and then changes were made using {@link #setPixel(int, int, int, int, int, double)}, for example, these changes will be reflected, and this
+     * was previously set using {@link #setBytes(byte[])}, and then changes were made using {@link #setPixel(int, int, int, int, int, float)}, for example, these changes will be reflected, and this
      * will not return the same byte data originally passed in.
      *
      * @return  A byte array containing the pixel data encoded in the specified format.
@@ -285,9 +285,9 @@ public class PixelData implements java.io.Serializable {
      * @param z     The z-coordinate of the pixel to return.
      * @param c     The c-coordinate of the pixel to return.
      * @param t     The t-coordinate of the pixel to return.
-     * @return      The value of the PixelData at the specified coordinates, as a double.
+     * @return      The value of the PixelData at the specified coordinates, as a float.
      */
-	public double getPixel(int x, int y, int z, int c, int t) {
+	public float getPixel(int x, int y, int z, int c, int t) {
 		return convertedPixels[x*x_offset + y*y_offset + z*z_offset + c*c_offset + t*t_offset];
 	}
 
@@ -298,8 +298,8 @@ public class PixelData implements java.io.Serializable {
      * Note that the parameters are passed in the order x,y,z,c,t regardless of the ordering in the underlying byte array representation and
      * will be converted to the correct ordering automatically.
      *<p>
-     * Likewise, though the value is passed as a double, it will be converted automatically to the underlying byte representation in the correct format.
-     * This may lead to the truncation of the passed double value when retrieving the byte array representation.  However, the double passed in can still be retreived
+     * Likewise, though the value is passed as a float, it will be converted automatically to the underlying byte representation in the correct format.
+     * This may lead to the truncation of the passed float value when retrieving the byte array representation.  However, the float passed in can still be retreived
      * without truncation by calling {@link #getPixel(int, int, int, int, int)}.
      *
      *<p>
@@ -312,7 +312,7 @@ public class PixelData implements java.io.Serializable {
      * @param t     The t-coordinate of the pixel to return.
      * @param value The value to which the pixel at the specified coordinates will be set.
      */
-	public void setPixel(int x, int y, int z, int c, int t, double value) {
+	public void setPixel(int x, int y, int z, int c, int t, float value) {
 
 		convertedPixels[x*x_offset + y*y_offset + z*z_offset + c*c_offset + t*t_offset] = value;
 		return;
@@ -341,11 +341,11 @@ public class PixelData implements java.io.Serializable {
 
     /**
      * Reads the underlying byte array using the specified byte order, dimension order, and data format and stores it
-     * as an array of doubles, which is accessed by users of this class.
+     * as an array of floats, which is accessed by users of this class.
      */
 	protected void updateConvertedPixelsFromBytes() {
 
-        //converts the byte array representation of the data into the internal double representation of the data
+        //converts the byte array representation of the data into the internal float representation of the data
 
 		java.nio.ByteBuffer in = java.nio.ByteBuffer.wrap(this.pixels);
 				
@@ -361,7 +361,7 @@ public class PixelData implements java.io.Serializable {
 		case loci.formats.FormatTools.INT8:
 			
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.get());
+				convertedPixels[counter++] = (float) (in.get());
 			}
             break;
         
@@ -369,7 +369,7 @@ public class PixelData implements java.io.Serializable {
 
 			while(in.hasRemaining()) {
                 byte b = in.get();
-				convertedPixels[counter++] = (double) (b & 0xFF); // this will convert b to int by bits, not by value
+				convertedPixels[counter++] = (float) (b & 0xFF); // this will convert b to int by bits, not by value
 			}
             break;
 			
@@ -377,7 +377,7 @@ public class PixelData implements java.io.Serializable {
 		case loci.formats.FormatTools.INT16:
 			
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.getShort());
+				convertedPixels[counter++] = (float) (in.getShort());
 			}
             break;
 
@@ -385,21 +385,21 @@ public class PixelData implements java.io.Serializable {
         case loci.formats.FormatTools.UINT16:
 
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) ((in.getShort()) & 0xFFFF);
+				convertedPixels[counter++] = (float)) ((in.getShort()) & 0xFFFF);
 			}
             break;
 
 		case loci.formats.FormatTools.INT32:
 			
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.getInt());
+				convertedPixels[counter++] = (float) (in.getInt());
 			}
             break;
 
         case loci.formats.FormatTools.UINT32:
 
             while(in.hasRemaining()) {
-                convertedPixels[counter++] = (double) (0xFFFFFFFFL & (in.getInt()));
+                convertedPixels[counter++] = (float) (0xFFFFFFFFL & (in.getInt()));
             }
             break;
 
@@ -407,7 +407,7 @@ public class PixelData implements java.io.Serializable {
 		case loci.formats.FormatTools.FLOAT:
 			
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.getFloat());
+				convertedPixels[counter++] = (float) (in.getFloat());
 			}
             break;
 			
@@ -415,14 +415,14 @@ public class PixelData implements java.io.Serializable {
 		case loci.formats.FormatTools.DOUBLE:
 			
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.getDouble());
+				convertedPixels[counter++] = (float) (in.getDouble());
 			}
             break;
 
         default:
             
             while(in.hasRemaining()) {
-				convertedPixels[counter++] = (double) (in.get() > 0 ? 1.0 : 0.0);
+				convertedPixels[counter++] = (float) (in.get() > 0 ? 1.0 : 0.0);
 			}
             break;
 			
@@ -433,13 +433,13 @@ public class PixelData implements java.io.Serializable {
 	}
 
     /**
-     * Converts the array of doubles used for access by users of this class back to a byte array representation (suitable for writing to disk)
+     * Converts the array of floats used for access by users of this class back to a byte array representation (suitable for writing to disk)
      * according to the stored byte order, dimension order, and data type.
      */
 	protected void updateBytesFromConvertedPixels() {
 
 
-        //converts the internal double representation of the data into the byte array representation
+        //converts the internal float representation of the data into the byte array representation
 
 		java.nio.ByteBuffer bytes_out = null;
 		
@@ -460,7 +460,7 @@ public class PixelData implements java.io.Serializable {
 		case loci.formats.FormatTools.INT8:
         case loci.formats.FormatTools.UINT8:
 			
-			for (double pixel: this.convertedPixels) {
+			for (float pixel: this.convertedPixels) {
 				bytes_out.put((byte) pixel);
 			}
 			
@@ -469,7 +469,7 @@ public class PixelData implements java.io.Serializable {
 		case loci.formats.FormatTools.INT16:
         case loci.formats.FormatTools.UINT16:
 			
-			for (double pixel: this.convertedPixels) {
+			for (float pixel: this.convertedPixels) {
 
                 bytes_out.putShort((short) pixel);
                 
@@ -480,27 +480,27 @@ public class PixelData implements java.io.Serializable {
 		case loci.formats.FormatTools.INT32:
         case loci.formats.FormatTools.UINT32:
 			
-			for (double pixel: this.convertedPixels) {
+			for (float pixel: this.convertedPixels) {
 				bytes_out.putInt((int) pixel);
 			}
             break;
 			
 		case loci.formats.FormatTools.FLOAT:
 			
-			for (double pixel: this.convertedPixels) {
-				bytes_out.putFloat((float) pixel);
+			for (float pixel: this.convertedPixels) {
+				bytes_out.putFloat(pixel);
 			}
 			
 			break;
 			
 		case loci.formats.FormatTools.DOUBLE:
-			for (double pixel: this.convertedPixels) {
-				bytes_out.putDouble(pixel);
+			for (float pixel: this.convertedPixels) {
+				bytes_out.putDouble((double) pixel);
 			}
             break;
 
         default:
-            for (double pixel : this.convertedPixels) {
+            for (float pixel : this.convertedPixels) {
 				bytes_out.put((byte) ((pixel > 0) ? 1 : 0));
 			}
             break;

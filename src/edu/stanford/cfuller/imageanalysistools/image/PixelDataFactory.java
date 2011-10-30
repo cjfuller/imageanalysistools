@@ -35,7 +35,7 @@ public class PixelDataFactory {
 
 	//TODO: reimplement to handle images other than 5D.
 	
-    static final int DEFAULT_MAX_BYTE_SIZE = 20000000;
+    static final int DEFAULT_MAX_BYTE_SIZE = 120000000;
     //static final int DEFAULT_MAX_BYTE_SIZE = 0;
 
     private int maxByteSize;

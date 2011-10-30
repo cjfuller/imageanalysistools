@@ -130,13 +130,13 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
      * @param dimensionSizes    An ImageCoordinate whose components will be the sizes of each dimension of the Image.
      * @param initialValue      The initial value to which all the pixels will be set.
      */
-	public Image(ImageCoordinate dimensionSizes, double initialValue){
+	public Image(ImageCoordinate dimensionSizes, float initialValue){
 		this.isBoxed = false;
         this.boxMin = null;
         this.boxMax = null;
         this.coordinateArrayStorage = null;
         this.dimensionSizes = ImageCoordinate.cloneCoord(dimensionSizes);
-		this.pixelData= (new PixelDataFactory()).createPixelData(dimensionSizes, loci.formats.FormatTools.UINT16, "XYZCT");
+		this.pixelData= (new PixelDataFactory()).createPixelData(dimensionSizes, loci.formats.FormatTools.FLOAT, "XYZCT");
 		setupNewMetadata();
 		
 		for (ImageCoordinate i : this) {
@@ -165,7 +165,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
         this.boxMax = null;
         this.coordinateArrayStorage = null;
         this.dimensionSizes = ImageCoordinate.cloneCoord(dimensionSizes);
-		this.pixelData= (new PixelDataFactory()).createPixelData(dimensionSizes, loci.formats.FormatTools.UINT16, "XYZCT");
+		this.pixelData= (new PixelDataFactory()).createPixelData(dimensionSizes, loci.formats.FormatTools.FLOAT, "XYZCT");
 		setupNewMetadata();
 		
 		dimensionSizes.recycle();
@@ -196,7 +196,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
         this.boxMax = null;
         this.coordinateArrayStorage = null;
         this.dimensionSizes = ImageCoordinate.cloneCoord(dimensionSizes);
-		this.pixelData= (new PixelDataFactory()).createPixelData(dimensionSizes, loci.formats.FormatTools.UINT16, "XYZCT");
+		this.pixelData= (new PixelDataFactory()).createPixelData(dimensionSizes, loci.formats.FormatTools.FLOAT, "XYZCT");
 		setupNewMetadata();
 		
 		dimensionSizes.recycle();
@@ -402,20 +402,20 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
     /**
      * Gets the value of the Image at the coordinate specified.  No bounds checking is performed.
      * @param coord     An ImageCoordinate specifying the location of the value to retrieve.
-     * @return          The value of the Image at the specified location as a double.
+     * @return          The value of the Image at the specified location as a float.
      */
-	public double getValue(ImageCoordinate coord) {
+	public float getValue(ImageCoordinate coord) {
 		return pixelData.getPixel(coord.get(ImageCoordinate.X), coord.get(ImageCoordinate.Y), coord.get(ImageCoordinate.Z), coord.get(ImageCoordinate.C), coord.get(ImageCoordinate.T));
 	}
 
     /**
      * Sets the value of the Image at the 2D coordinate specified.  No bounds checking is performed.
-     * @deprecated  Use {@link #setValue(ImageCoordinate, double)} instead.
+     * @deprecated  Use {@link #setValue(ImageCoordinate, float)} instead.
      * @param row   The row (y-coordinate) to set.
      * @param col   The column (x-coordinate) to set.
      * @param value The value that the Image will be set to at the specified location.
      */
-	public void setValue(int row, int col, double value) {
+	public void setValue(int row, int col, float value) {
 		pixelData.setPixel(col, row, 0, 0, 0, value);
 	}
 
@@ -424,7 +424,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
      * @param coord     The ImageCoordinate at which to set the Image's value.
      * @param value     The value to which to set the Image at the specified coordinate.
      */
-	public void setValue(ImageCoordinate coord, double value) {
+	public void setValue(ImageCoordinate coord, float value) {
 		pixelData.setPixel(coord.get(ImageCoordinate.X), coord.get(ImageCoordinate.Y), coord.get(ImageCoordinate.Z), coord.get(ImageCoordinate.C), coord.get(ImageCoordinate.T), value);
 	}
 	
@@ -830,7 +830,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
      * Image is currently boxed with a region of interest.
      */
 	public java.util.Iterator<ImageCoordinate> iterator() {
-		return new edu.stanford.cfuller.imageanalysistools.image.ImageIterator(this);
+		return new edu.stanford.cfuller.imageanalysistools.image.ImageIterator5D(this);
 	}
 
     /**
