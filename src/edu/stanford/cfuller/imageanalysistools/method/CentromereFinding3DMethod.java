@@ -24,22 +24,15 @@
 
 package edu.stanford.cfuller.imageanalysistools.method;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
 import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
-//import edu.stanford.cfuller.imageanalysistools.filter.LocalBackgroundEstimation3DFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.LocalBackgroundEstimation3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.RegionMaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.VariableSizeMeanFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
-import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 
 /**
@@ -47,9 +40,7 @@ import edu.stanford.cfuller.imageanalysistools.metric.Metric;
  * <p>
  * Identifies volumes, rather than planar regions, and outputs a 3D mask rather than a single plane mask.
  * 
- * 
- * 
- * @author cfuller
+ * @author Colin J. Fuller
  *
  */
 public class CentromereFinding3DMethod extends Method {
@@ -79,37 +70,15 @@ public class CentromereFinding3DMethod extends Method {
 		this.parameters.addIfNotSet("marker_channel_index", Integer.toString(referenceChannel));
 		
 		referenceChannel = this.parameters.getIntValueForKey("marker_channel_index");
-//		List<Image> foundCentromeres = new ArrayList<Image>();
-//		
-//		for (int i = 0; i < this.images.size()-1; i++) {
-//			foundCentromeres.add(this.centromereFinding(this.images.get(i)));
-//			this.storedImages.clear();
-//		}
 		
-		Image output = this.centromereFinding(this.images.get(0));
-		
-//		for (ImageCoordinate ic : output) {
-//			
-//			boolean shouldZero = false;
-//			for (int i = 0; i < foundCentromeres.size(); i++) {
-//				if (((int) foundCentromeres.get(i).getValue(ic)) ==0) {
-//					shouldZero = true;
-//					break;
-//				}
-//			}
-//			if (shouldZero) {
-//				output.setValue(ic, 0);
-//			}
-//		}
+		this.centromereFinding(this.images.get(0));
 		
 	}
 	
 	protected Image centromereFinding(Image input) {
 
         java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
-        
-        //LocalBackgroundEstimation3DFilter LBE3F = new LocalBackgroundEstimation3DFilter();
-        
+                
         Renormalization3DFilter LBE3F = new Renormalization3DFilter();
        
         
@@ -125,8 +94,6 @@ public class CentromereFinding3DMethod extends Method {
         filters.add(new RelabelFilter());
         filters.add(new SizeAbsoluteFilter());
         filters.add(new RelabelFilter());
-        //filters.add(new RegionMaximumSeparabilityThresholdingFilter());
-        //filters.add(new RelabelFilter());
 
         for (Filter i : filters){
             i.setParameters(this.parameters);

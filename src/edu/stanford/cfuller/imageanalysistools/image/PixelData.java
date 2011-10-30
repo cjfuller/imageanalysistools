@@ -427,6 +427,8 @@ public class PixelData implements java.io.Serializable {
             break;
 			
 		}
+		
+		this.pixels = null;
 
 	}
 

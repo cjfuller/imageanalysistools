@@ -28,6 +28,7 @@ import java.util.Deque;
 import java.util.List;
 
 import org.apache.commons.math.MathException;
+import org.apache.commons.math.MathRuntimeException;
 import org.apache.commons.math.distribution.FDistribution;
 import org.apache.commons.math.distribution.FDistributionImpl;
 
@@ -58,7 +59,7 @@ public class VariableSizeMeanFilter extends Filter {
 	/**
 	 * Sets the minimum box size of the resulting segmentation.
 	 * <p>
-	 * The box size is the linear dimension of the smalles possible volume from
+	 * The box size is the linear dimension of the smallest possible volume from
 	 * the QOTree segmentation.
 	 * 
 	 * @param size		The linear dimension of the box size.
@@ -281,6 +282,8 @@ public class VariableSizeMeanFilter extends Filter {
 			
 		}
 		
+		if (count == 1) return false;
+		
 		l_sum/=count;
 		sum/=count;
 		
@@ -301,19 +304,23 @@ public class VariableSizeMeanFilter extends Filter {
 		laplacianFiltered.clearBoxOfInterest();
 		
 		
-		FDistribution f = new FDistributionImpl(count-1, count-1);
 		
 		double cutoff = 0.001;
 		
 		double smallerVar = var < l_var ? var : l_var;
 		double largerVar = var > l_var ? var : l_var;
 		try {
+			FDistribution f = new FDistributionImpl(count-1, count-1);
+
 			double valueAtLowerCutoff = f.inverseCumulativeProbability(cutoff);
 			double valueAtUpperCutoff = f.inverseCumulativeProbability(1-cutoff);
 			boolean result =  (smallerVar/largerVar > valueAtUpperCutoff || smallerVar/largerVar < valueAtLowerCutoff);
 			return result;
 
 		} catch (MathException e) {
+			LoggingUtilities.getLogger().severe("Exception while calculating variable size mean QO partition: " + e.getMessage());
+			return false;
+		} catch (MathRuntimeException e) {
 			LoggingUtilities.getLogger().severe("Exception while calculating variable size mean QO partition: " + e.getMessage());
 			return false;
 		}
