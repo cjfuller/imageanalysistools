@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealMatrix;
@@ -113,9 +112,6 @@ public class KinetochoreMatcher {
 			try {
 				ref.fitPosition(parameters);
 			} catch (OptimizationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (FunctionEvaluationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
