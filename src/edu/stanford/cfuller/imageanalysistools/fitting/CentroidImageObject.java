@@ -26,7 +26,6 @@ package edu.stanford.cfuller.imageanalysistools.fitting;
 
 import java.util.Vector;
 
-import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
@@ -65,7 +64,7 @@ public class CentroidImageObject extends ImageObject {
      */
 	@Override
 	public void fitPosition(ParameterDictionary p)
-			throws FunctionEvaluationException, OptimizationException {
+			throws OptimizationException {
 		
 		if (this.sizeInPixels == 0) {
             this.nullifyImages();
