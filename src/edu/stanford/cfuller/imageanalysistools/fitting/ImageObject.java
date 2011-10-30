@@ -28,8 +28,7 @@ import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
-import org.apache.commons.math.FunctionEvaluationException;
-import org.apache.commons.math.geometry.Vector3D;
+import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
 
@@ -296,10 +295,9 @@ public abstract class ImageObject implements Serializable {
 	/**
 	 * Fits the object to the ImageObject's functional form in order to determine its position.
 	 * @param p     The parameters for the current analysis.
-	 * @throws FunctionEvaluationException  if the functional form of the ImageObject returns an invalid value during the optimization.
 	 * @throws OptimizationException        if there is an error during the optimization.
 	 */
-	public abstract void fitPosition(ParameterDictionary p) throws FunctionEvaluationException, OptimizationException;
+	public abstract void fitPosition(ParameterDictionary p) throws OptimizationException;
 
 
 	/**

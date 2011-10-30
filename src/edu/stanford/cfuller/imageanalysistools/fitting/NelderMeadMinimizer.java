@@ -195,7 +195,7 @@ public class NelderMeadMinimizer {
             for (int i =0; i < currentSimplex.getRowDimension(); i++) {
                 if (i == maxIndex) continue;
 
-                centerOfMass = centerOfMass.add(currentSimplex.getRow(i));
+                centerOfMass = centerOfMass.add(currentSimplex.getRowVector(i));
 
             }
 

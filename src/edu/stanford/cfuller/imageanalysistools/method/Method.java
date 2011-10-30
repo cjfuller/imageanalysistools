@@ -30,6 +30,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
+import edu.stanford.cfuller.imageanalysistools.frontend.StatusUpdater;
 
 import org.apache.commons.math.linear.RealMatrix;
 
@@ -49,6 +50,7 @@ public abstract class Method implements Runnable {
 	protected java.util.Vector<Image> images;
     protected ImageSet imageSet;
 	protected org.apache.commons.math.linear.RealMatrix storedDataOutput;
+	protected StatusUpdater updater;
 	
 	//protected methods
 
@@ -77,6 +79,9 @@ public abstract class Method implements Runnable {
     			LoggingUtilities.getLogger().info("completed filter #" + c++);
 
 //			   toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
+            }
+            if (this.updater != null) {
+            	updater.update(++c, filters.size(), null);
             }
 		}
 		if (m != null) {
@@ -112,6 +117,7 @@ public abstract class Method implements Runnable {
 	public Method() {
 		this.images = new java.util.Vector<Image>();
 		this.storedImages = new java.util.Vector<Image>();
+		this.updater = null;
 	}
 
     /**
@@ -195,6 +201,10 @@ public abstract class Method implements Runnable {
      */
     public RealMatrix getStoredDataOutput() {
         return storedDataOutput;
+    }
+    
+    public void setStatusUpdater(StatusUpdater up) {
+    	this.updater = up;
     }
 
     /**

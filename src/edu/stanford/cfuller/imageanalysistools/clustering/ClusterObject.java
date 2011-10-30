@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.clustering;
 
-import org.apache.commons.math.geometry.Vector3D;
+import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 
 
 /**
@@ -36,7 +36,7 @@ public class ClusterObject implements Positioned{
 
     private Cluster currentCluster;
     private int mostProbableCluster;
-    private org.apache.commons.math.geometry.Vector3D centroid;
+    private Vector3D centroid;
     private int nPixels;
     private double prob;
 

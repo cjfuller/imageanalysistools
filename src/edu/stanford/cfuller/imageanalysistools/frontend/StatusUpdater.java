@@ -22,31 +22,14 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.clustering;
-
-import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
+package edu.stanford.cfuller.imageanalysistools.frontend;
 
 /**
- *
- * Describes something that has a 3D position that can calculate its distance to some other object with a 3D position.
- * 
- * @author Colin J. Fuller
+ * @author cfuller
  *
  */
-public interface Positioned {
+public interface StatusUpdater {
 
-
-    /**
-     * Calculates the 3D Euclidean distance to another Positioned object.
-     * @param other     The other object with a position.
-     * @return          The Euclidean distance between the two objects.
-     */
-    public double distanceTo(Positioned other);
-
-    /**
-     * Gets the absolute position of the Positioned object in 3D space.
-     * @return  A Vector3D containing the coordinates of the Positioned object.
-     */
-    public Vector3D getPosition();
-
+	public void update(int currentProgress, int maxProgress, String message);
+	
 }

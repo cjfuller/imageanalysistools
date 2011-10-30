@@ -109,7 +109,24 @@ public class TestMethod extends Method {
         
         km.makePairs(this.images.get(0), this.images.get(2));
         
-        
+       
+//        java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
+//
+//        filters.add(new RenormalizationFilter());
+//		
+//        for (Filter f : filters) {
+//            f.setParameters(this.parameters);
+//            f.setReferenceImage(this.images.get(0));
+//        }
+//
+//        Image toProcess = new Image(this.images.get(0));
+//        //java.awt.image.BufferedImage buffered = toProcess.toBufferedImage();
+//        
+//        //Image converted = new Image(buffered);
+//
+//        
+//        iterateOnFiltersAndStoreResult(filters, new Image(toProcess), new edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric());
+
 	}
 
 }

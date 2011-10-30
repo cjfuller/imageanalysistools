@@ -208,7 +208,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 			int index = imPl.getStackIndex(i.get(ImageCoordinate.C)+1, i.get(ImageCoordinate.Z)+1, i.get(ImageCoordinate.T)+1); //these are 1-indexed in ImageJ
 			
 			if (currSlice != index) {
-				imPl.setSlice(index);
+				imPl.setSliceWithoutUpdate(index);
 				currSlice = index;
 			}
 			
@@ -652,27 +652,37 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
     	
     	int n_planes = this.getPlaneCount();
     	
-    	ImageStack stack = new ImageStack(this.getDimensionSizes().get(ImageCoordinate.X), this.getDimensionSizes().get(ImageCoordinate.Y), n_planes);
+    	int width = this.getDimensionSizes().get(ImageCoordinate.X);
     	
+    	int height = this.getDimensionSizes().get(ImageCoordinate.Y);
+    	
+    	ImageStack stack = new ImageStack(width, height);
+    	    	    	
     	for (int i = 0; i < n_planes; i++) {
     		
-    		stack.addSlice("", new FloatProcessor(this.getDimensionSizes().get(ImageCoordinate.X), this.getDimensionSizes().get(ImageCoordinate.Y)));
+    		FloatProcessor fp = new FloatProcessor(width, height, new float[width*height], null);
+    		
+    		if (i == 0) {stack.update(fp);}
+    		    		
+    		stack.addSlice("", fp);
     		
     	}
-    	
-    	ImagePlus imPl = new ImagePlus("", stack);
+    	    	
+    	ImagePlus imPl = new ImagePlus("output", stack);
     	
     	imPl.setDimensions(this.getDimensionSizes().get(ImageCoordinate.C), this.getDimensionSizes().get(ImageCoordinate.Z), this.getDimensionSizes().get(ImageCoordinate.T));
     	
     	for (ImageCoordinate ic : this) {
     		
-    		imPl.setPositionWithoutUpdate(ic.get(ImageCoordinate.C), ic.get(ImageCoordinate.Z), ic.get(ImageCoordinate.T));
+    		imPl.setPositionWithoutUpdate(ic.get(ImageCoordinate.C)+1, ic.get(ImageCoordinate.Z)+1, ic.get(ImageCoordinate.T)+1);
     		
     		ImageProcessor imP = imPl.getProcessor();
     		
     		imP.setf(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y), (float) this.getValue(ic));
     		
     	}
+    	
+    	imPl.resetDisplayRange();
     	
     	return imPl;
     	
