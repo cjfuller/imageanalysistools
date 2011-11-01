@@ -26,12 +26,15 @@ package edu.stanford.cfuller.imageanalysistools.method;
 
 
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
+import edu.stanford.cfuller.imageanalysistools.filter.KernelFilterND;
 import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.LaplacianFilterND;
+import edu.stanford.cfuller.imageanalysistools.filter.LocalMaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.ZeroPointFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 
@@ -63,7 +66,6 @@ public class CentromereFinding3DMethod extends Method {
     */
     @Override
 	public void go() {
-		this.parameters.setValueForKey("DEBUG", "false");
 
 		int referenceChannel = 0;
 		
@@ -83,12 +85,9 @@ public class CentromereFinding3DMethod extends Method {
        
         
         filters.add(LBE3F);
-        LBE3F.setParameters(this.parameters);
+
         
-        Image QOSeg = new Image(input);
-        LBE3F.apply(QOSeg);
-        
-        filters.add(new MaximumSeparabilityThresholdingFilter());
+        filters.add(new LocalMaximumSeparabilityThresholdingFilter());
         filters.add(new Label3DFilter());
         filters.add(new RecursiveMaximumSeparability3DFilter());
         filters.add(new RelabelFilter());
@@ -97,11 +96,11 @@ public class CentromereFinding3DMethod extends Method {
 
         for (Filter i : filters){
             i.setParameters(this.parameters);
-            i.setReferenceImage(QOSeg);
+            i.setReferenceImage(this.images.get(0));
         }
 
-        Image toProcess = new Image(QOSeg);
-
+        Image toProcess = new Image(this.images.get(0));
+        
         iterateOnFiltersAndStoreResult(filters, toProcess, metric);
 
         return this.getStoredImage();

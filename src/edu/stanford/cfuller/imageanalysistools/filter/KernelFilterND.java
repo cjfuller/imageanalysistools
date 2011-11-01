@@ -101,6 +101,16 @@ public class KernelFilterND extends Filter {
 						
 						int kernelOffset = ic2.get(i2) - ic.get(i2) + halfDimensionSizes.get(i2);
 						
+						if (kernelOffset < 0 ) {
+							ij.IJ.log("kernel offset: " + kernelOffset);
+							ij.IJ.log("ic2: " + ic2);
+							ij.IJ.log("ic: " + ic);
+							ij.IJ.log("i2: " + i2);
+							ij.IJ.log("sizes: " + halfDimensionSizes);
+							ij.IJ.log("lower: " + boxLower);
+							ij.IJ.log("upper: " + boxUpper);
+						}
+						
 						currKernelValue *= kernelByDimension.get(i2)[kernelOffset];
 						
 						

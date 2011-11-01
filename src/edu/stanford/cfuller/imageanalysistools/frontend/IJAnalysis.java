@@ -75,6 +75,12 @@ public class IJAnalysis {
     		imSet.addImageWithImage(i);
     	}
     	
+    	 if (params.hasKey("marker_channel_index")) {
+             int markerIndex = params.getIntValueForKey("marker_channel_index");
+             imSet.setMarkerImage(markerIndex);
+
+         }
+    	
     	m.setImages(imSet);
     	
     	StatusUpdater su = new ImageJStatusUpdater();

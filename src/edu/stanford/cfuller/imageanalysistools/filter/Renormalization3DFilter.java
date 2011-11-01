@@ -24,7 +24,9 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
+import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
  * A filter that performs prefiltering on a 3D image to aid in segmentation.
@@ -46,10 +48,50 @@ public class Renormalization3DFilter extends Filter {
 	 */
 	@Override
 	public void apply(Image im) {
+		
+		Image mean = new Image(im);
 
 		VariableSizeMeanFilter VSMF = new VariableSizeMeanFilter();
-		VSMF.setBoxSize(1);
-		VSMF.apply(im);
+		VSMF.setBoxSize(5);
+		VSMF.apply(mean);
+		
+        KernelFilterND kf = new KernelFilterND();
+        double[] d = {0.1, 0.2, 0.4, 0.2, 0.1};
+        kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.X, d);
+        kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Y, d);
+        kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Z, d);
+        
+        LaplacianFilterND lfnd = new LaplacianFilterND();
+        ZeroPointFilter zpf = new ZeroPointFilter();
+        
+        kf.apply(mean);
+        kf.setParameters(this.params);
+        lfnd.setParameters(this.params);
+        zpf.setParameters(this.params);
+
+        Image lf = new Image(mean);
+        
+        lfnd.apply(lf);
+        zpf.apply(lf);
+        kf.apply(lf);
+        
+		float min = Float.MAX_VALUE;
+		float max = 0;
+		
+		Histogram h = new Histogram(im);
+		
+		for (ImageCoordinate ic : im) {
+			float value = im.getValue(ic)/(1+lf.getValue(ic) + mean.getValue(ic));
+			if (value < min) {min = value;}
+			if (value > max) {max = value;}
+			im.setValue(ic, value);
+		}
+		
+		for (ImageCoordinate ic : im) {
+			im.setValue(ic, (im.getValue(ic) - min)/(max-min)*h.getMaxValue());
+		}
+		
+		kf.apply(im);
 
 		
 	}
