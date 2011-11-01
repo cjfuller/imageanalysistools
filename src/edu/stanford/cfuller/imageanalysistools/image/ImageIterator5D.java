@@ -121,6 +121,7 @@ public class ImageIterator5D extends ImageIterator {
 		
 		
 		this.nextCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
+		this.currCoord.setCoord(this.nextCoord);
 				
 	}
 	
