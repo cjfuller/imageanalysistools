@@ -68,11 +68,11 @@ public class LaplacianFilter extends Filter{
 
         Image newIm = new Image(im);
 
-        double minValue = Double.MAX_VALUE;
+        float minValue = Float.MAX_VALUE;
 
         for (ImageCoordinate ic : im) {
 
-            double newValue = 0;
+            float newValue = 0;
 
             ImageCoordinate icTemp = ImageCoordinate.cloneCoord(ic);
 
@@ -101,14 +101,14 @@ public class LaplacianFilter extends Filter{
                 newValue -= (numEl - count) * im.getValue(ic);
             }
 
-            newIm.setValue(ic, newValue);
+            newIm.setValue(ic, (float) newValue);
 
             if (newValue < minValue) minValue = newValue;
 
         }
 
         for (ImageCoordinate ic : im) {
-            im.setValue(ic, newIm.getValue(ic)-minValue);
+            im.setValue(ic, (newIm.getValue(ic)-minValue));
         }
 
         

@@ -306,7 +306,9 @@ public class LocalAnalysis {
 
         Image multiwavelength = fileSet.getImageForIndex(0);
 
+        
         java.util.List<Image> split = multiwavelength.splitChannels();
+        
 
         ImageSet splitSet = new ImageSet(fileSet.getParameters());
 

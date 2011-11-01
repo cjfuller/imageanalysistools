@@ -52,7 +52,11 @@ public class ImageIterator5D extends ImageIterator {
 	int upper_c;
 	int upper_t;
 	
+	boolean updateFlag;
+	
 	public ImageIterator5D(Image im) {
+		
+		this.updateFlag = false;
 		
 		this.toIterate = im;
 		
@@ -63,21 +67,21 @@ public class ImageIterator5D extends ImageIterator {
 		
 		if (this.isBoxedIterator) {
 			
-			ImageCoordinate box = im.getBoxMin();
+			ImageCoordinate boxMin = im.getBoxMin();
 			
-			curr_x = box.get(ImageCoordinate.X);
-			curr_y = box.get(ImageCoordinate.Y);
-			curr_z = box.get(ImageCoordinate.Z);
-			curr_c = box.get(ImageCoordinate.C);
-			curr_t = box.get(ImageCoordinate.T);
+			curr_x = boxMin.get(ImageCoordinate.X);
+			curr_y = boxMin.get(ImageCoordinate.Y);
+			curr_z = boxMin.get(ImageCoordinate.Z);
+			curr_c = boxMin.get(ImageCoordinate.C);
+			curr_t = boxMin.get(ImageCoordinate.T);
 			
-			box = im.getBoxMax();
+			ImageCoordinate boxMax = im.getBoxMax();
 			
-			upper_x = box.get(ImageCoordinate.X);
-			upper_y = box.get(ImageCoordinate.Y);
-			upper_z = box.get(ImageCoordinate.Z);
-			upper_c = box.get(ImageCoordinate.C);
-			upper_t = box.get(ImageCoordinate.T);
+			upper_x = boxMax.get(ImageCoordinate.X);
+			upper_y = boxMax.get(ImageCoordinate.Y);
+			upper_z = boxMax.get(ImageCoordinate.Z);
+			upper_c = boxMax.get(ImageCoordinate.C);
+			upper_t = boxMax.get(ImageCoordinate.T);
 			
 		} else {
 			
@@ -104,6 +108,7 @@ public class ImageIterator5D extends ImageIterator {
 		lower_c = curr_c;
 		lower_t = curr_t;
 		
+		
 		//account for the possibility of a zero size dimension
 		
 		if (upper_x <= lower_x || upper_y <= lower_y || upper_z <= lower_z || upper_c <= lower_c || upper_t <= lower_t) {
@@ -114,8 +119,9 @@ public class ImageIterator5D extends ImageIterator {
 			curr_t = upper_t;
 		}
 		
-		this.nextCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
 		
+		this.nextCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
+				
 	}
 	
 	public boolean hasNext() {
@@ -126,8 +132,9 @@ public class ImageIterator5D extends ImageIterator {
 		ImageCoordinate temp = this.currCoord;
 		this.currCoord = this.nextCoord;
 		this.nextCoord = temp;
+		if (this.updateFlag) {this.nextCoord.setCoord(this.currCoord); this.updateFlag = false;}
 		curr_x++;
-		if (curr_x >= upper_x) {
+		if (curr_x < upper_x) {
 			this.nextCoord.set(ImageCoordinate.X, curr_x);
 		} else {
 			curr_x = lower_x;
@@ -135,6 +142,7 @@ public class ImageIterator5D extends ImageIterator {
 			if (curr_y < upper_y) {
 				this.nextCoord.set(ImageCoordinate.X, curr_x);
 				this.nextCoord.set(ImageCoordinate.Y, curr_y);
+				this.updateFlag = true;
 			} else {
 				curr_y = lower_y;
 				curr_z++;
@@ -142,6 +150,7 @@ public class ImageIterator5D extends ImageIterator {
 					this.nextCoord.set(ImageCoordinate.X, curr_x);
 					this.nextCoord.set(ImageCoordinate.Y, curr_y);
 					this.nextCoord.set(ImageCoordinate.Z, curr_z);
+					this.updateFlag = true;
 				} else {
 					curr_z = lower_z;
 					curr_c++;
@@ -150,16 +159,18 @@ public class ImageIterator5D extends ImageIterator {
 						this.nextCoord.set(ImageCoordinate.Y, curr_y);
 						this.nextCoord.set(ImageCoordinate.Z, curr_z);
 						this.nextCoord.set(ImageCoordinate.C, curr_c);
+						this.updateFlag = true;
 					} else {
 						curr_c = lower_c;
 						curr_t++;
 						this.nextCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
+						this.updateFlag = true;
 					}
 				}
 			}
 			
 		}
-		
+				
 		return this.currCoord;
 	}
 	

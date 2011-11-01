@@ -101,7 +101,7 @@ public class KinetochoreMatcher {
 			
 		}
 		
-		Image ones = new Image(reference.getDimensionSizes(), 1.0);
+		Image ones = new Image(reference.getDimensionSizes(), 1.0f);
 		
 		Map<Integer, RealVector> refCentroids = new HashMap<Integer, RealVector>();
 		

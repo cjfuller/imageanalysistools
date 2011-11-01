@@ -24,12 +24,15 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
+import java.util.ArrayList;
+
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import org.apache.commons.math.linear.ArrayRealVector;
 /**
- * A Filter that thresholds an Image using Otsu's method.  (Otsu, 1979, DOI: 10.1109/TSMC.1979.4310076).
+ * A Filter that thresholds an Image using Otsu's method.  (Otsu, 1979, DOI: 10.1109/TSMC.1979.4310076).  Slightly modified such that if there are two
+ * close contenders for the correct threshold, it chooses the higher intensity valued one.
  * <p>
  * This filter does not use a reference Image.
  * <p>
@@ -40,7 +43,7 @@ import org.apache.commons.math.linear.ArrayRealVector;
  *
  *
  */
-public class MaximumSeparabilityThresholdingFilter extends Filter {
+public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 
 	final int defaultIncrement = 1;
 	final boolean defaultAdaptive = false;
@@ -93,6 +96,7 @@ public class MaximumSeparabilityThresholdingFilter extends Filter {
 				
 		ArrayRealVector omega_v = new ArrayRealVector(h.getMaxValue());
 		ArrayRealVector mu_v = new ArrayRealVector(h.getMaxValue());
+		ArrayRealVector eta_v = new ArrayRealVector(h.getMaxValue());
 		
 		int c = 0;
 		
@@ -101,7 +105,7 @@ public class MaximumSeparabilityThresholdingFilter extends Filter {
 			if (increment < 1) increment = 1;
 		}
 		
-
+		
 		for (int k= h.getMinValue(); k < h.getMaxValue() + 1; k+= increment) {
 			
 			if (k==0) continue;
@@ -126,6 +130,8 @@ public class MaximumSeparabilityThresholdingFilter extends Filter {
 				
 				double eta = omega*(1-omega) * Math.pow((meannonzero - mu)/(1-omega) - mu/omega, 2);
 				
+				eta_v.setEntry(c, eta);
+				
 				if (eta >= best_eta) {
 					best_eta = eta;
 					best_index = k;
@@ -133,11 +139,44 @@ public class MaximumSeparabilityThresholdingFilter extends Filter {
 				
 				//System.out.printf("%d, %f\n", k, eta);
 				
+			} else {
+				eta_v.setEntry(c, 0);
 			}
 			
 			c++;
 			
 		}
+		
+		c = 1;
+		
+		ArrayList<Integer> maxima = new ArrayList<Integer>();
+		
+		for (int k= h.getMinValue()+1; k < h.getMaxValue(); k+= increment) {
+			
+			//detect if this is a local maximum
+			
+			int lastEntryNotEqual = c-1;
+			int nextEntryNotEqual = c+1;
+			
+			while(lastEntryNotEqual > 0 && eta_v.getEntry(lastEntryNotEqual) == eta_v.getEntry(c)) {--lastEntryNotEqual;}
+			while(nextEntryNotEqual < (eta_v.getDimension()-1) && eta_v.getEntry(nextEntryNotEqual) == eta_v.getEntry(c)) {++nextEntryNotEqual;}
+
+			
+			if (eta_v.getEntry(c) > eta_v.getEntry(lastEntryNotEqual) && eta_v.getEntry(c) > eta_v.getEntry(nextEntryNotEqual)) {
+										
+				if (eta_v.getEntry(c) > 0.5*best_eta) { //require that we're close to the best
+				
+					maxima.add(k);
+					
+				}
+				
+			}
+			
+			c++;
+			
+		}
+				
+		best_index = maxima.get(maxima.size() -1);
 				
 		thresholdValue = best_index;
 		

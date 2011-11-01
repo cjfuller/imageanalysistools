@@ -53,7 +53,7 @@ public class Label3DFilter extends Filter {
 	@Override
 	public void apply(Image im) {
 
-		Image preliminaryLabeledImage = new Image(im.getDimensionSizes(), 0.0);
+		Image preliminaryLabeledImage = new Image(im.getDimensionSizes(), 0.0f);
 		int labelCounter = 1;
 
 		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);

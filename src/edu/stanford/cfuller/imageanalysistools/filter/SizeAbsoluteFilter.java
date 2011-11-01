@@ -85,7 +85,7 @@ public class SizeAbsoluteFilter extends Filter {
 
         for (ImageCoordinate ic : im) {
 
-            double value = im.getValue(ic);
+            float value = im.getValue(ic);
 
             im.setValue(ic, value*multipliers[(int) value]);
             

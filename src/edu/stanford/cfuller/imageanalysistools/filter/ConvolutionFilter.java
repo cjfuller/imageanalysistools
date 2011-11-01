@@ -189,7 +189,7 @@ public class ConvolutionFilter extends Filter {
         oldMin  = 0;
 
         for (ImageCoordinate ic : orig) {
-            orig.setValue(ic, (rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] - newMin)*scaleFactor + oldMin);
+            orig.setValue(ic, (float) ((rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] - newMin)*scaleFactor + oldMin));
         }
         
         orig.clearBoxOfInterest();

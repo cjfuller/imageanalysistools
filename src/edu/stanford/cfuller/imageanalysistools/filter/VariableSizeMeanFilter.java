@@ -194,7 +194,7 @@ public class VariableSizeMeanFilter extends Filter {
 		
 		//for 3D, residual is Laplacian divided by sqrt(56)
 		
-		double norm = Math.sqrt(56);
+		float norm = (float) Math.sqrt(56);
 		
 		//for 2D, residual is sqrt(30)
 		
@@ -239,7 +239,7 @@ public class VariableSizeMeanFilter extends Filter {
 		for (OcttreeNode node : leaves) {
 			
 			double count = 0;
-			double mean = 0;
+			float mean = 0;
 			
 			im.setBoxOfInterest(node.getBoxMin(), node.getBoxMax());
 			

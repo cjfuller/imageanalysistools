@@ -119,7 +119,7 @@ public class GaussianImageObject extends ImageObject {
                 x.add((double) ic.get(ImageCoordinate.X));
                 y.add((double) ic.get(ImageCoordinate.Y));
                 z.add((double) ic.get(ImageCoordinate.Z));
-                f.add(parent.getValue(ic));
+                f.add((double) parent.getValue(ic));
             }
 
             xValues = new double[x.size()];

@@ -50,7 +50,7 @@ public class TimeAveragingMethod extends Method {
 
         dimSizes.set(ImageCoordinate.C,this.images.size());
 
-        Image reference = new Image(dimSizes, 0.0);
+        Image reference = new Image(dimSizes, 0.0f);
         
         for (ImageCoordinate ic : reference) {
             ImageCoordinate ic_c = ImageCoordinate.cloneCoord(ic);
@@ -65,7 +65,7 @@ public class TimeAveragingMethod extends Method {
 
         dimSizes.set(ImageCoordinate.T,1);
 
-        Image timeAveraged = new Image(dimSizes, 0.0);
+        Image timeAveraged = new Image(dimSizes, 0.0f);
 
         java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
 

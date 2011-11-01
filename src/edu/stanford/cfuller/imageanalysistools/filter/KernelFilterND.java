@@ -112,7 +112,7 @@ public class KernelFilterND extends Filter {
 	
 				}
 				
-				im.setValue(ic, filterTotal/kernelTotal);
+				im.setValue(ic, (float) (filterTotal/kernelTotal));
 				
 				original.clearBoxOfInterest();
 			

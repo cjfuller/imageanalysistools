@@ -70,15 +70,25 @@ public abstract class Method implements Runnable {
 		
 		if (Boolean.parseBoolean(parameters.getValueForKey("DEBUG"))) {
 			LoggingUtilities.getLogger().info("starting filters");
-//		    toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
-        }
+		    //toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
+			String name = Integer.toString(c++);
+			
+			ij.ImagePlus ip = (new Image(toProcess)).toImagePlus();
+			ip.setTitle(name);
+			ip.show();
+		}
 		for (Filter f : filters) {
 			
 			f.apply(toProcess);
             if (Boolean.parseBoolean(parameters.getValueForKey("DEBUG"))) {
-    			LoggingUtilities.getLogger().info("completed filter #" + c++);
-
-//			   toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
+    			LoggingUtilities.getLogger().info("completed filter #" + c);
+    			if (this.updater == null) c++;
+    			String name = Integer.toString(c);
+    			
+    			ij.ImagePlus ip = (new Image(toProcess)).toImagePlus();
+    			ip.setTitle(name);
+    			ip.show();
+			   //toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
             }
             if (this.updater != null) {
             	updater.update(++c, filters.size(), null);

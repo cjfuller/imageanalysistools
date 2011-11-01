@@ -95,7 +95,7 @@ public class CentroidImageObject extends ImageObject {
             java.util.Vector<Double> x = new java.util.Vector<Double>();
             java.util.Vector<Double> y = new java.util.Vector<Double>();
             java.util.Vector<Double> z = new java.util.Vector<Double>();
-            java.util.Vector<Double> f = new java.util.Vector<Double>();
+            java.util.Vector<Float> f = new java.util.Vector<Float>();
 
 
             for (ImageCoordinate ic : this.parent) {
@@ -105,7 +105,7 @@ public class CentroidImageObject extends ImageObject {
                 if (((int) this.mask.getValue(ic)) == this.label) {
                 	f.add(parent.getValue(ic));
                 } else {
-                	f.add(0.0);
+                	f.add(0.0f);
                 }
             }
 

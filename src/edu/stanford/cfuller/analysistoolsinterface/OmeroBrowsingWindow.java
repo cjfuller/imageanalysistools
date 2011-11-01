@@ -184,10 +184,6 @@ public class OmeroBrowsingWindow extends javax.swing.JFrame {
         this.controller.doneButtonPressed();
     }//GEN-LAST:event_imageButtonActionPerformed
 
-    /**
-    * @param args the command line arguments
-    */
-  
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton imageButton;

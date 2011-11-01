@@ -126,7 +126,7 @@ public class GaussianFilter extends Filter {
 				sum+= imValue * coeffs[halfKernelSize + offset];
 				
 			}
-			intermediate.setValue(i, sum/(partialCoeffSum/coeffsSum));
+			intermediate.setValue(i, (float) (sum/(partialCoeffSum/coeffsSum)));
 		}
 		
 		for (ImageCoordinate i : intermediate) {
@@ -147,7 +147,7 @@ public class GaussianFilter extends Filter {
 				sum+= imValue * coeffs[halfKernelSize + offset];
 				
 			}
-			im.setValue(i, sum/(partialCoeffSum/coeffsSum));
+			im.setValue(i, (float) (sum/(partialCoeffSum/coeffsSum)));
 		}
 		
 		ic.recycle();

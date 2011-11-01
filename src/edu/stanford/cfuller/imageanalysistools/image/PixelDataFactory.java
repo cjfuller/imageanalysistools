@@ -79,7 +79,7 @@ public class PixelDataFactory {
         if (sizeInBytes > maxByteSize) {
             return new LargePixelData(size_x, size_y, size_z, size_c, size_t, data_type, dimensionOrder);
         } else {
-            return new PixelData(size_x, size_y, size_z, size_c, size_t, data_type, dimensionOrder);
+            return new ImagePlusPixelData(size_x, size_y, size_z, size_c, size_t, data_type, dimensionOrder);
         }
         
         

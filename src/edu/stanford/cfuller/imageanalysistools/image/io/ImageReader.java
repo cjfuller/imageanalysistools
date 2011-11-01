@@ -196,7 +196,7 @@ public class ImageReader {
         currentSeries.put(filename, currentSeries.get(filename) + 1);
 
         release(filename, Thread.currentThread());
-
+        
 		return toReturn;
 		
 	}

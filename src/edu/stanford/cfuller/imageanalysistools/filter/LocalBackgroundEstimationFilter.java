@@ -76,15 +76,17 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		//RealVector localArea = new org.apache.commons.math.linear.ArrayRealVector();
 		
 		edu.stanford.cfuller.imageanalysistools.image.Histogram h = new edu.stanford.cfuller.imageanalysistools.image.Histogram(this.referenceImage);
-
+		
 		int numPixelsInBox = boxSize*boxSize;
 		
 		ImageCoordinate ic = this.referenceImage.getDimensionSizes();
 		
 		ImageCoordinate icnew = ImageCoordinate.createCoordXYZCT(ic.get(ImageCoordinate.X)+2*boxSize, ic.get(ImageCoordinate.Y)+2*boxSize, ic.get(ImageCoordinate.Z), ic.get(ImageCoordinate.C), ic.get(ImageCoordinate.T));
 
-		Image padded = new Image(icnew, -1.0);
+		Image padded = new Image(icnew, -1.0f);
 		
+		
+		float maxValue = 0;
 		
 		for(ImageCoordinate i : this.referenceImage) {
 		
@@ -96,7 +98,10 @@ public class LocalBackgroundEstimationFilter extends Filter {
 			
 			padded.setValue(icnew, this.referenceImage.getValue(i));
 			
+			if (this.referenceImage.getValue(i) > maxValue) maxValue = this.referenceImage.getValue(i);
+					
 		}
+						
 		
 		
 		RealVector overallCounts = new org.apache.commons.math.linear.ArrayRealVector(h.getMaxValue() + 1);

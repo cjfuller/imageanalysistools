@@ -24,6 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.image;
 
+import ij.ImagePlus;
+
 
 /**
  * Holds image pixel data in a type-independent manner; handles conversion to the appropriate number format for the data being stored to disk.
@@ -288,7 +290,12 @@ public class PixelData implements java.io.Serializable {
      * @return      The value of the PixelData at the specified coordinates, as a float.
      */
 	public float getPixel(int x, int y, int z, int c, int t) {
+		try {
 		return convertedPixels[x*x_offset + y*y_offset + z*z_offset + c*c_offset + t*t_offset];
+		} catch (ArrayIndexOutOfBoundsException e) {
+			System.out.printf("offsets: %d, %d, %d, %d, %d\n requested: %d, %d, %d, %d, %d\n", x_offset, y_offset, z_offset, c_offset, t_offset, x, y, z, c, t);
+			throw e;
+		}
 	}
 
 
@@ -385,7 +392,7 @@ public class PixelData implements java.io.Serializable {
         case loci.formats.FormatTools.UINT16:
 
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (float)) ((in.getShort()) & 0xFFFF);
+				convertedPixels[counter++] = (float) ((in.getShort()) & 0xFFFF);
 			}
             break;
 
@@ -450,9 +457,9 @@ public class PixelData implements java.io.Serializable {
 		} else {
 			
 			bytes_out = java.nio.ByteBuffer.allocate(this.convertedPixels.length * loci.formats.FormatTools.getBytesPerPixel(this.dataType));
-			
+
 		}
-		
+				
 		bytes_out.order(this.byteOrder);
 		
 		switch (this.dataType) {
@@ -578,6 +585,17 @@ public class PixelData implements java.io.Serializable {
      */
 	public java.nio.ByteOrder getByteOrder() {
 		return this.byteOrder;
+	}
+	
+	/**
+	 * Returns an ImagePlus representation of the data contained in this PixelData.
+	 * <p>
+	 * This may return null if an ImagePlus is not involved in the representation of the PixelData.
+	 * 
+	 * @return	An ImagePlus representation of the PixelData, or null.
+	 */
+	public ImagePlus toImagePlus() {
+		return null;
 	}
 	
 }

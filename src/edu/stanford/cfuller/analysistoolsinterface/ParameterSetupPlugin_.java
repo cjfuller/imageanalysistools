@@ -25,6 +25,7 @@
 package edu.stanford.cfuller.analysistoolsinterface;
 
 import ij.plugin.PlugIn;
+import edu.stanford.cfuller.analysistoolsinterface.ParameterSetupController;
 
 /**
  * @author cfuller
@@ -38,8 +39,8 @@ public class ParameterSetupPlugin_ implements PlugIn {
 	@Override
 	public void run(String arg0) {
 
-		(new ParameterSetupController()).startTask();
-		
+		ParameterSetupController p = new ParameterSetupController();
+		java.awt.EventQueue.invokeLater(p);
 	}
 
 }

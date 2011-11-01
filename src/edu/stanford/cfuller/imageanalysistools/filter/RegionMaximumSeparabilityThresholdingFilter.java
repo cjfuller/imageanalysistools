@@ -246,9 +246,9 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		
 
 		
-		double[] sums = new double[numRegions];
+		float[] sums = new float[numRegions];
 		
-		java.util.Arrays.fill(sums, 0.0);
+		java.util.Arrays.fill(sums, 0.0f);
 				
 		for (ImageCoordinate ic : result) {
 			
@@ -266,7 +266,7 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		
 		ImageCoordinate dimensionSizes = ImageCoordinate.createCoordXYZCT(numRegions, 1,1,1,1);
 		
-		Image meanValues = new Image(dimensionSizes, 0.0);
+		Image meanValues = new Image(dimensionSizes, 0.0f);
 		
 
 		

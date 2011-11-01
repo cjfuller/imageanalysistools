@@ -153,7 +153,7 @@ public class WatershedFilter extends Filter {
     protected Image getSeedImage(java.util.Hashtable<Double, java.util.Vector<Vector3D> > greylevelLookup, Image im, Histogram h) {
 
         Image tempSeed = this.seedImage;
-        if (tempSeed == null) tempSeed = new Image(im.getDimensionSizes(), 0.0);
+        if (tempSeed == null) tempSeed = new Image(im.getDimensionSizes(), 0.0f);
 
         double minValue = h.getMinValue();
 

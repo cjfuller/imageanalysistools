@@ -42,7 +42,7 @@ public class ZeroPointFilter extends Filter {
 	@Override
 	public void apply(Image im) {
 		
-		double min = 0;
+		float min = 0;
 		
 		for (ImageCoordinate ic : im) {
 			if (im.getValue(ic) < min) min = im.getValue(ic);

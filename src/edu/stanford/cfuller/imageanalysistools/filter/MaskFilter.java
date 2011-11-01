@@ -47,7 +47,7 @@ public class MaskFilter extends Filter {
      */
 	@Override
 	public void apply(Image im) {
-
+		
 		for (ImageCoordinate c : im) {
 			if (this.referenceImage.getValue(c) == 0) {
 				im.setValue(c, 0);

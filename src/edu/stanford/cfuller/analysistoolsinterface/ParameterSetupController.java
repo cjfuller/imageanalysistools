@@ -29,7 +29,6 @@ package edu.stanford.cfuller.analysistoolsinterface;
 import edu.stanford.cfuller.imageanalysistools.parameters.Parameter;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterXMLParser;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterXMLWriter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.List;
 import java.util.Vector;

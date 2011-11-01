@@ -50,7 +50,11 @@ public class ImageAnalysisToolsPlugin_ implements PlugIn {
 	@Override
 	public void run(String arg) {
 		
+		if (ij.WindowManager.getImageCount() == 0) {ij.IJ.noImage(); return;}
+
+		
 		ImagePlus imPl = ij.IJ.getImage();
+		
 		
 		IJAnalysis ija = new IJAnalysis();
 		
@@ -87,8 +91,11 @@ public class ImageAnalysisToolsPlugin_ implements PlugIn {
 				
 				ImagePlus output = ija.run(p);
 				
+				if (output!=null) {
 				
-				output.show();
+					output.show();
+					
+				}
 				
 			}
 			
