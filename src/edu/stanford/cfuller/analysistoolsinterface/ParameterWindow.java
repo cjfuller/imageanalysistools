@@ -27,6 +27,7 @@ package edu.stanford.cfuller.analysistoolsinterface;
 
 import edu.stanford.cfuller.imageanalysistools.parameters.Parameter;
 import javax.swing.DefaultListModel;
+import javax.swing.DropMode;
 
 /**
  *
@@ -44,7 +45,8 @@ public class ParameterWindow extends javax.swing.JFrame {
         this.inUseParametersModel = new DefaultListModel();
         initComponents();
         this.usedParameterList.setModel(this.inUseParametersModel);
-
+        this.availableParameterList.setDragEnabled(true);
+        this.usedParameterList.setDropMode(DropMode.ON_OR_INSERT);
     }
 
     public void setAvailableParameters(java.util.List<Object> parameters) {
