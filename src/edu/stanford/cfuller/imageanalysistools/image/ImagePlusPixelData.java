@@ -27,7 +27,6 @@ package edu.stanford.cfuller.imageanalysistools.image;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.FloatProcessor;
-import ij.process.ImageConverter;
 
 /**
  * A type of PixelData that uses an ImageJ ImagePlus as its underlying representation.
@@ -126,10 +125,8 @@ public class ImagePlusPixelData extends PixelData {
 		this.initNewImagePlus();
 	}
 	
-	/**
-	 * Creates a new ImagePlusPixelData from an existing ImagePlus.
-	 * 
-	 * @param imPl	The ImagePlus to use.  This will not be copied, but used and potentially modified in place.
+	/* (non-Javadoc)
+	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#PixelData(int, int, int, int, int, int, String)
 	 */
 	public ImagePlusPixelData(int size_x, int size_y, int size_z, int size_c, int size_t, int data_type, String dimensionOrder) {
 
