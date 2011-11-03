@@ -143,6 +143,8 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 				eta_v.setEntry(c, 0);
 			}
 			
+			System.out.printf("%d, %f\n", k, eta_v.getEntry(c));
+			
 			c++;
 			
 		}
@@ -167,7 +169,10 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 				if (eta_v.getEntry(c) > 0.5*best_eta) { //require that we're close to the best
 				
 					maxima.add(k);
+					System.out.println("added local maximum at " + k + " with eta=" + eta_v.getEntry(c));
 					
+				} else {
+					System.out.println("detected local maximum, but ignoring, at " + k + " with eta=" + eta_v.getEntry(c));
 				}
 				
 			}

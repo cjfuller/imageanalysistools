@@ -65,6 +65,13 @@ public class Renormalization3DFilter extends Filter {
         ZeroPointFilter zpf = new ZeroPointFilter();
         
         kf.apply(mean);
+        
+//        LocalBackgroundEstimation3DFilter LBE3F = new LocalBackgroundEstimation3DFilter();
+//        LBE3F.setParameters(this.params);
+//        LBE3F.setBoxSize(5);
+//        
+//        LBE3F.apply(mean);
+        
         kf.setParameters(this.params);
         lfnd.setParameters(this.params);
         zpf.setParameters(this.params);
