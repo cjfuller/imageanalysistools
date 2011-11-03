@@ -26,16 +26,12 @@ package edu.stanford.cfuller.imageanalysistools.method;
 
 
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
-import edu.stanford.cfuller.imageanalysistools.filter.KernelFilterND;
 import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.LaplacianFilterND;
 import edu.stanford.cfuller.imageanalysistools.filter.LocalMaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.ThreePartMaximumSeparabilityFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.ZeroPointFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 
@@ -83,13 +79,10 @@ public class CentromereFinding3DMethod extends Method {
         java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
                 
         Renormalization3DFilter LBE3F = new Renormalization3DFilter();
-       
         
         filters.add(LBE3F);
-
         
-        //filters.add(new LocalMaximumSeparabilityThresholdingFilter());
-        filters.add(new ThreePartMaximumSeparabilityFilter());
+        filters.add(new LocalMaximumSeparabilityThresholdingFilter());
         filters.add(new Label3DFilter());
         filters.add(new RecursiveMaximumSeparability3DFilter());
         filters.add(new RelabelFilter());
