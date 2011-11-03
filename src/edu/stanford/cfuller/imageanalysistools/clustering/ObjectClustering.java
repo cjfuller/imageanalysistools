@@ -31,7 +31,7 @@ import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.LabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.MaskFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.GaussianFilter;
-import org.apache.commons.math.geometry.Vector3D;
+import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math.linear.ArrayRealVector;
 import edu.stanford.cfuller.imageanalysistools.random.RandomGenerator;
 

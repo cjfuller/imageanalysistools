@@ -131,6 +131,8 @@ public class MaximumSeparabilityThresholdingFilter extends Filter {
 					best_index = k;
 				}
 				
+				//System.out.printf("%d, %f\n", k, eta);
+				
 			}
 			
 			c++;

@@ -25,6 +25,9 @@
 
 package edu.stanford.cfuller.analysistoolsinterface;
 
+import javax.swing.GroupLayout;
+import javax.swing.LayoutStyle;
+
 /**
  *
  * @author cfuller
@@ -79,38 +82,38 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(10, 10, 10)
-                        .add(jLabel1))
-                    .add(layout.createSequentialGroup()
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(jLabel2))
-                    .add(layout.createSequentialGroup()
+                        .addComponent(jLabel2))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(taskSelectorComboBox, 0, 270, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .addComponent(taskSelectorComboBox, 0, 270, Short.MAX_VALUE))
+                    .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap(212, Short.MAX_VALUE)
-                        .add(goButton)))
+                        .addComponent(goButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(6, 6, 6)
-                .add(jLabel1)
-                .add(18, 18, 18)
-                .add(jLabel2)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(taskSelectorComboBox, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(goButton)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel2)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(taskSelectorComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(goButton)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();

@@ -75,7 +75,7 @@ public class CentromereFindingMethod extends Method {
 
         java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
 
-        filters.add(new MaximumSeparabilityThresholdingFilter());
+        filters.add(new LocalMaximumSeparabilityThresholdingFilter());
         filters.add(new LabelFilter());
         filters.add(new RecursiveMaximumSeparabilityFilter());
         filters.add(new RelabelFilter());
@@ -111,6 +111,7 @@ public class CentromereFindingMethod extends Method {
      */
     @Override
     public void go() {
+    	this.parameters.setValueForKey("DEBUG", "false");
 
         SizeAbsoluteFilter SELF = new SizeAbsoluteFilter();
         SimpleThresholdingFilter ImThF = new SimpleThresholdingFilter();
@@ -123,7 +124,7 @@ public class CentromereFindingMethod extends Method {
         ImThF.setParameters(this.parameters);
         LF.setParameters(this.parameters);
         RLF.setParameters(this.parameters);
-
+        
         Image normalized = new Image(this.images.get(0));
 
 
@@ -148,6 +149,7 @@ public class CentromereFindingMethod extends Method {
         //clustering
 
         if(this.parameters.hasKeyAndTrue("use_clustering")) {
+        	
             //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Filtering");
 
             Image gaussianFilteredMask = ObjectClustering.gaussianFilterMask(groupMask);

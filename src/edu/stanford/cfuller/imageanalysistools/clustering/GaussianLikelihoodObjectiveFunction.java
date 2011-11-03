@@ -25,6 +25,8 @@
 package edu.stanford.cfuller.imageanalysistools.clustering;
 
 import edu.stanford.cfuller.imageanalysistools.fitting.ObjectiveFunction;
+
+import org.apache.commons.math.analysis.function.Exp;
 import org.apache.commons.math.linear.*;
 
 /**
@@ -192,7 +194,7 @@ public class GaussianLikelihoodObjectiveFunction implements ObjectiveFunction {
                 if (clusterProbs.getEntry(n, k) > tempMax) tempMax = clusterProbs.getEntry(n,k);
             }
 
-            pk.setEntry(k, tempMax + Math.log(clusterProbs.getColumnVector(k).mapSubtract(tempMax).mapExpToSelf().getL1Norm()) - Math.log(this.objects.size()));
+            pk.setEntry(k, tempMax + Math.log(clusterProbs.getColumnVector(k).mapSubtract(tempMax).mapToSelf(new Exp()).getL1Norm()) - Math.log(this.objects.size()));
             
         }
 
@@ -203,7 +205,7 @@ public class GaussianLikelihoodObjectiveFunction implements ObjectiveFunction {
             if (pk.getEntry(k) > pkMax) pkMax = pk.getEntry(k);
         }
 
-        double logSumPk = pkMax + Math.log(pk.mapSubtract(pkMax).mapExpToSelf().getL1Norm());
+        double logSumPk = pkMax + Math.log(pk.mapSubtract(pkMax).mapToSelf(new Exp()).getL1Norm());
 
         pk.mapSubtractToSelf(logSumPk);
 
@@ -221,7 +223,7 @@ public class GaussianLikelihoodObjectiveFunction implements ObjectiveFunction {
                 if (toSum.getEntry(k) > tempMax) tempMax = toSum.getEntry(k);
             }
 
-            double pn = tempMax + Math.log(toSum.mapSubtract(tempMax).mapExpToSelf().getL1Norm());
+            double pn = tempMax + Math.log(toSum.mapSubtract(tempMax).mapToSelf(new Exp()).getL1Norm());
 
             //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("pn: " + pn);
 

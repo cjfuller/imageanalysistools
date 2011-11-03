@@ -71,7 +71,7 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
                                                                 // overwrites the reference Image, so make a copy
 		boolean doRecursion = true;
 		
-		Image maskBuffer = new Image(im.getDimensionSizes(), 0.0);
+		Image maskBuffer = new Image(im.getDimensionSizes(), 0.0f);
 		
 		Image imageBuffer = null;
 		
@@ -190,6 +190,7 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
 				ImageCoordinate lowerBound = ImageCoordinate.createCoordXYZCT(lower_width, lower_height, 0, 0, 0);
 				ImageCoordinate upperBound = ImageCoordinate.createCoordXYZCT(upper_width + 1, upper_height + 1, 1, 1, 1);
 
+				
                 maskBuffer.setBoxOfInterest(lowerBound, upperBound);
                 imageBuffer = this.referenceImage;
                 imageBuffer.setBoxOfInterest(lowerBound, upperBound);

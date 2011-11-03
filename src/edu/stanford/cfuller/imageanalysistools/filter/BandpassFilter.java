@@ -183,7 +183,7 @@ public class BandpassFilter extends Filter {
 
 
             for (ImageCoordinate ic : im) {
-                im.setValue(ic, (rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] - newMin)*scaleFactor + oldMin);
+                im.setValue(ic, (float) ((rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] - newMin)*scaleFactor + oldMin));
             }
 
 

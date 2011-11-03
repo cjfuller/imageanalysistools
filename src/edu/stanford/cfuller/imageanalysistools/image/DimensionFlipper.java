@@ -43,7 +43,7 @@ public class DimensionFlipper {
         sizes.set(ImageCoordinate.T,sizes.get(ImageCoordinate.Z));
         sizes.set(ImageCoordinate.Z,temp_t);
 
-        Image newImage = new Image(sizes, 0.0);
+        Image newImage = new Image(sizes, 0.0f);
 
         ImageCoordinate flipCoord = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 

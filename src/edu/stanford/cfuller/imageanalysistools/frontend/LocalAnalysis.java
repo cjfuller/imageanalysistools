@@ -44,7 +44,7 @@ import java.io.PrintWriter;
 
 public class LocalAnalysis {
 
-    private LocalAnalysis() {}
+    protected LocalAnalysis() {}
 
     private static edu.stanford.cfuller.imageanalysistools.image.io.ImageReader reader;
 
@@ -306,7 +306,9 @@ public class LocalAnalysis {
 
         Image multiwavelength = fileSet.getImageForIndex(0);
 
+        
         java.util.List<Image> split = multiwavelength.splitChannels();
+        
 
         ImageSet splitSet = new ImageSet(fileSet.getParameters());
 
@@ -326,8 +328,13 @@ public class LocalAnalysis {
     }
 
 
-
-    private static Method getMethod(ParameterDictionary params) {
+    /**
+     * Retrieves the method to run from a parameter dictionary.
+     * 
+     * @param params	The parameter dictionary containing information about the method to run.
+     * @return			A Method object of the type specified in the parameter dictionary.
+     */
+    public static Method getMethod(ParameterDictionary params) {
 
         String methodName = params.getValueForKey("method_name");
         Method method = null;

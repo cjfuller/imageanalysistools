@@ -66,7 +66,7 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 		
 		boolean first = true;
 				
-		Image counts = new Image(this.referenceImage.getDimensionSizes(), 0.0);
+		Image counts = new Image(this.referenceImage.getDimensionSizes(), 0.0f);
 		
 		ImageCoordinate lastCoordinate = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 		
@@ -86,7 +86,7 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 				
 				this.referenceImage.setBoxOfInterest(boxMin, boxMax);
 			
-				double total = 0;
+				float total = 0;
 				int count = 0;
 				
 				for (ImageCoordinate iBox : this.referenceImage) {
@@ -111,7 +111,7 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 				int y = i.get(ImageCoordinate.Y);
 				int z = i.get(ImageCoordinate.Z);
 								
-				double sum = 0;
+				float sum = 0;
 				
 				int count = 0;
 				

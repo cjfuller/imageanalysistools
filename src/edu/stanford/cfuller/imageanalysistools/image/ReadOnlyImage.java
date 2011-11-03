@@ -74,13 +74,13 @@ public class ReadOnlyImage extends Image {
 
     /**
      * Overrides the setValue function to throw an UnsupportedOperationException.
-     * @deprecated  Use {@link #setValue(ImageCoordinate, double)} instead.
+     * @deprecated  Use {@link #setValue(ImageCoordinate, float)} instead.
      * @param row   The row (y-coordinate) to set.
      * @param col   The column (x-coordinate) to set.
      * @param value The value that the Image will be set to at the specified location.
      */
     @Override
-    public void setValue(int row, int col, double value) {
+    public void setValue(int row, int col, float value) {
         throw new UnsupportedOperationException("Setting values is not supported for read-only Images.");
     }
 
@@ -90,7 +90,7 @@ public class ReadOnlyImage extends Image {
      * @param value     The value to which to set the Image at the specified coordinate.
      */
     @Override
-    public void setValue(ImageCoordinate coord, double value) {
+    public void setValue(ImageCoordinate coord, float value) {
         throw new UnsupportedOperationException("Setting values is not supported for read-only Images.");
     }
 

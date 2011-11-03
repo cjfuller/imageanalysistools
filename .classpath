@@ -3,12 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/bio-formats.jar"/>
-	<classpathentry kind="lib" path="lib/commons-math-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/loci-common.jar"/>
 	<classpathentry kind="lib" path="lib/ome-xml.jar"/>
 	<classpathentry kind="lib" path="lib/omero_client.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-nop-1.6.1.jar"/>
-	<classpathentry kind="lib" path="lib/swing-layout-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/ij.jar"/>
+	<classpathentry kind="lib" path="lib/commons-math.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

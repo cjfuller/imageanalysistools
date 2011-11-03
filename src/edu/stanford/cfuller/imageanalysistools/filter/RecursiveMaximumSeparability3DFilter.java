@@ -69,7 +69,7 @@ public class RecursiveMaximumSeparability3DFilter extends Filter {
                                                                 // overwrites the reference Image, so make a copy
 		boolean doRecursion = true;
 		
-		Image maskBuffer = new Image(im.getDimensionSizes(), 0.0);
+		Image maskBuffer = new Image(im.getDimensionSizes(), 0.0f);
 		
 		Image imageBuffer = null;
 		

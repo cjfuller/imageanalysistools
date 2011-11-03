@@ -30,9 +30,9 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 import org.apache.commons.math.ConvergenceException;
-import org.apache.commons.math.FunctionEvaluationException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.commons.math.analysis.integration.LegendreGaussIntegrator;
+import org.apache.commons.math.exception.util.DummyLocalizable;
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
@@ -71,10 +71,9 @@ public class GaussianImageObject extends ImageObject {
     /**
      * Fits this object to a 3-dimensional gaussian, and estimates error and goodness of fit.
      * @param p     The parameters for the current analysis.
-     * @throws FunctionEvaluationException if there is an error evaluating the gaussian function or the likelihood function used to fit the gaussian.
      * @throws OptimizationException        if the optimizer used to compute the fit raises an exception.
      */
-    public void fitPosition(ParameterDictionary p) throws FunctionEvaluationException, OptimizationException {
+    public void fitPosition(ParameterDictionary p) throws OptimizationException {
 
         if (this.sizeInPixels == 0) {
             this.nullifyImages();
@@ -120,7 +119,7 @@ public class GaussianImageObject extends ImageObject {
                 x.add((double) ic.get(ImageCoordinate.X));
                 y.add((double) ic.get(ImageCoordinate.Y));
                 z.add((double) ic.get(ImageCoordinate.Z));
-                f.add(parent.getValue(ic));
+                f.add((double) parent.getValue(ic));
             }
 
             xValues = new double[x.size()];
@@ -291,7 +290,7 @@ public class GaussianImageObject extends ImageObject {
             
             eif.setParams(b, n_photons, A, sa_z, sa_x, a, alpha);
             
-            LegendreGaussIntegrator lgi = new LegendreGaussIntegrator(5, 1000);
+            LegendreGaussIntegrator lgi = new LegendreGaussIntegrator(5, 10, 1000);
             
             //integrate over 10*width of PSF in z 
             
@@ -300,19 +299,15 @@ public class GaussianImageObject extends ImageObject {
             double intpart = 0;
             try {
             	
-            	if (b < 0) throw new FunctionEvaluationException(b, "negative background!"); // a negative value for b seems to cause the integration to hang, preventing the program from progressing
+            	if (b < 0) throw new ConvergenceException(new DummyLocalizable("negative background!")); // a negative value for b seems to cause the integration to hang, preventing the program from progressing
             	
-            	intpart = lgi.integrate(eif, -size, size);
+            	intpart = lgi.integrate(10000, eif, -size, size);
             	
             	double fullIntPart = intpart + Math.pow(2*Math.PI, 1.5)*sa_x*A/Math.sqrt(sa_z);
             	
             	error_x = Math.sqrt(2/(n_photons*sa_z/(2*sa_z + sa_x)*fullIntPart));
             	error_z = Math.sqrt(2/(n_photons*sa_x/(2*sa_z + sa_x)*fullIntPart));
             	
-            } catch (FunctionEvaluationException e) {
-            	LoggingUtilities.getLogger().severe("Integration error: " + e.getMessage());
-            	error_x = -1;
-            	error_z = -1;
             } catch (ConvergenceException e) {
             	LoggingUtilities.getLogger().severe("Integration error: " + e.getMessage());
             	error_x = -1;
@@ -380,7 +375,7 @@ public class GaussianImageObject extends ImageObject {
     	private DI1Func di1;
     	
     	public ErrIntFunc() {
-    		this.lgi = new LegendreGaussIntegrator(5,1000);
+    		this.lgi = new LegendreGaussIntegrator(5,10,1000);
     		this.di1 = new DI1Func();
     	}
     	
@@ -389,16 +384,16 @@ public class GaussianImageObject extends ImageObject {
     		this.di1.setParams(b,n,A,sa_z,a,alpha);
     	}
     	
-    	public double value(double z) throws FunctionEvaluationException {
+    	public double value(double z) throws IllegalArgumentException {
     		
     		this.di1.setZ(z);
     		
     		double I1 = 0;
     		
     		try {
-    			I1 = lgi.integrate(di1,0,1);
+    			I1 = lgi.integrate(10000,di1,0,1);
     		} catch (ConvergenceException e) {
-    			throw new FunctionEvaluationException(e, z);
+    			throw new IllegalArgumentException(e);
     		}
     		
     		double part1 = 4*Math.PI*A*Math.exp(-z*z/(2*sa_z))*I1;

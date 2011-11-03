@@ -24,28 +24,26 @@
 
 package edu.stanford.cfuller.imageanalysistools.method;
 
-
-import java.util.ArrayList;
-
-import org.apache.commons.math.linear.Array2DRowRealMatrix;
-import org.apache.commons.math.linear.ArrayRealVector;
-import org.apache.commons.math.linear.RealMatrix;
-import org.apache.commons.math.linear.RealVector;
-
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
+import edu.stanford.cfuller.imageanalysistools.filter.KernelFilterND;
+import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.LaplacianFilterND;
+import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.RenormalizationFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.VariableSizeMeanFilter;
-import edu.stanford.cfuller.imageanalysistools.fitting.CentroidImageObject;
-import edu.stanford.cfuller.imageanalysistools.fitting.ImageObject;
-import edu.stanford.cfuller.imageanalysistools.image.Histogram;
+import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.ZeroPointFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
-import edu.stanford.cfuller.imageanalysistools.image.ReadOnlyImage;
-import edu.stanford.cfuller.imageanalysistools.image.io.PromptingImageReader;
+import edu.stanford.cfuller.imageanalysistools.matching.KinetochoreMatcher;
+import edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric;
 
 /**
- * @author cfuller
+ * A veritable playground of image analysis that will sit in the GUI and allow
+ * easy testing of new methods.
+ * 
+ * @author Colin J. Fuller
  *
  */
 public class TestMethod extends Method {
@@ -55,163 +53,94 @@ public class TestMethod extends Method {
 	 */
 	@Override
 	public void go() {
-
-        java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
-
-        filters.add(new Renormalization3DFilter());
 		
-        for (Filter f : filters) {
-            f.setParameters(this.parameters);
-            f.setReferenceImage(this.images.get(0));
-        }
-
-        //java.awt.image.BufferedImage buffered = toProcess.toBufferedImage();
-        
-        //Image converted = new Image(buffered);
-
-        PromptingImageReader pir = new PromptingImageReader();
-        
-        Image mask = null;
-        
-        try {
-        	mask = pir.promptingRead();
-        } catch (java.io.IOException e) {
-        	e.printStackTrace();
-        }
-        
-        Histogram h = new Histogram(mask);
-        
-        ArrayList<ImageObject> imageObjects = new ArrayList<ImageObject>();
-        
-        for (int i = 1; i <= h.getMaxValue(); i++) {
-        	
-        	ImageObject o = new CentroidImageObject(i, new ReadOnlyImage(mask), new ReadOnlyImage(this.images.get(0)), this.parameters);
-        	try {
-        		o.fitPosition(this.parameters);
-        	} catch (Exception e) {
-        		e.printStackTrace();
-        	}
-        	
-        	imageObjects.add(o);
-        	
-        	System.out.printf("%d: %s\n", o.getLabel(), o.getPositionForChannel(0).toString());
-        }
-        
-        RealMatrix distanceMatrix = new Array2DRowRealMatrix(h.getMaxValue(), h.getMaxValue());
-        RealMatrix weightMatrix = new Array2DRowRealMatrix(h.getMaxValue(), h.getMaxValue());
-
-        Image matchingChannel = this.images.get(2);
-        
-        for (int i = 0; i < h.getMaxValue(); i++) {
-        	for (int j = 0; j < h.getMaxValue(); j++) {
-        		distanceMatrix.setEntry(i,j, imageObjects.get(i).getPositionForChannel(0).getDistance(imageObjects.get(j).getPositionForChannel(0)));
-        		
-        		
-        		if (i == j) {
-        			weightMatrix.setEntry(i,j,0);
-        		} else {
-        			weightMatrix.setEntry(i,j,getWeight(imageObjects.get(i).getPositionForChannel(0), imageObjects.get(j).getPositionForChannel(0), matchingChannel));
-        		}
-        		
-        		System.out.printf("%d --> %d: %f\n", i+1, j+1, weightMatrix.getEntry(i,j));
-        	}
-        }
-        
-        double cutoff = 40;
-        
-        for (int i = 0; i < h.getMaxValue(); i++) {
-        	System.out.print((i+1) + "--> " );
-        	for (int j = 0; j < h.getMaxValue(); j++) {
-        		if (distanceMatrix.getEntry(i,j) < cutoff) {
-        			System.out.printf("%d (%0.2f), ", (j+1), weightMatrix.getEntry(i,j));
-        		}
-        	}
-        	
-        	System.out.println("");
-        }
-        
-//
-//        for (int i = 0; i < this.images.size(); i++) {
-//        	
-//        	Image toProcess = new Image(this.images.get(i));
-//        	
-//            iterateOnFiltersAndStoreResult(filters, toProcess, new edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric());
-//
-//        	
-//        }
+//		Image input = new Image(this.images.get(2));
+//		KernelFilterND kf = new KernelFilterND();
+//		
+//		double[] d = {0.1, 0.2, 0.4, 0.2, 0.1};
+//				
+//		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.X, d);
+//		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Y, d);
+//		kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Z, d);
+//		java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
+//        		
+//        Renormalization3DFilter LBE3F = new Renormalization3DFilter();
+//       
 //        
+////        filters.add(LBE3F);
+////        LBE3F.setParameters(this.parameters);
+////        
+////        Image QOSeg = new Image(input);
+////        LBE3F.apply(QOSeg);
+//        
+//        filters.add(kf);
+//        
+//        LaplacianFilterND lf = new LaplacianFilterND();
+//        
+//        filters.add(lf);
+//        
+//        filters.add(new ZeroPointFilter());
+//        
+//        filters.add(new MaximumSeparabilityThresholdingFilter());
+//        filters.add(new Label3DFilter());
+//        filters.add(new SizeAbsoluteFilter());
+//        filters.add(new RelabelFilter());
+//        
+//        this.parameters.setValueForKey("min_size", "10");
+//        this.parameters.setValueForKey("max_size", "1000000");
+//        
+////        filters.add(new RecursiveMaximumSeparability3DFilter());
+////        filters.add(new RelabelFilter());
+////        filters.add(new SizeAbsoluteFilter());
+////        filters.add(new RelabelFilter());
+//
+//        for (Filter i : filters){
+//            i.setParameters(this.parameters);
+////            i.setReferenceImage(QOSeg);
+//            i.setReferenceImage(this.images.get(0));
+//        }
+//
+////        Image toProcess = new Image(QOSeg);
+//
+//        iterateOnFiltersAndStoreResult(filters, input, new ZeroMetric());
+		
+//        KinetochoreMatcher km = new KinetochoreMatcher();
+//        
+//        km.setParameters(this.parameters);
+//        
+//        km.makePairs(this.images.get(0), this.images.get(2));
+        
+       
+//        java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
+//
+//        filters.add(new RenormalizationFilter());
+//		
+//        for (Filter f : filters) {
+//            f.setParameters(this.parameters);
+//            f.setReferenceImage(this.images.get(0));
+//        }
+//
+//        Image toProcess = new Image(this.images.get(0));
+//        //java.awt.image.BufferedImage buffered = toProcess.toBufferedImage();
+//        
+//        //Image converted = new Image(buffered);
+//
+//        
+//        iterateOnFiltersAndStoreResult(filters, new Image(toProcess), new edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric());
 
-	}
-	
-	double getWeight(RealVector pos0, RealVector pos1, Image weights) {
+		long start = System.currentTimeMillis();
 		
-		ImageCoordinate boxLower = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
-		ImageCoordinate boxUpper = ImageCoordinate.createCoordXYZCT(1,1,1,1,1);
+		double d = 0;
 		
-		int x0 = (int) Math.round(pos0.getEntry(0));
+		Image process = this.images.get(0);
 		
-		int x1 = (int) Math.round(pos1.getEntry(0));
-		
-		int y0 = (int) Math.round(pos0.getEntry(1));
-		
-		int y1 = (int) Math.round(pos1.getEntry(1));
-		
-		int z0 = (int) Math.round(pos0.getEntry(2));
-		
-		int z1 = (int) Math.round(pos1.getEntry(2));
-		
-		boxLower.set(ImageCoordinate.X, x0 < x1 ? x0 : x1);
-		boxLower.set(ImageCoordinate.Y, y0 < y1 ? y0 : y1);
-		boxLower.set(ImageCoordinate.Z, z0 < z1 ? z0 : z1);
-		
-		boxUpper.set(ImageCoordinate.X, x0 > x1 ? x0+1 : x1+1);
-		boxUpper.set(ImageCoordinate.Y, y0 > y1 ? y0+1 : y1+1);
-		boxUpper.set(ImageCoordinate.Z, z0 > z1 ? z0+1 : z1+1);
-		
-		weights.setBoxOfInterest(boxLower, boxUpper);
-		
-		RealVector currPos = new ArrayRealVector(3, 0.0);
-		RealVector unitVector = pos1.subtract(pos0);
-		unitVector.unitize();
-		
-		double weight = 0;
-		int count = 0;
-		
-		for (ImageCoordinate ic : weights) {
-			
-			currPos.setEntry(0, ic.get(ImageCoordinate.X));
-			currPos.setEntry(1, ic.get(ImageCoordinate.Y));
-			currPos.setEntry(2, ic.get(ImageCoordinate.Z));
-			
-			RealVector posOffset = currPos.subtract(pos0);
-			
-			double dot = unitVector.dotProduct(posOffset);
-			
-			RealVector perpendicular = posOffset.subtract(unitVector.mapMultiply(dot));
-			
-			double distToPixel = perpendicular.getNorm();
-			
-			final double cutoff = 2*Math.sqrt(2);
-			
-			if (distToPixel < cutoff) {
-				weight += weights.getValue(ic);
-				count++;
-			}
-			
-			
+		for (ImageCoordinate ic : process) {
+			d += process.getValue(ic);
 		}
 		
-		weights.clearBoxOfInterest();
+		long end = System.currentTimeMillis();
 		
-		boxLower.recycle();
-		boxUpper.recycle();
-		
-		if (count > 0) {
-			weight/=count;
-		}
-		
-		return weight;
-		
+		System.out.println("time: " + (end-start));
 		
 	}
 

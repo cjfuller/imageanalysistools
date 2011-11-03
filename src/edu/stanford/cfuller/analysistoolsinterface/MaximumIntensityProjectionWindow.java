@@ -25,6 +25,9 @@
 
 package edu.stanford.cfuller.analysistoolsinterface;
 
+import javax.swing.GroupLayout;
+import javax.swing.LayoutStyle;
+
 /**
  *
  * @author cfuller
@@ -97,50 +100,50 @@ public class MaximumIntensityProjectionWindow extends javax.swing.JFrame {
 
         statusLabel.setText("Ready");
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(9, 9, 9)
-                        .add(jLabel1))
-                    .add(layout.createSequentialGroup()
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(directoryTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 333, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(layout.createSequentialGroup()
+                        .addComponent(directoryTextField, GroupLayout.PREFERRED_SIZE, 333, GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(jLabel2))
-                    .add(layout.createSequentialGroup()
+                        .addComponent(jLabel2))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(browseButton))
-                    .add(layout.createSequentialGroup()
+                        .addComponent(browseButton))
+                    .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(goButton)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jLabel3)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(statusLabel)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(goButton)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(statusLabel)))
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(9, 9, 9)
-                .add(jLabel1)
-                .add(38, 38, 38)
-                .add(jLabel2)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(directoryTextField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(browseButton)
-                .add(18, 18, 18)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(goButton)
-                    .add(jLabel3)
-                    .add(statusLabel))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(9, 9, 9)
+                .addComponent(jLabel1)
+                .addGap(38, 38, 38)
+                .addComponent(jLabel2)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(directoryTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(browseButton)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(goButton)
+                    .addComponent(jLabel3)
+                    .addComponent(statusLabel))
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();

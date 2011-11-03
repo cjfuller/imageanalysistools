@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.clustering;
 
-import org.apache.commons.math.geometry.Vector3D;
+import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 
 import java.util.Set;
 
@@ -37,7 +37,7 @@ public class Cluster implements Positioned{
 
     private java.util.Set<ClusterObject> objectSet;
     private int ID;
-    private org.apache.commons.math.geometry.Vector3D centroid;
+    private Vector3D centroid;
 
     /**
      * Constructs an empty cluster.

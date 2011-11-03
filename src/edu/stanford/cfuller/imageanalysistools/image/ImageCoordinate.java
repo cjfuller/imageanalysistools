@@ -366,10 +366,10 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      */
 	public void setCoordXYZCT(int x, int y, int z, int c, int t) {
 		this.set(ImageCoordinate.X, x);
-		this.set(ImageCoordinate.Y, x);
-		this.set(ImageCoordinate.Z, x);
-		this.set(ImageCoordinate.C, x);
-		this.set(ImageCoordinate.T, x);
+		this.set(ImageCoordinate.Y, y);
+		this.set(ImageCoordinate.Z, z);
+		this.set(ImageCoordinate.C, c);
+		this.set(ImageCoordinate.T, t);
 	}
 	
     /**
@@ -384,10 +384,10 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      */
 	public void setCoord(int x, int y, int z, int c, int t) {
 		this.set(ImageCoordinate.X, x);
-		this.set(ImageCoordinate.Y, x);
-		this.set(ImageCoordinate.Z, x);
-		this.set(ImageCoordinate.C, x);
-		this.set(ImageCoordinate.T, x);
+		this.set(ImageCoordinate.Y, y);
+		this.set(ImageCoordinate.Z, z);
+		this.set(ImageCoordinate.C, c);
+		this.set(ImageCoordinate.T, t);
 	}
 
     /**

@@ -29,7 +29,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.FillFilter;
-import org.apache.commons.math.geometry.Vector3D;
+import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 
 /**
  * A Filter that computes a convex hull for each region in a specified Image and converts each region to its filled convex hull.

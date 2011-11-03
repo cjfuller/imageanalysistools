@@ -27,7 +27,7 @@ package edu.stanford.cfuller.imageanalysistools.filter;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
-import org.apache.commons.math.geometry.Vector3D;
+import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 
 import java.util.Hashtable;
 
@@ -153,7 +153,7 @@ public class WatershedFilter extends Filter {
     protected Image getSeedImage(java.util.Hashtable<Double, java.util.Vector<Vector3D> > greylevelLookup, Image im, Histogram h) {
 
         Image tempSeed = this.seedImage;
-        if (tempSeed == null) tempSeed = new Image(im.getDimensionSizes(), 0.0);
+        if (tempSeed == null) tempSeed = new Image(im.getDimensionSizes(), 0.0f);
 
         double minValue = h.getMinValue();
 

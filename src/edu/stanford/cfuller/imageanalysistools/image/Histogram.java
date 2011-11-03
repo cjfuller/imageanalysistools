@@ -164,12 +164,11 @@ public class Histogram implements Serializable {
 		int tempMax = 0;
 	
 		for (ImageCoordinate i : im) {
-			
 			if (im.getValue(i) > tempMax) {
 				tempMax = (int) im.getValue(i);
 			}
 		}
-		
+				
 		return tempMax;
 	}
 

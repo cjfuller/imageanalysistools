@@ -110,7 +110,7 @@ public class GradientFilter extends Filter {
 				outputVal =Math.hypot(output1, output2);
 			}
 			
-			im.setValue(i, Math.floor(outputVal));
+			im.setValue(i, (float) Math.floor(outputVal));
 			
 		}
 		

@@ -46,7 +46,7 @@ public class LaplacianFilterND extends Filter {
 		for (ImageCoordinate ic : im) {
 
 			int count = 0;
-			double total = 0;
+			float total = 0;
 			
 			icTemp.setCoord(ic);
 			
@@ -69,7 +69,7 @@ public class LaplacianFilterND extends Filter {
 				
 			}
 			
-			double laplacian = count * copy.getValue(ic) - total;
+			float laplacian = count * copy.getValue(ic) - total;
 			
 			im.setValue(ic, laplacian);
 			

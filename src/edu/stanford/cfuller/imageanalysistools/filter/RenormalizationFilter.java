@@ -85,20 +85,20 @@ public class RenormalizationFilter extends Filter {
 
 		GAUF.apply(gradient);
 		
-		Image tempStorage = new Image(input.getDimensionSizes(), 0.0);
+		Image tempStorage = new Image(input.getDimensionSizes(), 0.0f);
 		
-		double maxValue = 0.0;
-		double minValue = Double.MAX_VALUE;
+		float maxValue = 0.0f;
+		float minValue = Float.MAX_VALUE;
 		
 		Histogram h = new Histogram(input);
 		
 		for (ImageCoordinate i : output) {
 			
-			double denom = output.getValue(i) + gradient.getValue(i);
+			float denom = output.getValue(i) + gradient.getValue(i);
 			denom = (denom < 1) ? 1 : denom;
 			
 			if (input.getValue(i)/denom > 0) {
-				tempStorage.setValue(i, Math.log(input.getValue(i)/denom));
+				tempStorage.setValue(i, (float) Math.log(input.getValue(i)/denom));
 			} 
 			
 			if (tempStorage.getValue(i) > maxValue) maxValue = tempStorage.getValue(i);
@@ -106,11 +106,11 @@ public class RenormalizationFilter extends Filter {
 			
 		}
 		
-		double sumValue = 0;
+		float sumValue = 0;
 		
 		for (ImageCoordinate i : output) {
 			
-			double tempValue = tempStorage.getValue(i);
+			float tempValue = tempStorage.getValue(i);
 			
 			tempValue = (tempValue - minValue)/(maxValue - minValue) * h.getMaxValue();
 			
@@ -118,14 +118,14 @@ public class RenormalizationFilter extends Filter {
 			
 			sumValue += tempValue;
 			
-			output.setValue(i, Math.floor(tempValue));
+			output.setValue(i, (float) Math.floor(tempValue));
 			
 		}
 		
 		sumValue /= (output.getDimensionSizes().get(ImageCoordinate.X) * output.getDimensionSizes().get(ImageCoordinate.Y));
 		
 		for (ImageCoordinate i : output) {
-			double tempValue = output.getValue(i) - sumValue;
+			float tempValue = output.getValue(i) - sumValue;
 			if (tempValue < 0) tempValue = 0;
 			output.setValue(i, tempValue);
 		}
