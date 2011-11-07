@@ -24,6 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.image.io;
 
+import java.io.File;
+
 import ome.xml.model.enums.EnumerationException;
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
@@ -74,8 +76,7 @@ public class ImageWriter {
 			LoggingUtilities.getLogger().severe("Exception while trying to update dimension order of pixel data: " + e.getMessage());
 		}
 
-		
-		
+	
 		writer.setMetadataRetrieve(toWrite.getMetadata());
 		//the next line is a hack... when writing the same image multiple times, there seems to be some sort of issue with 
 		//the pixels data being deleted, but not having a dummy object put in to read the endianness off of.
@@ -83,11 +84,20 @@ public class ImageWriter {
 		
 		
 		try {
+			
+			File f = new File(filename);
+			
+			if (f.exists()) { // there seems to be some bug with adding to the end of an existing image rather than overwriting if it's there already; delete any existing file to avoid this.
+				f.delete();
+			}
+			
 			writer.setId(filename);
 						
 			for (int i = 0; i < imagePixels.getNumPlanes(); i++) {
 				
-				writer.savePlane(i, imagePixels.getPlane(i));
+				byte[] bytes = imagePixels.getPlane(i);
+								
+				writer.savePlane(i, bytes);
 				
 			}
 			

@@ -213,9 +213,9 @@ public class ImagePlusPixelData extends PixelData {
 		
 		int c_index = index % size_c;
 		
-		int z_index = (index - c_index)/size_c;
+		int z_index = ((index - c_index)/size_c) % size_z;
 		
-		int t_index = (index - c_index - size_c*z_index)/size_z;
+		int t_index = (index - c_index - size_c*z_index)/(size_z*size_c);
 		
 		index = this.imPl.getStackIndex(c_index, z_index, t_index);
 		
@@ -227,7 +227,7 @@ public class ImagePlusPixelData extends PixelData {
 		
 		float[] pixelData = (float[]) this.imPl.getProcessor().getPixels();
 		
-		java.nio.ByteBuffer out = java.nio.ByteBuffer.allocate(this.imPl.getImageStackSize()*this.size_x*this.size_y*loci.formats.FormatTools.getBytesPerPixel(this.dataType));
+		java.nio.ByteBuffer out = java.nio.ByteBuffer.allocate(this.size_x*this.size_y*loci.formats.FormatTools.getBytesPerPixel(this.dataType));
 
 		out.order(this.byteOrder);
 		

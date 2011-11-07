@@ -32,6 +32,7 @@ import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparabili
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
+import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 
@@ -75,7 +76,7 @@ public class CentromereFinding3DMethod extends Method {
 	}
 	
 	protected Image centromereFinding(Image input) {
-
+		
         java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
                 
         Renormalization3DFilter LBE3F = new Renormalization3DFilter();
@@ -97,6 +98,7 @@ public class CentromereFinding3DMethod extends Method {
         Image toProcess = new Image(this.images.get(0));
         
         iterateOnFiltersAndStoreResult(filters, toProcess, metric);
+        
 
         return this.getStoredImage();
     }
