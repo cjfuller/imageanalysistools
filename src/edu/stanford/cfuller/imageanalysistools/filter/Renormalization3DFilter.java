@@ -29,9 +29,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
- * A filter that performs prefiltering on a 3D image to aid in segmentation.
- * <p>
- * Currently, this is just a wrapper around a box-size-1 {@link VariableSizeMeanFilter}.
+ * A filter that performs prefiltering on a 3D image to aid in segmentation by normalizing for local variations in image intensity.
  * <p>
  * The argument to the apply method should be the image to be filtered.
  * <p>
@@ -66,11 +64,6 @@ public class Renormalization3DFilter extends Filter {
         
         kf.apply(mean);
         
-//        LocalBackgroundEstimation3DFilter LBE3F = new LocalBackgroundEstimation3DFilter();
-//        LBE3F.setParameters(this.params);
-//        LBE3F.setBoxSize(5);
-//        
-//        LBE3F.apply(mean);
         
         kf.setParameters(this.params);
         lfnd.setParameters(this.params);

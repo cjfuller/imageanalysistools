@@ -78,7 +78,7 @@ public class LocalAnalysis {
 
         java.util.List<ImageSet> namedFileSets = null;
 
-        if (Boolean.parseBoolean(params.getValueForKey("multi_wavelength_file"))) {
+        if (params.hasKeyAndTrue("multi_wavelength_file") || ! params.hasKey("multi_wavelength_file")) {
             namedFileSets = DirUtils.makeMultiwavelengthFileSets(params);
         } else {
 
@@ -179,7 +179,7 @@ public class LocalAnalysis {
 
         ImageSet images = null;
 
-        if (Boolean.parseBoolean(params.getValueForKey("multi_wavelength_file"))) {
+        if (params.hasKeyAndTrue("multi_wavelength_file") || ! params.hasKey("multi_wavelength_file")) {
 
             int markerIndex = 0;
 

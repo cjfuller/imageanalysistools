@@ -30,7 +30,6 @@ import java.util.Map;
 
 import edu.stanford.cfuller.imageanalysistools.fitting.NelderMeadMinimizer;
 import edu.stanford.cfuller.imageanalysistools.fitting.ObjectiveFunction;
-import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;

@@ -39,6 +39,7 @@
 
     <parameter name="swap_z_t" displayname="swap z and t dimensions?" type="boolean" defaultvalue="false"/>
 
+	<parameter name="method_name" displayname="Name of the method to run" type="string" defaultvalue=""/>
 
     <parameter displayname="Custom parameter"/>
 
