@@ -16,30 +16,30 @@
 -->
 
 <root>
-    <parameter name="max_size" displayname="Maximum size" type="integer" defaultvalue="50"/>
-    <parameter name="min_size" displayname="Minimum size" type="integer" defaultvalue="0"/>
+    <parameter name="max_size" displayname="Maximum size" type="integer" default="50"/>
+    <parameter name="min_size" displayname="Minimum size" type="integer" default="0"/>
 
-    <parameter name="use_clustering" displayname="Cluster centromeres?" type="boolean" defaultvalue="false"/>
-    <parameter name="minimum_cluster_size" displayname="Minimum cluster size" type="integer" defaultvalue="0"/>
-    <parameter name="maximum_clustering_iterations" displayname="Maximum number of clustering iterations" type="integer" defaultvalue="1"/>
-    <parameter name="use_basic_clustering" displayname="Use basic clustering only?" type="boolean" defaultvalue="true"/>
+    <parameter name="use_clustering" displayname="Cluster centromeres?" type="boolean" default="false"/>
+    <parameter name="minimum_cluster_size" displayname="Minimum cluster size" type="integer" default="0"/>
+    <parameter name="maximum_clustering_iterations" displayname="Maximum number of clustering iterations" type="integer" default="1"/>
+    <parameter name="use_basic_clustering" displayname="Use basic clustering only?" type="boolean" default="true"/>
 
-    <parameter name="decrease_speckle_background" displayname="Force compensate for punctate background?" type="boolean" defaultvalue="false"/>
-    <parameter name="maximum_number_of_centromeres" displayname="Compensate for punctate background if more centromeres than" type="integer" defaultvalue="1000"/>
+    <parameter name="decrease_speckle_background" displayname="Force compensate for punctate background?" type="boolean" default="false"/>
+    <parameter name="maximum_number_of_centromeres" displayname="Compensate for punctate background if more centromeres than" type="integer" default="1000"/>
 
-    <parameter name="generate_masks" displayname="Generate masks?" type="boolean" defaultvalue="true"/>
-    <parameter name="generate_values" displayname="Generate values?" type="boolean" defaultvalue="true"/>
+    <parameter name="generate_masks" displayname="Generate masks?" type="boolean" default="true"/>
+    <parameter name="generate_values" displayname="Generate values?" type="boolean" default="true"/>
 
-    <parameter name="channel_name" displayname="Channel name" type="string" defaultvalue=""/>
-    <parameter name="marker_channel_index" displayname="Marker channel index" type="integer" defaultvalue="0"/>
-    <parameter name="max_threads" displayname="Maximum number of execution threads" type="integer" defaultvalue="1"/>
-    <parameter name="multi_wavelength_file" displayname="Multiple wavelengths in a single file?" type="boolean" defaultvalue = "true"/>
+    <parameter name="channel_name" displayname="Channel name" type="string" default=""/>
+    <parameter name="marker_channel_index" displayname="Marker channel index" type="integer" default="0"/>
+    <parameter name="max_threads" displayname="Maximum number of execution threads" type="integer" default="1"/>
+    <parameter name="multi_wavelength_file" displayname="Multiple wavelengths in a single file?" type="boolean" default = "true"/>
 
-    <parameter name="process_max_intensity_projections" displayname="Process max intensity projections?" type="boolean" defaultvalue="true"/>
+    <parameter name="process_max_intensity_projections" displayname="Process max intensity projections?" type="boolean" default="true"/>
 
-    <parameter name="swap_z_t" displayname="swap z and t dimensions?" type="boolean" defaultvalue="false"/>
+    <parameter name="swap_z_t" displayname="swap z and t dimensions?" type="boolean" default="false"/>
 
-	<parameter name="method_name" displayname="Name of the method to run" type="string" defaultvalue=""/>
+	<parameter name="method_name" displayname="Name of the method to run" type="string" default=""/>
 
     <parameter displayname="Custom parameter"/>
 

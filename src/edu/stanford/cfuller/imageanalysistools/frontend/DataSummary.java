@@ -149,7 +149,10 @@ public class DataSummary {
 
                 String[] splitline = line.split(" ");
 
-                int regionID = (int) Double.parseDouble(splitline[splitline.length - 1]);
+                int regionID = (int) Double.parseDouble(splitline[0]);
+                if (params != null && params.getBooleanValueForKey("background_calculated")) {
+                	regionID = (int) Double.parseDouble(splitline[numChannels + 2]);
+                }
                 int regionType = 0;
 
                 if (! regions.containsKey(regionID)){
@@ -166,21 +169,21 @@ public class DataSummary {
                 for (int i = 0; i < numChannels; i++) {
 
                     //averages[i] += Double.parseDouble(splitline[i])/Double.parseDouble(splitline[numChannels]);
-                    averages[i] += Double.parseDouble(splitline[i]);
+                    averages[i] += Double.parseDouble(splitline[i+1]);
                 }
 
                 averageCounts[regionType] += 1;
                 Double[] tempBg = new Double[numChannels];
                 if (params != null && params.getBooleanValueForKey("background_calculated")) {
 	                for (int i = 0; i < numChannels; i++) {
-	                    tempBg[i] = Double.parseDouble(splitline[numChannels+i+1]);
+	                    tempBg[i] = Double.parseDouble(splitline[numChannels+i+3]);
 	
 	                }
                 } else {
                 	java.util.Arrays.fill(tempBg, 0.0);
                 }
 
-                average_sizes.put(regionID, average_sizes.get(regionID)+ Double.parseDouble(splitline[numChannels]));
+                average_sizes.put(regionID, average_sizes.get(regionID)+ Double.parseDouble(splitline[numChannels+1]));
 
                 allBG.put(regionID, tempBg);
 

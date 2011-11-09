@@ -27,6 +27,7 @@ package edu.stanford.cfuller.imageanalysistools.clustering;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
+import edu.stanford.cfuller.imageanalysistools.filter.LocalMaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.LabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.MaskFilter;
@@ -456,7 +457,7 @@ public class ObjectClustering {
             }
         }
 
-        gf.setWidth(origCopy.getDimensionSizes().get(ImageCoordinate.X)/4);
+        gf.setWidth(origCopy.getDimensionSizes().get(ImageCoordinate.X)/5);
 
 
 
@@ -499,9 +500,9 @@ public class ObjectClustering {
         } else {
             origCopy = gaussianFiltered;
         }
-
+        
         lf.apply(origCopy);
-
+        
         //java.util.logging.Logger.getLogger("debug").info("finished with filters");
 
         Image mapped = new Image(origCopy);

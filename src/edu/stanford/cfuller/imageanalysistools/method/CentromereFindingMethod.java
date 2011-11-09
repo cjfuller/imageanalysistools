@@ -153,7 +153,7 @@ public class CentromereFindingMethod extends Method {
             //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Filtering");
 
             Image gaussianFilteredMask = ObjectClustering.gaussianFilterMask(groupMask);
-
+            
             //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Done filtering");
 
             boolean decreaseBackground = Boolean.parseBoolean(this.parameters.getValueForKey("decrease_speckle_background"));
@@ -328,7 +328,7 @@ public class CentromereFindingMethod extends Method {
         }
 
 
-        RealMatrix masterResult = new org.apache.commons.math.linear.Array2DRowRealMatrix(fullResult.getRowDimension(), fullResult.getColumnDimension() + Integer.parseInt(this.parameters.getValueForKey("number_of_channels")) + 2);
+        RealMatrix masterResult = new org.apache.commons.math.linear.Array2DRowRealMatrix(fullResult.getRowDimension(), fullResult.getColumnDimension() + Integer.parseInt(this.parameters.getValueForKey("number_of_channels")) + 1);
 
         int[] resultMap = new int[fullResult.getRowDimension()];
 
@@ -356,16 +356,16 @@ public class CentromereFindingMethod extends Method {
 
             for (int b = 0; b < Integer.parseInt(this.parameters.getValueForKey("number_of_channels")); b++) {
 
-                if (resultMap[i]-1 < backgroundResult.getRowDimension() && resultMap[i] > 0 && b < backgroundResult.getColumnDimension()) {
-                    masterResult.setEntry(i,fullResult.getColumnDimension() + b, backgroundResult.getEntry(resultMap[i]-1, b));
+                if (resultMap[i]-1 < backgroundResult.getRowDimension() && resultMap[i] > 0 && (b+1) < backgroundResult.getColumnDimension()) {
+                    masterResult.setEntry(i,fullResult.getColumnDimension() + b + 1, backgroundResult.getEntry(resultMap[i]-1, b+1));
                 } else {
-                    masterResult.setEntry(i,fullResult.getColumnDimension() + b, 0);
+                    masterResult.setEntry(i,fullResult.getColumnDimension() + b + 1, 0);
                 }
 
             }
 
-            masterResult.setEntry(i, masterResult.getColumnDimension()-2, i+1);
-            masterResult.setEntry(i, masterResult.getColumnDimension()-1, resultMap[i]);
+            //masterResult.setEntry(i, masterResult.getColumnDimension()-2, i+1);
+            masterResult.setEntry(i, fullResult.getColumnDimension(), resultMap[i]);
 
 
         }

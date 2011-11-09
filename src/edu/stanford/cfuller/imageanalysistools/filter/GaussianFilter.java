@@ -24,6 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
+import ij.ImagePlus;
+import ij.plugin.filter.GaussianBlur;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -93,7 +95,7 @@ public class GaussianFilter extends Filter {
         }
 
 
-        double[] kernelCoeffs = new double[kernelSize*kernelSize];
+        float[] kernelCoeffs = new float[kernelSize*kernelSize];
 
         int kernelCounter = 0;
 
@@ -103,54 +105,65 @@ public class GaussianFilter extends Filter {
             }
         }
 
+        ImagePlus imP = im.toImagePlus();
+        
+        GaussianBlur gb = new GaussianBlur();
+        
+        
+        gb.blur(imP.getProcessor(), width);
+        
+        im.copy(new Image(imP));
+        
 
-		Image intermediate = new Image(im);
-		
-		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
-		
-		for (ImageCoordinate i : intermediate) {
-			double sum = 0;
-            double partialCoeffSum = 0;
-
-			for (int offset = -1*halfKernelSize; offset <= halfKernelSize; offset++) {
-				double imValue = 0;
-				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
-				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y) + offset);
-				
-				if (im.inBounds(ic)) {
-                    partialCoeffSum += coeffs[halfKernelSize+offset];
-					imValue = im.getValue(ic);
-				}
-				
-				
-				sum+= imValue * coeffs[halfKernelSize + offset];
-				
-			}
-			intermediate.setValue(i, (float) (sum/(partialCoeffSum/coeffsSum)));
-		}
-		
-		for (ImageCoordinate i : intermediate) {
-			double sum = 0;
-            double partialCoeffSum = 0;
-
-			for (int offset = -1*halfKernelSize; offset <= halfKernelSize; offset++) {
-				double imValue = 0;
-				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+offset);
-				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
-				
-				if (intermediate.inBounds(ic)) {
-                    partialCoeffSum += coeffs[halfKernelSize+offset];
-					imValue = intermediate.getValue(ic);
-				}
-				
-				
-				sum+= imValue * coeffs[halfKernelSize + offset];
-				
-			}
-			im.setValue(i, (float) (sum/(partialCoeffSum/coeffsSum)));
-		}
-		
-		ic.recycle();
+//        
+//        
+//		Image intermediate = new Image(im);
+//		
+//		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
+//		
+//		for (ImageCoordinate i : intermediate) {
+//			double sum = 0;
+//            double partialCoeffSum = 0;
+//
+//			for (int offset = -1*halfKernelSize; offset <= halfKernelSize; offset++) {
+//				double imValue = 0;
+//				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
+//				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y) + offset);
+//				
+//				if (im.inBounds(ic)) {
+//                    partialCoeffSum += coeffs[halfKernelSize+offset];
+//					imValue = im.getValue(ic);
+//				}
+//				
+//				
+//				sum+= imValue * coeffs[halfKernelSize + offset];
+//				
+//			}
+//			intermediate.setValue(i, (float) (sum/(partialCoeffSum/coeffsSum)));
+//		}
+//		
+//		for (ImageCoordinate i : intermediate) {
+//			double sum = 0;
+//            double partialCoeffSum = 0;
+//
+//			for (int offset = -1*halfKernelSize; offset <= halfKernelSize; offset++) {
+//				double imValue = 0;
+//				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+offset);
+//				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
+//				
+//				if (intermediate.inBounds(ic)) {
+//                    partialCoeffSum += coeffs[halfKernelSize+offset];
+//					imValue = intermediate.getValue(ic);
+//				}
+//				
+//				
+//				sum+= imValue * coeffs[halfKernelSize + offset];
+//				
+//			}
+//			im.setValue(i, (float) (sum/(partialCoeffSum/coeffsSum)));
+//		}
+//		
+//		ic.recycle();
 	
 	}
 
@@ -161,6 +174,9 @@ public class GaussianFilter extends Filter {
 	public void setWidth(int width) {
        
 		this.width = width;
+		
+		if (this.width % 2 == 0) {this.width+=1;}
+		
 	}
 
 	

@@ -48,7 +48,7 @@ public class ParameterXMLParser {
     final static String NAME_ATTR_NAME = "name";
     final static String DISPLAY_ATTR_NAME = "displayname";
     final static String VALUE_ATTR_NAME = "value";
-    final static String DEFAULT_ATTR_NAME = "defaultvalue";
+    final static String DEFAULT_ATTR_NAME = "default";
     final static String DESCRIPTION_NODE_NAME = "description";
 
     final static String BOOL_TYPE_NAME = "boolean";
@@ -83,7 +83,7 @@ public class ParameterXMLParser {
      */
     public ParameterDictionary convertParameterListToParameterDictionary(java.util.List<Parameter> pl) {
         ParameterDictionary pd = ParameterDictionary.emptyDictionary();
-        for (Parameter p : pl) {
+        for (Parameter p : pl) {        	
             pd.addParameter(p);
 
         }
@@ -99,6 +99,7 @@ public class ParameterXMLParser {
      */
     public java.util.List<Parameter> parseXMLFileToParameterList(String filename) {
 
+    	
         java.util.LinkedList<Parameter> output = new java.util.LinkedList<Parameter>();
 
         Document taskDoc = null;
@@ -120,7 +121,7 @@ public class ParameterXMLParser {
         }
 
         NodeList tasks = taskDoc.getElementsByTagName(PARAMETER_TAG_NAME);
-
+        
         for (int i = 0; i < tasks.getLength(); i++) {
 
             Node n = tasks.item(i);
@@ -231,7 +232,7 @@ public class ParameterXMLParser {
                 defaultValue = null;
             }
         }
-
+        
         if (nnm.getNamedItem(VALUE_ATTR_NAME) != null) {
             String valueString = nnm.getNamedItem(VALUE_ATTR_NAME).getNodeValue();
 
@@ -263,7 +264,7 @@ public class ParameterXMLParser {
                         break;
 
                 }
-
+                
             } catch (NumberFormatException e) {
                 LoggingUtilities.getLogger().warning("Exception encountered while parsing value for parameter named: " + name);
                 value = null;

@@ -176,9 +176,9 @@ public class SegmentationController extends TaskController implements OmeroListe
         MethodInfo mi = (MethodInfo) this.sw.getMethodComboBoxModel().getElementAt(this.sw.getSelectedMethodIndex());
 
         Class<? extends Method> c = mi.getMethodClass();
-
-        final ParameterDictionary pd = (new ParameterXMLParser()).parseXMLFileToParameterDictionary(parameterFilename);
-
+                        
+        final ParameterDictionary pd = (new ParameterXMLParser()).parseXMLFileToParameterDictionary(parameterFilename);        
+        
         if (c == null && !pd.hasKey("method_name")) {
             try {
                 c = (Class<? extends Method>) Class.forName(this.sw.getCustomClassName());

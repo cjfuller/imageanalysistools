@@ -72,22 +72,23 @@ public class IntensityPerPixelMetric extends Metric {
 		
 		if (h.getMaxValue() == 0) return null;
 		
-		RealMatrix channelIntensities = (new org.apache.commons.math.linear.Array2DRowRealMatrix(images.getImageCount()+1, h.getMaxValue())).scalarMultiply(0);
+		RealMatrix channelIntensities = (new org.apache.commons.math.linear.Array2DRowRealMatrix(images.getImageCount()+2, h.getMaxValue())).scalarMultiply(0);
 		
 		for (ImageCoordinate i : mask) {
 			int regionNum = (int) mask.getValue(i);
 			
 			if (regionNum > 0) {
 				for (int c = 0; c < images.getImageCount(); c++) {
-					channelIntensities.addToEntry(c, regionNum-1, images.getImageForIndex(c).getValue(i));
+					channelIntensities.addToEntry(c+1, regionNum-1, images.getImageForIndex(c).getValue(i));
 				}
 			}
 		}
 		
 		for (int i = 0; i < h.getMaxValue(); i++) {
-			channelIntensities.setEntry(images.getImageCount(), i, h.getCounts(i+1));
+			channelIntensities.setEntry(0, i, i+1);
+			channelIntensities.setEntry(images.getImageCount()+1, i, h.getCounts(i+1));
 			for (int c = 0; c < images.getImageCount(); c++) {
-				channelIntensities.setEntry(c, i, channelIntensities.getEntry(c,i)/h.getCounts(i+1));
+				channelIntensities.setEntry(c+1, i, channelIntensities.getEntry(c+1,i)/h.getCounts(i+1));
 			}
 		}
 		
