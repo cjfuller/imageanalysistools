@@ -49,6 +49,8 @@ public class ParameterWindow extends javax.swing.JFrame {
         this.usedParameterList.setModel(this.inUseParametersModel);
         this.availableParameterList.setDragEnabled(true);
         this.usedParameterList.setDropMode(DropMode.ON_OR_INSERT);
+        this.availableParameterList.setTransferHandler(new ParameterTransferHandler(this.controller));
+        this.usedParameterList.setTransferHandler(new ParameterTransferHandler(this.controller));
     }
 
     public void setAvailableParameters(java.util.List<Object> parameters) {
