@@ -29,7 +29,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 
-import javax.activation.DataHandler;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.TransferHandler;
@@ -37,7 +36,10 @@ import javax.swing.TransferHandler;
 import edu.stanford.cfuller.imageanalysistools.parameters.Parameter;
 
 /**
- * @author cfuller
+ * Transfer handler to coordinate drag and drop of parameters into the parameter
+ * setup list in the GUI.
+ * 
+ * @author Colin J. Fuller
  *
  */
 public class ParameterTransferHandler extends TransferHandler {
@@ -102,10 +104,6 @@ public class ParameterTransferHandler extends TransferHandler {
 		
 	}
 	
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6116086270413180899L;
 	
 	ParameterSetupController controller;
@@ -156,7 +154,9 @@ public class ParameterTransferHandler extends TransferHandler {
 			
 			Parameter p = (Parameter) t.getTransferable().getTransferData(objectFlavor);
 			
-			return true;
+			if (p != null) return true;
+			
+			return false;
 			
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
