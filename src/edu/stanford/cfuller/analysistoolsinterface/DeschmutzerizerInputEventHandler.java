@@ -50,10 +50,6 @@ public class DeschmutzerizerInputEventHandler implements MouseInputListener, Key
     @Override
     public void mouseClicked(MouseEvent me) {
 
-        if (this.mouseDragEndPoint != null) return;
-
-        this.mouseDownPoint = me.getPoint();
-        this.mouseUpPoint = me.getPoint();
 
         this.dc.processSelectedPoint();
 
@@ -61,16 +57,11 @@ public class DeschmutzerizerInputEventHandler implements MouseInputListener, Key
 
     @Override
     public void mousePressed(MouseEvent me) {
-        this.mouseDownPoint = me.getPoint();
-        this.mouseUpPoint = null;
-        this.mouseDragEndPoint = null;
+
     }
 
     @Override
     public void mouseReleased(MouseEvent me) {
-        this.mouseUpPoint = me.getPoint();
-
-        if (this.mouseDragEndPoint == null) return;
 
         this.dc.shouldDrawMouseDragBox(false);
 
@@ -88,8 +79,7 @@ public class DeschmutzerizerInputEventHandler implements MouseInputListener, Key
 
     @Override
     public void mouseDragged(MouseEvent me) {
-        this.mouseDragEndPoint = me.getPoint();
-        this.dc.shouldDrawMouseDragBox(true);
+
 
     }
 
@@ -103,16 +93,6 @@ public class DeschmutzerizerInputEventHandler implements MouseInputListener, Key
 
     @Override
     public void keyPressed(KeyEvent ke) {
-        
-        int keyCode = ke.getKeyCode();
-
-        if (keyCode == DeschmutzerizerController.ZOOM_IN_KEY_CODE) {
-            this.dc.zoomIn();
-        } else if (keyCode == DeschmutzerizerController.ZOOM_OUT_KEY_CODE) {
-            this.dc.zoomOut();
-        } else if (keyCode == DeschmutzerizerController.ZOOM_RESET_KEY_CODE) {
-            this.dc.resetZoom();
-        }
 
     }
 

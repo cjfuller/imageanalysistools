@@ -29,6 +29,12 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import ij.ImagePlus;
+import ij.gui.ImageWindow;
+import ij.gui.Roi;
+import ij.process.ImageConverter;
+import ij.process.ImageProcessor;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -49,562 +55,555 @@ import javax.swing.JFrame;
  */
 public class DeschmutzerizerController extends TaskController {
 
-    public static final int ZOOM_IN_KEY_CODE = java.awt.event.KeyEvent.VK_EQUALS;
-    public static final int ZOOM_OUT_KEY_CODE = java.awt.event.KeyEvent.VK_MINUS;
-    public static final int ZOOM_RESET_KEY_CODE = java.awt.event.KeyEvent.VK_0;
 
-    public static final String PARAMETERS_DIR = "parameters";
-    public static final String OUTPUT_DIR = "deschmutzed";
+	public static final String PARAMETERS_DIR = "parameters";
+	public static final String OUTPUT_DIR = "deschmutzed";
 
-    static final double zoomFactor = 1.51;
+	DeschmutzerizerWindow dw;
+	DeschmutzerizerInputEventHandler dieh;
 
-    DeschmutzerizerWindow dw;
-    DeschmutzerizerInputEventHandler dieh;
-    ImageDisplayPanel originalImageDisplay;
-    ImageDisplayPanel maskImageDisplay;
-    JFrame originalImageWindow;
-    JFrame maskWindow;
+	ImageWindow originalImageWindow;
+	ImageWindow maskWindow;
 
-    Image currentOriginalImage;
-    Image currentMaskImage;
-    Image currentLabeledMaskImage;
+	Image currentOriginalImage;
+	Image currentMaskImage;
+	Image currentLabeledMaskImage;
 
-    HashSet selectedRegions;
+	HashSet<Integer> selectedRegions;
 
-    BufferedImage colorCodedMaskDisplay;
+	ImagePlus colorCodedMaskDisplay;
+	ImagePlus originalImageDisplay;
 
-    java.util.List<String> filenamesToProcess;
+	java.util.List<String> filenamesToProcess;
 
-    String currentMaskFilename;
-    String currentDataFilename;
-    String currentLabeledMaskFilename;
-    String currentParametersFilename;
+	String currentMaskFilename;
+	String currentDataFilename;
+	String currentLabeledMaskFilename;
+	String currentParametersFilename;
 
-    ParameterDictionary currentParameters;
+	ParameterDictionary currentParameters;
 
-    public void zoomIn() {
+	public void shouldDrawMouseDragBox(boolean shouldDraw) {
 
-        this.originalImageDisplay.zoomImage(zoomFactor, this.maskImageDisplay.getCurrentMousePositionInImageCoordinates());
-        this.maskImageDisplay.zoomImage(zoomFactor, this.maskImageDisplay.getCurrentMousePositionInImageCoordinates());
-        
-    }
+		//        if (shouldDraw) {
+			//            this.originalImageDisplay.drawSelectionBox(this.dieh.getMouseDownPoint(), this.dieh.getMouseDragEndPoint());
+		//            this.maskImageDisplay.drawSelectionBox(this.dieh.getMouseDownPoint(), this.dieh.getMouseDragEndPoint());
+		//
+		//        } else {
+		//            this.originalImageDisplay.clearSelectionBox();
+		//            this.maskImageDisplay.clearSelectionBox();
+		//
+		//        }
 
-    
-    public void zoomOut() {
-        
-        this.originalImageDisplay.zoomImage(1.0/zoomFactor, this.maskImageDisplay.getCurrentMousePositionInImageCoordinates());
-        this.maskImageDisplay.zoomImage(1.0/zoomFactor, this.maskImageDisplay.getCurrentMousePositionInImageCoordinates());
+	}
 
-    }
-    public void resetZoom() {
-        
-        this.originalImageDisplay.resetZoom();
-        this.maskImageDisplay.resetZoom();
-    }
+	public void processBox(Point start, Point end) {
 
-    public void shouldDrawMouseDragBox(boolean shouldDraw) {
+		Image regionNumberCheck = null;
 
-        if (shouldDraw) {
-            this.originalImageDisplay.drawSelectionBox(this.dieh.getMouseDownPoint(), this.dieh.getMouseDragEndPoint());
-            this.maskImageDisplay.drawSelectionBox(this.dieh.getMouseDownPoint(), this.dieh.getMouseDragEndPoint());
+		if (this.dw.groupSelectionSelected()) {
+			regionNumberCheck = this.currentMaskImage;
+		} else {
+			regionNumberCheck = this.currentLabeledMaskImage;
+		}
 
-        } else {
-            this.originalImageDisplay.clearSelectionBox();
-            this.maskImageDisplay.clearSelectionBox();
+		int xLower = (int) (start.getX() < end.getX() ? start.getX() : end.getX());
+		int yLower = (int) (start.getY() < end.getY() ? start.getY() : end.getY());
 
-        }
+		int width = (int) Math.abs(start.getX() - end.getX());
+		int height = (int) Math.abs(start.getY() - end.getY());
 
-    }
+		if (xLower < 0) {
+			width += xLower;
+			if (width < 0) width = 0;
+			xLower = 0;
+		}
 
-    public void processBox(Point start, Point end) {
+		if (yLower < 0) {
+			height += yLower;
+			if (height < 0) height = 0;
+			yLower = 0;
+		}
 
-        Image regionNumberCheck = null;
+		if (xLower + width > regionNumberCheck.getDimensionSizes().get(ImageCoordinate.X)) {
+			width = regionNumberCheck.getDimensionSizes().get(ImageCoordinate.X) - xLower;
+		}
 
-        if (this.dw.groupSelectionSelected()) {
-            regionNumberCheck = this.currentMaskImage;
-        } else {
-            regionNumberCheck = this.currentLabeledMaskImage;
-        }
+		if (yLower + height > regionNumberCheck.getDimensionSizes().get(ImageCoordinate.Y)) {
+			height = regionNumberCheck.getDimensionSizes().get(ImageCoordinate.Y) - yLower;
+		}
 
-        int xLower = (int) (start.getX() < end.getX() ? start.getX() : end.getX());
-        int yLower = (int) (start.getY() < end.getY() ? start.getY() : end.getY());
 
-        int width = (int) Math.abs(start.getX() - end.getX());
-        int height = (int) Math.abs(start.getY() - end.getY());
 
-        if (xLower < 0) {
-            width += xLower;
-            if (width < 0) width = 0;
-            xLower = 0;
-        }
 
-        if (yLower < 0) {
-            height += yLower;
-            if (height < 0) height = 0;
-            yLower = 0;
-        }
 
-        if (xLower + width > regionNumberCheck.getDimensionSizes().getX()) {
-            width = regionNumberCheck.getDimensionSizes().getX() - xLower;
-        }
+		ImageCoordinate startCoord = ImageCoordinate.createCoordXYZCT((int) xLower,(int)  yLower, 0,0,0);
+		ImageCoordinate endCoord = ImageCoordinate.createCoordXYZCT((int) xLower + width+1,(int) yLower + height +1, 1,1, 1);
 
-        if (yLower + height > regionNumberCheck.getDimensionSizes().getY()) {
-            height = regionNumberCheck.getDimensionSizes().getY() - yLower;
-        }
-        
+		regionNumberCheck.setBoxOfInterest(startCoord, endCoord);
 
-        
+		java.util.HashSet<Integer> tempSelectedRegions = new java.util.HashSet<Integer>();
 
+		for (ImageCoordinate ic : regionNumberCheck) {
+			if (regionNumberCheck.getValue(ic) > 0) {
+				tempSelectedRegions.add((int) regionNumberCheck.getValue(ic));
+			}
+		}
 
-        ImageCoordinate startCoord = ImageCoordinate.createCoordXYZCT((int) xLower,(int)  yLower, 0,0,0);
-        ImageCoordinate endCoord = ImageCoordinate.createCoordXYZCT((int) xLower + width+1,(int) yLower + height +1, 1,1, 1);
+		//for (Integer i : tempSelectedRegions) {System.out.println("selected " + i);}
 
-        regionNumberCheck.setBoxOfInterest(startCoord, endCoord);
 
-        java.util.HashSet<Integer> tempSelectedRegions = new java.util.HashSet<Integer>();
+		startCoord.recycle();
+		endCoord.recycle();
 
-        for (ImageCoordinate ic : regionNumberCheck) {
-            if (regionNumberCheck.getValue(ic) > 0) {
-                tempSelectedRegions.add((int) regionNumberCheck.getValue(ic));
-            }
-        }
+		regionNumberCheck.clearBoxOfInterest();
 
-        //for (Integer i : tempSelectedRegions) {System.out.println("selected " + i);}
+		int x0 = regionNumberCheck.getDimensionSizes().get(ImageCoordinate.X);
+		int xf = 0;
+		int y0 = regionNumberCheck.getDimensionSizes().get(ImageCoordinate.Y);
+		int yf = 0;
 
+		java.util.HashSet<Integer> nextSelectedRegions = new java.util.HashSet<Integer>();
 
-        startCoord.recycle();
-        endCoord.recycle();
+		nextSelectedRegions.addAll(this.selectedRegions);
 
-        regionNumberCheck.clearBoxOfInterest();
+		final int[] red = {255,0,0};
+		final int[] white = {255,255,255};
 
-        int x0 = regionNumberCheck.getDimensionSizes().get(ImageCoordinate.X);
-        int xf = 0;
-        int y0 = regionNumberCheck.getDimensionSizes().get(ImageCoordinate.Y);
-        int yf = 0;
+		for (ImageCoordinate ic : regionNumberCheck) {
 
-        java.util.HashSet<Integer> nextSelectedRegions = new java.util.HashSet<Integer>();
+			int x = ic.get(ImageCoordinate.X);
+			int y = ic.get(ImageCoordinate.Y);
+			int z = ic.get(ImageCoordinate.Z);
+			int c = ic.get(ImageCoordinate.C);
+			int t = ic.get(ImageCoordinate.T);
 
-        nextSelectedRegions.addAll(this.selectedRegions);
+			if (tempSelectedRegions.contains((int) regionNumberCheck.getValue(ic))  && ! this.selectedRegions.contains((int) this.currentLabeledMaskImage.getValue(ic))) {
 
-        for (ImageCoordinate ic : regionNumberCheck) {
+				this.colorCodedMaskDisplay.setPosition(c,z,t);
 
-            int x = ic.get(ImageCoordinate.X);
-            int y = ic.get(ImageCoordinate.Y);
+				ImageProcessor ip = this.colorCodedMaskDisplay.getProcessor();
 
-            if (tempSelectedRegions.contains((int) regionNumberCheck.getValue(ic))  && ! this.selectedRegions.contains((int) this.currentLabeledMaskImage.getValue(ic))) {
-                
-                this.colorCodedMaskDisplay.getAlphaRaster().setSample(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y), 0, ImageDisplayPanel.MAX_RGB);
+				ip.putPixel(x,y,red);
 
-                nextSelectedRegions.add((int) this.currentLabeledMaskImage.getValue(ic));
+				nextSelectedRegions.add((int) this.currentLabeledMaskImage.getValue(ic));
 
-                if (x < x0) x0 = x;
-                if (x >= xf) xf = x+1;
-                if (y < y0) y0 = y;
-                if (y >= yf) yf = y+1;
-                
+				if (x < x0) x0 = x;
+				if (x >= xf) xf = x+1;
+				if (y < y0) y0 = y;
+				if (y >= yf) yf = y+1;
 
-            } else if (tempSelectedRegions.contains((int) regionNumberCheck.getValue(ic))  && this.selectedRegions.contains((int) this.currentLabeledMaskImage.getValue(ic))) {
-                
 
-                nextSelectedRegions.remove((int) this.currentLabeledMaskImage.getValue(ic));
+			} else if (tempSelectedRegions.contains((int) regionNumberCheck.getValue(ic))  && this.selectedRegions.contains((int) this.currentLabeledMaskImage.getValue(ic))) {
 
-                if (x < x0) x0 = x;
-                if (x >= xf) xf = x+1;
-                if (y < y0) y0 = y;
-                if (y >= yf) yf = y+1;
+				this.colorCodedMaskDisplay.setPosition(c,z,t);
 
-                this.colorCodedMaskDisplay.getAlphaRaster().setSample(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y), 0, 0);
+				ImageProcessor ip = this.colorCodedMaskDisplay.getProcessor();
 
-            }
-        
-        }
+				ip.putPixel(x,y,white);
 
-        this.selectedRegions = nextSelectedRegions;
+				nextSelectedRegions.remove((int) this.currentLabeledMaskImage.getValue(ic));
 
-        this.maskImageDisplay.compositeWithImage(this.colorCodedMaskDisplay, x0, y0, xf, yf);
+				if (x < x0) x0 = x;
+				if (x >= xf) xf = x+1;
+				if (y < y0) y0 = y;
+				if (y >= yf) yf = y+1;
 
-       
+			}
 
-    }
+		}
 
-    public void processSelectedBox() {
+		this.selectedRegions = nextSelectedRegions;
 
-        this.processBox(this.maskImageDisplay.translateDisplayPointToImagePoint(this.dieh.getMouseDownPoint()), this.maskImageDisplay.translateDisplayPointToImagePoint(this.dieh.getMouseUpPoint()));
 
-        
+	}
 
-    }
+	public void processSelectedBox() {
+		
+		
+		Roi currentRoi = this.colorCodedMaskDisplay.getRoi();
+		
+		if (currentRoi == null) return;
+		
+		Point secondCorner = new Point(currentRoi.getBounds().getLocation());
+		secondCorner.translate((int) currentRoi.getBounds().getWidth(), (int) currentRoi.getBounds().getHeight());
 
-    public void processSelectedPoint() {
-        this.processBox(this.maskImageDisplay.translateDisplayPointToImagePoint(this.dieh.getMouseUpPoint()), this.maskImageDisplay.translateDisplayPointToImagePoint(this.dieh.getMouseUpPoint()));
-    }
+		
+		this.processBox(currentRoi.getBounds().getLocation(), secondCorner);
+		//this.processBox(this.maskImageDisplay.translateDisplayPointToImagePoint(this.dieh.getMouseDownPoint()), this.maskImageDisplay.translateDisplayPointToImagePoint(this.dieh.getMouseUpPoint()));
 
-    @Override
-    public void startTask() {
+		this.colorCodedMaskDisplay.killRoi();
 
-        this.currentParameters = null;
+	}
 
-        this.selectedRegions = new java.util.HashSet();
+	public void processSelectedPoint() {
+		this.processBox(this.colorCodedMaskDisplay.getCanvas().getCursorLoc(), this.colorCodedMaskDisplay.getCanvas().getCursorLoc());
+	}
 
-        this.dw = new DeschmutzerizerWindow(this);
+	@Override
+	public void startTask() {
 
-        this.dw.addWindowListener(this);
+		this.currentParameters = null;
 
-        this.dieh = new DeschmutzerizerInputEventHandler(this);
+		this.selectedRegions = new java.util.HashSet<Integer>();
 
-        this.dw.setImageFilename(Preferences.userNodeForPackage(this.getClass()).get("deschmutzerizer_filename", this.dw.getImageFilename()));
+		this.dw = new DeschmutzerizerWindow(this);
 
-        this.dw.setVisible(true);
+		this.dw.addWindowListener(this);
 
+		this.dieh = new DeschmutzerizerInputEventHandler(this);
 
-        this.originalImageDisplay = new ImageDisplayPanel();
-        this.originalImageWindow = new JFrame();
-        this.originalImageWindow.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.originalImageWindow.setLocationRelativeTo(this.dw);
-        this.originalImageWindow.setLocation((int) (this.originalImageWindow.getLocation().getX()-this.dw.getWidth()/2), (int) (this.originalImageWindow.getLocation().getY() + this.dw.getHeight()/2));
+		this.dw.setImageFilename(Preferences.userNodeForPackage(this.getClass()).get("deschmutzerizer_filename", this.dw.getImageFilename()));
 
+		this.dw.setVisible(true);
 
+		this.originalImageWindow = null;
+		this.maskWindow = null;
 
-        this.maskImageDisplay = new ImageDisplayPanel();
-        this.maskWindow = new JFrame();
-        this.maskWindow.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.maskWindow.setLocationRelativeTo(this.dw);
-        this.maskWindow.setLocation((int) (this.maskWindow.getLocation().getX()+this.dw.getWidth()*0.6), (int) (this.maskWindow.getLocation().getY() - this.dw.getHeight()/2));
+		//
+		//        this.originalImageWindow = new ImageWindow("Original Image");
+		//        this.originalImageWindow.setLocationRelativeTo(this.dw);
+		//        this.originalImageWindow.setLocation((int) (this.originalImageWindow.getLocation().getX()-this.dw.getWidth()/2), (int) (this.originalImageWindow.getLocation().getY() + this.dw.getHeight()/2));
+		//
+		//
+		//
+		//        this.maskWindow = new ImageWindow("Mask");
+		//        this.maskWindow.setLocationRelativeTo(this.dw);
+		//        this.maskWindow.setLocation((int) (this.maskWindow.getLocation().getX()+this.dw.getWidth()*0.6), (int) (this.maskWindow.getLocation().getY() - this.dw.getHeight()/2));
+		//
 
+		//       
+		//        this.maskWindow.addKeyListener(this.dieh);
+		//
+		//        
+		//        this.maskWindow.addMouseListener(this.dieh);
+		//
+		//        
+		//        this.maskWindow.addMouseMotionListener(this.dieh);
+		//        
+		//
 
-       
-        this.maskImageDisplay.addKeyListener(this.dieh);
-        this.maskWindow.addKeyListener(this.dieh);
+	}
 
-        
-        this.maskImageDisplay.addMouseListener(this.dieh);
-        this.maskWindow.addMouseListener(this.dieh);
+	private void finish(){
 
-        
-        this.maskImageDisplay.addMouseMotionListener(this.dieh);
-        this.maskWindow.addMouseMotionListener(this.dieh);
+		this.dw.setDone(true);
+		this.dw.setStartButtonEnabled(true);
+		if (this.currentParameters != null) {
+			try {
+				DataSummary.SummarizeData((new File(this.getOutputFilename(this.currentDataFilename))).getParent(), (new File(this.currentParametersFilename)).getParent());
+			} catch (java.io.IOException e ) {
+				LoggingUtilities.severe("encountered exception while making data summary");
+			}
+		}
+	}
 
-        this.originalImageWindow.getContentPane().add(this.originalImageDisplay);
-        this.maskWindow.getContentPane().add(this.maskImageDisplay);
+	private void createOutputDirectory(String outputFilename) {
+		File dirFile = (new File(outputFilename)).getParentFile();
+		if (!dirFile.exists()) {
+			dirFile.mkdirs();
+		}
+	}
 
+	private void finishCurrentImage() {
 
-    }
 
-    private void finish(){
+		this.originalImageWindow.setVisible(false);
+		this.maskWindow.setVisible(false);
 
-        this.dw.setDone(true);
-        this.dw.setStartButtonEnabled(true);
-        if (this.currentParameters != null) {
-            try {
-                DataSummary.SummarizeData((new File(this.getOutputFilename(this.currentDataFilename))).getParent(), (new File(this.currentParametersFilename)).getParent());
-            } catch (java.io.IOException e ) {
-                LoggingUtilities.severe("encountered exception while making data summary");
-            }
-        }
-    }
 
-    private void createOutputDirectory(String outputFilename) {
-        File dirFile = (new File(outputFilename)).getParentFile();
-        if (!dirFile.exists()) {
-            dirFile.mkdirs();
-        }
-    }
+		Image outputImage = new Image(this.currentMaskImage);
+		Image outputImageLabeled = new Image(this.currentLabeledMaskImage);
+		String outputImageFilename = this.getOutputFilename(this.currentMaskFilename);
+		String outputImageLabeledFilename = this.getOutputFilename(this.currentLabeledMaskFilename);
+		this.createOutputDirectory(outputImageFilename);
 
-    private void finishCurrentImage() {
+		for (ImageCoordinate ic : outputImage) {
+			if (this.selectedRegions.contains((int) this.currentLabeledMaskImage.getValue(ic))) {
+				outputImage.setValue(ic, 0);
+				outputImageLabeled.setValue(ic, 0);
+			}
+		}
 
 
-        this.originalImageWindow.setVisible(false);
-        this.maskWindow.setVisible(false);
+		outputImage.writeToFile(outputImageFilename);
+		outputImageLabeled.writeToFile(outputImageLabeledFilename);
 
+		String outputDataFilename = this.getOutputFilename(this.currentDataFilename);
+		this.createOutputDirectory(outputDataFilename);
 
-        Image outputImage = new Image(this.currentMaskImage);
-        Image outputImageLabeled = new Image(this.currentLabeledMaskImage);
-        String outputImageFilename = this.getOutputFilename(this.currentMaskFilename);
-        String outputImageLabeledFilename = this.getOutputFilename(this.currentLabeledMaskFilename);
-        this.createOutputDirectory(outputImageFilename);
 
-        for (ImageCoordinate ic : outputImage) {
-            if (this.selectedRegions.contains((int) this.currentLabeledMaskImage.getValue(ic))) {
-                outputImage.setValue(ic, 0);
-                outputImageLabeled.setValue(ic, 0);
-            }
-        }
+		try {
+			BufferedReader input = new BufferedReader(new FileReader(this.currentDataFilename));
 
+			PrintWriter output = new PrintWriter(new FileWriter(outputDataFilename));
 
-        outputImage.writeToFile(outputImageFilename);
-        outputImageLabeled.writeToFile(outputImageLabeledFilename);
+			String currentLine = input.readLine();
 
-        String outputDataFilename = this.getOutputFilename(this.currentDataFilename);
-        this.createOutputDirectory(outputDataFilename);
+			while (currentLine != null) {
 
+				String[] split = currentLine.split(" ");
 
-        try {
-            BufferedReader input = new BufferedReader(new FileReader(this.currentDataFilename));
+				int regionNumber =(int)  Double.parseDouble(split[split.length - 2]);
 
-            PrintWriter output = new PrintWriter(new FileWriter(outputDataFilename));
+				if (! this.selectedRegions.contains(regionNumber)) {
+					output.println(currentLine);
+				}
 
-            String currentLine = input.readLine();
+				currentLine = input.readLine();
 
-            while (currentLine != null) {
+			}
 
-                String[] split = currentLine.split(" ");
+			output.close();
 
-                int regionNumber =(int)  Double.parseDouble(split[split.length - 2]);
+		} catch (java.io.IOException e) {
+			LoggingUtilities.warning("encountered IO exception while writing deschmutzed data");
+		}
 
-                if (! this.selectedRegions.contains(regionNumber)) {
-                    output.println(currentLine);
-                }
 
-                currentLine = input.readLine();
-                
-            }
+	}
 
-            output.close();
+	private void readCurrentMaskAndDataFilenames(String nextImageToProcess) {
 
-        } catch (java.io.IOException e) {
-            LoggingUtilities.warning("encountered IO exception while writing deschmutzed data");
-        }
+		File nextToProcessFile = new File(nextImageToProcess);
 
+		// System.out.println(nextImageToProcess);
 
-    }
+		String parametersFilename = null;
 
-    private void readCurrentMaskAndDataFilenames(String nextImageToProcess) {
+		String parametersDir = nextToProcessFile.getParent() + File.separator + PARAMETERS_DIR;
 
-        File nextToProcessFile = new File(nextImageToProcess);
+		File parametersDirFile = new File(parametersDir);
 
-       // System.out.println(nextImageToProcess);
+		for (File f : parametersDirFile.listFiles()) {
+			if (f.getName().matches(".*" + nextToProcessFile.getName() + ".*")) {
+				parametersFilename = f.getAbsolutePath();
+				break;
+			}
+		}
 
-        String parametersFilename = null;
+		if (parametersFilename == null) {
+			this.currentParameters = null;
+			this.currentParametersFilename = null;
+			this.currentMaskFilename = null;
+			this.currentLabeledMaskFilename = null;
+			this.currentDataFilename = null;
+			return;
+		}
 
-        String parametersDir = nextToProcessFile.getParent() + File.separator + PARAMETERS_DIR;
+		ParameterDictionary p = ParameterDictionary.readParametersFromFile(parametersFilename);
 
-        File parametersDirFile = new File(parametersDir);
+		this.currentParameters = p;
+		this.currentParametersFilename = parametersFilename;
 
-        for (File f : parametersDirFile.listFiles()) {
-            if (f.getName().matches(".*" + nextToProcessFile.getName() + ".*")) {
-                parametersFilename = f.getAbsolutePath();
-                break;
-            }
-        }
+		String maskFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("mask_output_filename");
 
-        if (parametersFilename == null) {
-            this.currentParameters = null;
-            this.currentParametersFilename = null;
-            this.currentMaskFilename = null;
-            this.currentLabeledMaskFilename = null;
-            this.currentDataFilename = null;
-            return;
-        }
+		this.currentMaskFilename = maskFilename;
+		this.currentLabeledMaskFilename = maskFilename;
+		if (p.hasKey("secondary_mask_output_filename")) {
+			this.currentLabeledMaskFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("secondary_mask_output_filename");
+		}
+		this.currentDataFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("data_output_filename");
 
-        ParameterDictionary p = ParameterDictionary.readParametersFromFile(parametersFilename);
+	}
 
-        this.currentParameters = p;
-        this.currentParametersFilename = parametersFilename;
+	private String getOutputFilename(String inputFilename) {
+		File inputFile = new File(inputFilename);
 
-        String maskFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("mask_output_filename");
+		String outputFilename = inputFile.getParent() + File.separator + OUTPUT_DIR + File.separator + inputFile.getName();
+		return outputFilename;
+	}
 
-        this.currentMaskFilename = maskFilename;
-        this.currentLabeledMaskFilename = maskFilename;
-        if (p.hasKey("secondary_mask_output_filename")) {
-            this.currentLabeledMaskFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("secondary_mask_output_filename");
-        }
-        this.currentDataFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("data_output_filename");
+	private void processNextImage() {
 
-    }
 
-    private String getOutputFilename(String inputFilename) {
-        File inputFile = new File(inputFilename);
+		this.selectedRegions.clear();
 
-        String outputFilename = inputFile.getParent() + File.separator + OUTPUT_DIR + File.separator + inputFile.getName();
-        return outputFilename;
-    }
+		if (this.filenamesToProcess.isEmpty()) {this.finish(); return;}
 
-    private void processNextImage() {
+		String nextToProcess = this.filenamesToProcess.remove(0);
 
+		this.readCurrentMaskAndDataFilenames(nextToProcess);
 
-        this.selectedRegions.clear();
+		String maskFilename = this.currentMaskFilename;
+		String labeledMaskFilename = this.currentLabeledMaskFilename;
 
-        if (this.filenamesToProcess.isEmpty()) {this.finish(); return;}
+		ImageReader ir = new ImageReader();
 
-        String nextToProcess = this.filenamesToProcess.remove(0);
+		Image currentImage = null;
+		Image currentMask = null;
+		Image currentLabeledMask = null;
 
-        this.readCurrentMaskAndDataFilenames(nextToProcess);
+		Image existingMask = null;
 
-        String maskFilename = this.currentMaskFilename;
-        String labeledMaskFilename = this.currentLabeledMaskFilename;
+		try {
 
-        ImageReader ir = new ImageReader();
+			currentImage = ir.read(nextToProcess);
+			currentMask = ir.read(maskFilename);
+			currentLabeledMask = ir.read(labeledMaskFilename);
 
-        Image currentImage = null;
-        Image currentMask = null;
-        Image currentLabeledMask = null;
+			if (this.dw.useExistingMask()) {
+				try {
+					existingMask = ir.read(this.getOutputFilename(maskFilename));
+				} catch (Exception e) {
+					LoggingUtilities.warning("encountered exception while attempting to load deschmutzerized mask, continuing without");
+					existingMask = null;
+				}
+			}
 
-        Image existingMask = null;
+		} catch (java.io.IOException e) {
+			LoggingUtilities.warning("encountered exception while reading " + nextToProcess + ".  Continuing.");
+			this.processNextImage();
+			return;
+		} catch (IllegalArgumentException e) {
+			LoggingUtilities.warning("encountered exception while reading " + nextToProcess + ".  Continuing.");
+			this.processNextImage();
+			return;
+		}
 
-        try {
 
-            currentImage = ir.read(nextToProcess);
-            currentMask = ir.read(maskFilename);
-            currentLabeledMask = ir.read(labeledMaskFilename);
+		this.currentOriginalImage = currentImage;
+		this.currentMaskImage = currentMask;
+		this.currentLabeledMaskImage = currentLabeledMask;
 
-            if (this.dw.useExistingMask()) {
-                try {
-                    existingMask = ir.read(this.getOutputFilename(maskFilename));
-                } catch (Exception e) {
-                    LoggingUtilities.warning("encountered exception while attempting to load deschmutzerized mask, continuing without");
-                    existingMask = null;
-                }
-            }
 
-        } catch (java.io.IOException e) {
-            LoggingUtilities.warning("encountered exception while reading " + nextToProcess + ".  Continuing.");
-            this.processNextImage();
-            return;
-        } catch (IllegalArgumentException e) {
-            LoggingUtilities.warning("encountered exception while reading " + nextToProcess + ".  Continuing.");
-            this.processNextImage();
-            return;
-        }
+		int channel = 0;
 
+		if(this.currentParameters != null && this.currentParameters.hasKey("marker_channel_index")) {
+			channel = this.currentParameters.getIntValueForKey("marker_channel_index");
+		}
 
-        this.currentOriginalImage = currentImage;
-        this.currentMaskImage = currentMask;
-        this.currentLabeledMaskImage = currentLabeledMask;
+		ImageCoordinate start = ImageCoordinate.createCoordXYZCT(0,0,0,channel,0);
+		ImageCoordinate dims = ImageCoordinate.cloneCoord(this.currentOriginalImage.getDimensionSizes());
+		dims.set(ImageCoordinate.C, 1);
 
-        
-        int channel = 0;
-        
-        if(this.currentParameters != null && this.currentParameters.hasKey("marker_channel_index")) {
-        	channel = this.currentParameters.getIntValueForKey("marker_channel_index");
-        }
-                
-        ImageCoordinate start = ImageCoordinate.createCoordXYZCT(0,0,0,channel,0);
-        ImageCoordinate dims = ImageCoordinate.cloneCoord(this.currentOriginalImage.getDimensionSizes());
-        dims.set(ImageCoordinate.C, 1);
-        
 
-        this.currentOriginalImage = this.currentOriginalImage.subImage(dims, start);
-        
+		this.currentOriginalImage = this.currentOriginalImage.subImage(dims, start);
 
-        
-        
-        start.recycle();
-        dims.recycle();
 
-        
 
 
-        this.colorCodedMaskDisplay = new BufferedImage(this.currentMaskImage.getDimensionSizes().getX(), this.currentMaskImage.getDimensionSizes().getY(), BufferedImage.TYPE_INT_ARGB);
+		start.recycle();
+		dims.recycle();
 
-        WritableRaster wr = this.colorCodedMaskDisplay.getRaster();
-        WritableRaster ar = this.colorCodedMaskDisplay.getAlphaRaster();
 
-        final int max_value = ImageDisplayPanel.MAX_RGB;
+		Image display = new Image(this.currentMaskImage);
 
-        for (int x =0; x < wr.getWidth(); x++)  {
-            for (int y = 0; y < wr.getHeight(); y++) {
+		for (ImageCoordinate ic : display) {
+			if (display.getValue(ic) > 0) {
+				display.setValue(ic, Float.MAX_VALUE);
+			}
+		}
 
-                wr.setSample(x, y, 0, max_value);
-                wr.setSample(x, y, 1, 0);
-                wr.setSample(x, y, 1, 0);
-                ar.setSample(x, y, 0, 0);
+		this.colorCodedMaskDisplay = (new Image(this.currentMaskImage)).toImagePlus();
 
-            }
-        }
+		(new ImageConverter(this.colorCodedMaskDisplay)).convertToRGB();
 
-        if (existingMask != null) {
-            for (ImageCoordinate ic : existingMask) {
-                if (this.currentLabeledMaskImage.getValue(ic) > 0 && existingMask.getValue(ic) == 0) {
-                    ar.setSample(ic.getX(), ic.getY(), 0, max_value);
-                    this.selectedRegions.add((int) this.currentLabeledMaskImage.getValue(ic));
-                }
-            }
-        }
 
+		if (existingMask != null) {
+			for (ImageCoordinate ic : existingMask) {
+				if (this.currentLabeledMaskImage.getValue(ic) > 0 && existingMask.getValue(ic) == 0) {
 
+					this.colorCodedMaskDisplay.setPosition(ic.get(ImageCoordinate.C)+1, ic.get(ImageCoordinate.Z)+1, ic.get(ImageCoordinate.T)+1);
+					ImageProcessor ip = this.colorCodedMaskDisplay.getProcessor();
+					int[] red = {255,0,0};
+					ip.putPixel(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y), red);
+					this.selectedRegions.add((int) this.currentLabeledMaskImage.getValue(ic));
+				}
+			}
+		}
 
-        this.maskWindow.setVisible(true);
-        this.originalImageWindow.setVisible(true);
+		ImagePlus orig = this.currentOriginalImage.toImagePlus();
 
-        
-        
-        this.originalImageDisplay.setImage(this.currentOriginalImage.toBufferedImage(), false);
+		if (this.maskWindow == null || this.originalImageWindow == null) {
+			this.colorCodedMaskDisplay.show();
+			maskWindow = this.colorCodedMaskDisplay.getWindow();
 
-        this.maskImageDisplay.setImage(this.currentMaskImage.toBufferedImage(), true);
-        //this.maskImageDisplay.compositeWithImage(this.colorCodedMaskDisplay);
+			orig.show();
+			originalImageWindow = orig.getWindow();
 
+			this.originalImageWindow.setLocationRelativeTo(this.dw);
+			this.originalImageWindow.setLocationAndSize((int) (this.originalImageWindow.getLocation().getX()), (int) (this.originalImageWindow.getLocation().getY() + this.dw.getHeight()), 500, (int) (500.0*this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.Y)/this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.X)));
 
-        int titleBarSize = (int) (this.maskWindow.getSize().getHeight() - this.maskWindow.getContentPane().getSize().getHeight());
-        //System.out.println(titleBarSize);
+			this.maskWindow.setLocationRelativeTo(this.dw);
+			this.maskWindow.setLocationAndSize((int) (this.maskWindow.getLocation().getX()+this.dw.getWidth()*1.1), (int) (this.maskWindow.getLocation().getY()+ this.dw.getHeight()/2), 500, (int) (500.0*this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.Y)/this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.X)));
 
-        Dimension newSize = new Dimension((int) this.maskImageDisplay.getSize().getWidth(), (int) this.maskImageDisplay.getSize().getHeight() + titleBarSize);
+			this.maskWindow.addKeyListener(this.dieh);
+			this.maskWindow.getCanvas().addKeyListener(this.dieh);
 
-        //System.out.println(newSize);
+			this.maskWindow.addMouseListener(this.dieh);
+			this.maskWindow.getCanvas().addMouseListener(this.dieh);
 
-        this.maskWindow.setSize(newSize);
-        this.originalImageWindow.setSize(newSize);
+			//this.maskWindow.addMouseMotionListener(this.dieh);
+		} else {
 
-        if (this.dw.useExistingMask()) {
-            this.maskImageDisplay.compositeWithImage(this.colorCodedMaskDisplay, 0, 0, this.colorCodedMaskDisplay.getWidth(), this.colorCodedMaskDisplay.getHeight());
-        }
+			this.maskWindow.setImage(this.colorCodedMaskDisplay);
+			this.originalImageWindow.setImage(orig);
+		}
 
+		this.maskWindow.setVisible(true);
+		this.originalImageWindow.setVisible(true);
 
-    }
+		orig.resetDisplayRange();//TODO: fix
+		this.colorCodedMaskDisplay.resetDisplayRange();
+		orig.updateAndDraw();
 
-    public void startButtonPressed() {
-        
-        Preferences.userNodeForPackage(this.getClass()).put("deschmutzerizer_filename", this.dw.getImageFilename());
+	}
 
-        this.filenamesToProcess = new java.util.LinkedList<String>();
+	public void startButtonPressed() {
 
-        File toProcess = new File(this.dw.getImageFilename());
+		Preferences.userNodeForPackage(this.getClass()).put("deschmutzerizer_filename", this.dw.getImageFilename());
 
-        if (toProcess.isDirectory()) {
-            for (File f : toProcess.listFiles()) {
-                this.filenamesToProcess.add(f.getAbsolutePath());
-            }
-        } else {
-            this.filenamesToProcess.add(toProcess.getAbsolutePath());
-        }
+		this.filenamesToProcess = new java.util.LinkedList<String>();
 
-        this.dw.setStartButtonEnabled(false);
+		File toProcess = new File(this.dw.getImageFilename());
 
-        this.processNextImage();
-        
+		if (toProcess.isDirectory()) {
+			for (File f : toProcess.listFiles()) {
+				this.filenamesToProcess.add(f.getAbsolutePath());
+			}
+		} else {
+			this.filenamesToProcess.add(toProcess.getAbsolutePath());
+		}
 
-    }
+		this.dw.setStartButtonEnabled(false);
 
-    public void browseButtonPressed() {
-        String path = this.dw.getImageFilename();
-        JFileChooser fc = null;
-        if ((new File(path)).exists()) {
-            fc = new JFileChooser(path);
-        } else {
-            fc = new JFileChooser();
-        }
-        fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		this.processNextImage();
 
-        int retVal = fc.showOpenDialog(this.dw);
 
-        if (retVal == JFileChooser.APPROVE_OPTION) {
+	}
 
-            String selected = fc.getSelectedFile().getAbsolutePath();
+	public void browseButtonPressed() {
+		String path = this.dw.getImageFilename();
+		JFileChooser fc = null;
+		if ((new File(path)).exists()) {
+			fc = new JFileChooser(path);
+		} else {
+			fc = new JFileChooser();
+		}
+		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 
+		int retVal = fc.showOpenDialog(this.dw);
 
-            dw.setImageFilename(selected);
-        }
-    }
+		if (retVal == JFileChooser.APPROVE_OPTION) {
 
-    public void continueButtonPressed() {
-        this.finishCurrentImage();
-        this.processNextImage();
-    }
+			String selected = fc.getSelectedFile().getAbsolutePath();
 
-    public void selectAllButtonPressed() {
 
-        this.processBox(new Point(0,0), new Point(this.currentOriginalImage.getDimensionSizes().getX(), this.currentOriginalImage.getDimensionSizes().getY()));
-        
-    }
+			dw.setImageFilename(selected);
+		}
+	}
+
+	public void continueButtonPressed() {
+		this.finishCurrentImage();
+		this.processNextImage();
+	}
+
+	public void selectAllButtonPressed() {
+
+		this.processBox(new Point(0,0), new Point(this.currentOriginalImage.getDimensionSizes().getX(), this.currentOriginalImage.getDimensionSizes().getY()));
+
+	}
 
 
 
