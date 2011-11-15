@@ -495,9 +495,16 @@ public class DeschmutzerizerController extends TaskController {
 			}
 		}
 
-		this.colorCodedMaskDisplay = (new Image(this.currentMaskImage)).toImagePlus();
-
-		(new ImageConverter(this.colorCodedMaskDisplay)).convertToRGB();
+		this.colorCodedMaskDisplay = (new Image(this.currentMaskImage)).toImagePlus().duplicate();
+		//something is wrong here with float <=> RGB conversion.
+		ImageConverter iconv = new ImageConverter(this.colorCodedMaskDisplay);
+		ImageConverter.setDoScaling(true);
+		System.out.println(this.colorCodedMaskDisplay.getType());
+		for (int i = 0; i < this.colorCodedMaskDisplay.getImageStackSize(); i++) {
+			System.out.println(i);
+			this.colorCodedMaskDisplay.setSliceWithoutUpdate(i+1);
+			this.colorCodedMaskDisplay.setProcessor(this.colorCodedMaskDisplay.getProcessor().duplicate().convertToRGB());
+		}
 
 
 		if (existingMask != null) {
@@ -544,7 +551,7 @@ public class DeschmutzerizerController extends TaskController {
 		this.maskWindow.setVisible(true);
 		this.originalImageWindow.setVisible(true);
 
-		orig.resetDisplayRange();//TODO: fix
+		orig.resetDisplayRange();
 		this.colorCodedMaskDisplay.resetDisplayRange();
 		orig.updateAndDraw();
 
