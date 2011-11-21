@@ -134,11 +134,10 @@ public class DeschmutzerizerController extends TaskController {
 		}
 
 
+		int[] posCZT = this.colorCodedMaskDisplay.convertIndexToPosition(this.colorCodedMaskDisplay.getSlice());
 
-
-
-		ImageCoordinate startCoord = ImageCoordinate.createCoordXYZCT((int) xLower,(int)  yLower, 0,0,0);
-		ImageCoordinate endCoord = ImageCoordinate.createCoordXYZCT((int) xLower + width+1,(int) yLower + height +1, 1,1, 1);
+		ImageCoordinate startCoord = ImageCoordinate.createCoordXYZCT((int) xLower,(int)  yLower, posCZT[1]-1,posCZT[0]-1,posCZT[2]-1);
+		ImageCoordinate endCoord = ImageCoordinate.createCoordXYZCT((int) xLower + width+1,(int) yLower + height +1, posCZT[1],posCZT[0],posCZT[2]);
 
 		regionNumberCheck.setBoxOfInterest(startCoord, endCoord);
 
@@ -169,6 +168,8 @@ public class DeschmutzerizerController extends TaskController {
 
 		final int[] red = {255,0,0};
 		final int[] white = {255,255,255};
+		
+		int currentSlice = this.colorCodedMaskDisplay.getSlice();
 
 		for (ImageCoordinate ic : regionNumberCheck) {
 
@@ -180,7 +181,7 @@ public class DeschmutzerizerController extends TaskController {
 
 			if (tempSelectedRegions.contains((int) regionNumberCheck.getValue(ic))  && ! this.selectedRegions.contains((int) this.currentLabeledMaskImage.getValue(ic))) {
 
-				this.colorCodedMaskDisplay.setPosition(c,z,t);
+				this.colorCodedMaskDisplay.setPositionWithoutUpdate(c+1,z+1,t+1);
 
 				ImageProcessor ip = this.colorCodedMaskDisplay.getProcessor();
 
@@ -196,7 +197,7 @@ public class DeschmutzerizerController extends TaskController {
 
 			} else if (tempSelectedRegions.contains((int) regionNumberCheck.getValue(ic))  && this.selectedRegions.contains((int) this.currentLabeledMaskImage.getValue(ic))) {
 
-				this.colorCodedMaskDisplay.setPosition(c,z,t);
+				this.colorCodedMaskDisplay.setPositionWithoutUpdate(c+1,z+1,t+1);
 
 				ImageProcessor ip = this.colorCodedMaskDisplay.getProcessor();
 
@@ -210,8 +211,14 @@ public class DeschmutzerizerController extends TaskController {
 				if (y >= yf) yf = y+1;
 
 			}
+			
 
 		}
+		
+		this.colorCodedMaskDisplay.setSlice(currentSlice);
+		
+		this.colorCodedMaskDisplay.updateAndRepaintWindow();
+
 
 		this.selectedRegions = nextSelectedRegions;
 
@@ -311,7 +318,7 @@ public class DeschmutzerizerController extends TaskController {
 		this.originalImageWindow.setVisible(false);
 		this.maskWindow.setVisible(false);
 
-
+		
 		Image outputImage = new Image(this.currentMaskImage);
 		Image outputImageLabeled = new Image(this.currentLabeledMaskImage);
 		String outputImageFilename = this.getOutputFilename(this.currentMaskFilename);
@@ -344,7 +351,7 @@ public class DeschmutzerizerController extends TaskController {
 
 				String[] split = currentLine.split(" ");
 
-				int regionNumber =(int)  Double.parseDouble(split[split.length - 2]);
+				int regionNumber =(int)  Double.parseDouble(split[0]);
 
 				if (! this.selectedRegions.contains(regionNumber)) {
 					output.println(currentLine);
@@ -450,7 +457,7 @@ public class DeschmutzerizerController extends TaskController {
 					existingMask = null;
 				}
 			}
-
+			
 		} catch (java.io.IOException e) {
 			LoggingUtilities.warning("encountered exception while reading " + nextToProcess + ".  Continuing.");
 			this.processNextImage();
@@ -494,16 +501,15 @@ public class DeschmutzerizerController extends TaskController {
 				display.setValue(ic, Float.MAX_VALUE);
 			}
 		}
+		
+		ImagePlus origMask = (new Image(this.currentMaskImage)).toImagePlus();
+		
+		this.colorCodedMaskDisplay = origMask.createHyperStack("mask", this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.C), this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.Z), this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.T), 24); //24 = RGB
 
-		this.colorCodedMaskDisplay = (new Image(this.currentMaskImage)).toImagePlus().duplicate();
-		//something is wrong here with float <=> RGB conversion.
-		ImageConverter iconv = new ImageConverter(this.colorCodedMaskDisplay);
-		ImageConverter.setDoScaling(true);
-		System.out.println(this.colorCodedMaskDisplay.getType());
 		for (int i = 0; i < this.colorCodedMaskDisplay.getImageStackSize(); i++) {
-			System.out.println(i);
-			this.colorCodedMaskDisplay.setSliceWithoutUpdate(i+1);
-			this.colorCodedMaskDisplay.setProcessor(this.colorCodedMaskDisplay.getProcessor().duplicate().convertToRGB());
+			this.colorCodedMaskDisplay.setSlice(i+1);
+			origMask.setSlice(i+1);
+			this.colorCodedMaskDisplay.setProcessor(origMask.getProcessor().duplicate().convertToRGB());
 		}
 
 

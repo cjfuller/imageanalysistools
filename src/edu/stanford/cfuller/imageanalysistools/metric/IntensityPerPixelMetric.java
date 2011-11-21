@@ -62,8 +62,8 @@ public class IntensityPerPixelMetric extends Metric {
      * @param mask      A mask that specifies the region of interest.  This should have regions of interest uniquely labeled consecutively, starting with the value 1,
      *                  as might be produced by a {@link edu.stanford.cfuller.imageanalysistools.filter.LabelFilter}.
      * @param images    An ImageSet of Images to be quantified using the same masks (perhaps corresponding to different color channels, for example).
-     * @return          A RealMatrix containing the average intensity value for each region of interest in each input Image.  The (i,j)th
-     *                  entry will contain the quantification of ROI (i+1) in Image j.
+     * @return          A RealMatrix containing the average intensity value for each region of interest in each input Image.  A single column of the region labels preceeds a sub-matrix, the (i,j)th
+     *                  entry of which will contain the quantification of ROI (i+1) in Image j.  This will then be followed by a single column containing the pixel count for that region.
      */
 	@Override
 	public RealMatrix quantify(Image mask, ImageSet images) {

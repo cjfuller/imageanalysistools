@@ -217,7 +217,7 @@ public class ImagePlusPixelData extends PixelData {
 		
 		int t_index = (index - c_index - size_c*z_index)/(size_z*size_c);
 		
-		index = this.imPl.getStackIndex(c_index, z_index, t_index);
+		index = this.imPl.getStackIndex(c_index+1, z_index+1, t_index+1);
 		
 		
 		if (index != this.currentStackIndex) {
