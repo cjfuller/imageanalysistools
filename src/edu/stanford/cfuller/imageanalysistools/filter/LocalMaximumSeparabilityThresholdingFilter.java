@@ -85,7 +85,7 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
      * @param increment             the increment size (in greylevels) to use for determining the threshold; must be positive.
      */
 	public void apply_ext(Image im, boolean adaptiveincrement, int increment) {
-		
+				
 		Histogram h = new Histogram(im);
 		
 		int thresholdValue = 0;
@@ -152,6 +152,8 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 			
 		}
 		
+		int orig_method_best_index = best_index;
+		
 		c = 1;
 		
 		ArrayList<Integer> maxima = new ArrayList<Integer>();
@@ -171,6 +173,7 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 			while(lastEntryNotEqual > 0 && eta_v.getEntry(lastEntryNotEqual) == eta_v.getEntry(c)) {--lastEntryNotEqual;}
 			while(nextEntryNotEqual < (eta_v.getDimension()-1) && eta_v.getEntry(nextEntryNotEqual) == eta_v.getEntry(c)) {++nextEntryNotEqual;}
 
+
 			
 			if (eta_v.getEntry(c) > eta_v.getEntry(lastEntryNotEqual) && eta_v.getEntry(c) > eta_v.getEntry(nextEntryNotEqual)) {
 										
@@ -185,6 +188,7 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 			c++;
 			
 		}
+		
 				
 		//now that we have maxima, try doing a gaussian fit to find the positions.  If there's only one, we need to guess at a second
 		
@@ -201,8 +205,8 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 		} else {
 			
 			position0 = c_by_k.get(maxima.get(0));
-			position1 = (eta_v.getDimension() - position0)/4 + position0;
-
+			position1 = (eta_v.getDimension() - position0)/2 + position0;
+			
 		}
 		
 		double s = (position1 - position0)/4.0;
@@ -220,15 +224,17 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 		
 		NelderMeadMinimizer nmm = new NelderMeadMinimizer();
 		
-		RealVector result = nmm.optimize(dgof, parameters);
 		
+		RealVector result = nmm.optimize(dgof, parameters);
+				
 		best_index = (int) result.getEntry(4);
 		
 		if (k_by_c.containsKey(best_index)) {
 			best_index = k_by_c.get(best_index);
 		} else {
-			//fall back to the best local maximum if the fitting seems to have found an invalid value.
-			best_index = maxima.get(maxima.size() -1);
+			//fall back to the normal global maximum if the fitting seems to have found an invalid value.
+			best_index = orig_method_best_index;
+			System.out.println("falling back to thresholding at: " + best_index);
 		
 		}	
 		thresholdValue = best_index;

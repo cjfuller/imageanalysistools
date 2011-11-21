@@ -231,6 +231,8 @@ public class LocalAnalysis {
                 newImages.addImageWithImageAndName(proj, images.getImageNameForIndex(i));
 
             }
+            
+            newImages.setMarkerImage(images.getMarkerIndex());
 
             images = newImages;
         }
