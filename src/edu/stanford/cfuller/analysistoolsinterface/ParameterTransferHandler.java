@@ -43,6 +43,7 @@ import edu.stanford.cfuller.imageanalysistools.parameters.Parameter;
  *
  */
 public class ParameterTransferHandler extends TransferHandler {
+	
 
 	protected class ParameterTransferable implements Transferable {
 		
@@ -189,7 +190,7 @@ public class ParameterTransferHandler extends TransferHandler {
 				if (! t.isDataFlavorSupported(objectFlavor)) {return false;}
 				
 				Parameter p = (Parameter) t.getTransferable().getTransferData(objectFlavor);
-				
+
 				this.controller.useParameter(p);
 				
 				return true;

@@ -340,6 +340,12 @@ public class LocalAnalysis {
 
         String methodName = params.getValueForKey("method_name");
         Method method = null;
+        
+        final String dynamicMethodName="DynamicMethod";
+        
+        if (params.hasKeyAndTrue("dynamic_method")) {
+        	methodName= dynamicMethodName;
+        }
 
         //methodName might be fully qualified, in which case we want to use that; otherwise, we should use the value of the parameter method_package_name
         //or fall back on a default value for that, which we will add here.

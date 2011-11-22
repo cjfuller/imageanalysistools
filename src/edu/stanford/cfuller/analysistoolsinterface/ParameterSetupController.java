@@ -44,7 +44,12 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class ParameterSetupController extends TaskController {
 
     final static String DEFAULT_FILENAME = "default.xml";
-
+    
+	public static final String P_FILTER_ALL = "filter_all";
+	public static final String P_FILTER_ADD = "filter_add";
+	public static final String P_METRIC = "metric_name";
+	public static final String P_METRIC_ADD = "metric_add";
+	
     ParameterWindow pw;
 
     List<Parameter> availableParameters;
@@ -85,10 +90,39 @@ public class ParameterSetupController extends TaskController {
 
     }
 
+    public void addSelectedFilter(String name, String classname) {
+    	
+    	Parameter p = new Parameter(P_FILTER_ALL, name, Parameter.TYPE_STRING, null, classname, null);
+    	
+    	this.useParameter(p);
+    	
+    }
+    
+    public void addSelectedMetric(String name, String classname) {
+    	
+    	Parameter p = new Parameter(P_METRIC, name, Parameter.TYPE_STRING, null, classname, null);
+    	
+    	this.useParameter(p);
+    }
 
     public void useParameter(Object parameter) {
 
         Parameter p = (Parameter) parameter;
+        
+		
+		if (p.getName().equals(P_FILTER_ADD)) {
+			FilterSelectionFrame sel = (new FilterSelectionFrame(this));
+			sel.setVisible(true);
+			return;
+		}
+		
+		if (p.getName().equals(P_METRIC_ADD)) {
+			MetricSelectionFrame sel = (new MetricSelectionFrame(this));
+			sel.setVisible(true);
+			return;
+		}
+		
+        
 
         DefaultListModel dlm = pw.getInUseParametersModel();
 

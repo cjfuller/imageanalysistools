@@ -48,7 +48,7 @@ public class KernelFilterND extends Filter {
 	
 	Map<Integer, double[]> kernelByDimension; //TODO: reimplement Kernel class to be more ND-friendly and use this instead.
 	
-	List<Integer> halfDimensionSizes;
+	Map<Integer, Integer> halfDimensionSizes;
 	
 	public KernelFilterND() {
 		
@@ -56,7 +56,7 @@ public class KernelFilterND extends Filter {
 		
 		this.kernelByDimension = new HashMap<Integer, double[]>();
 		
-		this.halfDimensionSizes = new ArrayList<Integer>();
+		this.halfDimensionSizes = new HashMap<Integer, Integer>();
 	
 	}
 	
@@ -76,7 +76,7 @@ public class KernelFilterND extends Filter {
 			Image original = new Image(im);
 			
 			Integer dim = this.dimensionsToFilter.get(i);
-			int size = halfDimensionSizes.get(i);
+			int size = halfDimensionSizes.get(dim);
 		
 			for (ImageCoordinate ic : im) {
 				boxLower.setCoord(ic);
@@ -198,7 +198,7 @@ public class KernelFilterND extends Filter {
 		
 		this.kernelByDimension.put(dimension, kernel);
 		
-		this.halfDimensionSizes.add((kernel.length-1)/2);
+		this.halfDimensionSizes.put(dimension, (kernel.length-1)/2);
 		
 	}
 

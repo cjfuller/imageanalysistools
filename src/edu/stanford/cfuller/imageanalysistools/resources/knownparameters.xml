@@ -16,6 +16,10 @@
 -->
 
 <root>
+	<parameter name="dynamic_method" displayname="Use created method" type="boolean" default="false" value="true"/>
+	<parameter name="filter_add" displayname="Add filter..." type="string" default=""/>
+	<parameter name="metric_add" displayname="Select metric..." type="string" default=""/>
+
     <parameter name="max_size" displayname="Maximum size" type="integer" default="50"/>
     <parameter name="min_size" displayname="Minimum size" type="integer" default="0"/>
 
@@ -26,10 +30,10 @@
 
     <parameter name="decrease_speckle_background" displayname="Force compensate for punctate background?" type="boolean" default="false"/>
     <parameter name="maximum_number_of_centromeres" displayname="Compensate for punctate background if more centromeres than" type="integer" default="1000"/>
-
+<!-- 
     <parameter name="generate_masks" displayname="Generate masks?" type="boolean" default="true"/>
     <parameter name="generate_values" displayname="Generate values?" type="boolean" default="true"/>
-
+-->
     <parameter name="channel_name" displayname="Channel name" type="string" default=""/>
     <parameter name="marker_channel_index" displayname="Marker channel index" type="integer" default="0"/>
     <parameter name="max_threads" displayname="Maximum number of execution threads" type="integer" default="1"/>
@@ -40,6 +44,8 @@
     <parameter name="swap_z_t" displayname="swap z and t dimensions?" type="boolean" default="false"/>
 
 	<parameter name="method_name" displayname="Name of the method to run" type="string" default=""/>
+	
+
 
     <parameter displayname="Custom parameter"/>
 

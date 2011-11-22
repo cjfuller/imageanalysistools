@@ -27,7 +27,6 @@ package edu.stanford.cfuller.imageanalysistools.filter;
 import ij.ImagePlus;
 import ij.plugin.filter.GaussianBlur;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
-import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
  * A Filter that applies a gaussian blur to a 2D Image.
@@ -42,8 +41,6 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 
 public class GaussianFilter extends Filter {
-
-	//TODO: reimplement using ConvolutionFilter to make use of FFT implementation.
 	
 	//TODO: deal with more than 2 dimensional blur. (Or make that be the job of other filters and rename this one -2D?)
 	
@@ -83,38 +80,39 @@ public class GaussianFilter extends Filter {
         }
 
 
-        double powOfTwo = Math.pow(2.0, kernelSize - 1);
-		
-		double[] coeffs = new double[kernelSize];
-
-        double coeffsSum = 0;
-
-		for (int i = 0; i < coeffs.length; i++) {
-			coeffs[i] = org.apache.commons.math.util.MathUtils.binomialCoefficientDouble(kernelSize-1, i)/powOfTwo;
-            coeffsSum+=coeffs[i];
-        }
-
-
-        float[] kernelCoeffs = new float[kernelSize*kernelSize];
-
-        int kernelCounter = 0;
-
-        for (int i =0; i < coeffs.length; i++) {
-            for (int j =0; j < coeffs.length; j++) {
-                kernelCoeffs[kernelCounter++] = (float) (coeffs[i]*coeffs[j]);
-            }
-        }
+//        double powOfTwo = Math.pow(2.0, kernelSize - 1);
+//		
+//		double[] coeffs = new double[kernelSize];
+//
+//        double coeffsSum = 0;
+//
+//		for (int i = 0; i < coeffs.length; i++) {
+//			coeffs[i] = org.apache.commons.math.util.MathUtils.binomialCoefficientDouble(kernelSize-1, i)/powOfTwo;
+//            coeffsSum+=coeffs[i];
+//        }
+//
+//
+//        float[] kernelCoeffs = new float[kernelSize*kernelSize];
+//
+//        int kernelCounter = 0;
+//
+//        for (int i =0; i < coeffs.length; i++) {
+//            for (int j =0; j < coeffs.length; j++) {
+//                kernelCoeffs[kernelCounter++] = (float) (coeffs[i]*coeffs[j]);
+//            }
+//        }
 
         ImagePlus imP = im.toImagePlus();
         
         GaussianBlur gb = new GaussianBlur();
-        
-        
-        gb.blur(imP.getProcessor(), width);
+                
+        for (int i = 0; i < imP.getImageStackSize(); i++) {
+        	imP.setSliceWithoutUpdate(i+1);
+            gb.blur(imP.getProcessor(), width);
+        }
         
         im.copy(new Image(imP));
         
-
 //        
 //        
 //		Image intermediate = new Image(im);

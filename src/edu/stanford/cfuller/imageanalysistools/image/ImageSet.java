@@ -47,6 +47,8 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
 
     final static long serialVersionUID=1L;
 
+    final static int defaultMarkerIndex = 0;
+    
     List<ImageHolder> images;
 
     Integer markerIndex;
@@ -187,6 +189,19 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
     public Image getMarkerImage() {
         if (markerIndex == null) {return null;}
         return this.images.get(markerIndex).getImage();
+    }
+    
+    /**
+     * Gets the Image specified as the marker Image.  If one has not been specified,
+     * the zeroth image in the set will be chosen as the default and returned.
+     *
+     * The marker Image might be the one to use for segmentation, for instance.
+     *
+     * @return  The marker Image, or an Image selected as the default.
+     */
+    public Image getMarkerImageOrDefault() {
+    	if (markerIndex == null) {return this.images.get(defaultMarkerIndex).getImage();}
+    	return getMarkerImage();
     }
 
     /**

@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-    Document   : methods.xml.xml
+    Document   : methods.xml
     Created on : February 26, 2011, 1:29 PM
-    Author     : cfuller
+    Author     : Colin J. Fuller
     Description:
         Purpose of the document follows.
 -->
 
 <root>
     <method displayname="Centromere finding method" class="edu.stanford.cfuller.imageanalysistools.method.CentromereFindingMethod"/>
+    <method displayname="3D Centromere finding method" class="edu.stanford.cfuller.imageanalysistools.method.CentromereFinding3DMethod"/>
     <method displayname="Recursive thresholding method" class="edu.stanford.cfuller.imageanalysistools.method.RecursiveThresholdingMethod"/>
     <method displayname="Chromosome centromere finding method" class="edu.stanford.cfuller.imageanalysistools.method.ChromosomeCentromereFindingMethod"/>
     <method displayname="Timepoint splitting method" class="edu.stanford.cfuller.imageanalysistools.method.TimepointSplittingMethod"></method>
+    <method displayname="Dynamic method" class="edu.stanford.cfuller.imageanalysistools.method.DynamicMethod"></method>
     <method displayname="Custom method (specify manually)"/>
     <method displayname="Test method" class="edu.stanford.cfuller.imageanalysistools.method.TestMethod"/>
-    <method displayname="3D Centromere finding method" class="edu.stanford.cfuller.imageanalysistools.method.CentromereFinding3DMethod"/>
 </root>

@@ -104,11 +104,11 @@ public class TestMethod extends Method {
 //
 //        iterateOnFiltersAndStoreResult(filters, input, new ZeroMetric());
 		
-//        KinetochoreMatcher km = new KinetochoreMatcher();
-//        
-//        km.setParameters(this.parameters);
-//        
-//        km.makePairs(this.images.get(0), this.images.get(2));
+        KinetochoreMatcher km = new KinetochoreMatcher();
+        
+        km.setParameters(this.parameters);
+        
+        km.makePairs(this.images.get(0), this.images.get(2));
         
        
 //        java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
@@ -128,19 +128,19 @@ public class TestMethod extends Method {
 //        
 //        iterateOnFiltersAndStoreResult(filters, new Image(toProcess), new edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric());
 
-		long start = System.currentTimeMillis();
-		
-		double d = 0;
-		
-		Image process = this.images.get(0);
-		
-		for (ImageCoordinate ic : process) {
-			d += process.getValue(ic);
-		}
-		
-		long end = System.currentTimeMillis();
-		
-		System.out.println("time: " + (end-start));
+//		long start = System.currentTimeMillis();
+//		
+//		double d = 0;
+//		
+//		Image process = this.images.get(0);
+//		
+//		for (ImageCoordinate ic : process) {
+//			d += process.getValue(ic);
+//		}
+//		
+//		long end = System.currentTimeMillis();
+//		
+//		System.out.println("time: " + (end-start));
 		
 	}
 

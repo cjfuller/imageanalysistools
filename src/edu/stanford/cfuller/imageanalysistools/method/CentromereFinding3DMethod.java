@@ -32,7 +32,6 @@ import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparabili
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
-import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 
@@ -64,7 +63,7 @@ public class CentromereFinding3DMethod extends Method {
     */
     @Override
 	public void go() {
-
+    	
 		int referenceChannel = 0;
 		
 		this.parameters.addIfNotSet("marker_channel_index", Integer.toString(referenceChannel));
@@ -72,6 +71,7 @@ public class CentromereFinding3DMethod extends Method {
 		referenceChannel = this.parameters.getIntValueForKey("marker_channel_index");
 		
 		this.centromereFinding(this.images.get(0));
+		
 		
 	}
 	

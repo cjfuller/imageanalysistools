@@ -50,14 +50,21 @@ public class Renormalization3DFilter extends Filter {
 		Image mean = new Image(im);
 
 		VariableSizeMeanFilter VSMF = new VariableSizeMeanFilter();
-		VSMF.setBoxSize(5);
+		VSMF.setBoxSize(5); // was 5
 		VSMF.apply(mean);
 		
         KernelFilterND kf = new KernelFilterND();
+        //double[] d = {0.625, 0.25, 0.375, 0.25, 0.625};
         double[] d = {0.1, 0.2, 0.4, 0.2, 0.1};
-        kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.X, d);
-        kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Y, d);
+        //kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.X, d);
+        //kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Y, d);
         kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Z, d);
+        
+        GaussianFilter gf = new GaussianFilter();
+        
+        gf.setWidth(2);
+        
+        gf.apply(mean);
         
         LaplacianFilterND lfnd = new LaplacianFilterND();
         ZeroPointFilter zpf = new ZeroPointFilter();

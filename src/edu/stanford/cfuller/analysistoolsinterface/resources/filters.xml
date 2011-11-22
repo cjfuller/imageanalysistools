@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : filters.xml
+    Author     : auto-generated
+-->
+
+
+<root>
+<filter displayname="AntiseedFilter" class="edu.stanford.cfuller.imageanalysistools.filter.AntiseedFilter"></filter>
+<filter displayname="BackgroundEstimationFilter" class="edu.stanford.cfuller.imageanalysistools.filter.BackgroundEstimationFilter"></filter>
+<filter displayname="BandpassFilter" class="edu.stanford.cfuller.imageanalysistools.filter.BandpassFilter"></filter>
+<filter displayname="ConvexHullByLabelFilter" class="edu.stanford.cfuller.imageanalysistools.filter.ConvexHullByLabelFilter"></filter>
+<filter displayname="ConvolutionFilter" class="edu.stanford.cfuller.imageanalysistools.filter.ConvolutionFilter"></filter>
+<filter displayname="DilationFilter" class="edu.stanford.cfuller.imageanalysistools.filter.DilationFilter"></filter>
+<filter displayname="FillFilter" class="edu.stanford.cfuller.imageanalysistools.filter.FillFilter"></filter>
+<filter displayname="GaussianFilter" class="edu.stanford.cfuller.imageanalysistools.filter.GaussianFilter"></filter>
+<filter displayname="GaussianFitFilter" class="edu.stanford.cfuller.imageanalysistools.filter.GaussianFitFilter"></filter>
+<filter displayname="GradientFilter" class="edu.stanford.cfuller.imageanalysistools.filter.GradientFilter"></filter>
+<filter displayname="GradientHistogramThresholdingFilter" class="edu.stanford.cfuller.imageanalysistools.filter.GradientHistogramThresholdingFilter"></filter>
+<filter displayname="GraphJoiningFilter" class="edu.stanford.cfuller.imageanalysistools.filter.GraphJoiningFilter"></filter>
+<filter displayname="InversionFilter" class="edu.stanford.cfuller.imageanalysistools.filter.InversionFilter"></filter>
+<filter displayname="Label3DFilter" class="edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter"></filter>
+<filter displayname="LabelBySeedFilter" class="edu.stanford.cfuller.imageanalysistools.filter.LabelBySeedFilter"></filter>
+<filter displayname="LabelFilter" class="edu.stanford.cfuller.imageanalysistools.filter.LabelFilter"></filter>
+<filter displayname="LaplacianFilter" class="edu.stanford.cfuller.imageanalysistools.filter.LaplacianFilter"></filter>
+<filter displayname="LocalBackgroundEstimation3DFilter" class="edu.stanford.cfuller.imageanalysistools.filter.LocalBackgroundEstimation3DFilter"></filter>
+<filter displayname="LocalBackgroundEstimationFilter" class="edu.stanford.cfuller.imageanalysistools.filter.LocalBackgroundEstimationFilter"></filter>
+<filter displayname="LocalMaximumSeparabilityThresholdingFilter" class="edu.stanford.cfuller.imageanalysistools.filter.LocalMaximumSeparabilityThresholdingFilter"></filter>
+<filter displayname="MaskFilter" class="edu.stanford.cfuller.imageanalysistools.filter.MaskFilter"></filter>
+<filter displayname="MaximumSeparabilityThresholdingFilter" class="edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter"></filter>
+<filter displayname="MergeFilter" class="edu.stanford.cfuller.imageanalysistools.filter.MergeFilter"></filter>
+<filter displayname="OneToOneLabelBySeedFilter" class="edu.stanford.cfuller.imageanalysistools.filter.OneToOneLabelBySeedFilter"></filter>
+<filter displayname="RecursiveMaximumSeparability3DFilter" class="edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter"></filter>
+<filter displayname="RecursiveMaximumSeparabilityFilter" class="edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparabilityFilter"></filter>
+<filter displayname="RegionMaximumSeparabilityThresholdingFilter" class="edu.stanford.cfuller.imageanalysistools.filter.RegionMaximumSeparabilityThresholdingFilter"></filter>
+<filter displayname="RegionThresholdingFilter" class="edu.stanford.cfuller.imageanalysistools.filter.RegionThresholdingFilter"></filter>
+<filter displayname="RelabelFilter" class="edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter"></filter>
+<filter displayname="Renormalization3DFilter" class="edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter"></filter>
+<filter displayname="RenormalizationFilter" class="edu.stanford.cfuller.imageanalysistools.filter.RenormalizationFilter"></filter>
+<filter displayname="ScalespaceFilter" class="edu.stanford.cfuller.imageanalysistools.filter.ScalespaceFilter"></filter>
+<filter displayname="SeededFilter" class="edu.stanford.cfuller.imageanalysistools.filter.SeededFilter"></filter>
+<filter displayname="SeededWatershedFilter" class="edu.stanford.cfuller.imageanalysistools.filter.SeededWatershedFilter"></filter>
+<filter displayname="SeedFilter" class="edu.stanford.cfuller.imageanalysistools.filter.SeedFilter"></filter>
+<filter displayname="SimpleThresholdingFilter" class="edu.stanford.cfuller.imageanalysistools.filter.SimpleThresholdingFilter"></filter>
+<filter displayname="SizeAbsoluteFilter" class="edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter"></filter>
+<filter displayname="SizeFilter" class="edu.stanford.cfuller.imageanalysistools.filter.SizeFilter"></filter>
+<filter displayname="TimeAveragingFilter" class="edu.stanford.cfuller.imageanalysistools.filter.TimeAveragingFilter"></filter>
+<filter displayname="UnionFilter" class="edu.stanford.cfuller.imageanalysistools.filter.UnionFilter"></filter>
+<filter displayname="VariableSizeMeanFilter" class="edu.stanford.cfuller.imageanalysistools.filter.VariableSizeMeanFilter"></filter>
+<filter displayname="WatershedFilter" class="edu.stanford.cfuller.imageanalysistools.filter.WatershedFilter"></filter>
+<filter displayname="ZeroPointFilter" class="edu.stanford.cfuller.imageanalysistools.filter.ZeroPointFilter"></filter>
+</root>
