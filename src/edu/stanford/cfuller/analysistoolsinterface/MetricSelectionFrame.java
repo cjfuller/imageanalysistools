@@ -116,7 +116,13 @@ public class MetricSelectionFrame extends JFrame {
 		
         Document taskDoc = null;
 
-        String taskURLString = ClassLoader.getSystemClassLoader().getResource(METRICS_XML_FILENAME).toString();
+        String taskURLString = null;
+        
+        if (ij.IJ.getInstance() != null) {
+        	taskURLString = ij.IJ.getClassLoader().getResource(METRICS_XML_FILENAME).toString();
+        } else {
+        	taskURLString = ClassLoader.getSystemClassLoader().getResource(METRICS_XML_FILENAME).toString();
+        }
         
         try {
             taskDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(taskURLString);
