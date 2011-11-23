@@ -29,9 +29,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -49,6 +51,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Rectangle;
 import java.awt.Dimension;
+import javax.swing.JLabel;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * @author cfuller
@@ -74,8 +81,21 @@ public class FilterSelectionFrame extends JFrame {
 		filters = new ArrayList<String>();
 		filterLookupByName = new HashMap<String, String>();
 		
-		populateFilterList();
+		populateFilterList(FILTERS_XML_FILENAME, true);
 		
+	}
+	
+	protected void addAdditionalFilters() {
+		JFileChooser jfc = new JFileChooser(Preferences.userNodeForPackage(this.getClass()).get("additional_filters_filename", ""));
+		jfc.setMultiSelectionEnabled(false);
+		jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int result = jfc.showOpenDialog(this);
+		if (result == JFileChooser.APPROVE_OPTION) {
+			String filename = jfc.getSelectedFile().getAbsolutePath();
+			Preferences.userNodeForPackage(this.getClass()).put("additional_filters_filename", filename);
+			populateFilterList(filename, false);
+			parameterList.setListData(filters.toArray());
+		}
 	}
 	
 	public FilterSelectionFrame(ParameterSetupController pscIn) {
@@ -87,14 +107,35 @@ public class FilterSelectionFrame extends JFrame {
 		this.psc = pscIn;
 		
 		JScrollPane scrollPane = new JScrollPane();
+		
+		JLabel lblLoadAdditionalFilters = new JLabel("Load additional filters from an XML file:");
+		
+		JButton btnLoad = new JButton("Load");
+		btnLoad.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				addAdditionalFilters();
+			}
+		});
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblLoadAdditionalFilters)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnLoad)
+					.addContainerGap(64, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
-				.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+				.addGroup(groupLayout.createSequentialGroup()
+					.addComponent(scrollPane, GroupLayout.PREFERRED_SIZE, 239, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblLoadAdditionalFilters)
+						.addComponent(btnLoad))
+					.addContainerGap(11, Short.MAX_VALUE))
 		);
 		
 		parameterList = new JList();
@@ -112,16 +153,20 @@ public class FilterSelectionFrame extends JFrame {
 		parameterList.setListData(filters.toArray());
 	}
 	
-	protected static void populateFilterList() {
+	protected static void populateFilterList(String filename, boolean isResource) {
 		
         Document taskDoc = null;
 
         String taskURLString = null;
         
-        if (ij.IJ.getInstance() != null) {
-        	taskURLString = ij.IJ.getClassLoader().getResource(FILTERS_XML_FILENAME).toString();
+        if (isResource) {
+	        if (ij.IJ.getInstance() != null) {
+	        	taskURLString = ij.IJ.getClassLoader().getResource(filename).toString();
+	        } else {
+	        	taskURLString = ClassLoader.getSystemClassLoader().getResource(filename).toString();
+	        }
         } else {
-        	taskURLString = ClassLoader.getSystemClassLoader().getResource(FILTERS_XML_FILENAME).toString();
+        	taskURLString = filename;
         }
         
         try {
@@ -157,5 +202,4 @@ public class FilterSelectionFrame extends JFrame {
 
         }
     }
-	
 }
