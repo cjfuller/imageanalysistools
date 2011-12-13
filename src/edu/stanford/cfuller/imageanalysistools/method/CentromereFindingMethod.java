@@ -126,9 +126,23 @@ public class CentromereFindingMethod extends Method {
         RLF.setParameters(this.parameters);
         
         Image normalized = new Image(this.images.get(0));
-
-
+        
         this.normalizeInputImage(normalized);
+        
+        BandpassFilter bf = new BandpassFilter();
+        
+        bf.setParameters(this.parameters);
+        
+        
+        final float band_lower = 3.0f;
+        final float band_upper = 4.0f;
+        
+        bf.setBand(band_lower, band_upper);
+        
+        bf.apply(normalized);
+
+        
+        
 
 
         Image groupMask = centromereFinding(normalized);

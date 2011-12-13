@@ -73,6 +73,8 @@ public abstract class Method implements Runnable {
 		    //toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
 			String name = Integer.toString(c++);
 			
+			if (ij.IJ.getInstance() == null) {new ij.ImageJ();}
+			
 			ij.ImagePlus ip = (new Image(toProcess)).toImagePlus();
 			ip.setTitle(name);
 			ip.show();

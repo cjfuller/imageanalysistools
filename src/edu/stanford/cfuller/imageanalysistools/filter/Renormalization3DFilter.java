@@ -47,8 +47,13 @@ public class Renormalization3DFilter extends Filter {
 	@Override
 	public void apply(Image im) {
 		
+		PlaneNormalizationFilter pnf = new PlaneNormalizationFilter();
+		
+		pnf.apply(im);
+				
 		Image mean = new Image(im);
 
+		
 		VariableSizeMeanFilter VSMF = new VariableSizeMeanFilter();
 		VSMF.setBoxSize(5); // was 5
 		VSMF.apply(mean);
@@ -62,7 +67,7 @@ public class Renormalization3DFilter extends Filter {
         
         GaussianFilter gf = new GaussianFilter();
         
-        gf.setWidth(2);
+        gf.setWidth(5);
         
         gf.apply(mean);
         
@@ -80,6 +85,7 @@ public class Renormalization3DFilter extends Filter {
         
         lfnd.apply(lf);
         zpf.apply(lf);
+        gf.apply(lf);
         kf.apply(lf);
         
 		float min = Float.MAX_VALUE;

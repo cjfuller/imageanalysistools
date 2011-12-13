@@ -25,6 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.method;
 
 
+import edu.stanford.cfuller.imageanalysistools.filter.BandpassFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
 import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.LocalMaximumSeparabilityThresholdingFilter;
@@ -81,7 +82,18 @@ public class CentromereFinding3DMethod extends Method {
                 
         Renormalization3DFilter LBE3F = new Renormalization3DFilter();
         
+        final float band_lower = 4.0f;
+        final float band_upper = 5.0f;
+        
+        BandpassFilter bf = new BandpassFilter();
+        
+        bf.setBand(band_lower, band_upper);
+        
+        filters.add(bf);
+        
         filters.add(LBE3F);
+        
+        
         
         filters.add(new LocalMaximumSeparabilityThresholdingFilter());
         filters.add(new Label3DFilter());
