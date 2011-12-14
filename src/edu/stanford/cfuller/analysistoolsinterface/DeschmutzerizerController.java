@@ -445,6 +445,10 @@ public class DeschmutzerizerController extends TaskController {
 
 		try {
 
+			if (maskFilename == null || labeledMaskFilename == null) {
+				throw new java.io.IOException("could not locate mask");
+			}
+			
 			currentImage = ir.read(nextToProcess);
 			currentMask = ir.read(maskFilename);
 			currentLabeledMask = ir.read(labeledMaskFilename);

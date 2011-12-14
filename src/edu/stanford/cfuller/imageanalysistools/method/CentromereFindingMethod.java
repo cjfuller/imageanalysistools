@@ -133,17 +133,12 @@ public class CentromereFindingMethod extends Method {
         
         bf.setParameters(this.parameters);
         
-        
         final float band_lower = 3.0f;
         final float band_upper = 4.0f;
         
         bf.setBand(band_lower, band_upper);
         
         bf.apply(normalized);
-
-        
-        
-
 
         Image groupMask = centromereFinding(normalized);
 

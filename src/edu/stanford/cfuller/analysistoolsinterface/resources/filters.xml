@@ -31,6 +31,7 @@
 <filter displayname="MaximumSeparabilityThresholdingFilter" class="edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter"></filter>
 <filter displayname="MergeFilter" class="edu.stanford.cfuller.imageanalysistools.filter.MergeFilter"></filter>
 <filter displayname="OneToOneLabelBySeedFilter" class="edu.stanford.cfuller.imageanalysistools.filter.OneToOneLabelBySeedFilter"></filter>
+<filter displayname="PlaneNormalizationFilter" class="edu.stanford.cfuller.imageanalysistools.filter.PlaneNormalizationFilter"></filter>
 <filter displayname="RecursiveMaximumSeparability3DFilter" class="edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter"></filter>
 <filter displayname="RecursiveMaximumSeparabilityFilter" class="edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparabilityFilter"></filter>
 <filter displayname="RegionMaximumSeparabilityThresholdingFilter" class="edu.stanford.cfuller.imageanalysistools.filter.RegionMaximumSeparabilityThresholdingFilter"></filter>

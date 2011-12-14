@@ -211,8 +211,6 @@ public class ImageReader {
     protected static Thread lock(String filename) throws InterruptedException {
 
 
-
-
         synchronized (ImageReader.class) {
 
             if (!fileLocks.containsKey(filename)) {
