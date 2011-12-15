@@ -297,7 +297,7 @@ public class CentromereFindingMethod extends Method {
             if (allCentromeres.getValue(c) > 0) backgroundMask.setValue(c, 0);
         }
 
-        if (this.parameters.hasKey("use_clustering") && Boolean.parseBoolean(this.parameters.getValueForKey("use_clustering"))) {
+        if (this.parameters.hasKeyAndTrue("use_clustering")) {
 
             BackgroundEstimationFilter BEF = new BackgroundEstimationFilter();
 
@@ -318,7 +318,7 @@ public class CentromereFindingMethod extends Method {
 
         RealMatrix backgroundResult = null;
 
-        if (this.parameters.hasKey("use_clustering") && Boolean.parseBoolean(this.parameters.getValueForKey("use_clustering"))) {
+        if (this.parameters.hasKeyAndTrue("use_clustering")) {
 
             backgroundResult = metric.quantify(backgroundMask, this.imageSet);
 
