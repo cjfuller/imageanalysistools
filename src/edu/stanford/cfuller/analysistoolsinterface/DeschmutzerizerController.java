@@ -80,6 +80,8 @@ public class DeschmutzerizerController extends TaskController {
 	String currentDataFilename;
 	String currentLabeledMaskFilename;
 	String currentParametersFilename;
+	String lastParametersProcessed;
+	String lastDataFilenameProcessed;
 
 	ParameterDictionary currentParameters;
 
@@ -251,6 +253,8 @@ public class DeschmutzerizerController extends TaskController {
 	public void startTask() {
 
 		this.currentParameters = null;
+		this.lastDataFilenameProcessed = null;
+		this.lastParametersProcessed = null;
 
 		this.selectedRegions = new java.util.HashSet<Integer>();
 
@@ -296,9 +300,9 @@ public class DeschmutzerizerController extends TaskController {
 
 		this.dw.setDone(true);
 		this.dw.setStartButtonEnabled(true);
-		if (this.currentParameters != null) {
+		if (this.lastParametersProcessed != null) {
 			try {
-				DataSummary.SummarizeData((new File(this.getOutputFilename(this.currentDataFilename))).getParent(), (new File(this.currentParametersFilename)).getParent());
+				DataSummary.SummarizeData((new File(this.getOutputFilename(this.lastDataFilenameProcessed))).getParent(), (new File(this.lastParametersProcessed)).getParent());
 			} catch (java.io.IOException e ) {
 				LoggingUtilities.severe("encountered exception while making data summary");
 			}
@@ -397,6 +401,8 @@ public class DeschmutzerizerController extends TaskController {
 			this.currentDataFilename = null;
 			return;
 		}
+		
+		
 
 		ParameterDictionary p = ParameterDictionary.readParametersFromFile(parametersFilename);
 
@@ -412,6 +418,9 @@ public class DeschmutzerizerController extends TaskController {
 		}
 		this.currentDataFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("data_output_filename");
 
+		this.lastParametersProcessed = parametersFilename;
+		this.lastDataFilenameProcessed = this.currentDataFilename;
+		
 	}
 
 	private String getOutputFilename(String inputFilename) {
