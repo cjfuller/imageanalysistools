@@ -83,6 +83,12 @@ public class Quantification {
 		
 	}
 	
+	public void addAllMeasurements(Quantification q) {
+		for (Measurement m : q.measurements) {
+			this.addMeasurement(m);
+		}
+	}
+	
 	public List<Measurement> getAllMeasurements() {
 		return this.measurements;
 	}

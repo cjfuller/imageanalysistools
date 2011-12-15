@@ -24,13 +24,18 @@
 
 package edu.stanford.cfuller.imageanalysistools.method;
 
+import java.util.List;
+
 import edu.stanford.cfuller.imageanalysistools.filter.*;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.clustering.ObjectClustering;
+import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
+import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
+import edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
 import org.apache.commons.math.linear.RealMatrix;
@@ -309,14 +314,14 @@ public class CentromereFindingMethod extends Method {
         
         //generate output
 
-        RealMatrix fullResult = metric.quantify(allCentromeres, this.imageSet);
+        Quantification fullResult = metric.quantify(allCentromeres, this.imageSet);
 
         if (fullResult == null) {
             this.storedDataOutput = null;
             return;
         }
 
-        RealMatrix backgroundResult = null;
+        Quantification backgroundResult = null;
 
         if (this.parameters.hasKeyAndTrue("use_clustering")) {
 
@@ -326,9 +331,7 @@ public class CentromereFindingMethod extends Method {
 
         if (backgroundResult == null) { // either not using clustering or the quantification failed due to no ROIs
 
-            backgroundResult = new Array2DRowRealMatrix(fullResult.getRowDimension(), fullResult.getColumnDimension());
-
-            backgroundResult = backgroundResult.scalarMultiply(0.0);
+            backgroundResult = (new ZeroMetric()).quantify(backgroundMask, this.imageSet);
 
         }
         
@@ -337,9 +340,7 @@ public class CentromereFindingMethod extends Method {
         }
 
 
-        RealMatrix masterResult = new org.apache.commons.math.linear.Array2DRowRealMatrix(fullResult.getRowDimension(), fullResult.getColumnDimension() + Integer.parseInt(this.parameters.getValueForKey("number_of_channels")) + 1);
-
-        int[] resultMap = new int[fullResult.getRowDimension()];
+        int[] resultMap = new int[Histogram.findMaxVal(allCentromeres)];
 
 
         //TODO: consider new return type for the quantification (XML document?)
@@ -355,31 +356,27 @@ public class CentromereFindingMethod extends Method {
 
         }
 
-        for (int i = 0; i < fullResult.getRowDimension(); i++) {
-
-            for (int j = 0; j < fullResult.getColumnDimension(); j++) {
-
-                masterResult.setEntry(i, j, fullResult.getEntry(i, j));
-
-            }
-
-            for (int b = 0; b < Integer.parseInt(this.parameters.getValueForKey("number_of_channels")); b++) {
-
-                if (resultMap[i]-1 < backgroundResult.getRowDimension() && resultMap[i] > 0 && (b+1) < backgroundResult.getColumnDimension()) {
-                    masterResult.setEntry(i,fullResult.getColumnDimension() + b + 1, backgroundResult.getEntry(resultMap[i]-1, b+1));
-                } else {
-                    masterResult.setEntry(i,fullResult.getColumnDimension() + b + 1, 0);
-                }
-
-            }
-
-            //masterResult.setEntry(i, masterResult.getColumnDimension()-2, i+1);
-            masterResult.setEntry(i, fullResult.getColumnDimension(), resultMap[i]);
-
-
+        for (int i = 0; i < resultMap.length; i++) {
+        	
+        	fullResult.addMeasurement(new Measurement(true, i+1, resultMap[i], "cell_id", Measurement.TYPE_GROUPING, this.imageSet.getMarkerImageName()));
+        	
+        	List<Measurement> background = backgroundResult.getAllMeasurementsForRegion(resultMap[i]);
+        	
+        	for (Measurement m : background) {
+        		
+        		if (m.getMeasurementType() == Measurement.TYPE_INTENSITY) {
+        			
+        			fullResult.addMeasurement(new Measurement(true, i+1, m.getMeasurement(), m.getMeasurementName() + "_background", Measurement.TYPE_BACKGROUND, this.imageSet.getMarkerImageName()));
+        			        			
+        		}
+        		
+        	}
+        	
         }
+        
+        
 
-        this.storedDataOutput = masterResult;
+        this.storedDataOutput = fullResult;
 
     }
 
