@@ -51,6 +51,6 @@ public abstract class Metric {
      * @param images    An ImageSet of Images to be quantified using the same masks (perhaps corresponding to different color channels, for example).
      * @return          A RealMatrix containing all the quantified values; rows correspond to ROIs, columns to input Images.
      */
-	public abstract RealMatrix quantify(Image mask, ImageSet images);
+	public abstract Quantification quantify(Image mask, ImageSet images);
 	
 }

@@ -66,34 +66,44 @@ public class IntensityPerPixelMetric extends Metric {
      *                  entry of which will contain the quantification of ROI (i+1) in Image j.  This will then be followed by a single column containing the pixel count for that region.
      */
 	@Override
-	public RealMatrix quantify(Image mask, ImageSet images) {
+	public Quantification quantify(Image mask, ImageSet images) {
 		
 		edu.stanford.cfuller.imageanalysistools.image.Histogram h = new edu.stanford.cfuller.imageanalysistools.image.Histogram(mask);
 		
 		if (h.getMaxValue() == 0) return null;
 		
-		RealMatrix channelIntensities = (new org.apache.commons.math.linear.Array2DRowRealMatrix(images.getImageCount()+2, h.getMaxValue())).scalarMultiply(0);
+		RealMatrix channelIntensities = (new org.apache.commons.math.linear.Array2DRowRealMatrix(images.getImageCount(), h.getMaxValue())).scalarMultiply(0);
 		
 		for (ImageCoordinate i : mask) {
 			int regionNum = (int) mask.getValue(i);
 			
 			if (regionNum > 0) {
 				for (int c = 0; c < images.getImageCount(); c++) {
-					channelIntensities.addToEntry(c+1, regionNum-1, images.getImageForIndex(c).getValue(i));
+					channelIntensities.addToEntry(c, regionNum-1, images.getImageForIndex(c).getValue(i));
 				}
 			}
 		}
 		
 		for (int i = 0; i < h.getMaxValue(); i++) {
-			channelIntensities.setEntry(0, i, i+1);
-			channelIntensities.setEntry(images.getImageCount()+1, i, h.getCounts(i+1));
 			for (int c = 0; c < images.getImageCount(); c++) {
-				channelIntensities.setEntry(c+1, i, channelIntensities.getEntry(c+1,i)/h.getCounts(i+1));
+				channelIntensities.setEntry(c, i, channelIntensities.getEntry(c,i)/h.getCounts(i+1));
 			}
 		}
 		
+		Quantification q = new Quantification();
 		
-		return channelIntensities.transpose();
+		for (int i = 0; i < h.getMaxValue(); i++) {
+			for (int c = 0; c < images.getImageCount(); c++) {
+				Measurement m = new Measurement(true, i+1, channelIntensities.getEntry(c, i), "channel_" + c, Measurement.TYPE_INTENSITY, images.getMarkerImageName());
+				q.addMeasurement(m);
+			}
+			
+			Measurement m = new Measurement(true, i+1, h.getCounts(i+1), "pixel_count", Measurement.TYPE_SIZE, images.getMarkerImageName());
+			q.addMeasurement(m);
+		}
+		
+		return q;
+		
 	}
 
 }

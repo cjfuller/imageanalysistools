@@ -192,6 +192,17 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
     }
     
     /**
+     * Gets the filename of the marker Image.
+     * 
+     * @return	the filename, or null if there is no marker image.
+     */
+    public String getMarkerImageName() {
+    	if (markerIndex == null) {return null;}
+        return this.images.get(markerIndex).getFilename();
+    	
+    }
+    
+    /**
      * Gets the Image specified as the marker Image.  If one has not been specified,
      * the zeroth image in the set will be chosen as the default and returned.
      *

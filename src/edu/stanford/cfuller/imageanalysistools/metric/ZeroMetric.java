@@ -24,8 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.metric;
 
-import org.apache.commons.math.linear.RealMatrix;
 
+import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 
@@ -39,11 +39,18 @@ public class ZeroMetric extends Metric {
 	 * @see edu.stanford.cfuller.imageanalysistools.metric.Metric#quantify(edu.stanford.cfuller.imageanalysistools.image.Image, java.util.Vector)
 	 */
 	@Override
-	public RealMatrix quantify(Image mask, ImageSet images) {
+	public Quantification quantify(Image mask, ImageSet images) {
 
-
-		RealMatrix channelIntensities = (new org.apache.commons.math.linear.Array2DRowRealMatrix(images.size()+1, 1)).scalarMultiply(0);
-
-		return channelIntensities.transpose();
+		int maxRegion = Histogram.findMaxVal(mask);
+		
+		Quantification q = new Quantification();
+		
+		for (int i = 1; i < maxRegion; i++) {
+			Measurement m = new Measurement(true, i, 0.0, "zero", "zero", images.getMarkerImageName());
+			q.addMeasurement(m);
+		}
+		
+		return q;
+		
 	}
 }

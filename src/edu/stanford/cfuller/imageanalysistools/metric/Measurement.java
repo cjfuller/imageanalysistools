@@ -40,6 +40,11 @@ public class Measurement {
 	protected String measurementType;
 	protected String imageID;
 	
+	public static final String TYPE_INTENSITY = "intensity";
+	public static final String TYPE_SIZE = "size";
+	public static final String TYPE_GROUPING = "group";
+	public static final String TYPE_BACKGROUND = "background";
+	
 	/**
 	 * Creates a new, empty measurement.
 	 */
