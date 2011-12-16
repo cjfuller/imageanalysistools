@@ -66,318 +66,351 @@ import org.apache.commons.math.linear.RealMatrix;
 
 public class CentromereFindingMethod extends Method {
 
-    Metric metric;
+	Metric metric;
 
 
-    /**
-     * Sole constructor, which creates a default instance.
-     */
-    public CentromereFindingMethod() {
-        this.metric = new edu.stanford.cfuller.imageanalysistools.metric.IntensityPerPixelMetric();
-    }
+	/**
+	 * Sole constructor, which creates a default instance.
+	 */
+	public CentromereFindingMethod() {
+		this.metric = new edu.stanford.cfuller.imageanalysistools.metric.IntensityPerPixelMetric();
+	}
 
-    protected Image centromereFinding(Image input) {
+	protected Image centromereFinding(Image input) {
 
-        java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
+		java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
 
-        filters.add(new LocalMaximumSeparabilityThresholdingFilter());
-        filters.add(new LabelFilter());
-        filters.add(new RecursiveMaximumSeparabilityFilter());
-        filters.add(new RelabelFilter());
-        filters.add(new SizeAbsoluteFilter());
-        filters.add(new RelabelFilter());
+		filters.add(new LocalMaximumSeparabilityThresholdingFilter());
+		filters.add(new LabelFilter());
+		filters.add(new RecursiveMaximumSeparabilityFilter());
+		filters.add(new RelabelFilter());
+		filters.add(new SizeAbsoluteFilter());
+		filters.add(new RelabelFilter());
 
-        for (Filter i : filters){
-            i.setParameters(this.parameters);
-            i.setReferenceImage(this.images.get(0));
-        }
+		for (Filter i : filters){
+			i.setParameters(this.parameters);
+			i.setReferenceImage(this.images.get(0));
+		}
 
-        Image toProcess = new Image(input);
+		Image toProcess = new Image(input);
 
-        iterateOnFiltersAndStoreResult(filters, toProcess, metric);
+		iterateOnFiltersAndStoreResult(filters, toProcess, metric);
 
-        return this.getStoredImage();
-    }
+		return this.getStoredImage();
+	}
 
-    protected void normalizeInputImage(Image input) {
+	protected void normalizeInputImage(Image input) {
 
-        RenormalizationFilter rnf = new RenormalizationFilter();
-        rnf.setParameters(this.parameters);
-        rnf.apply(input);
+		RenormalizationFilter rnf = new RenormalizationFilter();
+		rnf.setParameters(this.parameters);
+		rnf.apply(input);
 
 
-    }
+	}
 
 
-    /**
-     *
-     * Runs the centromere finding method using the stored images and parameters.
-     *
-     */
-    @Override
-    public void go() {
-    	this.parameters.setValueForKey("DEBUG", "false");
+	/**
+	 *
+	 * Runs the centromere finding method using the stored images and parameters.
+	 *
+	 */
+	@Override
+	public void go() {
+		this.parameters.setValueForKey("DEBUG", "false");
 
-        SizeAbsoluteFilter SELF = new SizeAbsoluteFilter();
-        SimpleThresholdingFilter ImThF = new SimpleThresholdingFilter();
-        LabelFilter LF = new LabelFilter();
-        RelabelFilter RLF = new RelabelFilter();
-        MaskFilter MF = new MaskFilter();
+		SizeAbsoluteFilter SELF = new SizeAbsoluteFilter();
+		SimpleThresholdingFilter ImThF = new SimpleThresholdingFilter();
+		LabelFilter LF = new LabelFilter();
+		RelabelFilter RLF = new RelabelFilter();
+		MaskFilter MF = new MaskFilter();
 
 
-        SELF.setParameters(this.parameters);
-        ImThF.setParameters(this.parameters);
-        LF.setParameters(this.parameters);
-        RLF.setParameters(this.parameters);
-        
-        Image normalized = new Image(this.images.get(0));
-        
-        this.normalizeInputImage(normalized);
-        
-        BandpassFilter bf = new BandpassFilter();
-        
-        bf.setParameters(this.parameters);
-        
-        final float band_lower = 3.0f;
-        final float band_upper = 4.0f;
-        
-        bf.setBand(band_lower, band_upper);
-        
-        bf.apply(normalized);
+		SELF.setParameters(this.parameters);
+		ImThF.setParameters(this.parameters);
+		LF.setParameters(this.parameters);
+		RLF.setParameters(this.parameters);
 
-        Image groupMask = centromereFinding(normalized);
+		Image normalized = new Image(this.images.get(0));
 
-        this.clearImageOutput();
+		this.normalizeInputImage(normalized);
 
-        ImThF.setReferenceImage(normalized);
+		BandpassFilter bf = new BandpassFilter();
 
-        SELF.apply(groupMask);
+		bf.setParameters(this.parameters);
 
-        ImThF.apply(groupMask);
+		final float band_lower = 3.0f;
+		final float band_upper = 4.0f;
 
-        LF.apply(groupMask);
-        Image allCentromeres = new Image(groupMask);
+		bf.setBand(band_lower, band_upper);
 
-        Histogram h = new Histogram(groupMask);
+		bf.apply(normalized);
 
-        //clustering
+		Image groupMask = centromereFinding(normalized);
 
-        if(this.parameters.hasKeyAndTrue("use_clustering")) {
-        	
-            //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Filtering");
+		this.clearImageOutput();
 
-            Image gaussianFilteredMask = ObjectClustering.gaussianFilterMask(groupMask);
-            
-            //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Done filtering");
+		ImThF.setReferenceImage(normalized);
 
-            boolean decreaseBackground = Boolean.parseBoolean(this.parameters.getValueForKey("decrease_speckle_background"));
+		SELF.apply(groupMask);
 
-            decreaseBackground = decreaseBackground || (this.parameters.hasKey("maximum_number_of_centromeres") && this.parameters.getIntValueForKey("maximum_number_of_centromeres") < h.getMaxValue());
+		ImThF.apply(groupMask);
 
+		LF.apply(groupMask);
+		Image allCentromeres = new Image(groupMask);
 
-            if (!decreaseBackground) {
-                if (this.parameters.hasKeyAndTrue("use_basic_clustering")) {
-                    groupMask.copy(ObjectClustering.doBasicClustering(groupMask, normalized, gaussianFilteredMask));
-                } else {
-                    ObjectClustering.doComplexClustering(groupMask, normalized, Integer.parseInt(this.parameters.getValueForKey("maximum_clustering_iterations")), gaussianFilteredMask);
-                }
-            } else {
+		Histogram h = new Histogram(groupMask);
 
-                Image output = ObjectClustering.doBasicClustering(groupMask, normalized, new Image(gaussianFilteredMask));
+		//clustering
 
-                RegionThresholdingFilter rtf = new RegionThresholdingFilter();
-                MaximumSeparabilityThresholdingFilter mstf_clustering = new MaximumSeparabilityThresholdingFilter();
+		if (this.parameters.hasKeyAndTrue("use_clustering")) {
 
-                rtf.setThresholdingFilter(mstf_clustering);
-                rtf.setParameters(this.parameters);
-                Image ch0_copy = new Image(this.images.get(0));
+			if (this.parameters.hasKeyAndTrue("cluster_by_DNA")) {
 
-                Histogram h_clustered = new Histogram(output);
+				int dnaChannel = 0;
+				if (this.parameters.hasKey("DNA_channel")) {
+					dnaChannel = this.parameters.getIntValueForKey("DNA_channel");
+				}
 
-                Image singleClusterTemp = new Image(output);
+				Image dnaImage = this.imageSet.getImageForIndex(dnaChannel);
 
-                for (int c = 1; c<= h_clustered.getMaxValue(); c++) {
+				MaximumSeparabilityThresholdingFilter mstf = new MaximumSeparabilityThresholdingFilter();
+				LabelFilter lf = new LabelFilter();
+				MaskFilter mf = new MaskFilter();
 
-                    for (ImageCoordinate i : singleClusterTemp) {
+				lf.setParameters(this.parameters);
+				mstf.setParameters(this.parameters);
 
-                        if (output.getValue(i) ==  c) {
-                            singleClusterTemp.setValue(i,c);
-                            ch0_copy.setValue(i, this.images.get(0).getValue(i));
-                        } else {
-                            singleClusterTemp.setValue(i, 0);
-                            ch0_copy.setValue(i,0);
-                        }
+				groupMask = new Image(dnaImage);
 
-                    }
+				mstf.apply(groupMask);
+				lf.apply(groupMask);
 
-                    rtf.setReferenceImage(ch0_copy);
-                    LF.apply(singleClusterTemp);
-                    rtf.apply(singleClusterTemp);
+				mf.setReferenceImage(allCentromeres);
 
-                    for (ImageCoordinate i : singleClusterTemp) {
-                        if (output.getValue(i) == c && singleClusterTemp.getValue(i) == 0) {
-                            output.setValue(i, 0);
-                        }
-                    }
+				mf.apply(groupMask);
 
-                }
 
-                LF.apply(output);
+			} else  {
 
-                MF.setReferenceImage(output);
+				//java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Filtering");
 
-                MF.apply(groupMask);
+				Image gaussianFilteredMask = ObjectClustering.gaussianFilterMask(groupMask);
 
-                gaussianFilteredMask = ObjectClustering.gaussianFilterMask(groupMask);
+				//java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Done filtering");
 
-                if (this.parameters.hasKey("use_basic_clustering") && this.parameters.getBooleanValueForKey("use_basic_clustering")) {
-                    groupMask.copy(ObjectClustering.doBasicClustering(groupMask, normalized, gaussianFilteredMask));
-                } else {
-                    ObjectClustering.doComplexClustering(groupMask, normalized, Integer.parseInt(this.parameters.getValueForKey("maximum_clustering_iterations")), gaussianFilteredMask);
-                }
+				boolean decreaseBackground = Boolean.parseBoolean(this.parameters.getValueForKey("decrease_speckle_background"));
 
-            }
+				decreaseBackground = decreaseBackground || (this.parameters.hasKey("maximum_number_of_centromeres") && this.parameters.getIntValueForKey("maximum_number_of_centromeres") < h.getMaxValue());
 
-            MF.setReferenceImage(groupMask);
-            MF.apply(allCentromeres);
-            RLF.apply(allCentromeres);
 
-            if (parameters.hasKey("minimum_cluster_size") && Integer.parseInt(parameters.getValueForKey("minimum_cluster_size")) > 0) {
+				if (!decreaseBackground) {
+					if (this.parameters.hasKeyAndTrue("use_basic_clustering")) {
+						groupMask.copy(ObjectClustering.doBasicClustering(groupMask, normalized, gaussianFilteredMask));
+					} else {
+						ObjectClustering.doComplexClustering(groupMask, normalized, Integer.parseInt(this.parameters.getValueForKey("maximum_clustering_iterations")), gaussianFilteredMask);
+					}
+				} else {
 
-                Histogram h_clustered = new Histogram(groupMask);
+					Image output = ObjectClustering.doBasicClustering(groupMask, normalized, new Image(gaussianFilteredMask));
 
-                java.util.Vector<java.util.HashSet<Integer> > clusterContents = new java.util.Vector<java.util.HashSet<Integer> >();
+					RegionThresholdingFilter rtf = new RegionThresholdingFilter();
+					MaximumSeparabilityThresholdingFilter mstf_clustering = new MaximumSeparabilityThresholdingFilter();
 
-                for (int i =0; i < h_clustered.getMaxValue()+1; i++) {
+					rtf.setThresholdingFilter(mstf_clustering);
+					rtf.setParameters(this.parameters);
+					Image ch0_copy = new Image(this.images.get(0));
 
-                    clusterContents.add(new java.util.HashSet<Integer>() );
+					Histogram h_clustered = new Histogram(output);
 
-                }
+					Image singleClusterTemp = new Image(output);
 
+					for (int c = 1; c<= h_clustered.getMaxValue(); c++) {
 
-                for (ImageCoordinate i : groupMask) {
+						for (ImageCoordinate i : singleClusterTemp) {
 
-                    if (groupMask.getValue(i) > 0 && allCentromeres.getValue(i) > 0) {
+							if (output.getValue(i) ==  c) {
+								singleClusterTemp.setValue(i,c);
+								ch0_copy.setValue(i, this.images.get(0).getValue(i));
+							} else {
+								singleClusterTemp.setValue(i, 0);
+								ch0_copy.setValue(i,0);
+							}
 
-                        clusterContents.get((int) (groupMask.getValue(i))).add((int) (allCentromeres.getValue(i)));
+						}
 
-                    }
+						rtf.setReferenceImage(ch0_copy);
+						LF.apply(singleClusterTemp);
+						rtf.apply(singleClusterTemp);
 
-                }
+						for (ImageCoordinate i : singleClusterTemp) {
+							if (output.getValue(i) == c && singleClusterTemp.getValue(i) == 0) {
+								output.setValue(i, 0);
+							}
+						}
 
-                for (ImageCoordinate i : groupMask) {
-                    if (groupMask.getValue(i) > 0 && clusterContents.get((int) groupMask.getValue(i)).size() < Integer.parseInt(this.parameters.getValueForKey("minimum_cluster_size"))) {
-                        groupMask.setValue(i, 0);
-                    }
-                }
+					}
 
-                RLF.apply(groupMask);
+					LF.apply(output);
 
-            }
+					MF.setReferenceImage(output);
 
-            MF.setReferenceImage(groupMask);
-            MF.apply(allCentromeres);
-            RLF.apply(allCentromeres);
+					MF.apply(groupMask);
 
-        }
+					gaussianFilteredMask = ObjectClustering.gaussianFilterMask(groupMask);
 
-        RLF.apply(groupMask);
+					if (this.parameters.hasKey("use_basic_clustering") && this.parameters.getBooleanValueForKey("use_basic_clustering")) {
+						groupMask.copy(ObjectClustering.doBasicClustering(groupMask, normalized, gaussianFilteredMask));
+					} else {
+						ObjectClustering.doComplexClustering(groupMask, normalized, Integer.parseInt(this.parameters.getValueForKey("maximum_clustering_iterations")), gaussianFilteredMask);
+					}
 
-        this.storeImageOutput(groupMask);
+				}
 
-        Image allCentromeresCopy = new Image(allCentromeres);
+			}
 
-        this.storeImageOutput(allCentromeresCopy);
+			MF.setReferenceImage(groupMask);
+			MF.apply(allCentromeres);
+			RLF.apply(allCentromeres);
 
-        //background estimation
-        
-        Image backgroundMask = new Image(groupMask);
+			if (parameters.hasKey("minimum_cluster_size") && Integer.parseInt(parameters.getValueForKey("minimum_cluster_size")) > 0) {
 
-        ConvexHullByLabelFilter chblf = new ConvexHullByLabelFilter();
+				Histogram h_clustered = new Histogram(groupMask);
 
-        chblf.setReferenceImage(allCentromeres);
-        chblf.apply(backgroundMask);
+				java.util.Vector<java.util.HashSet<Integer> > clusterContents = new java.util.Vector<java.util.HashSet<Integer> >();
 
-        for (ImageCoordinate c : backgroundMask) {
-            if (allCentromeres.getValue(c) > 0) backgroundMask.setValue(c, 0);
-        }
+				for (int i =0; i < h_clustered.getMaxValue()+1; i++) {
 
-        if (this.parameters.hasKeyAndTrue("use_clustering")) {
+					clusterContents.add(new java.util.HashSet<Integer>() );
 
-            BackgroundEstimationFilter BEF = new BackgroundEstimationFilter();
+				}
 
-            BEF.setReferenceImage(this.images.get(0));
 
-            BEF.apply(backgroundMask);
+				for (ImageCoordinate i : groupMask) {
 
-        }
-        
-        //generate output
+					if (groupMask.getValue(i) > 0 && allCentromeres.getValue(i) > 0) {
 
-        Quantification fullResult = metric.quantify(allCentromeres, this.imageSet);
 
-        if (fullResult == null) {
-            this.storedDataOutput = null;
-            return;
-        }
+						clusterContents.get((int) (groupMask.getValue(i))).add((int) (allCentromeres.getValue(i)));
 
-        Quantification backgroundResult = null;
+					}
 
-        if (this.parameters.hasKeyAndTrue("use_clustering")) {
 
-            backgroundResult = metric.quantify(backgroundMask, this.imageSet);
+				}
 
-        }
+				for (ImageCoordinate i : groupMask) {
+					if (groupMask.getValue(i) > 0 && clusterContents.get((int) groupMask.getValue(i)).size() < Integer.parseInt(this.parameters.getValueForKey("minimum_cluster_size"))) {
+						groupMask.setValue(i, 0);
+					}
+				}
 
-        if (backgroundResult == null) { // either not using clustering or the quantification failed due to no ROIs
+				RLF.apply(groupMask);
 
-            backgroundResult = (new ZeroMetric()).quantify(backgroundMask, this.imageSet);
+			}
 
-        }
-        
-        if (backgroundResult != null) {
-    		this.parameters.setValueForKey("background_calculated", "true");
-        }
+			MF.setReferenceImage(groupMask);
+			MF.apply(allCentromeres);
+			RLF.apply(allCentromeres);
 
 
-        int[] resultMap = new int[Histogram.findMaxVal(allCentromeres)];
+		}
 
+		RLF.apply(groupMask);
 
-        //TODO: consider new return type for the quantification (XML document?)
+		this.storeImageOutput(groupMask);
 
+		Image allCentromeresCopy = new Image(allCentromeres);
 
-        for (ImageCoordinate i : allCentromeres) {
+		this.storeImageOutput(allCentromeresCopy);
 
-            int value = (int) allCentromeres.getValue(i);
+		//background estimation
 
-            if (value > 0) {
-                resultMap[value - 1] = (int) groupMask.getValue(i);
-            }
+		Image backgroundMask = new Image(groupMask);
 
-        }
+		ConvexHullByLabelFilter chblf = new ConvexHullByLabelFilter();
 
-        for (int i = 0; i < resultMap.length; i++) {
-        	
-        	fullResult.addMeasurement(new Measurement(true, i+1, resultMap[i], "cell_id", Measurement.TYPE_GROUPING, this.imageSet.getMarkerImageName()));
-        	
-        	List<Measurement> background = backgroundResult.getAllMeasurementsForRegion(resultMap[i]);
-        	
-        	for (Measurement m : background) {
-        		
-        		if (m.getMeasurementType() == Measurement.TYPE_INTENSITY) {
-        			
-        			fullResult.addMeasurement(new Measurement(true, i+1, m.getMeasurement(), m.getMeasurementName() + "_background", Measurement.TYPE_BACKGROUND, this.imageSet.getMarkerImageName()));
-        			        			
-        		}
-        		
-        	}
-        	
-        }
-        
-        
+		chblf.setReferenceImage(allCentromeres);
+		chblf.apply(backgroundMask);
 
-        this.storedDataOutput = fullResult;
+		for (ImageCoordinate c : backgroundMask) {
+			if (allCentromeres.getValue(c) > 0) backgroundMask.setValue(c, 0);
+		}
 
-    }
+		if (this.parameters.hasKeyAndTrue("use_clustering")) {
+
+			BackgroundEstimationFilter BEF = new BackgroundEstimationFilter();
+
+			BEF.setReferenceImage(this.images.get(0));
+
+			BEF.apply(backgroundMask);
+
+		}
+
+		//generate output
+
+		Quantification fullResult = metric.quantify(allCentromeres, this.imageSet);
+
+		if (fullResult == null) {
+			this.storedDataOutput = null;
+			return;
+		}
+
+		Quantification backgroundResult = null;
+
+		if (this.parameters.hasKeyAndTrue("use_clustering")) {
+
+			backgroundResult = metric.quantify(backgroundMask, this.imageSet);
+
+		}
+
+		if (backgroundResult == null) { // either not using clustering or the quantification failed due to no ROIs
+
+			backgroundResult = (new ZeroMetric()).quantify(backgroundMask, this.imageSet);
+
+		}
+
+		if (backgroundResult != null) {
+			this.parameters.setValueForKey("background_calculated", "true");
+		}
+
+
+		int[] resultMap = new int[Histogram.findMaxVal(allCentromeres)];
+
+
+		//TODO: consider new return type for the quantification (XML document?)
+
+
+		for (ImageCoordinate i : allCentromeres) {
+
+			int value = (int) allCentromeres.getValue(i);
+
+			if (value > 0) {
+				resultMap[value - 1] = (int) groupMask.getValue(i);
+			}
+
+		}
+
+		for (int i = 0; i < resultMap.length; i++) {
+
+			fullResult.addMeasurement(new Measurement(true, i+1, resultMap[i], "cell_id", Measurement.TYPE_GROUPING, this.imageSet.getMarkerImageName()));
+
+			List<Measurement> background = backgroundResult.getAllMeasurementsForRegion(resultMap[i]);
+
+			for (Measurement m : background) {
+
+				if (m.getMeasurementType() == Measurement.TYPE_INTENSITY) {
+
+					fullResult.addMeasurement(new Measurement(true, i+1, m.getMeasurement(), m.getMeasurementName() + "_background", Measurement.TYPE_BACKGROUND, this.imageSet.getMarkerImageName()));
+
+				}
+
+			}
+
+		}
+
+
+
+		this.storedDataOutput = fullResult;
+
+	}
 
 }
