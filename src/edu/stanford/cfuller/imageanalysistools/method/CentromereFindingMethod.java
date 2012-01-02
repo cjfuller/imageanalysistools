@@ -399,7 +399,7 @@ public class CentromereFindingMethod extends Method {
 
 				if (m.getMeasurementType() == Measurement.TYPE_INTENSITY) {
 
-					fullResult.addMeasurement(new Measurement(true, i+1, m.getMeasurement(), m.getMeasurementName() + "_background", Measurement.TYPE_BACKGROUND, this.imageSet.getMarkerImageName()));
+					fullResult.addMeasurement(new Measurement(true, i+1, m.getMeasurement(), m.getMeasurementName(), Measurement.TYPE_BACKGROUND, this.imageSet.getMarkerImageName()));
 
 				}
 

@@ -30,6 +30,8 @@ import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
+import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
+
 import org.apache.commons.math.linear.RealMatrix;
 
 import java.io.File;
@@ -389,7 +391,6 @@ public class LocalAnalysis {
 
         String shortMethodName = splitMethodName[splitMethodName.length - 1];
 
-
         String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.txt";
 
         String dataOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
@@ -398,9 +399,17 @@ public class LocalAnalysis {
 
         PrintWriter output = new PrintWriter(new FileOutputStream(dataOutputFilename));
 
-        RealMatrix data = finishedMethod.getStoredDataOutput();
-
+        Quantification data = finishedMethod.getStoredDataOutput();
+  
         if (data == null) {output.close(); return;}
+                
+        java.util.Set<Long> regions = data.getAllRegions();
+        
+        java.util.ArrayList<Long> sortedRegions = new java.util.ArrayList<Long>();
+        
+        sortedRegions.addAll(regions);
+        
+        java.util.Collections.sort(sortedRegions);
 
         for (int i = 0; i < data.getRowDimension(); i++) {
             for (int j = 0; j < data.getColumnDimension(); j++) {

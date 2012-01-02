@@ -101,6 +101,10 @@ public class Quantification {
 		return this.measurementsByRegion.get(regionID);
 	}
 	
+	public java.util.Set<Long> getAllRegions() {
+		return this.measurementsByRegion.keySet();
+	}
+	
 	public List<Measurement> getAllMeasurementsForType(String type) {
 		return this.measurementsByType.get(type);
 	}
