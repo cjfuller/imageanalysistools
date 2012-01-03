@@ -80,7 +80,7 @@ public class ImageIterator5D extends ImageIterator {
 			
 		} else {
 			
-			curr_x = -1;
+			curr_x = 0;
 			curr_y = 0;
 			curr_z = 0;
 			curr_c = 0;
@@ -115,7 +115,7 @@ public class ImageIterator5D extends ImageIterator {
 		}
 		
 		
-		this.currCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
+		this.currCoord.setCoordXYZCT(curr_x-1, curr_y, curr_z, curr_c, curr_t);
 				
 	}
 	
@@ -138,32 +138,36 @@ public class ImageIterator5D extends ImageIterator {
 
 		curr_x++;
 		if (curr_x < upper_x) {
-			this.currCoord.set(ImageCoordinate.X, curr_x);
+			this.currCoord.quickSet(ImageCoordinate.X, curr_x);
 		} else {
 			curr_x = lower_x;
 			curr_y++;
 			if (curr_y < upper_y) {
-				this.currCoord.set(ImageCoordinate.X, curr_x);
-				this.currCoord.set(ImageCoordinate.Y, curr_y);
+				this.currCoord.quickSet(ImageCoordinate.X, curr_x);
+				this.currCoord.quickSet(ImageCoordinate.Y, curr_y);
 			} else {
 				curr_y = lower_y;
 				curr_z++;
 				if (curr_z < upper_z) {
-					this.currCoord.set(ImageCoordinate.X, curr_x);
-					this.currCoord.set(ImageCoordinate.Y, curr_y);
-					this.currCoord.set(ImageCoordinate.Z, curr_z);
+					this.currCoord.quickSet(ImageCoordinate.X, curr_x);
+					this.currCoord.quickSet(ImageCoordinate.Y, curr_y);
+					this.currCoord.quickSet(ImageCoordinate.Z, curr_z);
 				} else {
 					curr_z = lower_z;
 					curr_c++;
 					if (curr_c < upper_c) {
-						this.currCoord.set(ImageCoordinate.X, curr_x);
-						this.currCoord.set(ImageCoordinate.Y, curr_y);
-						this.currCoord.set(ImageCoordinate.Z, curr_z);
-						this.currCoord.set(ImageCoordinate.C, curr_c);
+						this.currCoord.quickSet(ImageCoordinate.X, curr_x);
+						this.currCoord.quickSet(ImageCoordinate.Y, curr_y);
+						this.currCoord.quickSet(ImageCoordinate.Z, curr_z);
+						this.currCoord.quickSet(ImageCoordinate.C, curr_c);
 					} else {
 						curr_c = lower_c;
 						curr_t++;
-						this.currCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
+						this.currCoord.quickSet(ImageCoordinate.X, curr_x);
+						this.currCoord.quickSet(ImageCoordinate.Y, curr_y);
+						this.currCoord.quickSet(ImageCoordinate.Z, curr_z);
+						this.currCoord.quickSet(ImageCoordinate.C, curr_c);
+						this.currCoord.quickSet(ImageCoordinate.Z, curr_z);
 					}
 				}
 			}

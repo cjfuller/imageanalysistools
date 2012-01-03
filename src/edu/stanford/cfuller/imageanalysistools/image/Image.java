@@ -390,7 +390,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 	 * @return          The value of the Image at the specified location as a float.
 	 */
 	public float getValue(ImageCoordinate coord) {
-		return pixelData.getPixel(coord.get(ImageCoordinate.X), coord.get(ImageCoordinate.Y), coord.get(ImageCoordinate.Z), coord.get(ImageCoordinate.C), coord.get(ImageCoordinate.T));
+		return pixelData.getPixel(coord.quickGet(ImageCoordinate.X), coord.quickGet(ImageCoordinate.Y), coord.quickGet(ImageCoordinate.Z), coord.quickGet(ImageCoordinate.C), coord.quickGet(ImageCoordinate.T));
 	}
 
 	/**
@@ -410,7 +410,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 	 * @param value     The value to which to set the Image at the specified coordinate.
 	 */
 	public void setValue(ImageCoordinate coord, float value) {
-		pixelData.setPixel(coord.get(ImageCoordinate.X), coord.get(ImageCoordinate.Y), coord.get(ImageCoordinate.Z), coord.get(ImageCoordinate.C), coord.get(ImageCoordinate.T), value);
+		pixelData.setPixel(coord.quickGet(ImageCoordinate.X), coord.quickGet(ImageCoordinate.Y), coord.quickGet(ImageCoordinate.Z), coord.quickGet(ImageCoordinate.C), coord.quickGet(ImageCoordinate.T), value);
 	}
 
 
@@ -424,8 +424,8 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		ImageCoordinate sizes = this.getDimensionSizes();
 
 		for (Integer s : c) {
-			if (c.get(s) < 0) return false;
-			if (c.get(s) >= sizes.get(s)) return false;
+			if (c.quickGet(s) < 0) return false;
+			if (c.quickGet(s) >= sizes.get(s)) return false;
 		}
 
 		return true;
@@ -460,10 +460,10 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 
 		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 
-		for (int i =0; i < this.dimensionSizes.get(dimension); i++) {
+		for (int i =0; i < this.dimensionSizes.quickGet(dimension); i++) {
 			ic.recycle();
 			ic = ImageCoordinate.cloneCoord(this.getDimensionSizes());
-			ic.set(dimension, 1);
+			ic.quickSet(dimension, 1);
 			Image newChannelImage = new Image(ic, 0.0f);
 
 			split.add(newChannelImage);
@@ -475,9 +475,9 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 
 			ic = ImageCoordinate.cloneCoord(i);
 
-			ic.set(dimension, 0);
+			ic.quickSet(dimension, 0);
 
-			split.get(i.get(dimension)).setValue(ic, this.getValue(i));
+			split.get(i.quickGet(dimension)).setValue(ic, this.getValue(i));
 
 		}
 
@@ -571,9 +571,9 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 
 			ic = ImageCoordinate.cloneCoord(i);
 
-			ic.set(ImageCoordinate.C, 0);
+			ic.quickSet(ImageCoordinate.C, 0);
 
-			split.get(i.get(ImageCoordinate.C)).setValue(ic, this.getValue(i));
+			split.get(i.quickGet(ImageCoordinate.C)).setValue(ic, this.getValue(i));
 
 		}
 

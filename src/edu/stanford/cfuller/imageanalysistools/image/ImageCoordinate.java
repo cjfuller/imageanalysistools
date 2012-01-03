@@ -173,6 +173,8 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 	
 	/**
 	 * Sets the specified coordinate component of the ImageCoordinate by its index.
+	 * <p>
+	 * This checks that the dimension exists and adds it if it does not exist.
 	 * 
 	 * @param dimensionConstant		the constant corresponding to the dimension to set.
 	 * @param value					the value to which to set the coordinate.
@@ -201,6 +203,31 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 		this.undefinedCoordinates[dimensionConstant] = ImageCoordinate.zero;
 		this.dimensionCoordinates[dimensionConstant] = value;
 
+	}
+	
+	/**
+	 * Sets the specified coordinate component of the ImageCoordinate by its index.
+	 * <p>
+	 * This does not check that the dimension exists before accessing it.
+	 * 
+	 * @param dimensionConstant		the constant corresponding to the dimension to set.
+	 * @param value					the value to which to set the coordinate.
+	 */
+	public void quickSet(int dimensionConstant, int value) {
+		this.dimensionCoordinates[dimensionConstant] = value;
+	}
+	
+	
+	/**
+	 * Gets the specified coordinate component of the ImageCoordinate by its index.
+	 * <p>
+	 * This does not check that the dimension exists before accessing it.
+	 * 
+	 * @param dimensionConstant		the constant corresponding to the dimension whose value will be retrieved.
+	 * @return						the value of the specified dimension component
+	 */
+	public int quickGet(int dimensionConstant) {
+		return this.dimensionCoordinates[dimensionConstant];
 	}
 	
 

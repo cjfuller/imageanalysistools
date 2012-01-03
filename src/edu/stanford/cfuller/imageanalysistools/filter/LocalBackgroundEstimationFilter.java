@@ -90,11 +90,11 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		
 		for(ImageCoordinate i : this.referenceImage) {
 		
-			icnew.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+boxSize);
-			icnew.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+boxSize);
-			icnew.set(ImageCoordinate.Z,i.get(ImageCoordinate.Z));
-			icnew.set(ImageCoordinate.C,i.get(ImageCoordinate.C));
-			icnew.set(ImageCoordinate.T,i.get(ImageCoordinate.T));
+			icnew.quickSet(ImageCoordinate.X,i.quickGet(ImageCoordinate.X)+boxSize);
+			icnew.quickSet(ImageCoordinate.Y,i.quickGet(ImageCoordinate.Y)+boxSize);
+			icnew.quickSet(ImageCoordinate.Z,i.quickGet(ImageCoordinate.Z));
+			icnew.quickSet(ImageCoordinate.C,i.quickGet(ImageCoordinate.C));
+			icnew.quickSet(ImageCoordinate.T,i.quickGet(ImageCoordinate.T));
 			
 			padded.setValue(icnew, this.referenceImage.getValue(i));
 			
@@ -111,7 +111,7 @@ public class LocalBackgroundEstimationFilter extends Filter {
 
 		//loop over columns
 		
-		for (int i = boxSize; i < im.getDimensionSizes().get(ImageCoordinate.X)+boxSize; i++) {
+		for (int i = boxSize; i < im.getDimensionSizes().quickGet(ImageCoordinate.X)+boxSize; i++) {
 			
 			overallCounts.mapMultiplyToSelf(0.0);
             double[] overallCounts_a = overallCounts.getData();
@@ -123,15 +123,13 @@ public class LocalBackgroundEstimationFilter extends Filter {
 			
 			for (int m = i-boxSize; m <= i+boxSize; m++) {
 				for (int n = 0; n < 2*boxSize + 1; n++) {
-					icnew.set(ImageCoordinate.X,m);
-					icnew.set(ImageCoordinate.Y,n);
+					icnew.quickSet(ImageCoordinate.X,m);
+					icnew.quickSet(ImageCoordinate.Y,n);
 					int value = (int) padded.getValue(icnew);
 
 					if (value == -1) continue;
 					
-					//overallCounts.setEntry(value, overallCounts.getEntry(value) +1.0);
                     overallCounts_a[value]++;
-					//countsByRow.addToEntry((n+countsByRow_rowZero_pointer) % countsByRow.getRowDimension(), value, 1.0);
 					countsByRow_a[(n+countsByRow_rowZero_pointer) % countsByRow.getRowDimension()][value]++;
 					
 				}
@@ -142,28 +140,23 @@ public class LocalBackgroundEstimationFilter extends Filter {
 			int k = 0;
 			
 			while(runningSum < (numPixelsInBox >> 1) ) {
-				//runningSum += overallCounts.getEntry(k++);
                 runningSum += overallCounts_a[k++];
 			}
 			
-			//runningSum -= overallCounts.getEntry(k-1);
-
             runningSum -= overallCounts_a[k-1];
 
 			currMedian = k-1;
 			
-			icnew.set(ImageCoordinate.X,i-boxSize);
-			icnew.set(ImageCoordinate.Y,0);
+			icnew.quickSet(ImageCoordinate.X,i-boxSize);
+			icnew.quickSet(ImageCoordinate.Y,0);
 			
 			im.setValue(icnew, currMedian);
 			
-			for (int j = boxSize + 1; j < im.getDimensionSizes().get(ImageCoordinate.Y)+boxSize; j++) {
+			int num_rows = countsByRow.getRowDimension();
+			
+			for (int j = boxSize + 1; j < im.getDimensionSizes().quickGet(ImageCoordinate.Y)+boxSize; j++) {
 				
-				//double[] toRemove = countsByRow.getRow((countsByRow_rowZero_pointer) % countsByRow.getRowDimension());
-
-                double[] toRemove = countsByRow_a[(countsByRow_rowZero_pointer) % countsByRow.getRowDimension()];
-
-				//overallCounts = overallCounts.subtract(toRemove);
+                double[] toRemove = countsByRow_a[(countsByRow_rowZero_pointer) % num_rows];
 
                 for (int oc_counter = 0; oc_counter < overallCounts_a.length; oc_counter++) {
                     overallCounts_a[oc_counter]-=toRemove[oc_counter];
@@ -174,22 +167,21 @@ public class LocalBackgroundEstimationFilter extends Filter {
 						runningSum -= toRemove[c];
 					}
 					
-					//countsByRow.multiplyEntry(countsByRow_rowZero_pointer % countsByRow.getRowDimension(), c, 0.0);
-                    countsByRow_a[countsByRow_rowZero_pointer % countsByRow.getRowDimension()][c]*= 0.0;
+                    countsByRow_a[countsByRow_rowZero_pointer % num_rows][c]*= 0.0;
 				}
 				
 				countsByRow_rowZero_pointer++;
 				
+				
 				for (int c = i - boxSize; c <= i+boxSize; c++) {
-					icnew.set(ImageCoordinate.X,c);
-					icnew.set(ImageCoordinate.Y,j+boxSize);
+					icnew.quickSet(ImageCoordinate.X,c);
+					icnew.quickSet(ImageCoordinate.Y,j+boxSize);
 					int value = (int) padded.getValue(icnew);
 					
 					if (value == -1) continue;
 					
-					//countsByRow.addToEntry((countsByRow_rowZero_pointer + countsByRow.getRowDimension() - 1) % countsByRow.getRowDimension(), value, 1);
-					countsByRow_a[(countsByRow_rowZero_pointer + countsByRow.getRowDimension() - 1) % countsByRow.getRowDimension()][value]+= 1;
-                    //overallCounts.setEntry(value, overallCounts.getEntry(value) + 1);
+					countsByRow_a[(countsByRow_rowZero_pointer + num_rows - 1) % num_rows][value]+= 1;
+
 					overallCounts_a[value]++;
 
 
@@ -205,7 +197,7 @@ public class LocalBackgroundEstimationFilter extends Filter {
 					
 					k = currMedian -1;
 					while(runningSum > (numPixelsInBox>>1)) {
-						//runningSum -= overallCounts.getEntry(k--);
+
                         runningSum -= overallCounts_a[k--];
 					}
 					
@@ -216,21 +208,20 @@ public class LocalBackgroundEstimationFilter extends Filter {
 					k = currMedian;
 					
 					while(runningSum < (numPixelsInBox >> 1)) {
-						//runningSum += overallCounts.getEntry(k++);
+
                         runningSum += overallCounts_a[k++];
 					}
 					
 					currMedian = k-1;
 					
-					//runningSum -= overallCounts.getEntry(k-1);
                     runningSum -= overallCounts_a[k-1];
 					
 				}
 				
 				//cast 3: spot on, do nothing
 				
-				icnew.set(ImageCoordinate.X,i-boxSize);
-				icnew.set(ImageCoordinate.Y,j-boxSize);
+				icnew.quickSet(ImageCoordinate.X,i-boxSize);
+				icnew.quickSet(ImageCoordinate.Y,j-boxSize);
 				
 				im.setValue(icnew,currMedian);
 				

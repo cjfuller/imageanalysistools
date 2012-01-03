@@ -94,7 +94,7 @@ public class GradientFilter extends Filter {
 			double outputVal = 0;
 			double output1 = 0;
 			double output2 = 0;
-			
+						
 			if (i.get(ImageCoordinate.X) == 0 || i.get(ImageCoordinate.Y) == 0 || i.get(ImageCoordinate.X) == copy1.getDimensionSizes().get(ImageCoordinate.X)-1 || i.get(ImageCoordinate.Y) == copy1.getDimensionSizes().get(ImageCoordinate.Y)-1) {
 				outputVal = 0;
 			} else {
