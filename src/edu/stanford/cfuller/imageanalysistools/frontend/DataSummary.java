@@ -148,10 +148,17 @@ public class DataSummary {
 
 
                 String[] splitline = line.split(" ");
+                
+                int regionID = 0;
+                
+                try {
+                	regionID = (int) Double.parseDouble(splitline[0]);
+                } catch (NumberFormatException e) {
+                	continue;
+                }
 
-                int regionID = (int) Double.parseDouble(splitline[0]);
                 if (params != null && params.getBooleanValueForKey("background_calculated")) {
-                	regionID = (int) Double.parseDouble(splitline[numChannels + 2]);
+                	regionID = (int) Double.parseDouble(splitline[splitline.length - 1]); // for now, cell id is the last column; this is not guaranteed and needs to be fixed
                 }
                 int regionType = 0;
 
@@ -176,14 +183,14 @@ public class DataSummary {
                 Double[] tempBg = new Double[numChannels];
                 if (params != null && params.getBooleanValueForKey("background_calculated")) {
 	                for (int i = 0; i < numChannels; i++) {
-	                    tempBg[i] = Double.parseDouble(splitline[numChannels+i+3]);
+	                    tempBg[i] = Double.parseDouble(splitline[numChannels+i+1]);
 	
 	                }
                 } else {
                 	java.util.Arrays.fill(tempBg, 0.0);
                 }
 
-                average_sizes.put(regionID, average_sizes.get(regionID)+ Double.parseDouble(splitline[numChannels+1]));
+                average_sizes.put(regionID, average_sizes.get(regionID)+ Double.parseDouble(splitline[splitline.length - 2])); // for now, second from the end; not guaranteed to be the case...
 
                 allBG.put(regionID, tempBg);
 
@@ -204,7 +211,6 @@ public class DataSummary {
                 for (int i = 0; i < numChannels; i++) {
                     output.print("" + allBG.get(key)[i] + " ");
                 }
-                //output.println("" + counts.get(key)[0]*1.0/totalCounts + " " + counts.get(key)[1]*1.0/totalCounts + " " + counts.get(key)[2]*1.0/totalCounts + " " + counts.get(key)[3]*1.0/totalCounts);
 
                 output.print("" + totalCounts + " ");
 
