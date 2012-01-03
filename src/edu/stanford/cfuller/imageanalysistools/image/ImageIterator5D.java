@@ -51,17 +51,12 @@ public class ImageIterator5D extends ImageIterator {
 	int upper_z;
 	int upper_c;
 	int upper_t;
-	
-	boolean updateFlag;
-	
+		
 	public ImageIterator5D(Image im) {
-		
-		this.updateFlag = false;
-		
+				
 		this.toIterate = im;
 		
-		this.nextCoord = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
-		this.currCoord = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
+		this.currCoord = ImageCoordinate.createCoordXYZCT(-1,0,0,0,0);
 		
 		this.isBoxedIterator = im.getIsBoxed();
 		
@@ -69,7 +64,7 @@ public class ImageIterator5D extends ImageIterator {
 			
 			ImageCoordinate boxMin = im.getBoxMin();
 			
-			curr_x = boxMin.get(ImageCoordinate.X);
+			curr_x = boxMin.get(ImageCoordinate.X)-1;
 			curr_y = boxMin.get(ImageCoordinate.Y);
 			curr_z = boxMin.get(ImageCoordinate.Z);
 			curr_c = boxMin.get(ImageCoordinate.C);
@@ -85,7 +80,7 @@ public class ImageIterator5D extends ImageIterator {
 			
 		} else {
 			
-			curr_x = 0;
+			curr_x = -1;
 			curr_y = 0;
 			curr_z = 0;
 			curr_c = 0;
@@ -120,52 +115,55 @@ public class ImageIterator5D extends ImageIterator {
 		}
 		
 		
-		this.nextCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
-		this.currCoord.setCoord(this.nextCoord);
+		this.currCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
 				
 	}
 	
 	public boolean hasNext() {
-		return (curr_t < upper_t);
+		if (curr_x + 1 < upper_x) {
+			return true;
+		} else if (curr_y + 1 < upper_y) {
+			return true;
+		} else if (curr_z + 1 < upper_z) {
+			return true;
+		} else if (curr_c + 1 < upper_c) {
+			return true;
+		} else if (curr_t + 1 < upper_t) {
+			return true;
+		}
+		return false;
 	}
 	
 	public ImageCoordinate next() {
-		ImageCoordinate temp = this.currCoord;
-		this.currCoord = this.nextCoord;
-		this.nextCoord = temp;
-		if (this.updateFlag) {this.nextCoord.setCoord(this.currCoord); this.updateFlag = false;}
+
 		curr_x++;
 		if (curr_x < upper_x) {
-			this.nextCoord.set(ImageCoordinate.X, curr_x);
+			this.currCoord.set(ImageCoordinate.X, curr_x);
 		} else {
 			curr_x = lower_x;
 			curr_y++;
 			if (curr_y < upper_y) {
-				this.nextCoord.set(ImageCoordinate.X, curr_x);
-				this.nextCoord.set(ImageCoordinate.Y, curr_y);
-				this.updateFlag = true;
+				this.currCoord.set(ImageCoordinate.X, curr_x);
+				this.currCoord.set(ImageCoordinate.Y, curr_y);
 			} else {
 				curr_y = lower_y;
 				curr_z++;
 				if (curr_z < upper_z) {
-					this.nextCoord.set(ImageCoordinate.X, curr_x);
-					this.nextCoord.set(ImageCoordinate.Y, curr_y);
-					this.nextCoord.set(ImageCoordinate.Z, curr_z);
-					this.updateFlag = true;
+					this.currCoord.set(ImageCoordinate.X, curr_x);
+					this.currCoord.set(ImageCoordinate.Y, curr_y);
+					this.currCoord.set(ImageCoordinate.Z, curr_z);
 				} else {
 					curr_z = lower_z;
 					curr_c++;
 					if (curr_c < upper_c) {
-						this.nextCoord.set(ImageCoordinate.X, curr_x);
-						this.nextCoord.set(ImageCoordinate.Y, curr_y);
-						this.nextCoord.set(ImageCoordinate.Z, curr_z);
-						this.nextCoord.set(ImageCoordinate.C, curr_c);
-						this.updateFlag = true;
+						this.currCoord.set(ImageCoordinate.X, curr_x);
+						this.currCoord.set(ImageCoordinate.Y, curr_y);
+						this.currCoord.set(ImageCoordinate.Z, curr_z);
+						this.currCoord.set(ImageCoordinate.C, curr_c);
 					} else {
 						curr_c = lower_c;
 						curr_t++;
-						this.nextCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
-						this.updateFlag = true;
+						this.currCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
 					}
 				}
 			}
