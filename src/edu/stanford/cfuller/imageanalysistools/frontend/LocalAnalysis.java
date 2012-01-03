@@ -30,6 +30,7 @@ import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
+import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
 import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
 
 import org.apache.commons.math.linear.RealMatrix;
@@ -37,6 +38,9 @@ import org.apache.commons.math.linear.RealMatrix;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controls analysis done on the local machine, including routines for threading analysis, and data input and output.
@@ -405,19 +409,166 @@ public class LocalAnalysis {
                 
         java.util.Set<Long> regions = data.getAllRegions();
         
-        java.util.ArrayList<Long> sortedRegions = new java.util.ArrayList<Long>();
+        List<Long> sortedRegions = new java.util.ArrayList<Long>();
         
         sortedRegions.addAll(regions);
         
         java.util.Collections.sort(sortedRegions);
+        
+        final String backgroundSuffix = "_background";
+        
+        List<String> columnHeadings = new java.util.ArrayList<String>();
+        
+        Map<Long, List<Measurement> > allOrderedMeasurements = new java.util.HashMap<Long, List<Measurement> >();
+        
+        for (Long label : sortedRegions) {
+        	
+        	List<Measurement> measurements = data.getAllMeasurementsForRegion(label);
+        	
+        	List<Measurement> intensityMeasurements = new java.util.ArrayList<Measurement>();
+        	
+        	List<Measurement> backgroundMeasurements = new java.util.ArrayList<Measurement>();
+        	
+        	List<Measurement> otherMeasurements = new java.util.ArrayList<Measurement>();
+        	
+        	for (Measurement m : measurements) {
+        		
+        		if (m.getMeasurementType() == Measurement.TYPE_INTENSITY) {
+        			intensityMeasurements.add(m);
+        		} else if (m.getMeasurementType() == Measurement.TYPE_BACKGROUND) {
+        			backgroundMeasurements.add(m);
+        		} else {
+        			otherMeasurements.add(m);
+        		}
+        		
+        	}
+        	
+        	java.util.Collections.sort(intensityMeasurements, new Comparator<Measurement>() {
+        		public int compare(Measurement o1, Measurement o2) {
+        			return o1.getMeasurementName().compareTo(o2.getMeasurementName());
+        		}
+        	});
+        	
+        	List<Measurement> orderedMeasurements = new java.util.ArrayList<Measurement>();
+        	
+        	for (int i = 0; i < measurements.size(); i++) {
+        		orderedMeasurements.add(null);
+        	}
+        	
+        	for (Measurement m : intensityMeasurements) {
+        		
+        		int i = columnHeadings.indexOf(m.getMeasurementName());
+        		
+        		if (i == -1) {// not found in list
+        			
+        			columnHeadings.add(m.getMeasurementName());
+        			i = columnHeadings.size() -1;
+        			
+        		}
+        		
+        		if (i >= orderedMeasurements.size()) {
+        			for (int j = orderedMeasurements.size(); j <= i; j++) {
+        				orderedMeasurements.add(null);
+        			}
+        		}
+        		
+    			orderedMeasurements.set(i, m);
 
-        for (int i = 0; i < data.getRowDimension(); i++) {
-            for (int j = 0; j < data.getColumnDimension(); j++) {
-                output.print(data.getEntry(i,j));
-                output.print(" ");
-            }
-            output.println("");
+        		        		
+        	}
+        	
+        	
+        	for (Measurement m : intensityMeasurements) {
+        	
+        		Measurement bkg = null;
+        		        		
+        		for (Measurement b : backgroundMeasurements) {
+        			        			
+        			if (b.getMeasurementName().equals(m.getMeasurementName())) {
+        				
+        				bkg = b;
+        				
+        				break;
+        				
+        			}
+        			
+        		}
+        		
+        		if (bkg == null) continue;
+        		
+        		String backgroundName = bkg.getMeasurementName() + backgroundSuffix;
+        		
+        		int i = columnHeadings.indexOf(backgroundName);
+        		
+        		if (i == -1) {// not found in list
+        			
+        			columnHeadings.add(backgroundName);
+        			i = columnHeadings.size() -1;
+        			
+        		}
+        		
+        		if (i >= orderedMeasurements.size()) {
+        			for (int j = orderedMeasurements.size(); j <= i; j++) {
+        				orderedMeasurements.add(null);
+        			}
+        		}
+        		
+    			orderedMeasurements.set(i, bkg);
+        	
+        	}
+        	
+        	for (Measurement m : otherMeasurements) {
+        		
+        		int i = columnHeadings.indexOf(m.getMeasurementName());
+        		
+        		if (i == -1) {// not found in list
+        			
+        			columnHeadings.add(m.getMeasurementName());
+        			i = columnHeadings.size() -1;
+        			
+        		}
+        		
+        		if (i >= orderedMeasurements.size()) {
+        			for (int j = orderedMeasurements.size(); j <= i; j++) {
+        				orderedMeasurements.add(null);
+        			}
+        		}
+        		
+    			orderedMeasurements.set(i, m);
+        		
+        	}
+        	
+        	allOrderedMeasurements.put(label, orderedMeasurements);
+        	
+        	
         }
+        
+        output.print("region ");
+        
+        for (String s : columnHeadings) {
+        	output.print(s);
+        	output.print(" ");
+        }
+        output.println("");
+        
+        for (Long l : sortedRegions) {
+        	List<Measurement> orderedMeasurements = allOrderedMeasurements.get(l);
+        	
+        	output.print("" + l + " ");
+        	
+        	for (Measurement m : orderedMeasurements) {
+        		if (m == null) {
+        			output.print("N/A ");
+        		} else {
+        			output.print(m.getMeasurement());
+        			output.print(" ");
+        		}
+        	}
+        	
+        	output.println("");
+        	
+        }
+
 
         output.close();
 
