@@ -170,14 +170,15 @@ public class ImagePlusPixelData extends PixelData {
 		
 		this.pixels = null;
 		
-		for (int x = 0; x < size_x; x++) {
-			for (int y = 0; y < size_y; y++) {
+		for (int t = 0; t < size_t; t++) {
+			for (int c = 0; c < size_c; c++) {
 				for(int z = 0; z < size_z; z++) {
-					for (int c = 0; c < size_c; c++) {
-						for (int t = 0; t < size_t; t++) {
+					for (int y = 0; y < size_y; y++) {
+						for (int x = 0; x < size_x; x++) {
+							
 							
 							int slice = this.imPl.getStackIndex(c+1, z+1, t+1); //planes are 1-indexed in ImagePlus
-							
+														
 							if (slice != this.currentStackIndex) {
 								this.imPl.setSliceWithoutUpdate(slice);
 								this.currentStackIndex = slice;
@@ -190,6 +191,7 @@ public class ImagePlusPixelData extends PixelData {
 				}
 			}
 		}
+
 		
 		this.convertedPixels = null;
 		this.offsetSizes = null;
@@ -216,7 +218,7 @@ public class ImagePlusPixelData extends PixelData {
 		int z_index = ((index - c_index)/size_c) % size_z;
 		
 		int t_index = (index - c_index - size_c*z_index)/(size_z*size_c);
-		
+				
 		index = this.imPl.getStackIndex(c_index+1, z_index+1, t_index+1);
 		
 		
@@ -224,6 +226,7 @@ public class ImagePlusPixelData extends PixelData {
 			this.imPl.setSliceWithoutUpdate(index);
 			this.currentStackIndex = index;
 		}
+		
 		
 		float[] pixelData = (float[]) this.imPl.getProcessor().getPixels();
 		

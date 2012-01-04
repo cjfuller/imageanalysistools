@@ -86,7 +86,7 @@ public class DynamicMethod extends Method {
 			}
 			
 		}
-		
+				
 		for (Filter f : filters) {
 			f.setParameters(this.parameters);
 			f.setReferenceImage(this.imageSet.getMarkerImageOrDefault());
@@ -99,7 +99,7 @@ public class DynamicMethod extends Method {
 		if (m == null) {
 			m = new ZeroMetric();
 		}
-		
+				
 		iterateOnFiltersAndStoreResult(filters, new Image(this.imageSet.getMarkerImageOrDefault()), m);
 		
 	}

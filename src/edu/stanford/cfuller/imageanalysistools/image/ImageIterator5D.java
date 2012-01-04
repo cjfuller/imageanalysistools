@@ -167,7 +167,7 @@ public class ImageIterator5D extends ImageIterator {
 						this.currCoord.quickSet(ImageCoordinate.Y, curr_y);
 						this.currCoord.quickSet(ImageCoordinate.Z, curr_z);
 						this.currCoord.quickSet(ImageCoordinate.C, curr_c);
-						this.currCoord.quickSet(ImageCoordinate.Z, curr_z);
+						this.currCoord.quickSet(ImageCoordinate.T, curr_t);
 					}
 				}
 			}

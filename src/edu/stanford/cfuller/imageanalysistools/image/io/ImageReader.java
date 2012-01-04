@@ -168,7 +168,7 @@ public class ImageReader {
             lociReader.setSeries(currentSeries.get(filename));
 
             pixel_bytes = new byte[lociReader.getSizeX()*lociReader.getSizeY()*lociReader.getSizeZ()*lociReader.getSizeC()*lociReader.getSizeT()*((int) Math.ceil(lociReader.getBitsPerPixel()*1.0/8))];
-
+            
 			for (int i = 0; i < lociReader.getImageCount(); i++) {
 				byte[] currPlane = lociReader.openBytes(i);
                 System.arraycopy(currPlane, 0, pixel_bytes,byte_position,currPlane.length);
@@ -188,9 +188,9 @@ public class ImageReader {
 		}
 		
 		p.setBytes(pixel_bytes);
-						
+								
 		Image toReturn = new Image((loci.formats.meta.IMetadata) lociReader.getMetadataStore(), p);
-				
+		
 		lociReader.close();
 
         currentSeries.put(filename, currentSeries.get(filename) + 1);

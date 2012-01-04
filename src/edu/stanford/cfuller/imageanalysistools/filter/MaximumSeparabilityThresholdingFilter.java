@@ -79,7 +79,7 @@ public class MaximumSeparabilityThresholdingFilter extends Filter {
 	public void apply_ext(Image im, boolean adaptiveincrement, int increment) {
 		
 		Histogram h = new Histogram(im);
-		
+				
 		int thresholdValue = 0;
 		
 		final int numSteps = 1000;
@@ -140,7 +140,7 @@ public class MaximumSeparabilityThresholdingFilter extends Filter {
 		}
 				
 		thresholdValue = best_index;
-		
+				
 		if (thresholdValue == Integer.MAX_VALUE) {
 			thresholdValue = 0;
 		}

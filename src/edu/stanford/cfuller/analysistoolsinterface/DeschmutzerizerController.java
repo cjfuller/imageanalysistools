@@ -24,10 +24,13 @@
 
 package edu.stanford.cfuller.analysistoolsinterface;
 
+import edu.stanford.cfuller.imageanalysistools.frontend.AnalysisController;
 import edu.stanford.cfuller.imageanalysistools.frontend.DataSummary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
+import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
+import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
@@ -41,8 +44,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.prefs.Preferences;
@@ -354,9 +361,19 @@ public class DeschmutzerizerController extends TaskController {
 			while (currentLine != null) {
 
 				String[] split = currentLine.split(" ");
+				
+				int regionNumber = 0;
+				
+				try {
 
-				int regionNumber =(int)  Double.parseDouble(split[0]);
+					regionNumber =(int)  Double.parseDouble(split[0]);
 
+				} catch (NumberFormatException e) {
+					currentLine = input.readLine();
+
+					continue;
+				}
+					
 				if (! this.selectedRegions.contains(regionNumber)) {
 					output.println(currentLine);
 				}
@@ -366,9 +383,40 @@ public class DeschmutzerizerController extends TaskController {
 			}
 
 			output.close();
+			
+			File data = new File(this.currentDataFilename);
+			
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(data.getParent() + File.separator + AnalysisController.SERIALIZED_DATA_SUFFIX + File.separator + data.getName()));
+			
+			Quantification q = (Quantification) ois.readObject();
+			
+			Quantification outputQ = new Quantification();
+			
+			for (Measurement m : q.getAllMeasurements()) {
+				if (! this.selectedRegions.contains((int) m.getFeatureID())) {
+					outputQ.addMeasurement(m);
+				}
+			}
+			
+			File outputData = new File(outputDataFilename);
+			
+			File outputDir = new File(outputData.getParent() + File.separator + AnalysisController.SERIALIZED_DATA_SUFFIX);
+			
+			if (! outputDir.exists()) {
+				outputDir.mkdir();
+			}
+			
+			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputData.getParent() + File.separator + AnalysisController.SERIALIZED_DATA_SUFFIX + File.separator + outputData.getName()));
 
+			oos.writeObject(outputQ);
+			
+			oos.close();
+			ois.close();
+			
 		} catch (java.io.IOException e) {
 			LoggingUtilities.warning("encountered IO exception while writing deschmutzed data");
+		} catch (ClassNotFoundException e) {
+			LoggingUtilities.warning("unable to read quantification while writing deschmutzed data");
 		}
 
 

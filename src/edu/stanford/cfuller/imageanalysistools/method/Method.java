@@ -66,7 +66,7 @@ public abstract class Method implements Runnable {
 		
 		
 		int c = 0;
-		
+				
 		if (Boolean.parseBoolean(parameters.getValueForKey("DEBUG"))) {
 			LoggingUtilities.getLogger().info("starting filters");
 		    //toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
@@ -91,6 +91,7 @@ public abstract class Method implements Runnable {
     			ip.show();
 			   //toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
             }
+            
             if (this.updater != null) {
             	updater.update(++c, filters.size(), null);
             }
@@ -100,6 +101,7 @@ public abstract class Method implements Runnable {
 		}
 				
 		this.storeImageOutput(new Image(toProcess));
+		
 		
 		this.parameters.addIfNotSet("background_calculated", "false");
 		
