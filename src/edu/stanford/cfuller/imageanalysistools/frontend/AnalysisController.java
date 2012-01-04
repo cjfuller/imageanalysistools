@@ -41,6 +41,7 @@ public class AnalysisController {
     public static final String DATA_OUTPUT_DIR="output";
     public static final String IMAGE_OUTPUT_DIR="output_mask";
     public static final String PARAMETER_OUTPUT_DIR="parameters";
+    public static final String SERIALIZED_DATA_SUFFIX="serialized";
     static final String PARAMETER_EXTENSION=".xml";
 
     /**

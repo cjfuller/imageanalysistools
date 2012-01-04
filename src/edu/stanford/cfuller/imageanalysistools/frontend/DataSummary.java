@@ -24,14 +24,16 @@
 
 package edu.stanford.cfuller.imageanalysistools.frontend;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.PrintWriter;
-import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
+import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
+import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 
 /**
@@ -45,15 +47,6 @@ import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 
 public class DataSummary {
 
-    private static double[] newAverages(int numChannels) {
-
-        double[] averages = new double[numChannels];
-        for (int i = 0; i < numChannels; i++) {
-            averages[i] = 0.0;
-        }
-        return averages;
-
-    }
 
 
     /**
@@ -69,25 +62,20 @@ public class DataSummary {
         final String outputFileExtension = ".out.txt";
 
         File dir = new File(directory);
+        
+        File serialDir = new File(directory + File.separator + AnalysisController.SERIALIZED_DATA_SUFFIX);
 
-        if (! dir.exists()) {
-
-            dir.mkdir();
-
+        if (! dir.exists() || ! serialDir.exists()) {
+        	
+        	return;
         }
 
         File outputFile = new File(directory + File.separator + "summary.txt");
 
 
-
         PrintWriter output = new PrintWriter(new FileOutputStream(outputFile));
 
-
-        int numChannels = 0;
-
-        boolean headerRowWritten = false;
-
-        for (File f : dir.listFiles()) {
+        for (File f : serialDir.listFiles()) {
 
 
         	ParameterDictionary params = null;
@@ -99,126 +87,176 @@ public class DataSummary {
 
             params = ParameterDictionary.readParametersFromFile(parameterFile.getAbsolutePath());
 
-            numChannels = Integer.parseInt(params.getValueForKey("number_of_channels"));
+            ObjectInputStream o = new ObjectInputStream(new FileInputStream(f));
             
-            if (! headerRowWritten) {
+            Quantification q = null;
+            
+            try {
+            	q = (Quantification) o.readObject();
+            } catch (ClassNotFoundException e) {
+            	q = null;
+            }
+            
+            o.close();
+            
+            if (q == null) {continue;}
+            
+            Map<Long, Map<String, List<Measurement> > > intensityMeasurementsByGroup = new java.util.HashMap<Long, Map<String, List<Measurement> > >();
+            
+            Map<Long, Map<String, List<Measurement> > > backgroundMeasurementsByGroup = new java.util.HashMap<Long, Map<String, List<Measurement> > >();
+            
+            Map<Long, Map<String, List<Measurement> > > sizeMeasurementsByGroup = new java.util.HashMap<Long, Map<String, List<Measurement> > >();
+            
+            Map<Long, Long> groupLookup = new java.util.HashMap<Long, Long>();
+            
+            String imageID = null;
+            
+            for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_GROUPING)) {
+            	groupLookup.put(m.getFeatureID(), (long) m.getMeasurement());
+            	if (imageID == null) {imageID = m.getImageID();}
+            }
+            
+            if (imageID == null) {
+            	imageID = f.getName();
+            }
+            
+            for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_INTENSITY)) {
+            	
+            	long groupID = m.getFeatureID();
+            	if (groupLookup.containsKey(groupID)) {groupID = groupLookup.get(m.getFeatureID());}
+            	
+            	if (! intensityMeasurementsByGroup.containsKey(groupID)) {
+            		intensityMeasurementsByGroup.put(groupID, new java.util.HashMap<String, List<Measurement> >());
+            	}
+            	
+            	Map<String, List<Measurement> > currGroup = intensityMeasurementsByGroup.get(groupID);
+            	
+            	String name = m.getMeasurementName();
+            	
+            	if (! currGroup.containsKey(name) ) {
+            		currGroup.put(name, new java.util.ArrayList<Measurement>());
+            	}
+            	
+            	currGroup.get(name).add(m);
+            	
+            }
+            
+            for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_BACKGROUND)) {
+            	
+            	long groupID = m.getFeatureID();
+            	if (groupLookup.containsKey(groupID)) {groupID = groupLookup.get(m.getFeatureID());}
+            	
+            	if (! backgroundMeasurementsByGroup.containsKey(groupID)) {
+            		backgroundMeasurementsByGroup.put(groupID, new java.util.HashMap<String, List<Measurement> >());
+            	}
+            	
+            	Map<String, List<Measurement> > currGroup = backgroundMeasurementsByGroup.get(groupID);
+            	
+            	String name = m.getMeasurementName();
+            	
+            	if (! currGroup.containsKey(name) ) {
+            		currGroup.put(name, new java.util.ArrayList<Measurement>());
+            	}
+            	
+            	currGroup.get(name).add(m);
+            	
+            }
+            
+            for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_SIZE)) {
+            	
+            	long groupID = m.getFeatureID();
+            	if (groupLookup.containsKey(groupID)) {groupID = groupLookup.get(m.getFeatureID());}
+            	
+            	if (! sizeMeasurementsByGroup.containsKey(groupID)) {
+            		sizeMeasurementsByGroup.put(groupID, new java.util.HashMap<String, List<Measurement> >());
+            	}
+            	
+            	Map<String, List<Measurement> > currGroup = sizeMeasurementsByGroup.get(groupID);
+            	
+            	String name = m.getMeasurementName();
+            	
+            	if (! currGroup.containsKey(name) ) {
+            		currGroup.put(name, new java.util.ArrayList<Measurement>());
+            	}
+            	
+            	currGroup.get(name).add(m);
+            	
+            }
+            
+            Quantification groupQuant = new Quantification();
+            
+            for (Long group : intensityMeasurementsByGroup.keySet()) {
+            	
+            	int count = 0;
+            	boolean counted = false;
+            	
+            	for (String name : intensityMeasurementsByGroup.get(group).keySet()) {
+            	
+            		Measurement m = new Measurement(true, group, 0.0, name, Measurement.TYPE_INTENSITY, imageID);
+            		            		
+            		for (Measurement individual : intensityMeasurementsByGroup.get(group).get(name)) {
+            			
+            			m.setMeasurement(m.getMeasurement() + individual.getMeasurement());
+            			if (!counted) {count++;}
+            		}
+            		
+            		m.setMeasurement(m.getMeasurement() / count);
+            		
+            		counted = true;
+            		
+                	groupQuant.addMeasurement(m);
 
+            	}
+            	
+            	for (String name : backgroundMeasurementsByGroup.get(group).keySet()) {
+                	
+            		Measurement m = new Measurement(true, group, 0.0, name, Measurement.TYPE_BACKGROUND, imageID);
+            		            		
+            		for (Measurement individual : backgroundMeasurementsByGroup.get(group).get(name)) {
+            			
+            			m.setMeasurement(m.getMeasurement() + individual.getMeasurement());
+            			if (!counted) {count++;}
+            		}
+            		
+            		m.setMeasurement(m.getMeasurement() / count);
+            		
+            		counted = true;
+            		
+                	groupQuant.addMeasurement(m);
 
-                // column headers
+            	}
+            	
+            	for (String name : sizeMeasurementsByGroup.get(group).keySet()) {
+                	
+            		Measurement m = new Measurement(true, group, 0.0, name, Measurement.TYPE_SIZE, imageID);
+            		            		
+            		for (Measurement individual : sizeMeasurementsByGroup.get(group).get(name)) {
+            			
+            			m.setMeasurement(m.getMeasurement() + individual.getMeasurement());
+            			if (!counted) {count++;}
+            		}
+            		
+            		m.setMeasurement(m.getMeasurement() / count);
+            		
+            		counted = true;
+            		
+                	groupQuant.addMeasurement(m);
 
-                output.print("cell_number" + " ");
-                for (int i = 0; i < numChannels; i++) {
-
-                    output.print(params.getValueForKey("channel_name").split(" ")[i]);
-                    output.print(" ");
-                }
-
-                for (int i = 0; i < numChannels; i++) {
-                    output.print(params.getValueForKey("channel_name").split(" ")[i] + "_background ");
-
-                }
-
-                output.print("number_of_regions_in_cluster ");
-
-                output.println("average_region_size");
-
-
-
-                headerRowWritten = true;
-
+            	}
+            	
+            	groupQuant.addMeasurement(new Measurement(true, group, count, "region_count", Measurement.TYPE_SIZE, imageID));
+            	
             }
 
-
-
-
-            System.out.println(f.getName());
-
-            Hashtable<Integer, double[]> regions = new Hashtable<Integer, double[]>();
-            Hashtable<Integer, int[]> counts = new Hashtable<Integer, int[]>();
-
-            Hashtable<Integer, Double[]> allBG = new Hashtable<Integer, Double[]>();
-            Hashtable<Integer, Double> average_sizes = new Hashtable<Integer, Double>();
-
-
-            BufferedReader b = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-
-            String line;
-
-            while ((line = b.readLine()) != null) {
-
-
-                String[] splitline = line.split(" ");
-                
-                int regionID = 0;
-                
-                try {
-                	regionID = (int) Double.parseDouble(splitline[0]);
-                } catch (NumberFormatException e) {
-                	continue;
-                }
-
-                if (params != null && params.getBooleanValueForKey("background_calculated")) {
-                	regionID = (int) Double.parseDouble(splitline[splitline.length - 1]); // for now, cell id is the last column; this is not guaranteed and needs to be fixed
-                }
-                int regionType = 0;
-
-                if (! regions.containsKey(regionID)){
-                    regions.put(regionID, newAverages(numChannels));
-                    int[] countsArr = new int[4];
-                    countsArr[0] = 0; countsArr[1] = 0; countsArr[2] = 0; countsArr[3] = 0;
-                    counts.put(regionID, countsArr);
-                    average_sizes.put(regionID, 0.0);
-                }
-
-                double[] averages = regions.get(regionID);
-                int[] averageCounts = counts.get(regionID);
-
-                for (int i = 0; i < numChannels; i++) {
-
-                    //averages[i] += Double.parseDouble(splitline[i])/Double.parseDouble(splitline[numChannels]);
-                    averages[i] += Double.parseDouble(splitline[i+1]);
-                }
-
-                averageCounts[regionType] += 1;
-                Double[] tempBg = new Double[numChannels];
-                if (params != null && params.getBooleanValueForKey("background_calculated")) {
-	                for (int i = 0; i < numChannels; i++) {
-	                    tempBg[i] = Double.parseDouble(splitline[numChannels+i+1]);
-	
-	                }
-                } else {
-                	java.util.Arrays.fill(tempBg, 0.0);
-                }
-
-                average_sizes.put(regionID, average_sizes.get(regionID)+ Double.parseDouble(splitline[splitline.length - 2])); // for now, second from the end; not guaranteed to be the case...
-
-                allBG.put(regionID, tempBg);
-
-            }
-            output.println(f.getName());
-
-            for (int key : regions.keySet()) {
-
-                if (key == 0) continue; //things found as centromeres but excluded by clustering have region 0 -- exclude them
-
-                output.print("" + key + " ");
-
-                int totalCounts = counts.get(key)[0] + counts.get(key)[1] + counts.get(key)[2] + counts.get(key)[3];
-
-                for (int i = 0; i < numChannels; i++) {
-                    output.print("" + regions.get(key)[i]/totalCounts + " ");
-                }
-                for (int i = 0; i < numChannels; i++) {
-                    output.print("" + allBG.get(key)[i] + " ");
-                }
-
-                output.print("" + totalCounts + " ");
-
-                output.println("" + average_sizes.get(key)/totalCounts);
-
-            }
-
+            String data = LocalAnalysis.generateDataOutputString(groupQuant, params);
+            
+            output.println(imageID);
+            
+            output.println(data);
+            
         }
+            
+ 
 
         output.close();
 

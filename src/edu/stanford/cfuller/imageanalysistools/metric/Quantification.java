@@ -24,6 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.metric;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,9 @@ import java.util.Map;
  * @author Colin J. Fuller
  *
  */
-public class Quantification {
+public class Quantification implements Serializable {
+
+	private static final long serialVersionUID = 8194024040087176409L;
 
 	protected List<Measurement> measurements;
 	

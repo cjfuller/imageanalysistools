@@ -33,10 +33,9 @@ import edu.stanford.cfuller.imageanalysistools.method.Method;
 import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
 import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
 
-import org.apache.commons.math.linear.RealMatrix;
-
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.Comparator;
 import java.util.List;
@@ -59,6 +58,7 @@ public class LocalAnalysis {
     private static final int threadWaitTime_ms = 5000;
 
     static final String DATA_OUTPUT_DIR=AnalysisController.DATA_OUTPUT_DIR;
+    static final String SERIALIZED_DATA_SUFFIX=AnalysisController.SERIALIZED_DATA_SUFFIX;
     static final String IMAGE_OUTPUT_DIR=AnalysisController.IMAGE_OUTPUT_DIR;
     static final String PARAMETER_OUTPUT_DIR=AnalysisController.PARAMETER_OUTPUT_DIR;
     static final String PARAMETER_EXTENSION = AnalysisController.PARAMETER_EXTENSION;
@@ -382,30 +382,12 @@ public class LocalAnalysis {
         return method;
 
     }
-
-    private static void writeDataOutput(Method finishedMethod, ParameterDictionary p, ImageSet fileSet) throws java.io.IOException {
-
-        final String output_dir_suffix = DATA_OUTPUT_DIR;
-
-        java.io.File outputPath=  new java.io.File(finishedMethod.getParameters().getValueForKey("local_directory") + java.io.File.separator + output_dir_suffix);
-
-        if (!outputPath.exists()) {outputPath.mkdir();}
-
-        String[] splitMethodName = finishedMethod.getParameters().getValueForKey("method_name").split("\\.");
-
-        String shortMethodName = splitMethodName[splitMethodName.length - 1];
-
-        String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.txt";
-
-        String dataOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
-
-        p.addIfNotSet("data_output_filename", relativeOutputFilename);
-
-        PrintWriter output = new PrintWriter(new FileOutputStream(dataOutputFilename));
-
-        Quantification data = finishedMethod.getStoredDataOutput();
-  
-        if (data == null) {output.close(); return;}
+    
+    public static String generateDataOutputString(Quantification data, ParameterDictionary p) {
+    	
+    	StringBuilder output = new StringBuilder();
+    	  
+        if (data == null) {return "";}
                 
         java.util.Set<Long> regions = data.getAllRegions();
         
@@ -543,32 +525,72 @@ public class LocalAnalysis {
         	
         }
         
-        output.print("region ");
+        output.append("region ");
         
         for (String s : columnHeadings) {
-        	output.print(s);
-        	output.print(" ");
+        	output.append(s);
+        	output.append(" ");
         }
-        output.println("");
+        output.append("\n");
         
         for (Long l : sortedRegions) {
         	List<Measurement> orderedMeasurements = allOrderedMeasurements.get(l);
         	
-        	output.print("" + l + " ");
+        	output.append("" + l + " ");
         	
         	for (Measurement m : orderedMeasurements) {
         		if (m == null) {
-        			output.print("N/A ");
+        			output.append("N/A ");
         		} else {
-        			output.print(m.getMeasurement());
-        			output.print(" ");
+        			output.append(m.getMeasurement());
+        			output.append(" ");
         		}
         	}
         	
-        	output.println("");
+        	output.append("\n");
         	
         }
+        
+        return output.toString();
+    }
 
+    private static void writeDataOutput(Method finishedMethod, ParameterDictionary p, ImageSet fileSet) throws java.io.IOException {
+
+        final String output_dir_suffix = DATA_OUTPUT_DIR;
+
+        java.io.File outputPath=  new java.io.File(finishedMethod.getParameters().getValueForKey("local_directory") + java.io.File.separator + output_dir_suffix);
+
+        if (!outputPath.exists()) {outputPath.mkdir();}
+        
+        java.io.File serializedOutputPath = new java.io.File(outputPath.getAbsolutePath() + java.io.File.separator + SERIALIZED_DATA_SUFFIX);
+
+        if (!serializedOutputPath.exists()) {serializedOutputPath.mkdir();}
+        
+        String[] splitMethodName = finishedMethod.getParameters().getValueForKey("method_name").split("\\.");
+
+        String shortMethodName = splitMethodName[splitMethodName.length - 1];
+
+        String outputFilename =  ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.txt";
+
+        String relativeOutputFilename = outputPath.getName() + File.separator + outputFilename;
+        		
+        String dataOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
+        
+        String serializedOutputFilename = serializedOutputPath.getAbsolutePath() + File.separator + outputFilename;
+
+        p.addIfNotSet("data_output_filename", relativeOutputFilename);
+
+        PrintWriter output = new PrintWriter(new FileOutputStream(dataOutputFilename));
+        
+        ObjectOutputStream serializedOutput = new ObjectOutputStream(new FileOutputStream(serializedOutputFilename));
+
+    	Quantification data = finishedMethod.getStoredDataOutput();
+        
+        serializedOutput.writeObject(data);
+        
+        serializedOutput.close();
+
+        output.write(generateDataOutputString(data, p));
 
         output.close();
 

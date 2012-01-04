@@ -37,8 +37,6 @@ import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
 import edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric;
 
-import org.apache.commons.math.linear.Array2DRowRealMatrix;
-import org.apache.commons.math.linear.RealMatrix;
 
 /**
  * Method to find centromeres in immunofluorescence images.

@@ -24,14 +24,18 @@
 
 package edu.stanford.cfuller.imageanalysistools.metric;
 
+import java.io.Serializable;
+
 /**
  * Represents a single scalar measurement made based on the quantification of an image.
  * 
  * @author Colin J. Fuller
  *
  */
-public class Measurement {
+public class Measurement implements Serializable {
 
+	private static final long serialVersionUID = -1958967973002931120L;
+	
 	protected boolean hasAssociatedFeature;
 	protected long featureID;
 	
