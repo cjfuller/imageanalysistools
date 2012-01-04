@@ -28,8 +28,9 @@ import edu.stanford.cfuller.imageanalysistools.filter.MaskFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
+import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
-import org.apache.commons.math.linear.RealMatrix;
+import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
 
 
 /**
@@ -111,41 +112,26 @@ public class ChromosomeCentromereFindingMethod extends Method {
 
         }
 
-        RealMatrix fullResult = metric.quantify(chromosomeCentromereMask, this.imageSet);
+        Quantification fullResult = metric.quantify(chromosomeCentromereMask, this.imageSet);
 
-        RealMatrix backgroundResult = metric.quantify(chromosomeNonCentromereMask, this.imageSet);
+        Quantification chromosomeResult = metric.quantify(chromosomeNonCentromereMask, this.imageSet);
 
-        if (fullResult != null && backgroundResult != null) {
-
-            RealMatrix masterResult = new org.apache.commons.math.linear.Array2DRowRealMatrix(fullResult.getRowDimension(), fullResult.getColumnDimension() + Integer.parseInt(this.parameters.getValueForKey("number_of_channels")) + 2);
-
-            for (int i = 0; i < fullResult.getRowDimension(); i++) {
-
-                for (int j = 0; j < fullResult.getColumnDimension(); j++) {
-
-                    masterResult.setEntry(i, j, fullResult.getEntry(i, j));
-
-                }
-
-                for (int b = 0; b < Integer.parseInt(this.parameters.getValueForKey("number_of_channels")); b++) {
-
-                    if (i < backgroundResult.getRowDimension()) {
-
-                        masterResult.setEntry(i,fullResult.getColumnDimension() + b, backgroundResult.getEntry(i, b));
-                    }
-                }
-
-                masterResult.setEntry(i, masterResult.getColumnDimension()-2, i+1);
-                masterResult.setEntry(i, masterResult.getColumnDimension()-1, i+1);
-
-
+        
+        
+        if (fullResult != null && chromosomeResult != null) {
+        	
+        	for (Measurement m : chromosomeResult.getAllMeasurements()) {
+            	
+            	fullResult.addMeasurement(new Measurement(m.hasAssociatedFeature(), m.getFeatureID(), m.getMeasurement(), m.getMeasurementName() + "_chromosome", m.getMeasurementType(), m.getImageID() ));
+            	
             }
 
-
-
-            this.storedDataOutput = masterResult;
+            this.storedDataOutput = fullResult;
+            
         } else {
+        	
             this.storedDataOutput = null;
+            
         }
 
         this.storeImageOutput(chromosomeCentromereMask);

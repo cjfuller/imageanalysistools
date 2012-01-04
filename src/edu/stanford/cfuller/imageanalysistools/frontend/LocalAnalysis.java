@@ -30,11 +30,16 @@ import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
-import org.apache.commons.math.linear.RealMatrix;
+import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
+import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Controls analysis done on the local machine, including routines for threading analysis, and data input and output.
@@ -53,6 +58,7 @@ public class LocalAnalysis {
     private static final int threadWaitTime_ms = 5000;
 
     static final String DATA_OUTPUT_DIR=AnalysisController.DATA_OUTPUT_DIR;
+    static final String SERIALIZED_DATA_SUFFIX=AnalysisController.SERIALIZED_DATA_SUFFIX;
     static final String IMAGE_OUTPUT_DIR=AnalysisController.IMAGE_OUTPUT_DIR;
     static final String PARAMETER_OUTPUT_DIR=AnalysisController.PARAMETER_OUTPUT_DIR;
     static final String PARAMETER_EXTENSION = AnalysisController.PARAMETER_EXTENSION;
@@ -376,6 +382,177 @@ public class LocalAnalysis {
         return method;
 
     }
+    
+    public static String generateDataOutputString(Quantification data, ParameterDictionary p) {
+    	
+    	StringBuilder output = new StringBuilder();
+    	  
+        if (data == null) {return "";}
+                
+        java.util.Set<Long> regions = data.getAllRegions();
+        
+        List<Long> sortedRegions = new java.util.ArrayList<Long>();
+        
+        sortedRegions.addAll(regions);
+        
+        java.util.Collections.sort(sortedRegions);
+        
+        final String backgroundSuffix = "_background";
+        
+        List<String> columnHeadings = new java.util.ArrayList<String>();
+        
+        Map<Long, List<Measurement> > allOrderedMeasurements = new java.util.HashMap<Long, List<Measurement> >();
+        
+        for (Long label : sortedRegions) {
+        	
+        	List<Measurement> measurements = data.getAllMeasurementsForRegion(label);
+        	
+        	List<Measurement> intensityMeasurements = new java.util.ArrayList<Measurement>();
+        	
+        	List<Measurement> backgroundMeasurements = new java.util.ArrayList<Measurement>();
+        	
+        	List<Measurement> otherMeasurements = new java.util.ArrayList<Measurement>();
+        	
+        	for (Measurement m : measurements) {
+        		
+        		if (m.getMeasurementType() == Measurement.TYPE_INTENSITY) {
+        			intensityMeasurements.add(m);
+        		} else if (m.getMeasurementType() == Measurement.TYPE_BACKGROUND) {
+        			backgroundMeasurements.add(m);
+        		} else {
+        			otherMeasurements.add(m);
+        		}
+        		
+        	}
+        	
+        	java.util.Collections.sort(intensityMeasurements, new Comparator<Measurement>() {
+        		public int compare(Measurement o1, Measurement o2) {
+        			return o1.getMeasurementName().compareTo(o2.getMeasurementName());
+        		}
+        	});
+        	
+        	List<Measurement> orderedMeasurements = new java.util.ArrayList<Measurement>();
+        	
+        	for (int i = 0; i < measurements.size(); i++) {
+        		orderedMeasurements.add(null);
+        	}
+        	
+        	for (Measurement m : intensityMeasurements) {
+        		
+        		int i = columnHeadings.indexOf(m.getMeasurementName());
+        		
+        		if (i == -1) {// not found in list
+        			
+        			columnHeadings.add(m.getMeasurementName());
+        			i = columnHeadings.size() -1;
+        			
+        		}
+        		
+        		if (i >= orderedMeasurements.size()) {
+        			for (int j = orderedMeasurements.size(); j <= i; j++) {
+        				orderedMeasurements.add(null);
+        			}
+        		}
+        		
+    			orderedMeasurements.set(i, m);
+
+        		        		
+        	}
+        	
+        	
+        	for (Measurement m : intensityMeasurements) {
+        	
+        		Measurement bkg = null;
+        		        		
+        		for (Measurement b : backgroundMeasurements) {
+        			        			
+        			if (b.getMeasurementName().equals(m.getMeasurementName())) {
+        				
+        				bkg = b;
+        				
+        				break;
+        				
+        			}
+        			
+        		}
+        		
+        		if (bkg == null) continue;
+        		
+        		String backgroundName = bkg.getMeasurementName() + backgroundSuffix;
+        		
+        		int i = columnHeadings.indexOf(backgroundName);
+        		
+        		if (i == -1) {// not found in list
+        			
+        			columnHeadings.add(backgroundName);
+        			i = columnHeadings.size() -1;
+        			
+        		}
+        		
+        		if (i >= orderedMeasurements.size()) {
+        			for (int j = orderedMeasurements.size(); j <= i; j++) {
+        				orderedMeasurements.add(null);
+        			}
+        		}
+        		
+    			orderedMeasurements.set(i, bkg);
+        	
+        	}
+        	
+        	for (Measurement m : otherMeasurements) {
+        		
+        		int i = columnHeadings.indexOf(m.getMeasurementName());
+        		
+        		if (i == -1) {// not found in list
+        			
+        			columnHeadings.add(m.getMeasurementName());
+        			i = columnHeadings.size() -1;
+        			
+        		}
+        		
+        		if (i >= orderedMeasurements.size()) {
+        			for (int j = orderedMeasurements.size(); j <= i; j++) {
+        				orderedMeasurements.add(null);
+        			}
+        		}
+        		
+    			orderedMeasurements.set(i, m);
+        		
+        	}
+        	
+        	allOrderedMeasurements.put(label, orderedMeasurements);
+        	
+        	
+        }
+        
+        output.append("region ");
+        
+        for (String s : columnHeadings) {
+        	output.append(s);
+        	output.append(" ");
+        }
+        output.append("\n");
+        
+        for (Long l : sortedRegions) {
+        	List<Measurement> orderedMeasurements = allOrderedMeasurements.get(l);
+        	
+        	output.append("" + l + " ");
+        	
+        	for (Measurement m : orderedMeasurements) {
+        		if (m == null) {
+        			output.append("N/A ");
+        		} else {
+        			output.append(m.getMeasurement());
+        			output.append(" ");
+        		}
+        	}
+        	
+        	output.append("\n");
+        	
+        }
+        
+        return output.toString();
+    }
 
     private static void writeDataOutput(Method finishedMethod, ParameterDictionary p, ImageSet fileSet) throws java.io.IOException {
 
@@ -384,31 +561,36 @@ public class LocalAnalysis {
         java.io.File outputPath=  new java.io.File(finishedMethod.getParameters().getValueForKey("local_directory") + java.io.File.separator + output_dir_suffix);
 
         if (!outputPath.exists()) {outputPath.mkdir();}
+        
+        java.io.File serializedOutputPath = new java.io.File(outputPath.getAbsolutePath() + java.io.File.separator + SERIALIZED_DATA_SUFFIX);
 
+        if (!serializedOutputPath.exists()) {serializedOutputPath.mkdir();}
+        
         String[] splitMethodName = finishedMethod.getParameters().getValueForKey("method_name").split("\\.");
 
         String shortMethodName = splitMethodName[splitMethodName.length - 1];
 
+        String outputFilename =  ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.txt";
 
-        String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.txt";
-
+        String relativeOutputFilename = outputPath.getName() + File.separator + outputFilename;
+        		
         String dataOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
+        
+        String serializedOutputFilename = serializedOutputPath.getAbsolutePath() + File.separator + outputFilename;
 
         p.addIfNotSet("data_output_filename", relativeOutputFilename);
 
         PrintWriter output = new PrintWriter(new FileOutputStream(dataOutputFilename));
+        
+        ObjectOutputStream serializedOutput = new ObjectOutputStream(new FileOutputStream(serializedOutputFilename));
 
-        RealMatrix data = finishedMethod.getStoredDataOutput();
+    	Quantification data = finishedMethod.getStoredDataOutput();
+        
+        serializedOutput.writeObject(data);
+        
+        serializedOutput.close();
 
-        if (data == null) {output.close(); return;}
-
-        for (int i = 0; i < data.getRowDimension(); i++) {
-            for (int j = 0; j < data.getColumnDimension(); j++) {
-                output.print(data.getEntry(i,j));
-                output.print(" ");
-            }
-            output.println("");
-        }
+        output.write(generateDataOutputString(data, p));
 
         output.close();
 
