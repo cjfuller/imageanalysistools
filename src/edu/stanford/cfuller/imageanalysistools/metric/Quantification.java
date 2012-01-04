@@ -97,10 +97,12 @@ public class Quantification implements Serializable {
 	}
 	
 	public List<Measurement> getAllMeasurementsForName(String name) {
+		if (! this.measurementsByName.containsKey(name)) {return new java.util.ArrayList<Measurement>();}
 		return this.measurementsByName.get(name);
 	}
 	
 	public List<Measurement> getAllMeasurementsForRegion(long regionID) {
+		if (! this.measurementsByRegion.containsKey(regionID)) {return new java.util.ArrayList<Measurement>();}
 		return this.measurementsByRegion.get(regionID);
 	}
 	
@@ -109,6 +111,7 @@ public class Quantification implements Serializable {
 	}
 	
 	public List<Measurement> getAllMeasurementsForType(String type) {
+		if (! this.measurementsByType.containsKey(type)) {return new java.util.ArrayList<Measurement>();}
 		return this.measurementsByType.get(type);
 	}
 	

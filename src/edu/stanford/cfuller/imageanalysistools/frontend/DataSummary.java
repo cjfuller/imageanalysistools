@@ -111,9 +111,17 @@ public class DataSummary {
             
             String imageID = null;
             
-            for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_GROUPING)) {
-            	groupLookup.put(m.getFeatureID(), (long) m.getMeasurement());
-            	if (imageID == null) {imageID = m.getImageID();}
+            if (q.getAllMeasurementsForType(Measurement.TYPE_GROUPING) == null || q.getAllMeasurementsForType(Measurement.TYPE_GROUPING).size() == 0) {
+            	for (Measurement m : q.getAllMeasurements()) {
+            		groupLookup.put(m.getFeatureID(), m.getFeatureID());
+                	if (imageID == null) {imageID = m.getImageID();}
+            	}
+            } else {
+            
+	            for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_GROUPING)) {
+	            	groupLookup.put(m.getFeatureID(), (long) m.getMeasurement());
+	            	if (imageID == null) {imageID = m.getImageID();}
+	            }
             }
             
             if (imageID == null) {
