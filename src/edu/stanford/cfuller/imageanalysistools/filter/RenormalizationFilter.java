@@ -107,6 +107,7 @@ public class RenormalizationFilter extends Filter {
 		}
 		
 		float sumValue = 0;
+		long pixelCount = 0;
 		
 		for (ImageCoordinate i : output) {
 			
@@ -118,11 +119,13 @@ public class RenormalizationFilter extends Filter {
 			
 			sumValue += tempValue;
 			
+			pixelCount++;
+			
 			output.setValue(i, (float) Math.floor(tempValue));
 			
 		}
-		
-		sumValue /= (output.getDimensionSizes().get(ImageCoordinate.X) * output.getDimensionSizes().get(ImageCoordinate.Y));
+				
+		sumValue /= pixelCount;
 		
 		for (ImageCoordinate i : output) {
 			float tempValue = output.getValue(i) - sumValue;

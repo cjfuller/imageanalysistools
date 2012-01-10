@@ -24,20 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.method;
 
-import edu.stanford.cfuller.imageanalysistools.filter.Filter;
-import edu.stanford.cfuller.imageanalysistools.filter.KernelFilterND;
-import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.LaplacianFilterND;
-import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.ZeroPointFilter;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
-import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+
 import edu.stanford.cfuller.imageanalysistools.matching.KinetochoreMatcher;
-import edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric;
 
 /**
  * A veritable playground of image analysis that will sit in the GUI and allow

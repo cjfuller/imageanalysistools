@@ -27,7 +27,6 @@ package edu.stanford.cfuller.imageanalysistools.matching;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,15 +36,7 @@ import org.apache.commons.math.linear.RealMatrix;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
 
-import edu.stanford.cfuller.imageanalysistools.filter.Filter;
-import edu.stanford.cfuller.imageanalysistools.filter.KernelFilterND;
-import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.LaplacianFilterND;
-import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.VariableSizeMeanFilter;
-import edu.stanford.cfuller.imageanalysistools.filter.ZeroPointFilter;
+
 import edu.stanford.cfuller.imageanalysistools.fitting.CentroidImageObject;
 import edu.stanford.cfuller.imageanalysistools.fitting.ImageObject;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;

@@ -190,11 +190,7 @@ public class CentromereFindingMethod extends Method {
 
 			} else  {
 
-				//java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Filtering");
-
 				Image gaussianFilteredMask = ObjectClustering.gaussianFilterMask(groupMask);
-
-				//java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Done filtering");
 
 				boolean decreaseBackground = Boolean.parseBoolean(this.parameters.getValueForKey("decrease_speckle_background"));
 
@@ -372,9 +368,6 @@ public class CentromereFindingMethod extends Method {
 
 
 		int[] resultMap = new int[Histogram.findMaxVal(allCentromeres)];
-
-
-		//TODO: consider new return type for the quantification (XML document?)
 
 
 		for (ImageCoordinate i : allCentromeres) {
