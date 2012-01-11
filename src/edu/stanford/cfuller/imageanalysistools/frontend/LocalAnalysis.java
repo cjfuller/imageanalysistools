@@ -184,20 +184,13 @@ public class LocalAnalysis {
         //generate the images to pass to the analysis routine
 
         ImageSet images = null;
+        
+        int markerIndex = 0;
 
         if (params.hasKeyAndTrue("multi_wavelength_file") || ! params.hasKey("multi_wavelength_file")) {
 
-            int markerIndex = 0;
 
             images = loadSplitMutliwavelengthImages(namedFileSet, markerIndex);
-
-
-            if (params.hasKey("marker_channel_index")) {
-                markerIndex = params.getIntValueForKey("marker_channel_index");
-                images.setMarkerImage(markerIndex);
-
-            }
-
 
             String channelNames = "";
 
@@ -208,10 +201,19 @@ public class LocalAnalysis {
             params.setValueForKey("channel_name", channelNames);
 
         } else {
-
+        	
             images = loadImagesFromFileSet(namedFileSet);
 
         }
+        
+        if (params.hasKey("marker_channel_index")) {
+        	
+            markerIndex = params.getIntValueForKey("marker_channel_index");
+            images.setMarkerImage(markerIndex);
+
+        }
+        
+        
 
         //set the numberOfChannels and channelName parameters appropriately for the multi-wavelength file
 

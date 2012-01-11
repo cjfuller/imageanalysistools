@@ -392,12 +392,16 @@ public class DeschmutzerizerController extends TaskController {
 			
 			Quantification outputQ = new Quantification();
 			
-			for (Measurement m : q.getAllMeasurements()) {
-				if (! this.selectedRegions.contains((int) m.getFeatureID())) {
-					outputQ.addMeasurement(m);
-				}
-			}
+			if (q != null) {
 			
+				for (Measurement m : q.getAllMeasurements()) {
+					if (! this.selectedRegions.contains((int) m.getFeatureID())) {
+						outputQ.addMeasurement(m);
+					}
+				}
+			
+			}
+				
 			File outputData = new File(outputDataFilename);
 			
 			File outputDir = new File(outputData.getParent() + File.separator + AnalysisController.SERIALIZED_DATA_SUFFIX);
