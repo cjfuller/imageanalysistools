@@ -123,8 +123,8 @@ public class Quantification implements Serializable {
 	
 	/**
 	 * Gets all the measurements whose name matches the provided region ID.
-	 * @param name	A long designating the region ID.
-	 * @return		A List containing the measurements matching the given ID; if there are no matches, an empty list is returned.
+	 * @param regionID	A long designating the region ID.
+	 * @return			A List containing the measurements matching the given ID; if there are no matches, an empty list is returned.
 	 */
 	public List<Measurement> getAllMeasurementsForRegion(long regionID) {
 		if (! this.measurementsByRegion.containsKey(regionID)) {return new java.util.ArrayList<Measurement>();}
