@@ -49,227 +49,238 @@ public class DataSummary {
 
 
 
-    /**
-     * Creates a summary of output files created by the analysis program.
-     *
-     * @param directory     The full path to the directory containing the output files to be summarized.
-     * @param parameterDirectory       The directory that stores the parameters for the analysis.
-     * @throws java.io.IOException      If any problems reading the analysis output files or writing the summary to disk are encountered.
-     */
-    public static void SummarizeData(String directory, String parameterDirectory) throws java.io.IOException {
+	/**
+	 * Creates a summary of output files created by the analysis program.
+	 *
+	 * @param directory     The full path to the directory containing the output files to be summarized.
+	 * @param parameterDirectory       The directory that stores the parameters for the analysis.
+	 * @throws java.io.IOException      If any problems reading the analysis output files or writing the summary to disk are encountered.
+	 */
+	public static void SummarizeData(String directory, String parameterDirectory) throws java.io.IOException {
 
 
-        final String outputFileExtension = ".out.txt";
+		final String outputFileExtension = ".out.txt";
 
-        File dir = new File(directory);
-        
-        File serialDir = new File(directory + File.separator + AnalysisController.SERIALIZED_DATA_SUFFIX);
+		File dir = new File(directory);
 
-        if (! dir.exists() || ! serialDir.exists()) {
-        	
-        	return;
-        }
+		File serialDir = new File(directory + File.separator + AnalysisController.SERIALIZED_DATA_SUFFIX);
 
-        File outputFile = new File(directory + File.separator + "summary.txt");
+		if (! dir.exists() || ! serialDir.exists()) {
 
+			return;
+		}
 
-        PrintWriter output = new PrintWriter(new FileOutputStream(outputFile));
-
-        for (File f : serialDir.listFiles()) {
+		File outputFile = new File(directory + File.separator + "summary.txt");
 
 
-        	ParameterDictionary params = null;
-        	
+		PrintWriter output = new PrintWriter(new FileOutputStream(outputFile));
 
-            if (! f.getName().matches(".*" + outputFileExtension)) {continue;}
-
-            File parameterFile = new File(parameterDirectory + File.separator + f.getName().replace(outputFileExtension, AnalysisController.PARAMETER_EXTENSION));
-
-            params = ParameterDictionary.readParametersFromFile(parameterFile.getAbsolutePath());
-
-            ObjectInputStream o = new ObjectInputStream(new FileInputStream(f));
-            
-            Quantification q = null;
-            
-            try {
-            	q = (Quantification) o.readObject();
-            } catch (ClassNotFoundException e) {
-            	q = null;
-            }
-            
-            o.close();
-            
-            if (q == null) {continue;}
-            
-            Map<Long, Map<String, List<Measurement> > > intensityMeasurementsByGroup = new java.util.HashMap<Long, Map<String, List<Measurement> > >();
-            
-            Map<Long, Map<String, List<Measurement> > > backgroundMeasurementsByGroup = new java.util.HashMap<Long, Map<String, List<Measurement> > >();
-            
-            Map<Long, Map<String, List<Measurement> > > sizeMeasurementsByGroup = new java.util.HashMap<Long, Map<String, List<Measurement> > >();
-            
-            Map<Long, Long> groupLookup = new java.util.HashMap<Long, Long>();
-            
-            String imageID = null;
-            
-            if (q.getAllMeasurementsForType(Measurement.TYPE_GROUPING) == null || q.getAllMeasurementsForType(Measurement.TYPE_GROUPING).size() == 0) {
-            	for (Measurement m : q.getAllMeasurements()) {
-            		groupLookup.put(m.getFeatureID(), m.getFeatureID());
-                	if (imageID == null) {imageID = m.getImageID();}
-            	}
-            } else {
-            
-	            for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_GROUPING)) {
-	            	groupLookup.put(m.getFeatureID(), (long) m.getMeasurement());
-	            	if (imageID == null) {imageID = m.getImageID();}
-	            }
-            }
-            
-            if (imageID == null) {
-            	imageID = f.getName();
-            }
-            
-            for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_INTENSITY)) {
-            	
-            	long groupID = m.getFeatureID();
-            	if (groupLookup.containsKey(groupID)) {groupID = groupLookup.get(m.getFeatureID());}
-            	
-            	if (! intensityMeasurementsByGroup.containsKey(groupID)) {
-            		intensityMeasurementsByGroup.put(groupID, new java.util.HashMap<String, List<Measurement> >());
-            	}
-            	
-            	Map<String, List<Measurement> > currGroup = intensityMeasurementsByGroup.get(groupID);
-            	
-            	String name = m.getMeasurementName();
-            	
-            	if (! currGroup.containsKey(name) ) {
-            		currGroup.put(name, new java.util.ArrayList<Measurement>());
-            	}
-            	
-            	currGroup.get(name).add(m);
-            	
-            }
-            
-            for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_BACKGROUND)) {
-            	
-            	long groupID = m.getFeatureID();
-            	if (groupLookup.containsKey(groupID)) {groupID = groupLookup.get(m.getFeatureID());}
-            	
-            	if (! backgroundMeasurementsByGroup.containsKey(groupID)) {
-            		backgroundMeasurementsByGroup.put(groupID, new java.util.HashMap<String, List<Measurement> >());
-            	}
-            	
-            	Map<String, List<Measurement> > currGroup = backgroundMeasurementsByGroup.get(groupID);
-            	
-            	String name = m.getMeasurementName();
-            	
-            	if (! currGroup.containsKey(name) ) {
-            		currGroup.put(name, new java.util.ArrayList<Measurement>());
-            	}
-            	
-            	currGroup.get(name).add(m);
-            	
-            }
-            
-            for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_SIZE)) {
-            	
-            	long groupID = m.getFeatureID();
-            	if (groupLookup.containsKey(groupID)) {groupID = groupLookup.get(m.getFeatureID());}
-            	
-            	if (! sizeMeasurementsByGroup.containsKey(groupID)) {
-            		sizeMeasurementsByGroup.put(groupID, new java.util.HashMap<String, List<Measurement> >());
-            	}
-            	
-            	Map<String, List<Measurement> > currGroup = sizeMeasurementsByGroup.get(groupID);
-            	
-            	String name = m.getMeasurementName();
-            	
-            	if (! currGroup.containsKey(name) ) {
-            		currGroup.put(name, new java.util.ArrayList<Measurement>());
-            	}
-            	
-            	currGroup.get(name).add(m);
-            	
-            }
-            
-            Quantification groupQuant = new Quantification();
-            
-            for (Long group : intensityMeasurementsByGroup.keySet()) {
-            	
-            	int count = 0;
-            	boolean counted = false;
-            	
-            	for (String name : intensityMeasurementsByGroup.get(group).keySet()) {
-            	
-            		Measurement m = new Measurement(true, group, 0.0, name, Measurement.TYPE_INTENSITY, imageID);
-            		            		
-            		for (Measurement individual : intensityMeasurementsByGroup.get(group).get(name)) {
-            			
-            			m.setMeasurement(m.getMeasurement() + individual.getMeasurement());
-            			if (!counted) {count++;}
-            		}
-            		
-            		m.setMeasurement(m.getMeasurement() / count);
-            		
-            		counted = true;
-            		
-                	groupQuant.addMeasurement(m);
-
-            	}
-            	
-            	for (String name : backgroundMeasurementsByGroup.get(group).keySet()) {
-                	
-            		Measurement m = new Measurement(true, group, 0.0, name, Measurement.TYPE_BACKGROUND, imageID);
-            		            		
-            		for (Measurement individual : backgroundMeasurementsByGroup.get(group).get(name)) {
-            			
-            			m.setMeasurement(m.getMeasurement() + individual.getMeasurement());
-            			if (!counted) {count++;}
-            		}
-            		
-            		m.setMeasurement(m.getMeasurement() / count);
-            		
-            		counted = true;
-            		
-                	groupQuant.addMeasurement(m);
-
-            	}
-            	
-            	for (String name : sizeMeasurementsByGroup.get(group).keySet()) {
-                	
-            		Measurement m = new Measurement(true, group, 0.0, name, Measurement.TYPE_SIZE, imageID);
-            		            		
-            		for (Measurement individual : sizeMeasurementsByGroup.get(group).get(name)) {
-            			
-            			m.setMeasurement(m.getMeasurement() + individual.getMeasurement());
-            			if (!counted) {count++;}
-            		}
-            		
-            		m.setMeasurement(m.getMeasurement() / count);
-            		
-            		counted = true;
-            		
-                	groupQuant.addMeasurement(m);
-
-            	}
-            	
-            	groupQuant.addMeasurement(new Measurement(true, group, count, "region_count", Measurement.TYPE_SIZE, imageID));
-            	
-            }
-
-            String data = LocalAnalysis.generateDataOutputString(groupQuant, params);
-            
-            output.println(imageID);
-            
-            output.println(data);
-            
-        }
-            
- 
-
-        output.close();
+		for (File f : serialDir.listFiles()) {
 
 
-    }
+			ParameterDictionary params = null;
+
+
+			if (! f.getName().matches(".*" + outputFileExtension)) {continue;}
+
+			File parameterFile = new File(parameterDirectory + File.separator + f.getName().replace(outputFileExtension, AnalysisController.PARAMETER_EXTENSION));
+
+			params = ParameterDictionary.readParametersFromFile(parameterFile.getAbsolutePath());
+
+			ObjectInputStream o = new ObjectInputStream(new FileInputStream(f));
+
+			Quantification q = null;
+
+			try {
+				q = (Quantification) o.readObject();
+			} catch (ClassNotFoundException e) {
+				q = null;
+			}
+
+			o.close();
+
+			if (q == null) {continue;}
+
+			Map<Long, Map<String, List<Measurement> > > intensityMeasurementsByGroup = new java.util.HashMap<Long, Map<String, List<Measurement> > >();
+
+			Map<Long, Map<String, List<Measurement> > > backgroundMeasurementsByGroup = new java.util.HashMap<Long, Map<String, List<Measurement> > >();
+
+			Map<Long, Map<String, List<Measurement> > > sizeMeasurementsByGroup = new java.util.HashMap<Long, Map<String, List<Measurement> > >();
+
+			Map<Long, Long> groupLookup = new java.util.HashMap<Long, Long>();
+
+			String imageID = null;
+
+			if (q.getAllMeasurementsForType(Measurement.TYPE_GROUPING) == null || q.getAllMeasurementsForType(Measurement.TYPE_GROUPING).size() == 0) {
+				for (Measurement m : q.getAllMeasurements()) {
+					groupLookup.put(m.getFeatureID(), m.getFeatureID());
+					if (imageID == null) {imageID = m.getImageID();}
+				}
+			} else {
+
+				for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_GROUPING)) {
+					groupLookup.put(m.getFeatureID(), (long) m.getMeasurement());
+					if (imageID == null) {imageID = m.getImageID();}
+				}
+			}
+
+			if (imageID == null) {
+				imageID = f.getName();
+			}
+
+			for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_INTENSITY)) {
+
+				long groupID = m.getFeatureID();
+				if (groupLookup.containsKey(groupID)) {groupID = groupLookup.get(m.getFeatureID());}
+
+				if (! intensityMeasurementsByGroup.containsKey(groupID)) {
+					intensityMeasurementsByGroup.put(groupID, new java.util.HashMap<String, List<Measurement> >());
+				}
+
+				Map<String, List<Measurement> > currGroup = intensityMeasurementsByGroup.get(groupID);
+
+				String name = m.getMeasurementName();
+
+				if (! currGroup.containsKey(name) ) {
+					currGroup.put(name, new java.util.ArrayList<Measurement>());
+				}
+
+				currGroup.get(name).add(m);
+
+			}
+
+			for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_BACKGROUND)) {
+
+				long groupID = m.getFeatureID();
+				if (groupLookup.containsKey(groupID)) {groupID = groupLookup.get(m.getFeatureID());}
+
+				if (! backgroundMeasurementsByGroup.containsKey(groupID)) {
+					backgroundMeasurementsByGroup.put(groupID, new java.util.HashMap<String, List<Measurement> >());
+				}
+
+				Map<String, List<Measurement> > currGroup = backgroundMeasurementsByGroup.get(groupID);
+
+				String name = m.getMeasurementName();
+
+				if (! currGroup.containsKey(name) ) {
+					currGroup.put(name, new java.util.ArrayList<Measurement>());
+				}
+
+				currGroup.get(name).add(m);
+
+			}
+
+			for (Measurement m : q.getAllMeasurementsForType(Measurement.TYPE_SIZE)) {
+
+				long groupID = m.getFeatureID();
+				if (groupLookup.containsKey(groupID)) {groupID = groupLookup.get(m.getFeatureID());}
+
+				if (! sizeMeasurementsByGroup.containsKey(groupID)) {
+					sizeMeasurementsByGroup.put(groupID, new java.util.HashMap<String, List<Measurement> >());
+				}
+
+				Map<String, List<Measurement> > currGroup = sizeMeasurementsByGroup.get(groupID);
+
+				String name = m.getMeasurementName();
+
+				if (! currGroup.containsKey(name) ) {
+					currGroup.put(name, new java.util.ArrayList<Measurement>());
+				}
+
+				currGroup.get(name).add(m);
+
+			}
+
+			Quantification groupQuant = new Quantification();
+
+			for (Long group : intensityMeasurementsByGroup.keySet()) {
+
+				int count = 0;
+				boolean counted = false;
+
+				if (intensityMeasurementsByGroup.get(group) != null) {
+
+					for (String name : intensityMeasurementsByGroup.get(group).keySet()) {
+
+						Measurement m = new Measurement(true, group, 0.0, name, Measurement.TYPE_INTENSITY, imageID);
+
+						for (Measurement individual : intensityMeasurementsByGroup.get(group).get(name)) {
+
+							m.setMeasurement(m.getMeasurement() + individual.getMeasurement());
+							if (!counted) {count++;}
+						}
+
+						m.setMeasurement(m.getMeasurement() / count);
+
+						counted = true;
+
+						groupQuant.addMeasurement(m);
+
+					}
+
+				}
+
+				if (backgroundMeasurementsByGroup.get(group) != null) {
+
+					for (String name : backgroundMeasurementsByGroup.get(group).keySet()) {
+
+						Measurement m = new Measurement(true, group, 0.0, name, Measurement.TYPE_BACKGROUND, imageID);
+
+						for (Measurement individual : backgroundMeasurementsByGroup.get(group).get(name)) {
+
+							m.setMeasurement(m.getMeasurement() + individual.getMeasurement());
+							if (!counted) {count++;}
+						}
+
+						m.setMeasurement(m.getMeasurement() / count);
+
+						counted = true;
+
+						groupQuant.addMeasurement(m);
+
+					}
+				}
+
+				if (sizeMeasurementsByGroup.get(group) != null) {
+
+					for (String name : sizeMeasurementsByGroup.get(group).keySet()) {
+
+						Measurement m = new Measurement(true, group, 0.0, name, Measurement.TYPE_SIZE, imageID);
+
+						for (Measurement individual : sizeMeasurementsByGroup.get(group).get(name)) {
+
+							m.setMeasurement(m.getMeasurement() + individual.getMeasurement());
+							if (!counted) {count++;}
+						}
+
+						m.setMeasurement(m.getMeasurement() / count);
+
+						counted = true;
+
+						groupQuant.addMeasurement(m);
+
+					}
+
+				}
+
+				groupQuant.addMeasurement(new Measurement(true, group, count, "region_count", Measurement.TYPE_SIZE, imageID));
+
+			}
+
+			String data = LocalAnalysis.generateDataOutputString(groupQuant, params);
+
+			output.println(imageID);
+
+			output.println(data);
+
+		}
+
+
+
+		output.close();
+
+
+	}
 
 
 
