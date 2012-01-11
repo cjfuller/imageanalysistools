@@ -53,8 +53,14 @@ public class Quantification implements Serializable {
 		measurementsByName = new java.util.HashMap<String, List<Measurement> >();
 		measurementsByType = new java.util.HashMap<String, List<Measurement> >();
 		measurementsByRegion = new java.util.HashMap<Long, List<Measurement> >();
+		globalMeasurements = new java.util.ArrayList<Measurement>();
 	}
 	
+	/**
+	 * Adds a measurement to the Quantification.
+	 * 
+	 * @param m		The measurement to add.
+	 */
 	public void addMeasurement(Measurement m) {
 		measurements.add(m);
 		String name = m.getMeasurementName();
@@ -86,35 +92,70 @@ public class Quantification implements Serializable {
 		
 	}
 	
+	/**
+	 * Adds all the measurements present in another quantification.
+	 * 
+	 * @param q		The Quantification whose measurements will be added.
+	 */
 	public void addAllMeasurements(Quantification q) {
 		for (Measurement m : q.measurements) {
 			this.addMeasurement(m);
 		}
 	}
 	
+	/**
+	 * Get all the measurements comprising the Quantification.
+	 * @return	a List of Measurements in the Quantification.
+	 */
 	public List<Measurement> getAllMeasurements() {
 		return this.measurements;
 	}
 	
+	/**
+	 * Gets all the measurements whose name matches the provided name.
+	 * @param name	A String containing the name of the measurements.  This must be exactly the name used to create the measurement.
+	 * @return		A List containing the measurements matching the given name; if there are no matches, an empty list is returned.
+	 */
 	public List<Measurement> getAllMeasurementsForName(String name) {
 		if (! this.measurementsByName.containsKey(name)) {return new java.util.ArrayList<Measurement>();}
 		return this.measurementsByName.get(name);
 	}
 	
+	/**
+	 * Gets all the measurements whose name matches the provided region ID.
+	 * @param name	A long designating the region ID.
+	 * @return		A List containing the measurements matching the given ID; if there are no matches, an empty list is returned.
+	 */
 	public List<Measurement> getAllMeasurementsForRegion(long regionID) {
 		if (! this.measurementsByRegion.containsKey(regionID)) {return new java.util.ArrayList<Measurement>();}
 		return this.measurementsByRegion.get(regionID);
 	}
 	
+	/**
+	 * Gets the region IDs of all the regions that have associated measurements in the Quantification.
+	 * @return	A Set containing the region IDs.
+	 */
 	public java.util.Set<Long> getAllRegions() {
 		return this.measurementsByRegion.keySet();
 	}
 	
+	/**
+	 * Gets all the measurements in the Quantification matching the specified type.  The type should likely be one
+	 * of those listed in the constants in {@link Measurement} but can be any String.
+	 * @param type	A String specifying the type of the measurements to return.
+	 * @return		A List containing the measurements matching the given type; if there are no matches, an empty list is returned.
+	 */
 	public List<Measurement> getAllMeasurementsForType(String type) {
 		if (! this.measurementsByType.containsKey(type)) {return new java.util.ArrayList<Measurement>();}
 		return this.measurementsByType.get(type);
 	}
 	
+	/**
+	 * Gets all the global measurements in the Quantification.  (That is, the measurements without
+	 * an associated region.)
+	 * 
+	 * @return	A List containing all the global measurements, or an empty list if there are none.
+	 */
 	public List<Measurement> getAllGlobalMeasurements() {
 		return this.globalMeasurements;
 	}
