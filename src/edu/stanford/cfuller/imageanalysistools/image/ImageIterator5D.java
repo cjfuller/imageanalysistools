@@ -56,7 +56,7 @@ public class ImageIterator5D extends ImageIterator {
 				
 		this.toIterate = im;
 		
-		this.currCoord = ImageCoordinate.createCoordXYZCT(-1,0,0,0,0);
+		this.currCoord = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 		
 		this.isBoxedIterator = im.getIsBoxed();
 		
@@ -64,7 +64,7 @@ public class ImageIterator5D extends ImageIterator {
 			
 			ImageCoordinate boxMin = im.getBoxMin();
 			
-			curr_x = boxMin.get(ImageCoordinate.X)-1;
+			curr_x = boxMin.get(ImageCoordinate.X);
 			curr_y = boxMin.get(ImageCoordinate.Y);
 			curr_z = boxMin.get(ImageCoordinate.Z);
 			curr_c = boxMin.get(ImageCoordinate.C);
@@ -114,8 +114,9 @@ public class ImageIterator5D extends ImageIterator {
 			curr_t = upper_t;
 		}
 		
+		curr_x--;
 		
-		this.currCoord.setCoordXYZCT(curr_x-1, curr_y, curr_z, curr_c, curr_t);
+		this.currCoord.setCoordXYZCT(curr_x, curr_y, curr_z, curr_c, curr_t);
 				
 	}
 	

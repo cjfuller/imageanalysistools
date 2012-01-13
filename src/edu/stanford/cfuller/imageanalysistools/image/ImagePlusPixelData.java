@@ -250,7 +250,9 @@ public class ImagePlusPixelData extends PixelData {
 			this.imPl.setSliceWithoutUpdate(requestedStackIndex);
 			this.currentStackIndex = requestedStackIndex;
 		}
+
 		return imPl.getProcessor().getf(x,y);
+
 	}
 	
 	/* (non-Javadoc)

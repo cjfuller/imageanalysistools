@@ -275,7 +275,6 @@ public class VariableSizeMeanFilter extends Filter {
 		double count = 0;
 		
 		for (ImageCoordinate ic : im) {
-			
 			l_sum += laplacianFiltered.getValue(ic);
 			sum += im.getValue(ic);
 			count++;
