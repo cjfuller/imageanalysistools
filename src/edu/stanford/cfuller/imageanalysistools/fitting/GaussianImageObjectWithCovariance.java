@@ -34,8 +34,7 @@ import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
 
-import edu.stanford.cfuller.imageanalysistools.fitting.GaussianImageObject.DI1Func;
-import edu.stanford.cfuller.imageanalysistools.fitting.GaussianImageObject.ErrIntFunc;
+
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
@@ -86,7 +85,7 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
         this.fitErrorByChannel = new Vector<Double>();
         this.nPhotonsByChannel = new Vector<Double>();
 
-        GaussianFitter3D gf = new GaussianFitter3D();
+        GaussianFitter3DWithCovariance gf = new GaussianFitter3DWithCovariance();
 
         //System.out.println(this.parent.getDimensionSizes().getZ());
 
@@ -234,8 +233,14 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
             //System.out.println("guess: " + fitParameters);
             
             //do the fit
+            
+            //System.out.println("Initial for object " + this.label + ": " + fitParameters.toString());
 
+            
             fitParameters = gf.fit(this, fitParameters, ppg);
+            
+            //System.out.println("Parameters for object " + this.label + ": " + fitParameters.toString());
+
             
             //System.out.println("fit: " + fitParameters);
 
@@ -256,11 +261,11 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
 
             for (int i =0; i < this.xValues.length; i++) {
 
-                residualSumSquared += Math.pow(GaussianFitter3D.fitResidual(functionValues[i], xValues[i], yValues[i], zValues[i], fitParameters), 2);
+                residualSumSquared += Math.pow(GaussianFitter3DWithCovariance.fitResidual(functionValues[i], xValues[i], yValues[i], zValues[i], fitParameters), 2);
 
                 mean += functionValues[i];
 
-                n_photons += functionValues[i] - fitParameters.getEntry(6);
+                n_photons += functionValues[i] - fitParameters.getEntry(10); // was 6
 
             }
 
@@ -332,11 +337,14 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
             	error = Double.NaN;
             }
             
+            error = 0; // until a better error calculation
+            
             this.fitErrorByChannel.add(error);
             
-            this.positionsByChannel.add(fitParameters.getSubVector(3, 3));
+            this.positionsByChannel.add(fitParameters.getSubVector(7, 3));
             
             this.nPhotonsByChannel.add(n_photons);
+            
             
         }
 

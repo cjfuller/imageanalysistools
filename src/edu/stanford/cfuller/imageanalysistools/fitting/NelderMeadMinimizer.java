@@ -119,6 +119,13 @@ public class NelderMeadMinimizer {
         
         RealVector componentScales = initialPoint.mapMultiply(constantScale);
 
+        //if the initial point has zeros in it, those entries will not be optimized
+        //perturb slightly to allow optimization
+        for (int i = 0; i < componentScales.getDimension(); i++) {
+        	if (componentScales.getEntry(i) == 0.0) {
+        		componentScales.setEntry(i, constantScale);
+        	}
+        }
         
         
         return generateInitialSimplex(initialPoint, componentScales);

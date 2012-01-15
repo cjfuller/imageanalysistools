@@ -68,7 +68,7 @@ public class GaussianFitter3DWithCovariance {
         //System.out.println("for object " + toFit.getLabel() + " in image: " + toFit.getImageID() + " initial guess is: " + initialGuess.toString());
 
 
-        double tol = 1.0e-6;
+        double tol = 1.0e-12;
         NelderMeadMinimizer nmm = new NelderMeadMinimizer(tol);
         
         RealVector result = nmm.optimize(new MLObjectiveFunction(toFit, ppg), initialGuess);
