@@ -152,7 +152,7 @@ public class NelderMeadMinimizer {
 
         RealMatrix currentSimplex = initialSimplex.copy();
 
-        double currTolVal = 1.0e12;
+        double currTolVal = 1.0e6;
         
         RealVector values = new ArrayRealVector(initialSimplex.getRowDimension(), 0.0);
 
@@ -278,8 +278,8 @@ public class NelderMeadMinimizer {
 
             shouldEvaluate = true;
             
-            if (iterCounter++ > 1000) {
-        		System.out.println("tol: " + currTolVal + "  minValue: " + minValue);
+            if (iterCounter++ > 100000) {
+        		System.out.println("stalled?  tol: " + currTolVal + "  minValue: " + minValue);
         	}
 
         }
