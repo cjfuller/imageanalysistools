@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (c) 2011 Colin J. Fuller
+ * Copyright (c) 2012 Colin J. Fuller
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,18 +22,33 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.filter;
+package edu.stanford.cfuller.imageanalysistools.filter.morph;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 
 /**
- * Not yet implemented.
+ * A Filter implementing the operation of binary morphological opening in an arbitrary (i.e. up to 5) number of dimensions.
+ * <p>
+ * This filter does not take a reference image.
+ * <p>
+ * The argument to the apply method should be the image to be processed.  This should have foreground pixels labeled > 0 and
+ * background pixels labeled <= 0.  After processing, all foreground pixels will be set to 1 and all background pixels to 0.
+ * 
+ * @author Colin J. Fuller
  */
-public class DilationFilter extends Filter {
+public class OpeningFilter extends MorphologicalFilter {
 
+	/* (non-Javadoc)
+	 * @see edu.stanford.cfuller.imageanalysistools.filter.morph.MorphologicalFilter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
+	 */
 	@Override
 	public void apply(Image im) {
-		// TODO Auto-generated method stub
+		DilationFilter df = new DilationFilter(this);
+		ErosionFilter ef = new ErosionFilter(this);
+
+		ef.apply(im);
+		df.apply(im);
+
 
 	}
 

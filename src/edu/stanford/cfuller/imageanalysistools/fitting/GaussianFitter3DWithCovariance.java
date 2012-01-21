@@ -132,7 +132,6 @@ public class GaussianFitter3DWithCovariance {
     
     private class MLObjectiveFunction implements ObjectiveFunction, MultivariateRealFunction {
 
-
         private ImageObject toFit;
         private double ppg;
         public MLObjectiveFunction(ImageObject toFit, double ppg) {
