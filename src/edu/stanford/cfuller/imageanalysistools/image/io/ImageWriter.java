@@ -66,8 +66,9 @@ public class ImageWriter {
      * @throws java.io.IOException  if there is an exception while opening or writing the file.
      */
 	public void write(String filename, PixelData imagePixels) throws java.io.IOException {
+		
 		loci.formats.IFormatWriter writer = new loci.formats.ImageWriter();
-		//the pixel data object may change the underlying dimension order and pixel format, so we should check to see if this happened and update accordingly
+
 		try {
 			toWrite.getMetadata().setPixelsDimensionOrder(ome.xml.model.enums.DimensionOrder.fromString(imagePixels.getDimensionOrder().toUpperCase()), 0);
 			toWrite.getMetadata().setPixelsType(ome.xml.model.enums.PixelType.fromString(loci.formats.FormatTools.getPixelTypeString(imagePixels.getDataType())), 0);
@@ -75,7 +76,6 @@ public class ImageWriter {
 		} catch (EnumerationException e) {
 			LoggingUtilities.getLogger().severe("Exception while trying to update dimension order of pixel data: " + e.getMessage());
 		}
-
 	
 		writer.setMetadataRetrieve(toWrite.getMetadata());
 		//the next line is a hack... when writing the same image multiple times, there seems to be some sort of issue with 

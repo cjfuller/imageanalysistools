@@ -43,6 +43,8 @@ public class ImagePlusPixelData extends PixelData {
 
 	private ImagePlus imPl;
 	
+	private static final String imagePlusDimensionOrder = "XYCZT";
+	
 	int currentStackIndex;
 	
 	protected void init(int size_x, int size_y, int size_z, int size_c, int size_t, String dimensionOrder) {
@@ -148,7 +150,7 @@ public class ImagePlusPixelData extends PixelData {
 		
 		//ic.convertToGray32();
 		
-		this.init(imPl.getWidth(), imPl.getHeight(), imPl.getNSlices(), imPl.getNChannels(), imPl.getNFrames(), "XYCZT");
+		this.init(imPl.getWidth(), imPl.getHeight(), imPl.getNSlices(), imPl.getNChannels(), imPl.getNFrames(), imagePlusDimensionOrder);
 		
 		this.dataType = loci.formats.FormatTools.FLOAT;
 		
@@ -288,4 +290,12 @@ public class ImagePlusPixelData extends PixelData {
 	public ImagePlus toImagePlus() {
 		return this.imPl;
 	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#getDimensionOrder()
+	 */
+	public String getDimensionOrder() {
+		return imagePlusDimensionOrder;
+	}
+	
 }
