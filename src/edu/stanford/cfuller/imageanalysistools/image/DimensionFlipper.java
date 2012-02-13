@@ -25,8 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.image;
 
 /**
- * A Class that implements methods to flip the Z- and T- dimensions of an Image (these can get swapped, e.g. while reading
- * metamorph stacks).
+ * A Class that swaps two dimensions of an Image. 
  * 
  * @author Colin J. Fuller
  * 
@@ -34,25 +33,44 @@ package edu.stanford.cfuller.imageanalysistools.image;
 public class DimensionFlipper {
 
 
-    public static Image flipZT(Image flipped) {
+	/**
+	 * Swaps the Z- and T- dimensions of an Image (these can get mixed up, e.g. while reading certain
+	 * metamorph stacks).
+	 * @param toFlip	The Image whose dimensions will be swapped.  (This will not be modified.)
+	 * @return			A new Image whose dimensions are swapped from the input.
+	 */
+    public static Image flipZT(Image toFlip) {
+    	return flip(toFlip, ImageCoordinate.Z, ImageCoordinate.T);
+    }
+    
+    
+    /**
+     * Swaps two dimensions in an Image.
+     * 
+     * @param toFlip	The Image whose dimensions will be swapped.  (This will not be modified.)
+     * @param dim0		The first dimension to swap.  This should correspond to one of the constants defined in ImageCoordinate (or rarely, a user-defined dimension).
+     * @param dim1		The second dimension to swap.  This should correspond to one of the constants defined in ImageCoordinate (or rarely, a user-defined dimension).
+     * @return			A new Image whose dimensions are swapped from the input.
+     */
+    public static Image flip(Image toFlip, int dim0, int dim1) {
+    	    	
+        ImageCoordinate sizes = ImageCoordinate.cloneCoord(toFlip.getDimensionSizes());
+
+        int temp_1 = sizes.get(dim1);
         
-        ImageCoordinate sizes = ImageCoordinate.cloneCoord(flipped.getDimensionSizes());
-
-
-        int temp_t = sizes.get(ImageCoordinate.T);
-        sizes.set(ImageCoordinate.T,sizes.get(ImageCoordinate.Z));
-        sizes.set(ImageCoordinate.Z,temp_t);
+        sizes.set(dim1,sizes.get(dim0));
+        sizes.set(dim0, temp_1);
 
         Image newImage = new Image(sizes, 0.0f);
 
         ImageCoordinate flipCoord = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 
-        for (ImageCoordinate ic : flipped) {
+        for (ImageCoordinate ic : toFlip) {
             flipCoord.setCoord(ic);
-            flipCoord.set(ImageCoordinate.Z,ic.get(ImageCoordinate.T));
-            flipCoord.set(ImageCoordinate.T,ic.get(ImageCoordinate.Z));
+            flipCoord.set(dim0,ic.get(dim1));
+            flipCoord.set(dim1,ic.get(dim0));
 
-            newImage.setValue(flipCoord, flipped.getValue(ic));
+            newImage.setValue(flipCoord, toFlip.getValue(ic));
         }
 
         flipCoord.recycle();
@@ -61,6 +79,7 @@ public class DimensionFlipper {
         return newImage;
 
     }
+    
 
 
 }
