@@ -281,6 +281,9 @@ public class GaussianImageObject extends ImageObject {
             double alpha=  p.getDoubleValueForKey("z_sectionsize_nm");
             double sa_x = s_xy + Math.pow(a,2)/12;
             double sa_z = s_z + Math.pow(alpha, 2)/12;
+            
+            //System.out.printf("b = %f, a = %f, alpha = %f, s_xy = %f, s_z = %f, n= %f\n", b, a, alpha, s_xy, s_z, n_photons);
+            
             double error_x = sa_x/n_photons * (16.0/9.0 + 8*Math.PI*sa_x*b*b/(n_photons*Math.pow(p.getDoubleValueForKey("pixelsize_nm"), 2)));
             double error_z = sa_z/n_photons * (16.0/9.0 + 8*Math.PI*sa_z*b*b/(n_photons*Math.pow(p.getDoubleValueForKey("z_sectionsize_nm"), 2)));
             
