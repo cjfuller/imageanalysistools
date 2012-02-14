@@ -311,23 +311,23 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
             double size = 10*Math.sqrt(sa_z);
             
             double intpart = 0;
-            try {
-            	
-            	if (b < 0) throw new ConvergenceException(new DummyLocalizable("negative background!")); // a negative value for b seems to cause the integration to hang, preventing the program from progressing
-            	
-            	intpart = lgi.integrate(10000, eif, -size, size);
-            	
-            	double fullIntPart = intpart + Math.pow(2*Math.PI, 1.5)*sa_x*A/Math.sqrt(sa_z);
-            	
-            	error_x = Math.sqrt(2/(n_photons*sa_z/(2*sa_z + sa_x)*fullIntPart));
-            	error_z = Math.sqrt(2/(n_photons*sa_x/(2*sa_z + sa_x)*fullIntPart));
-            	
-            } catch (ConvergenceException e) {
-            	LoggingUtilities.getLogger().severe("Integration error: " + e.getMessage());
-            	error_x = -1;
-            	error_z = -1;
-            }
-            
+//            try {
+//            	
+//            	if (b < 0) throw new ConvergenceException(new DummyLocalizable("negative background!")); // a negative value for b seems to cause the integration to hang, preventing the program from progressing
+//            	
+//            	intpart = lgi.integrate(10000, eif, -size, size);
+//            	
+//            	double fullIntPart = intpart + Math.pow(2*Math.PI, 1.5)*sa_x*A/Math.sqrt(sa_z);
+//            	
+//            	error_x = Math.sqrt(2/(n_photons*sa_z/(2*sa_z + sa_x)*fullIntPart));
+//            	error_z = Math.sqrt(2/(n_photons*sa_x/(2*sa_z + sa_x)*fullIntPart));
+//            	
+//            } catch (ConvergenceException e) {
+//            	LoggingUtilities.getLogger().severe("Integration error: " + e.getMessage());
+//            	error_x = -1;
+//            	error_z = -1;
+//            }
+//            
 
             if (error_x > 0 && error_z > 0) {
             
