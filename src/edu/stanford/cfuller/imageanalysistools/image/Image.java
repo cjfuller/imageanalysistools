@@ -442,7 +442,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 	public ImageCoordinate getDimensionSizes(){return this.dimensionSizes;}
 
 	/**
-	 * Convenience method for converting a single Image with non-singleton specified dimension into a List of Images with
+	 * Method for converting a single Image with non-singleton specified dimension into a List of Images with
 	 * singleton specified dimension, each containing the Image for a single point along that dimension.
 	 * <p>
 	 * Images will be returned in the List in the order of their dimension index in the original Image.

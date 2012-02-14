@@ -25,17 +25,47 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
- * Not yet implemented.
+ * This class is a Filter that removes regions in one mask that do not overlap with regions in a second mask.
+ * <p>
+ * The reference image for this filter should be set to the mask that will not be modified.
+ * <p>
+ * The argument to the apply method
+ * should be the mask that will be modified.  Any regions in the Image argument to the apply method that do not overlap with regions in the reference image
+ * will be removed from this Image.
+ *
+ * @author Colin J. Fuller
+ *
  */
-
 public class SeedFilter extends Filter {
 
+	/**
+     * Applies the filter, keeping only the regions from the supplied Image argument that overlap with regions in the reference Image.
+     * @param im    The Image to process; regions will be removed from this Image that have no overlap with regions in the reference Image.
+     */
 	@Override
 	public void apply(Image im) {
-		// TODO Auto-generated method stub
-
+		java.util.HashSet<Integer> hasSeedSet = new java.util.HashSet<Integer>();
+				
+		for (ImageCoordinate i : im) {
+			int currValue = (int) im.getValue(i);
+			int seedValue = (int) this.referenceImage.getValue(i);
+			
+			if (seedValue > 0) {
+				hasSeedSet.add(currValue);
+			}
+		}
+		
+		for (ImageCoordinate i : im) {
+			int currValue = (int) im.getValue(i);
+				
+			if (!hasSeedSet.contains(currValue)) {
+				im.setValue(i,0);
+			}
+		}
+		
 	}
 
 }

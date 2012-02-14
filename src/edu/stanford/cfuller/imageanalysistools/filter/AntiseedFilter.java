@@ -46,7 +46,7 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 public class AntiseedFilter extends Filter {
 
     /**
-     * Applies the filter, removing any regions from the supplies Image argument that overlap with regions in the reference Image.
+     * Applies the filter, removing any regions from the supplied Image argument that overlap with regions in the reference Image.
      * @param im    The Image to process; regions will be removed from this Image that have any overlap with regions in the reference Image.
      */
 	@Override
@@ -65,7 +65,7 @@ public class AntiseedFilter extends Filter {
 		for (ImageCoordinate i : im) {
 			int currValue = (int) im.getValue(i);
 				
-			if (!hasSeedSet.contains(currValue)) {
+			if (hasSeedSet.contains(currValue)) {
 				im.setValue(i,0);
 			}
 		}

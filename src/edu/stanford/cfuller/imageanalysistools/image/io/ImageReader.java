@@ -35,7 +35,7 @@ import java.util.Hashtable;
 /**
  * This class reads an Image from a file on disk.
  * <p>
- * Uses the LOCI bio-formats library to do the reading (http://http://www.loci.wisc.edu/software/bio-formats), so
+ * Uses the LOCI bio-formats library to do the reading (http://www.loci.wisc.edu/software/bio-formats), so
  * all formats supported by that library are supported in this reader.
  * <p>
  * For image formats that support multiple series per file (that is, multiple (X,Y,Z,C,T) 5D images per file), the reader
