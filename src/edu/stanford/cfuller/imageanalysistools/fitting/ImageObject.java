@@ -107,6 +107,7 @@ public abstract class ImageObject implements Serializable {
 	String imageID;
 
 	boolean hadFittingError;
+	boolean correctionSuccessful;
 
 
 	/**
@@ -128,6 +129,7 @@ public abstract class ImageObject implements Serializable {
 		this.vectorDifferencesBetweenChannels = new Hashtable<Integer, RealVector>();
 		this.scalarDifferencesBetweenChannels = new Hashtable<Integer, Double>();
 		this.numberOfChannels = 0;
+		this.correctionSuccessful = false;
 	}
 
 
@@ -440,6 +442,22 @@ public abstract class ImageObject implements Serializable {
 	 */
 	public boolean finishedFitting() {
 		return !this.hadFittingError;
+	}
+	
+	/**
+	 * Gets information on whether this ImageObject had its position corrected successfully.
+	 * @return 	true if the position was corrected successfully, false if it failed or was not corrected at all.
+	 */
+	public boolean getCorrectionSuccessful() {
+		return this.correctionSuccessful;
+	}
+	
+	/**
+	 * Sets whether this ImageObject had its position corrected successfully.
+	 * @param success	Whether the position has been corrected successfully.
+	 */
+	public void setCorrectionSuccessful(boolean success) {
+		this.correctionSuccessful= success;
 	}
 
 	/**

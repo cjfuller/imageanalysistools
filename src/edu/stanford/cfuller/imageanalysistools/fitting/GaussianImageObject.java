@@ -40,7 +40,8 @@ import org.apache.commons.math.optimization.OptimizationException;
 import java.util.Vector;
 
 /**
- * An ImageObject that fits to a three-dimensional gaussian.
+ * An ImageObject that fits to a three-dimensional gaussian that is symmetric in x-y and has no covariance
+ * between any of the dimensions.
  * 
  * @author Colin J. Fuller
  */

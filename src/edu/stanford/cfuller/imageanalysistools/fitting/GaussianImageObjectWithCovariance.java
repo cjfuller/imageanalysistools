@@ -29,19 +29,20 @@ import java.util.Vector;
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
 import org.apache.commons.math.analysis.integration.LegendreGaussIntegrator;
-import org.apache.commons.math.exception.util.DummyLocalizable;
 import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
 
 
-import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 
 /**
- * @author cfuller
+ * An ImageObject that fits to a three-dimensional Gaussian.  Unlike GaussianImageObject, this 
+ * ImageObject can handle non-xy-symmetric Gaussians as well as Gaussians with covariance. 
+ * 
+ * @author Colin J. Fuller
  *
  */
 public class GaussianImageObjectWithCovariance extends ImageObject {
@@ -304,13 +305,13 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
             
             eif.setParams(b, n_photons, A, sa_z, sa_x, a, alpha);
             
-            LegendreGaussIntegrator lgi = new LegendreGaussIntegrator(5, 10, 1000);
+            //LegendreGaussIntegrator lgi = new LegendreGaussIntegrator(5, 10, 1000);
             
             //integrate over 10*width of PSF in z 
             
-            double size = 10*Math.sqrt(sa_z);
+            //double size = 10*Math.sqrt(sa_z);
             
-            double intpart = 0;
+            //double intpart = 0;
 //            try {
 //            	
 //            	if (b < 0) throw new ConvergenceException(new DummyLocalizable("negative background!")); // a negative value for b seems to cause the integration to hang, preventing the program from progressing
