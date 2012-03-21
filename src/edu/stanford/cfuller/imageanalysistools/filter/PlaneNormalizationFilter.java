@@ -43,7 +43,7 @@ public class PlaneNormalizationFilter extends Filter {
 	 */
 	@Override
 	public void apply(Image im) {
-				
+								
 		float origMin = Float.MAX_VALUE;
 		float origMax = -1.0f*Float.MAX_VALUE;
 		

@@ -1,3 +1,4 @@
+edu.stanford.cfuller.analysistoolsinterface
 edu.stanford.cfuller.imageanalysistools.clustering
 edu.stanford.cfuller.imageanalysistools.filter
 edu.stanford.cfuller.imageanalysistools.filter.morph

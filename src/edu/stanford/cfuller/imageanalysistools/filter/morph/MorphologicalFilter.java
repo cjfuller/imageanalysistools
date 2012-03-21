@@ -51,7 +51,7 @@ public abstract class MorphologicalFilter extends Filter {
 	/**
 	 * Constructs a new MorphologicalFilter, copying the structuring element and settings from another
 	 * MorphologicalFilter.
-	 * @param mf		The MorphologicalFilter whose settings will be copied.
+	 * @param copySettings		The MorphologicalFilter whose settings will be copied.
 	 */
 	public MorphologicalFilter(MorphologicalFilter copySettings) {
 		this.strel = copySettings.strel;

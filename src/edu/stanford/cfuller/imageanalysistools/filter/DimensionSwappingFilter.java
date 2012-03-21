@@ -32,7 +32,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
  * <p>
  * The two dimensions to be swapped can be specified using the {@link #setDimensionsToSwap(int, int)} method,
  * or by setting the parameters first_dimension_to_swap and second_dimension_to_swap as integer parameters.  In either case,
- * the dimensions to be swapped should be specified according to the dimension constants in {@link ImageCoordinate}.  Specifying
+ * the dimensions to be swapped should be specified according to the dimension constants in {@link edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate}.  Specifying
  * the dimensions in the parameter file will override the setting using {@link #setDimensionsToSwap}.
  * <p>
  * The argument to the apply method should be the Image whose dimensions will be swapped.
@@ -70,12 +70,16 @@ public class DimensionSwappingFilter extends Filter {
 		Image out = DimensionFlipper.flip(im, this.dim0, this.dim1);
 		
 		im.copy(out);
+		
+		/*
+			TODO the copy method does not work correctly when the dimensions flipped have different sizes; figure out a way to resize the image.
+		*/
 
 	}
 	
 	/**
 	 * Sets the two dimensions to swap in the image.  These should correspond to the 
-	 * dimension constants defined in {@link ImageCoordinate} (or, rarely, to a user-defined dimension).
+	 * dimension constants defined in {@link edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate} (or, rarely, to a user-defined dimension).
 	 * <p>
 	 * These will be overriden if dimensions are specified in the parameter file.
 	 * 

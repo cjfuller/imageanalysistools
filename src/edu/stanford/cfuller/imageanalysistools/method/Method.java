@@ -83,8 +83,8 @@ public abstract class Method implements Runnable {
 			f.apply(toProcess);
             if (Boolean.parseBoolean(parameters.getValueForKey("DEBUG"))) {
     			LoggingUtilities.getLogger().info("completed filter #" + c);
-    			if (this.updater == null) c++;
     			String name = Integer.toString(c);
+    			if (this.updater == null) c++;
     			
     			ij.ImagePlus ip = (new Image(toProcess)).toImagePlus();
     			ip.setTitle(name);

@@ -70,7 +70,7 @@ public class BandpassFilter extends Filter {
     public BandpassFilter() {
         bandLow = 0;
         bandHigh = 0;
-        this.shouldRescale = true;
+        this.shouldRescale = false;
        
     }
     

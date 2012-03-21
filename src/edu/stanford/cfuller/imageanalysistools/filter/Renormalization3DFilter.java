@@ -48,7 +48,7 @@ public class Renormalization3DFilter extends Filter {
 	public void apply(Image im) {
 		
 		PlaneNormalizationFilter pnf = new PlaneNormalizationFilter();
-		
+				
 		pnf.apply(im);
 				
 		Image mean = new Image(im);

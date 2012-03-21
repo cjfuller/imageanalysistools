@@ -29,11 +29,14 @@ import edu.stanford.cfuller.imageanalysistools.filter.BandpassFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
 import edu.stanford.cfuller.imageanalysistools.filter.Label3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.LocalMaximumSeparabilityThresholdingFilter;
+import edu.stanford.cfuller.imageanalysistools.filter.PlaneNormalizationFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RecursiveMaximumSeparability3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
+import edu.stanford.cfuller.imageanalysistools.image.DimensionFlipper;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 
 /**
@@ -87,13 +90,17 @@ public class CentromereFinding3DMethod extends Method {
         
         BandpassFilter bf = new BandpassFilter();
         
-        bf.setBand(band_lower, band_upper);
-        
+        bf.setBand(band_lower, band_upper);		
+		
+		if (this.parameters.hasKeyAndTrue("swap_z_t")) {
+			input = DimensionFlipper.flipZT(input);
+		}
+
         filters.add(bf);
         
-        filters.add(LBE3F);
-        
-        
+        filters.add(LBE3F);   
+        filters.add(LBE3F);        
+     
         
         filters.add(new LocalMaximumSeparabilityThresholdingFilter());
         filters.add(new Label3DFilter());
@@ -107,7 +114,7 @@ public class CentromereFinding3DMethod extends Method {
             i.setReferenceImage(this.images.get(0));
         }
 
-        Image toProcess = new Image(this.images.get(0));
+        Image toProcess = new Image(input);
         
         iterateOnFiltersAndStoreResult(filters, toProcess, metric);
         

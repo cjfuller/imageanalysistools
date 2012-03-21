@@ -24,6 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.image;
 
+import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
+
 /**
  * A Class that swaps two dimensions of an Image. 
  * 
@@ -53,7 +55,7 @@ public class DimensionFlipper {
      * @return			A new Image whose dimensions are swapped from the input.
      */
     public static Image flip(Image toFlip, int dim0, int dim1) {
-    	    	
+	    	    	
         ImageCoordinate sizes = ImageCoordinate.cloneCoord(toFlip.getDimensionSizes());
 
         int temp_1 = sizes.get(dim1);

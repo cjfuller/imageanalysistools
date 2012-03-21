@@ -5,7 +5,9 @@
 	<property name="builddir" value="build"/>
 	<property name="distdir" value="dist"/>
 	<property name="srcdir" value="src"/>
+	<property name="docdir" value="doc"/>
 	<property name="resourcesdir" location="src"/>
+	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
 	
 	<property name="version" value="4.0.8b"/>
 	
@@ -20,6 +22,14 @@
         <mkdir dir="${builddir}"/>
 		<mkdir dir="${distdir}"/>
     </target>
+
+	<target name="doc">
+		<mkdir dir="${docdir}"/>
+		<javadoc sourcepath="${srcdir}" destdir="${docdir}">
+			<classpath refid="ImageAnalysisTools.classpath"/>
+		</javadoc>
+	</target>
+
     <target name="clean">
         <delete dir="${builddir}"/>
 		<delete dir="${distdir}"/>
@@ -41,6 +51,10 @@
 			<fileset dir="${resourcesdir}">
 				<filename name="**/*.xml"/>
 			</fileset>
+			<fileset dir="${srcdir}">
+				<filename name="*.config"/>
+			</fileset>
 		</jar>
+		<copy file="${distdir}/${ant.project.name}_${version}.jar" todir="${ijdir}"/>
 	</target>
 </project>

@@ -40,16 +40,16 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 public class ErosionFilter extends MorphologicalFilter {
 
 	/**
-	 * Constructs a new DilationFilter.
+	 * Constructs a new ErosionFilter, copying the structuring element and settings from another
+	 * MorphologicalFilter.
+	 * @param mf		The MorphologicalFilter whose settings will be copied.
 	 */
 	public ErosionFilter(MorphologicalFilter mf) {
 		super(mf);
 	}
-	
+
 	/**
-	 * Constructs a new ErosionFilter, copying the structuring element and settings from another
-	 * MorphologicalFilter.
-	 * @param mf		The MorphologicalFilter whose settings will be copied.
+	 * Constructs a new ErosionFilter.
 	 */
 	public ErosionFilter() {
 		super();
