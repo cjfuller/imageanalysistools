@@ -67,121 +67,48 @@ public class KernelFilterND extends Filter {
 	@Override
 	public void apply(Image im) {
 
-		
-		ImageCoordinate boxLower = ImageCoordinate.cloneCoord(im.getDimensionSizes());
-		ImageCoordinate boxUpper = ImageCoordinate.cloneCoord(im.getDimensionSizes());
-				
 		for (int i = 0; i < this.dimensionsToFilter.size(); i++) {
 			
 			Image original = new Image(im);
 			
 			Integer dim = this.dimensionsToFilter.get(i);
 			int size = halfDimensionSizes.get(dim);
-		
-			for (ImageCoordinate ic : im) {
-				boxLower.setCoord(ic);
-				for (Integer i2 : boxLower) {
-					boxUpper.set(i2, boxLower.get(i2) + 1);
-				}
-				boxLower.set(dim, boxLower.get(dim)-size);
-				boxUpper.set(dim, boxUpper.get(dim)+size);
 			
-		
-				original.setBoxOfInterest(boxLower, boxUpper);
+			double[] currDimKernel = kernelByDimension.get(dim);
+			
+			for (ImageCoordinate ic : im) {
+				
+				ImageCoordinate ic2 = ImageCoordinate.cloneCoord(ic);
 	
 				double kernelTotal = 0;
 				
 				double filterTotal = 0;
 				
-				for (ImageCoordinate ic2 : original) {
+				int currPosOffset = halfDimensionSizes.get(dim) - ic.get(dim);
 				
-					double currKernelValue = 1;
+				int min = ic.get(dim)-size;
+				int max = ic.get(dim) + size + 1;
+				
+				for (int dimValue = min; dimValue < max; dimValue++) {
 					
-					for (Integer i2 : this.dimensionsToFilter) {
-						
-						int kernelOffset = ic2.get(i2) - ic.get(i2) + halfDimensionSizes.get(i2);
-						
-						if (kernelOffset < 0 ) {
-							ij.IJ.log("kernel offset: " + kernelOffset);
-							ij.IJ.log("ic2: " + ic2);
-							ij.IJ.log("ic: " + ic);
-							ij.IJ.log("i2: " + i2);
-							ij.IJ.log("sizes: " + halfDimensionSizes);
-							ij.IJ.log("lower: " + boxLower);
-							ij.IJ.log("upper: " + boxUpper);
-						}
-						
-						currKernelValue *= kernelByDimension.get(i2)[kernelOffset];
-						
-						
-					}
+					ic2.set(dim, dimValue);
+					
+					int kernelOffset = dimValue + currPosOffset;
+					
+					double currKernelValue = currDimKernel[kernelOffset];
 					
 					kernelTotal+= currKernelValue;
 					
 					filterTotal+= currKernelValue*original.getValue(ic2);
-	
 				}
 				
-				im.setValue(ic, (float) (filterTotal/kernelTotal));
 				
-				original.clearBoxOfInterest();
-			
+				im.setValue(ic, (float) (filterTotal/kernelTotal));
+							
 			}
 		
-		}
-		
-		
-//		
-//		for (ImageCoordinate ic : im) {
-//			
-//			boxLower.setCoord(ic);
-//			
-//			for (Integer i : boxLower) {
-//				boxUpper.set(i, boxLower.get(i) + 1);
-//			}
-//			
-//			for (int i = 0; i < this.dimensionsToFilter.size(); i++) {
-//				Integer dim = this.dimensionsToFilter.get(i);
-//				boxLower.set(dim, boxLower.get(dim) - halfDimensionSizes.get(i));
-//				boxUpper.set(dim, boxUpper.get(dim) + halfDimensionSizes.get(i)); //no additional +1 as this is already in at the previous step
-//			}
-//			
-//			original.setBoxOfInterest(boxLower, boxUpper);
-//			
-//			double kernelTotal = 0;
-//			
-//			double filterTotal = 0;
-//			
-//			for (ImageCoordinate ic2 : original) {
-//			
-//				double currKernelValue = 1;
-//				
-//				for (Integer i : this.dimensionsToFilter) {
-//					
-//					int kernelOffset = ic2.get(i) - ic.get(i) + halfDimensionSizes.get(i);
-//					
-//					currKernelValue *= kernelByDimension.get(i)[kernelOffset];
-//					
-//					
-//				}
-//				
-//				kernelTotal+= currKernelValue;
-//				
-//				filterTotal+= currKernelValue*original.getValue(ic2);
-//
-//			}
-//			
-//			im.setValue(ic, filterTotal/kernelTotal);
-//			
-//			original.clearBoxOfInterest();
-//			
-//		}
-		
-		
-		
-		boxLower.recycle();
-		boxUpper.recycle();
-		
+		}	
+				
 	}
 	
 	/**
