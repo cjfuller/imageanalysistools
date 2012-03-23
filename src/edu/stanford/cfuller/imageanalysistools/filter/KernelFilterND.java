@@ -84,7 +84,7 @@ public class KernelFilterND extends Filter {
 				
 				double filterTotal = 0;
 				
-				int currPosOffset = halfDimensionSizes.get(dim) - ic.get(dim);
+				int currPosOffset = size - ic.get(dim);
 				
 				int min = ic.get(dim)-size;
 				int max = ic.get(dim) + size + 1;

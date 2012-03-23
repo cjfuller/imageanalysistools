@@ -49,6 +49,14 @@ public abstract class Filter {
 	protected ParameterDictionary params;
 	
 	//methods
+	
+	/**
+	 * Constructs a new filter with fields initialized to null.
+	 */
+	public Filter() {
+		this.referenceImage = null;
+		this.params = null;
+	}
 
     /**
      * Applies the Filter to the supplied Image.

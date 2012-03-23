@@ -87,7 +87,7 @@ public class VariableSizeMeanFilter extends Filter {
 			
 			boolean succeeded = false;
 			
-			//continue as long as we can subdivide at least on dimension
+			//continue as long as we can subdivide at least one dimension
 			
 			for (int dim = ImageCoordinate.X; dim <= ImageCoordinate.Z; dim++) { //	TODO: fix this
 				
