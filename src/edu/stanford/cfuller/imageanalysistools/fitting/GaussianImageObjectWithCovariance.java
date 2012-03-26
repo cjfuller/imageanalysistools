@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.fitting;
 
-import java.util.Vector;
+import java.util.List;
 
 import org.apache.commons.math.ConvergenceException;
 import org.apache.commons.math.analysis.UnivariateRealFunction;
@@ -81,10 +81,10 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
             return;
         }
 
-        this.fitParametersByChannel = new Vector<RealVector>();
-        this.fitR2ByChannel = new Vector<Double>();
-        this.fitErrorByChannel = new Vector<Double>();
-        this.nPhotonsByChannel = new Vector<Double>();
+        this.fitParametersByChannel = new java.util.ArrayList<FitParameters>();
+        this.fitR2ByChannel = new java.util.ArrayList<Double>();
+        this.fitErrorByChannel = new java.util.ArrayList<Double>();
+        this.nPhotonsByChannel = new java.util.ArrayList<Double>();
 
         GaussianFitter3DWithCovariance gf = new GaussianFitter3DWithCovariance();
 
@@ -110,10 +110,10 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
 
             this.boxImages();
 
-            java.util.Vector<Double> x = new java.util.Vector<Double>();
-            java.util.Vector<Double> y = new java.util.Vector<Double>();
-            java.util.Vector<Double> z = new java.util.Vector<Double>();
-            java.util.Vector<Double> f = new java.util.Vector<Double>();
+            List<Double> x = new java.util.ArrayList<Double>();
+            List<Double> y = new java.util.ArrayList<Double>();
+            List<Double> z = new java.util.ArrayList<Double>();
+            List<Double> f = new java.util.ArrayList<Double>();
 
 
             for (ImageCoordinate ic : this.parent) {
@@ -245,9 +245,24 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
             
             //System.out.println("fit: " + fitParameters);
 
+			FitParameters fp = new FitParameters();
+			
+			fp.setPosition(ImageCoordinate.X, fitParameters.getEntry(7));
+			fp.setPosition(ImageCoordinate.Y, fitParameters.getEntry(8));
+			fp.setPosition(ImageCoordinate.Z, fitParameters.getEntry(9));
+			
+			fp.setSize(ImageCoordinate.X, fitParameters.getEntry(1));
+			fp.setSize(ImageCoordinate.Y, fitParameters.getEntry(2));
+			fp.setSize(ImageCoordinate.Z, fitParameters.getEntry(3));
+			
+			fp.setAmplitude(fitParameters.getEntry(0));
+			fp.setBackground(fitParameters.getEntry(10));
+			
+			fp.setOtherParameter("corr_xy", fitParameters.getEntry(4));
+			fp.setOtherParameter("corr_xz", fitParameters.getEntry(5));
+			fp.setOtherParameter("corr_yz", fitParameters.getEntry(6));
 
-
-            fitParametersByChannel.add(fitParameters);
+            fitParametersByChannel.add(fp);
             
 //            System.out.println(fitParameters);
 
@@ -266,7 +281,7 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
 
                 mean += functionValues[i];
 
-                n_photons += functionValues[i] - fitParameters.getEntry(10); // was 6
+                n_photons += functionValues[i] - fitParameters.getEntry(10);
 
             }
 

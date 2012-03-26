@@ -24,10 +24,10 @@
 
 package edu.stanford.cfuller.imageanalysistools.fitting;
 
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
@@ -36,8 +36,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.StringWriter;
-import java.lang.Double;import java.lang.Math;import java.lang.String;import java.lang.Throwable;import java.util.Hashtable;
-import java.util.Vector;
+import java.util.Map;
+import java.util.List;
 
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.stream.XMLOutputFactory;
@@ -88,15 +88,15 @@ public abstract class ImageObject implements Serializable {
 
 	int numberOfChannels;
 
-	java.util.Vector<RealVector> fitParametersByChannel;
-	java.util.Vector<Double> fitR2ByChannel;
-	java.util.Vector<Double> fitErrorByChannel;
+	List<FitParameters> fitParametersByChannel;
+	List<Double> fitR2ByChannel;
+	List<Double> fitErrorByChannel;
+	
+	List<Double> nPhotonsByChannel; 
 
-	java.util.Vector<Double> nPhotonsByChannel; 
-
-	java.util.Vector<RealVector> positionsByChannel;
-	Hashtable<Integer, RealVector> vectorDifferencesBetweenChannels;
-	Hashtable<Integer, Double> scalarDifferencesBetweenChannels;
+	List<RealVector> positionsByChannel;
+	Map<Integer, RealVector> vectorDifferencesBetweenChannels;
+	Map<Integer, Double> scalarDifferencesBetweenChannels;
 
 	ImageCoordinate parentBoxMin;
 	ImageCoordinate parentBoxMax;
@@ -126,8 +126,8 @@ public abstract class ImageObject implements Serializable {
 		this.fitErrorByChannel = null;
 		this.nPhotonsByChannel = null;
 		this.label = 0;
-		this.vectorDifferencesBetweenChannels = new Hashtable<Integer, RealVector>();
-		this.scalarDifferencesBetweenChannels = new Hashtable<Integer, Double>();
+		this.vectorDifferencesBetweenChannels = new java.util.HashMap<Integer, RealVector>();
+		this.scalarDifferencesBetweenChannels = new java.util.HashMap<Integer, Double>();
 		this.numberOfChannels = 0;
 		this.correctionSuccessful = false;
 	}
@@ -151,10 +151,10 @@ public abstract class ImageObject implements Serializable {
 		this.fitErrorByChannel = null;
 		this.nPhotonsByChannel = null;
 
-		this.positionsByChannel = new Vector<RealVector>();
+		this.positionsByChannel = new java.util.ArrayList<RealVector>();
 
-		this.vectorDifferencesBetweenChannels = new Hashtable<Integer, RealVector>();
-		this.scalarDifferencesBetweenChannels = new Hashtable<Integer, Double>();
+		this.vectorDifferencesBetweenChannels = new java.util.HashMap<Integer, RealVector>();
+		this.scalarDifferencesBetweenChannels = new java.util.HashMap<Integer, Double>();
 
 		//this.parent = new Image(parent);
 		//this.mask = new Image(mask);
@@ -304,9 +304,9 @@ public abstract class ImageObject implements Serializable {
 
 	/**
 	 * Gets the fitted parameters, one set per channel in the original image of the object.
-	 * @return  A vector containing a RealVector of fit parameters, one for each channel in the original object.
+	 * @return  A List containing FitParameters objects, one for each channel in the original object.
 	 */
-	public Vector<RealVector> getFitParametersByChannel() {
+	public List<FitParameters> getFitParametersByChannel() {
 		return fitParametersByChannel;
 	}
 
@@ -462,25 +462,25 @@ public abstract class ImageObject implements Serializable {
 
 	/**
 	 * Gets the R^2 values for the fit in each channel.
-	 * @return  a Vector containing one R^2 value for the fit in each channel.
+	 * @return  a List containing one R^2 value for the fit in each channel.
 	 */
-	public Vector<Double> getFitR2ByChannel() {
+	public List<Double> getFitR2ByChannel() {
 		return fitR2ByChannel;
 	}
 
 	/**
 	 * Gets an error estimate for the fitting of the position of the object in each channel.
-	 * @return  a Vector containing one fit error estimate for each channel.
+	 * @return  a List containing one fit error estimate for each channel.
 	 */
-	public Vector<Double> getFitErrorByChannel() {
+	public List<Double> getFitErrorByChannel() {
 		return fitErrorByChannel;
 	}
 
 	/**
 	 * Gets the number of photons above background from the object in each channel.
-	 * @return	a Vector containing the number of photons collected in each channel.
+	 * @return	a List containing the number of photons collected in each channel.
 	 */
-	public Vector<Double> getNPhotonsByChannel() {
+	public List<Double> getNPhotonsByChannel() {
 		return this.nPhotonsByChannel;
 	}
 

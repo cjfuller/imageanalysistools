@@ -37,7 +37,7 @@ import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.RealVector;
 import org.apache.commons.math.optimization.OptimizationException;
 
-import java.util.Vector;
+import java.util.List;
 
 /**
  * An ImageObject that fits to a three-dimensional gaussian that is symmetric in x-y and has no covariance
@@ -48,6 +48,20 @@ import java.util.Vector;
 public class GaussianImageObject extends ImageObject {
 
 	static final long serialVersionUID =2L;
+	
+	/**
+	 * Required parameters
+	 */
+	
+	static final String PHOTONS_PER_LEVEL_PARAM = "photons_per_greylevel";
+	static final String PIXELSIZE_PARAM = "pixelsize_nm";
+	static final String SECTIONSIZE_PARAM = "z_sectionsize_nm";
+	
+	/**
+	 * Optional parameters
+	 */
+	
+	static final String NUM_WAVELENGTHS_PARAM = "num_wavelengths";
 		
     /**
      * Creates an empty GaussianImageObject.
@@ -81,10 +95,10 @@ public class GaussianImageObject extends ImageObject {
             return;
         }
 
-        this.fitParametersByChannel = new Vector<RealVector>();
-        this.fitR2ByChannel = new Vector<Double>();
-        this.fitErrorByChannel = new Vector<Double>();
-        this.nPhotonsByChannel = new Vector<Double>();
+        this.fitParametersByChannel = new java.util.ArrayList<FitParameters>();
+        this.fitR2ByChannel = new java.util.ArrayList<Double>();
+        this.fitErrorByChannel = new java.util.ArrayList<Double>();
+        this.nPhotonsByChannel = new java.util.ArrayList<Double>();
 
         GaussianFitter3D gf = new GaussianFitter3D();
 
@@ -92,28 +106,27 @@ public class GaussianImageObject extends ImageObject {
 
         int numChannels = 0;
 
-        if (p.hasKey("num_wavelengths")) {
-            numChannels = p.getIntValueForKey("num_wavelengths");
+        if (p.hasKey(NUM_WAVELENGTHS_PARAM)) {
+            numChannels = p.getIntValueForKey(NUM_WAVELENGTHS_PARAM);
         } else {
             numChannels = this.parent.getDimensionSizes().get(ImageCoordinate.C);
         }
 
-        //for (int channelIndex = 0; channelIndex < this.parent.getDimensionSizes().getC(); channelIndex++) {
         for (int channelIndex = 0; channelIndex < numChannels; channelIndex++) {
 
             RealVector fitParameters = new ArrayRealVector(7, 0.0);
 
-            double ppg = p.getDoubleValueForKey("photons_per_greylevel");
+            double ppg = p.getDoubleValueForKey(PHOTONS_PER_LEVEL_PARAM);
 
             this.parentBoxMin.set(ImageCoordinate.C,channelIndex);
             this.parentBoxMax.set(ImageCoordinate.C,channelIndex + 1);
 
             this.boxImages();
 
-            java.util.Vector<Double> x = new java.util.Vector<Double>();
-            java.util.Vector<Double> y = new java.util.Vector<Double>();
-            java.util.Vector<Double> z = new java.util.Vector<Double>();
-            java.util.Vector<Double> f = new java.util.Vector<Double>();
+            List<Double> x = new java.util.ArrayList<Double>();
+            List<Double> y = new java.util.ArrayList<Double>();
+            List<Double> z = new java.util.ArrayList<Double>();
+            List<Double> f = new java.util.ArrayList<Double>();
 
 
             for (ImageCoordinate ic : this.parent) {
@@ -132,9 +145,6 @@ public class GaussianImageObject extends ImageObject {
             double yCentroid = 0;
             double zCentroid = 0;
             double totalCounts = 0;
-
-
-            
 
             for (int i = 0; i < x.size(); i++) {
             	
@@ -212,8 +222,8 @@ public class GaussianImageObject extends ImageObject {
             final double limitedWidthxy = 200;
             final double limitedWidthz = 500;
 
-            double sizex = limitedWidthxy / p.getDoubleValueForKey("pixelsize_nm");
-            double sizez = limitedWidthz / p.getDoubleValueForKey("z_sectionsize_nm");
+            double sizex = limitedWidthxy / p.getDoubleValueForKey(PIXELSIZE_PARAM);
+            double sizez = limitedWidthz / p.getDoubleValueForKey(SECTIONSIZE_PARAM);
 
             fitParameters.setEntry(1, sizex/2);
             fitParameters.setEntry(2, sizez/2);
@@ -232,11 +242,21 @@ public class GaussianImageObject extends ImageObject {
             //System.out.println("fit: " + fitParameters);
 
 
+			FitParameters fp = new FitParameters();
+			
+			fp.setPosition(ImageCoordinate.X, fitParameters.getEntry(3));
+			fp.setPosition(ImageCoordinate.Y, fitParameters.getEntry(4));
+			fp.setPosition(ImageCoordinate.Z, fitParameters.getEntry(5));
+			
+			fp.setSize(ImageCoordinate.X, fitParameters.getEntry(1));
+			fp.setSize(ImageCoordinate.Y, fitParameters.getEntry(1));
+			fp.setSize(ImageCoordinate.Z, fitParameters.getEntry(2));
+			
+			fp.setAmplitude(fitParameters.getEntry(0));
+			fp.setBackground(fitParameters.getEntry(6));
 
-            fitParametersByChannel.add(fitParameters);
+            fitParametersByChannel.add(fp);
             
-//            System.out.println(fitParameters);
-
             //calculate R2
 
             double residualSumSquared = 0;
@@ -270,23 +290,23 @@ public class GaussianImageObject extends ImageObject {
 
             //calculate fit error
 
-            double s_xy = fitParameters.getEntry(1)*fitParameters.getEntry(1) * Math.pow(p.getDoubleValueForKey("pixelsize_nm"), 2);
-            double s_z = fitParameters.getEntry(2)*fitParameters.getEntry(2) * Math.pow(p.getDoubleValueForKey("z_sectionsize_nm"), 2);
+            double s_xy = fitParameters.getEntry(1)*fitParameters.getEntry(1) * Math.pow(p.getDoubleValueForKey(PIXELSIZE_PARAM), 2);
+            double s_z = fitParameters.getEntry(2)*fitParameters.getEntry(2) * Math.pow(p.getDoubleValueForKey(SECTIONSIZE_PARAM), 2);
 
             //s_z = 0; //remove!!
             
             double error = (2*s_xy + s_z)/(n_photons-1);// + 4*Math.sqrt(Math.PI) * Math.pow(2*s_xy,1.5)*Math.pow(fitParameters.getEntry(6),2)/(p.getDoubleValueForKey("pixelsize_nm")*n_photons*n_photons);
  
             double b = fitParameters.getEntry(6);
-            double a = p.getDoubleValueForKey("pixelsize_nm");
-            double alpha=  p.getDoubleValueForKey("z_sectionsize_nm");
+            double a = p.getDoubleValueForKey(PIXELSIZE_PARAM);
+            double alpha=  p.getDoubleValueForKey(SECTIONSIZE_PARAM);
             double sa_x = s_xy + Math.pow(a,2)/12;
             double sa_z = s_z + Math.pow(alpha, 2)/12;
             
             //System.out.printf("b = %f, a = %f, alpha = %f, s_xy = %f, s_z = %f, n= %f\n", b, a, alpha, s_xy, s_z, n_photons);
             
-            double error_x = sa_x/n_photons * (16.0/9.0 + 8*Math.PI*sa_x*b*b/(n_photons*Math.pow(p.getDoubleValueForKey("pixelsize_nm"), 2)));
-            double error_z = sa_z/n_photons * (16.0/9.0 + 8*Math.PI*sa_z*b*b/(n_photons*Math.pow(p.getDoubleValueForKey("z_sectionsize_nm"), 2)));
+            double error_x = sa_x/n_photons * (16.0/9.0 + 8*Math.PI*sa_x*b*b/(n_photons*Math.pow(p.getDoubleValueForKey(PIXELSIZE_PARAM), 2)));
+            double error_z = sa_z/n_photons * (16.0/9.0 + 8*Math.PI*sa_z*b*b/(n_photons*Math.pow(p.getDoubleValueForKey(SECTIONSIZE_PARAM), 2)));
             
             double A = 1.0/(2*Math.sqrt(2)*Math.pow(Math.PI,1.5) * Math.sqrt(sa_z)*sa_x);
             
