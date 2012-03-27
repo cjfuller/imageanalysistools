@@ -27,7 +27,7 @@ package edu.stanford.cfuller.imageanalysistools.filter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
-import org.apache.commons.math.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.ArrayRealVector;
 /**
  * A Filter that thresholds an Image using Otsu's method.  (Otsu, 1979, DOI: 10.1109/TSMC.1979.4310076).
  * <p>

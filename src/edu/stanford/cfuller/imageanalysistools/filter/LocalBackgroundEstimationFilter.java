@@ -26,8 +26,8 @@ package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
-import org.apache.commons.math.linear.RealVector;
-import org.apache.commons.math.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.linear.RealMatrix;
 
 /**
  * A Filter that estimates the background locally in an Image, using a local median filtering approach.
@@ -73,7 +73,7 @@ public class LocalBackgroundEstimationFilter extends Filter {
 
 		if (this.referenceImage == null) return;
 		
-		//RealVector localArea = new org.apache.commons.math.linear.ArrayRealVector();
+		//RealVector localArea = new org.apache.commons.math3.linear.ArrayRealVector();
 		
 		edu.stanford.cfuller.imageanalysistools.image.Histogram h = new edu.stanford.cfuller.imageanalysistools.image.Histogram(this.referenceImage);
 		
@@ -104,9 +104,9 @@ public class LocalBackgroundEstimationFilter extends Filter {
 						
 		
 		
-		RealVector overallCounts = new org.apache.commons.math.linear.ArrayRealVector(h.getMaxValue() + 1);
+		RealVector overallCounts = new org.apache.commons.math3.linear.ArrayRealVector(h.getMaxValue() + 1);
 
-		RealMatrix countsByRow = new org.apache.commons.math.linear.Array2DRowRealMatrix(2*boxSize + 1, h.getMaxValue() + 1);
+		RealMatrix countsByRow = new org.apache.commons.math3.linear.Array2DRowRealMatrix(2*boxSize + 1, h.getMaxValue() + 1);
 
 
 		//loop over columns
@@ -114,7 +114,7 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		for (int i = boxSize; i < im.getDimensionSizes().quickGet(ImageCoordinate.X)+boxSize; i++) {
 			
 			overallCounts.mapMultiplyToSelf(0.0);
-            double[] overallCounts_a = overallCounts.getData();
+            double[] overallCounts_a = overallCounts.toArray();
 			countsByRow = countsByRow.scalarMultiply(0.0);
             double[][] countsByRow_a = countsByRow.getData();
 

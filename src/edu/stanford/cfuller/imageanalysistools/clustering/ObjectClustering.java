@@ -31,8 +31,8 @@ import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.LabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.MaskFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.GaussianFilter;
-import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
-import org.apache.commons.math.linear.ArrayRealVector;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.apache.commons.math3.linear.ArrayRealVector;
 import edu.stanford.cfuller.imageanalysistools.random.RandomGenerator;
 
 import java.util.Vector;
@@ -510,10 +510,10 @@ public class ObjectClustering {
 
         //first, find the centroid of each cluster
 
-        org.apache.commons.math.linear.RealVector centroids_x = new ArrayRealVector(h_mapped_0.getMaxValue()+1);
-        org.apache.commons.math.linear.RealVector centroids_y = new ArrayRealVector(h_mapped_0.getMaxValue()+1);
+        org.apache.commons.math3.linear.RealVector centroids_x = new ArrayRealVector(h_mapped_0.getMaxValue()+1);
+        org.apache.commons.math3.linear.RealVector centroids_y = new ArrayRealVector(h_mapped_0.getMaxValue()+1);
 
-        org.apache.commons.math.linear.RealVector counts = new ArrayRealVector(h_mapped_0.getMaxValue()+1);
+        org.apache.commons.math3.linear.RealVector counts = new ArrayRealVector(h_mapped_0.getMaxValue()+1);
 
 
         centroids_x.mapMultiplyToSelf(0.0);
@@ -566,7 +566,7 @@ public class ObjectClustering {
 
         Histogram h_mapped = new Histogram(mapped);
 
-        org.apache.commons.math.linear.RealMatrix mappingcounts = new Array2DRowRealMatrix(h_individualCentromeres.getMaxValue() + 1, h_mapped.getMaxValue() + 1);
+        org.apache.commons.math3.linear.RealMatrix mappingcounts = new Array2DRowRealMatrix(h_individualCentromeres.getMaxValue() + 1, h_mapped.getMaxValue() + 1);
 
         mappingcounts = mappingcounts.scalarMultiply(0.0);
 

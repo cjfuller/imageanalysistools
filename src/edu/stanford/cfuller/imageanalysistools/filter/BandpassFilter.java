@@ -164,7 +164,7 @@ public class BandpassFilter extends Filter {
         }
 	        
 
-//        FastFourierTransformer fft = new org.apache.commons.math.transform.FastFourierTransformer();
+//        FastFourierTransformer fft = new org.apache.commons.math3.transform.FastFourierTransformer();
 //
 //        int ydimPowOfTwo = im.getDimensionSizes().get(ImageCoordinate.Y);
 //        int xdimPowOfTwo = im.getDimensionSizes().get(ImageCoordinate.X);

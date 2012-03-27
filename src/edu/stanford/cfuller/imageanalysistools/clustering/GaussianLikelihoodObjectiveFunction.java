@@ -26,8 +26,8 @@ package edu.stanford.cfuller.imageanalysistools.clustering;
 
 import edu.stanford.cfuller.imageanalysistools.fitting.ObjectiveFunction;
 
-import org.apache.commons.math.analysis.function.Exp;
-import org.apache.commons.math.linear.*;
+import org.apache.commons.math3.analysis.function.Exp;
+import org.apache.commons.math3.linear.*;
 
 /**
  * A function that calculates the likelihood of observing a set of points given a set of Gaussian sources generating them.
@@ -126,13 +126,13 @@ public class GaussianLikelihoodObjectiveFunction implements ObjectiveFunction {
             abdMatrices.get(i).setEntry(0, 1, b);
             abdMatrices.get(i).setEntry(1, 1, d);
 
-            LUDecomposition abdLU = (new LUDecompositionImpl(abdMatrices.get(i)));
+            LUDecomposition abdLU = (new LUDecomposition(abdMatrices.get(i)));
 
             det.setEntry(i, (abdLU).getDeterminant());
             //det.setEntry(i, a*d-b*b);
             try {
                 abdMatrices.set(i, abdLU.getSolver().getInverse());
-            } catch (org.apache.commons.math.linear.SingularMatrixException e) {
+            } catch (org.apache.commons.math3.linear.SingularMatrixException e) {
                 return Double.MAX_VALUE;
             }
 

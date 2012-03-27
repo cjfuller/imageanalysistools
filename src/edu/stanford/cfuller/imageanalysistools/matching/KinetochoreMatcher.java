@@ -30,11 +30,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.math.linear.Array2DRowRealMatrix;
-import org.apache.commons.math.linear.ArrayRealVector;
-import org.apache.commons.math.linear.RealMatrix;
-import org.apache.commons.math.linear.RealVector;
-import org.apache.commons.math.optimization.OptimizationException;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
 
 
 import edu.stanford.cfuller.imageanalysistools.fitting.CentroidImageObject;
@@ -100,12 +99,8 @@ public class KinetochoreMatcher {
 		
 			ImageObject ref = new CentroidImageObject(i, new ReadOnlyImage(reference), new ReadOnlyImage(ones), this.parameters);
 			
-			try {
-				ref.fitPosition(parameters);
-			} catch (OptimizationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			ref.fitPosition(parameters);
+			
 			
 			refCentroids.put(i, ref.getPositionForChannel(0));
 			

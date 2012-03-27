@@ -24,9 +24,9 @@
 
 package edu.stanford.cfuller.imageanalysistools.fitting;
 
-import org.apache.commons.math.analysis.MultivariateRealFunction;
-import org.apache.commons.math.linear.ArrayRealVector;
-import org.apache.commons.math.linear.RealVector;
+import org.apache.commons.math3.analysis.MultivariateFunction;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealVector;
 
 /**
  * Performs a three-dimensional gaussian fit to an object in an image using a maximum likelihood method assuming Poisson
@@ -130,7 +130,7 @@ public class GaussianFitter3DWithCovariance {
         return logLikelihood;
     }
     
-    private class MLObjectiveFunction implements ObjectiveFunction, MultivariateRealFunction {
+    private class MLObjectiveFunction implements ObjectiveFunction, MultivariateFunction {
 
         private ImageObject toFit;
         private double ppg;
@@ -141,7 +141,7 @@ public class GaussianFitter3DWithCovariance {
 
         public double evaluate(RealVector parameters) {
 
-            return value(parameters.getData());
+            return value(parameters.toArray());
 
         }
 
@@ -163,7 +163,7 @@ public class GaussianFitter3DWithCovariance {
      */
     public static double fitResidual(double value, double x, double y, double z, RealVector parameters) {
 
-        return value - gaussian(x,y,z,parameters.getData());
+        return value - gaussian(x,y,z,parameters.toArray());
     }
 
     private static double logFactorial(int n) {

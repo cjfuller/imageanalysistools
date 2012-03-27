@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.metric;
 
-import org.apache.commons.math.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
@@ -72,7 +72,7 @@ public class IntensityPerPixelMetric extends Metric {
 		
 		if (h.getMaxValue() == 0) return null;
 		
-		RealMatrix channelIntensities = (new org.apache.commons.math.linear.Array2DRowRealMatrix(images.getImageCount(), h.getMaxValue())).scalarMultiply(0);
+		RealMatrix channelIntensities = (new org.apache.commons.math3.linear.Array2DRowRealMatrix(images.getImageCount(), h.getMaxValue())).scalarMultiply(0);
 		
 		for (ImageCoordinate i : mask) {
 			int regionNum = (int) mask.getValue(i);

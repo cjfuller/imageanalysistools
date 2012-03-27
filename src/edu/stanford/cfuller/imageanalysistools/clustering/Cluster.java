@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.clustering;
 
-import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 import java.util.Set;
 

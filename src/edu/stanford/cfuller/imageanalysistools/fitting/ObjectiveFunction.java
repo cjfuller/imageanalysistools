@@ -38,6 +38,6 @@ public interface ObjectiveFunction {
      * @param parameters    A RealVector containing the values of all the independent variables and/or parameters.
      * @return              The function value at this point.
      */
-    public double evaluate(org.apache.commons.math.linear.RealVector parameters);
+    public double evaluate(org.apache.commons.math3.linear.RealVector parameters);
 
 }

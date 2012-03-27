@@ -29,7 +29,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.FillFilter;
-import org.apache.commons.math.geometry.euclidean.threed.Vector3D;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 /**
  * A Filter that computes a convex hull for each region in a specified Image and converts each region to its filled convex hull.
@@ -121,7 +121,7 @@ public class ConvexHullByLabelFilter extends Filter {
 			hullPointsX.add(currentX);
 			hullPointsY.add(currentY);
 			
-			org.apache.commons.math.linear.RealVector angles = new org.apache.commons.math.linear.ArrayRealVector(xList.size());
+			org.apache.commons.math3.linear.RealVector angles = new org.apache.commons.math3.linear.ArrayRealVector(xList.size());
 			
 
             Vector3D currentVector = new Vector3D(0, -1, 0);

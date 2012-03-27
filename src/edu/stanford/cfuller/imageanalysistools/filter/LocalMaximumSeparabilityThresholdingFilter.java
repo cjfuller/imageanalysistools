@@ -33,8 +33,8 @@ import edu.stanford.cfuller.imageanalysistools.fitting.ObjectiveFunction;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
-import org.apache.commons.math.linear.ArrayRealVector;
-import org.apache.commons.math.linear.RealVector;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealVector;
 /**
  * A Filter that thresholds an Image using a modified Otsu's method.  (Otsu, 1979, DOI: 10.1109/TSMC.1979.4310076).  This attempts to fit the
  * eta vs. greylevel histogram to a double gaussian, and takes the higher value for the threshold.

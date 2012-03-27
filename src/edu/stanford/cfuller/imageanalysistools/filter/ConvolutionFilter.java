@@ -24,8 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import org.apache.commons.math.complex.Complex;
-import org.apache.commons.math.transform.FastFourierTransformer;
+import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.transform.FastFourierTransformer;
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
@@ -93,12 +93,12 @@ public class ConvolutionFilter extends Filter {
 	
 	public static Complex[][] transform(Image im, int z) {
 
-        FastFourierTransformer fft = new org.apache.commons.math.transform.FastFourierTransformer();
+        FastFourierTransformer fft = new org.apache.commons.math3.transform.FastFourierTransformer(org.apache.commons.math3.transform.DftNormalization.STANDARD);
 
         int ydimPowOfTwo = im.getDimensionSizes().get(ImageCoordinate.Y);
         int xdimPowOfTwo = im.getDimensionSizes().get(ImageCoordinate.X);
 
-        if (!FastFourierTransformer.isPowerOf2(ydimPowOfTwo) || !FastFourierTransformer.isPowerOf2(xdimPowOfTwo)) {
+        if (!org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(ydimPowOfTwo) || !org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(xdimPowOfTwo)) {
 
             xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get(ImageCoordinate.X)) / Math.log(2)));
             ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get(ImageCoordinate.Y))/Math.log(2)));
@@ -122,7 +122,7 @@ public class ConvolutionFilter extends Filter {
 
             for (int r = 0; r < rowImage.length; r++) {
                 double[] row = rowImage[r];
-                Complex[] transformedRow = fft.transform(row);
+                Complex[] transformedRow = fft.transform(row, org.apache.commons.math3.transform.TransformType.FORWARD);
 
                 for (int c = 0; c < colMajorImage.length; c++) {
                     colMajorImage[c][r] = transformedRow[c];
@@ -130,7 +130,7 @@ public class ConvolutionFilter extends Filter {
             }
 
             for (int c = 0; c < colMajorImage.length; c++) {
-                colMajorImage[c] = fft.transform(colMajorImage[c]);
+                colMajorImage[c] = fft.transform(colMajorImage[c], org.apache.commons.math3.transform.TransformType.FORWARD);
             }
             return colMajorImage;
         //}
@@ -142,11 +142,11 @@ public class ConvolutionFilter extends Filter {
 		
 		double[][] rowImage = new double[colMajorImage[0].length][colMajorImage.length];
 		
-        FastFourierTransformer fft = new org.apache.commons.math.transform.FastFourierTransformer();
+        FastFourierTransformer fft = new org.apache.commons.math3.transform.FastFourierTransformer(org.apache.commons.math3.transform.DftNormalization.STANDARD);
 
 
         for (int c = 0; c < colMajorImage.length; c++) {
-            colMajorImage[c] = fft.inversetransform(colMajorImage[c]);
+            colMajorImage[c] = fft.transform(colMajorImage[c], org.apache.commons.math3.transform.TransformType.INVERSE);
         }
 
         Complex[] tempRow = new Complex[rowImage.length];
@@ -161,7 +161,7 @@ public class ConvolutionFilter extends Filter {
                 tempRow[c] = colMajorImage[c][r];
             }
 
-            Complex[] transformedRow = fft.inversetransform(tempRow);
+            Complex[] transformedRow = fft.transform(tempRow, org.apache.commons.math3.transform.TransformType.INVERSE);
 
             for (int c = 0; c < colMajorImage.length; c++) {
                 rowImage[r][c] = transformedRow[c].abs();

@@ -30,9 +30,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.math.complex.Complex;
-import org.apache.commons.math.linear.ArrayRealVector;
-import org.apache.commons.math.linear.RealVector;
+import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealVector;
 
 import edu.stanford.cfuller.imageanalysistools.filter.ConvolutionFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
@@ -177,9 +177,9 @@ public class RandomKernelMethod extends Method {
 		
 		ImageCoordinate dim = ImageCoordinate.createCoordXYZCT(kDim, kDim, 1, 1, 1);
 		
-			Kernel kFinal = new Kernel(minParams.getSubVector(0, minParams.getDimension()/3).getData(), dim);
-			Kernel kFinal2 = new Kernel(minParams.getSubVector(minParams.getDimension()/3, minParams.getDimension()/3).getData(), dim);
-			Kernel kFinal3 = new Kernel(minParams.getSubVector(2*minParams.getDimension()/3, minParams.getDimension()/3).getData(), dim);
+			Kernel kFinal = new Kernel(minParams.getSubVector(0, minParams.getDimension()/3).toArray(), dim);
+			Kernel kFinal2 = new Kernel(minParams.getSubVector(minParams.getDimension()/3, minParams.getDimension()/3).toArray(), dim);
+			Kernel kFinal3 = new Kernel(minParams.getSubVector(2*minParams.getDimension()/3, minParams.getDimension()/3).toArray(), dim);
 		
 	        Image toProcess = new Image(this.images.get(0));
 	        
@@ -313,9 +313,9 @@ public class RandomKernelMethod extends Method {
 		
 		public double evaluate(RealVector kernelParameters) {
 			
-			Kernel k = new Kernel(kernelParameters.getSubVector(0, kernelParameters.getDimension()/3).getData(), dim);
-			Kernel k2 = new Kernel(kernelParameters.getSubVector(kernelParameters.getDimension()/3, kernelParameters.getDimension()/3).getData(), dim);
-			Kernel k3 = new Kernel(kernelParameters.getSubVector(2*kernelParameters.getDimension()/3, kernelParameters.getDimension()/3).getData(), dim);
+			Kernel k = new Kernel(kernelParameters.getSubVector(0, kernelParameters.getDimension()/3).toArray(), dim);
+			Kernel k2 = new Kernel(kernelParameters.getSubVector(kernelParameters.getDimension()/3, kernelParameters.getDimension()/3).toArray(), dim);
+			Kernel k3 = new Kernel(kernelParameters.getSubVector(2*kernelParameters.getDimension()/3, kernelParameters.getDimension()/3).toArray(), dim);
 			
 			ConvolutionFilter cf = new ConvolutionFilter();
 			

@@ -24,11 +24,10 @@
 
 package edu.stanford.cfuller.imageanalysistools.fitting;
 
-import java.util.Vector;
+import java.util.List;
 
-import org.apache.commons.math.linear.ArrayRealVector;
-import org.apache.commons.math.linear.RealVector;
-import org.apache.commons.math.optimization.OptimizationException;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealVector;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
@@ -63,18 +62,18 @@ public class CentroidImageObject extends ImageObject {
      * @param p     The parameters for the current analysis.
      */
 	@Override
-	public void fitPosition(ParameterDictionary p)
-			throws OptimizationException {
+	public void fitPosition(ParameterDictionary p){
+		
 		
 		if (this.sizeInPixels == 0) {
             this.nullifyImages();
             return;
         }
 
-        this.fitParametersByChannel = new Vector<RealVector>();
-        this.fitR2ByChannel = new Vector<Double>();
-        this.fitErrorByChannel = new Vector<Double>();
-        this.nPhotonsByChannel = new Vector<Double>();
+        this.fitParametersByChannel = new java.util.ArrayList<FitParameters>();
+        this.fitR2ByChannel = new java.util.ArrayList<Double>();
+        this.fitErrorByChannel = new java.util.ArrayList<Double>();
+        this.nPhotonsByChannel = new java.util.ArrayList<Double>();
 
         int numChannels = 0;
 

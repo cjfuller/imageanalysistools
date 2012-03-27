@@ -29,13 +29,12 @@ import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
-import org.apache.commons.math.ConvergenceException;
-import org.apache.commons.math.analysis.UnivariateRealFunction;
-import org.apache.commons.math.analysis.integration.LegendreGaussIntegrator;
-import org.apache.commons.math.exception.util.DummyLocalizable;
-import org.apache.commons.math.linear.ArrayRealVector;
-import org.apache.commons.math.linear.RealVector;
-import org.apache.commons.math.optimization.OptimizationException;
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.integration.LegendreGaussIntegrator;
+import org.apache.commons.math3.exception.util.DummyLocalizable;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.exception.ConvergenceException;
 
 import java.util.List;
 
@@ -86,9 +85,8 @@ public class GaussianImageObject extends ImageObject {
     /**
      * Fits this object to a 3-dimensional gaussian, and estimates error and goodness of fit.
      * @param p     The parameters for the current analysis.
-     * @throws OptimizationException        if the optimizer used to compute the fit raises an exception.
      */
-    public void fitPosition(ParameterDictionary p) throws OptimizationException {
+    public void fitPosition(ParameterDictionary p) {
 
         if (this.sizeInPixels == 0) {
             this.nullifyImages();
@@ -359,7 +357,7 @@ public class GaussianImageObject extends ImageObject {
         this.nullifyImages();
     }
     
-    protected class DI1Func implements UnivariateRealFunction {
+    protected class DI1Func implements UnivariateFunction {
     	
     	private double z;
     	private double b;
@@ -386,7 +384,7 @@ public class GaussianImageObject extends ImageObject {
     	
     }
     
-    protected class ErrIntFunc implements UnivariateRealFunction {
+    protected class ErrIntFunc implements UnivariateFunction {
     	private double b;
     	private double n;
     	private double A;

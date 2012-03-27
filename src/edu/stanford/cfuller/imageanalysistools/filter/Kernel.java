@@ -24,8 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import org.apache.commons.math.complex.Complex;
-import org.apache.commons.math.transform.FastFourierTransformer;
+import org.apache.commons.math3.complex.Complex;
+import org.apache.commons.math3.transform.FastFourierTransformer;
 
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -93,7 +93,7 @@ public class Kernel {
         int ydimPowOfTwo = size0;
         int xdimPowOfTwo = size1;
 
-        if (!FastFourierTransformer.isPowerOf2(ydimPowOfTwo) || !FastFourierTransformer.isPowerOf2(xdimPowOfTwo)) {
+        if (!org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(ydimPowOfTwo) || !org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(xdimPowOfTwo)) {
 
             xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(size1) / Math.log(2)));
             ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(size0)/Math.log(2)));
@@ -185,12 +185,12 @@ public class Kernel {
 			return this.transform;
 		}
 				
-		FastFourierTransformer fft = new org.apache.commons.math.transform.FastFourierTransformer();
+		FastFourierTransformer fft = new org.apache.commons.math3.transform.FastFourierTransformer(org.apache.commons.math3.transform.DftNormalization.STANDARD);
 
         int ydimPowOfTwo = size0;
         int xdimPowOfTwo = size1;
 
-        if (!FastFourierTransformer.isPowerOf2(ydimPowOfTwo) || !FastFourierTransformer.isPowerOf2(xdimPowOfTwo)) {
+        if (!org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(ydimPowOfTwo) || !org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(xdimPowOfTwo)) {
 
             xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(size1) / Math.log(2)));
             ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(size0)/Math.log(2)));
@@ -227,7 +227,7 @@ public class Kernel {
 
             for (int r = 0; r < rowImage.length; r++) {
                 double[] row = rowImage[r];
-                Complex[] transformedRow = fft.transform(row);
+                Complex[] transformedRow = fft.transform(row, org.apache.commons.math3.transform.TransformType.FORWARD);
 
                 for (int c = 0; c < colMajorImage.length; c++) {
                     colMajorImage[c][r] = transformedRow[c];
@@ -235,7 +235,7 @@ public class Kernel {
             }
 
             for (int c = 0; c < colMajorImage.length; c++) {
-                colMajorImage[c] = fft.transform(colMajorImage[c]);
+                colMajorImage[c] = fft.transform(colMajorImage[c], org.apache.commons.math3.transform.TransformType.FORWARD);
             }
             
             this.transform = colMajorImage;
@@ -249,13 +249,13 @@ public class Kernel {
 		
 		int halfSize = (sizeNonzero - 1)/2;
 		
-		FastFourierTransformer fft = new org.apache.commons.math.transform.FastFourierTransformer();
+		FastFourierTransformer fft = new org.apache.commons.math3.transform.FastFourierTransformer(org.apache.commons.math3.transform.DftNormalization.STANDARD);
 
 
         int ydimPowOfTwo = size0;
         int xdimPowOfTwo = size1;
 
-        if (!FastFourierTransformer.isPowerOf2(ydimPowOfTwo) || !FastFourierTransformer.isPowerOf2(xdimPowOfTwo)) {
+        if (!org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(ydimPowOfTwo) || !org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(xdimPowOfTwo)) {
 
             xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(size1) / Math.log(2)));
             ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(size0)/Math.log(2)));
@@ -289,7 +289,7 @@ public class Kernel {
 
             for (int r = 0; r < rowImage.length; r++) {
                 double[] row = rowImage[r];
-                Complex[] transformedRow = fft.transform(row);
+                Complex[] transformedRow = fft.transform(row, org.apache.commons.math3.transform.TransformType.FORWARD);
 
                 for (int c = 0; c < colMajorImage.length; c++) {
                     colMajorImage[c][r] = transformedRow[c];
@@ -297,7 +297,7 @@ public class Kernel {
             }
 
             for (int c = 0; c < colMajorImage.length; c++) {
-                colMajorImage[c] = fft.transform(colMajorImage[c]);
+                colMajorImage[c] = fft.transform(colMajorImage[c], org.apache.commons.math3.transform.TransformType.FORWARD);
             }
             return colMajorImage;
 				

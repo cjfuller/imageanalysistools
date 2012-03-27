@@ -87,7 +87,7 @@ public class GaussianFilter extends Filter {
 //        double coeffsSum = 0;
 //
 //		for (int i = 0; i < coeffs.length; i++) {
-//			coeffs[i] = org.apache.commons.math.util.MathUtils.binomialCoefficientDouble(kernelSize-1, i)/powOfTwo;
+//			coeffs[i] = org.apache.commons.math3.util.MathUtils.binomialCoefficientDouble(kernelSize-1, i)/powOfTwo;
 //            coeffsSum+=coeffs[i];
 //        }
 //
