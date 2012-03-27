@@ -40,9 +40,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
- * A filter that removes a section of frequency space from an Image's Fourier transform.
- *
- * Note that this is actually the opposite of the usual definition of a bandpass filter, in that the specified band is removed instead of retained.
+ * A filter that retains only a section of frequency space from an Image's Fourier transform.
  *
  * <p>
  * This filter does not use a reference Image.
@@ -158,7 +156,7 @@ public class BandpassFilter extends Filter {
         if (this.shouldRescale) {
         
 	        for (ImageCoordinate ic : im) {
-	        	im.setValue(ic, (im.getValue(ic) - newMin)/newRange*oldRange + oldMin );
+	        	im.setValue(ic, (im.getValue(ic) - newMin)/newRange*oldRange + oldMin);
 	        }
 	       
         }

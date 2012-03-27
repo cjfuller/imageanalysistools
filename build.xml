@@ -24,6 +24,7 @@
     </target>
 
 	<target name="doc">
+		<echo message = "java version = ${java.version}"/>
 		<mkdir dir="${docdir}"/>
 		<javadoc sourcepath="${srcdir}" destdir="${docdir}">
 			<classpath refid="ImageAnalysisTools.classpath"/>
