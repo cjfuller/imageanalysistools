@@ -296,16 +296,15 @@ public class BandpassFilter extends Filter {
 
 
     /**
-     * Sets the band to be removed from frequency space in the Fourier transformed Image.
+     * Sets the band in frequency space to be retained in the Fourier transformed Image.
      * <p>
-     * The two arguments specify the lower and upper bounds of the range to be removed as a fraction of the total
-     * frequency space.  Both arguments should therefore be between 0 and 1, and filtering will happen only if low < high.
-     * 0 refers to the lowest frequency, 1 refers to the highest frequency, so for example to filter out the highest 20% of frequencies,
-     * set low to 0.8 and high to 1.  Likewise, to filter out the lowest 10% of frequencies, set low to 0 and high to 0.1.
+     * The two arguments specify the lower and upper bounds of the range to be retained, in terms of size in pixels, rather than frequency.
+     * So for the low parameter, specify the lower size (and therefore the higher frequency); likewise, specify the larger size (and smaller frequency) for
+     * the high parameter.
      *
      *
-     * @param low   The lower bound of the proportional frequencies to be filtered, between 0 and 1, inclusive.
-     * @param high  The upper bound of the proportional frequencies to be filtered, between 0 and 1, inclusive.
+     * @param low   The lower bound of the sizes in pixels to be filtered.
+     * @param high  The upper bound of the sizes in pixels to be filtered.
      */
     public void setBand(double low, double high) {
         this.bandLow = low;
