@@ -9,7 +9,7 @@
 	<property name="resourcesdir" location="src"/>
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
 	<!--><property name="bootcp_jdk_1.6" location= "jdk_1.6/lib/classes.jar"/>-->
-	<property name="version" value="4.0.8b"/>
+	<property name="version" value="4.0.8"/>
 	
 	
     <path id="ImageAnalysisTools.classpath">
