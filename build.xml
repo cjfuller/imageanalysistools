@@ -8,7 +8,7 @@
 	<property name="docdir" value="doc"/>
 	<property name="resourcesdir" location="src"/>
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
-	
+	<!--><property name="bootcp_jdk_1.6" location= "jdk_1.6/lib/classes.jar"/>-->
 	<property name="version" value="4.0.8b"/>
 	
 	
@@ -24,7 +24,6 @@
     </target>
 
 	<target name="doc">
-		<echo message = "java version = ${java.version}"/>
 		<mkdir dir="${docdir}"/>
 		<javadoc sourcepath="${srcdir}" destdir="${docdir}">
 			<classpath refid="ImageAnalysisTools.classpath"/>
@@ -36,13 +35,16 @@
 		<delete dir="${distdir}"/>
     </target>
     <target name="cleanall" depends="clean"/>
+
     <target name="build" depends="init" >
         <echo message="${ant.project.name}: ${ant.file}"/>
-        <javac debug="true" destdir="${builddir}" includeantruntime="false">
+		<!--><javac target="1.6" source="1.6" srcdir="${srcdir}" destdir="${builddir}" bootclasspath="${bootcp_jdk_1.6}" debug="true" includeantruntime="false">-->
+		<javac srcdir="${srcdir}" destdir="${builddir}" debug="true" includeantruntime="false">
             <src path="${srcdir}"/>
             <classpath refid="ImageAnalysisTools.classpath"/>
         </javac>
     </target>
+
     <target name="dist" depends="build">
 		<jar jarfile="${distdir}/${ant.project.name}_${version}.jar" basedir="${builddir}">
 			<zipgroupfileset dir="${libdir}" includes="*.jar"/>

@@ -28,6 +28,7 @@ import java.util.Deque;
 import java.util.List;
 
 import org.apache.commons.math3.distribution.FDistribution;
+import org.apache.commons.math3.exception.MathIllegalArgumentException;
 
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
@@ -305,7 +306,7 @@ public class VariableSizeMeanFilter extends Filter {
 		
 		double smallerVar = var < l_var ? var : l_var;
 		double largerVar = var > l_var ? var : l_var;
-		//try {
+		try {
 			FDistribution f = new FDistribution(count-1, count-1);
 
 			double valueAtLowerCutoff = f.inverseCumulativeProbability(cutoff);
@@ -313,13 +314,10 @@ public class VariableSizeMeanFilter extends Filter {
 			boolean result =  (smallerVar/largerVar > valueAtUpperCutoff || smallerVar/largerVar < valueAtLowerCutoff);
 			return result;
 
-		/*} catch (MathException e) {
+		} catch (MathIllegalArgumentException e) {
 			LoggingUtilities.getLogger().severe("Exception while calculating variable size mean QO partition: " + e.getMessage());
 			return false;
-		} catch (MathRuntimeException e) {
-			LoggingUtilities.getLogger().severe("Exception while calculating variable size mean QO partition: " + e.getMessage());
-			return false;
-		}*/
+		} 
 	}
 
 }

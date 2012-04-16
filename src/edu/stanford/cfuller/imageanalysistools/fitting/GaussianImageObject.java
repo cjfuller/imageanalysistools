@@ -235,6 +235,8 @@ public class GaussianImageObject extends ImageObject {
             
             //do the fit
 
+			
+
             fitParameters = gf.fit(this, fitParameters, ppg);
             
             //System.out.println("fit: " + fitParameters);
@@ -354,7 +356,6 @@ public class GaussianImageObject extends ImageObject {
         }
 
         this.hadFittingError = false;
-        this.nullifyImages();
     }
     
     protected class DI1Func implements UnivariateFunction {

@@ -56,7 +56,6 @@ public class Renormalization3DFilter extends Filter {
 		
 		VariableSizeMeanFilter VSMF = new VariableSizeMeanFilter();
 		VSMF.setBoxSize(5); // was 5
-		VSMF.apply(mean);
 		
         KernelFilterND kf = new KernelFilterND();
         //double[] d = {0.625, 0.25, 0.375, 0.25, 0.625};
@@ -68,12 +67,13 @@ public class Renormalization3DFilter extends Filter {
         GaussianFilter gf = new GaussianFilter();
         
         gf.setWidth(5);
-        
-        gf.apply(mean);
-        
+                
         LaplacianFilterND lfnd = new LaplacianFilterND();
         ZeroPointFilter zpf = new ZeroPointFilter();
-        
+                
+		VSMF.apply(mean);
+		
+		gf.apply(mean);
         kf.apply(mean);
         
         
@@ -87,6 +87,8 @@ public class Renormalization3DFilter extends Filter {
         zpf.apply(lf);
         gf.apply(lf);
         kf.apply(lf);
+		//gf.apply(lf);
+		//kf.apply(lf);
         
 		float min = Float.MAX_VALUE;
 		float max = 0;

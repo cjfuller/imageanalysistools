@@ -28,14 +28,40 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 public class ImageSubtractionFilter extends Filter {
 	
+	boolean subtractPlanarImage;
+	
+	public ImageSubtractionFilter() {
+		this.subtractPlanarImage = false;
+	}
+	
+	public void setSubtractPlanarImage(boolean subPlanar) {
+		this.subtractPlanarImage = subPlanar;
+	}
+	
 	public void apply(Image im) {
 		
 		if (this.referenceImage == null) {
 			throw new ReferenceImageRequiredException("ImageSubtractionFilter requires a reference image.");
 		}
 		
-		for (ImageCoordinate ic : im) {
-			im.setValue(ic, im.getValue(ic) - this.referenceImage.getValue(ic));
+		if (this.subtractPlanarImage) {
+			ImageCoordinate ic2 = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
+			
+			for (ImageCoordinate ic : im) {
+				ic2.set(ImageCoordinate.X, ic.get(ImageCoordinate.X));
+				ic2.set(ImageCoordinate.Y, ic.get(ImageCoordinate.Y));
+				im.setValue(ic, im.getValue(ic) - this.referenceImage.getValue(ic2));
+
+			}
+			
+			ic2.recycle();
+			
+		} else {
+		
+			for (ImageCoordinate ic : im) {
+				im.setValue(ic, im.getValue(ic) - this.referenceImage.getValue(ic));
+			}
+			
 		}
 		
 	}
