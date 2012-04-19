@@ -5,15 +5,22 @@
 	<property name="builddir" value="build"/>
 	<property name="distdir" value="dist"/>
 	<property name="srcdir" value="src"/>
+	<property name="testdir" value="test"/>
 	<property name="docdir" value="doc"/>
 	<property name="resourcesdir" location="src"/>
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
 	<!--><property name="bootcp_jdk_1.6" location= "jdk_1.6/lib/classes.jar"/>-->
 	<property name="version" value="4.0.8"/>
 	
-	
     <path id="ImageAnalysisTools.classpath">
 		<fileset dir="${libdir}">
+			<include name="*.jar"/>
+		</fileset>
+    </path>
+
+	<!--this should be set to the path to a junit jar-->
+	<path id="ImageAnalysisTools.testclasspath">
+		<fileset dir="${testdir}">
 			<include name="*.jar"/>
 		</fileset>
     </path>
@@ -60,4 +67,29 @@
 		</jar>
 		<copy file="${distdir}/${ant.project.name}_${version}.jar" todir="${ijdir}"/>
 	</target>
+	
+	<target name="buildtest" depends="build">
+		<javac srcdir="${testdir}" destdir="${builddir}" debug="true" includeantruntime="false">
+            <src path="${testdir}"/>
+            <classpath>
+	 			<path refid="ImageAnalysisTools.classpath"/>
+				<path refid="ImageAnalysisTools.testclasspath"/>
+			</classpath>
+        </javac>
+	</target>
+		
+	
+	<target name="test" depends="buildtest">
+		<junit printsummary="on" showoutput="true">
+			<classpath>
+				<pathelement location="${builddir}"/>
+	 			<path refid="ImageAnalysisTools.classpath"/>
+				<path refid="ImageAnalysisTools.testclasspath"/>
+			</classpath>
+		
+			<test name="edu.stanford.cfuller.test.BisquareLinearFitTest"/>
+			<formatter type="brief" usefile="false"/>
+		</junit>
+	</target>
+	
 </project>
