@@ -9,7 +9,6 @@
 	<property name="docdir" value="doc"/>
 	<property name="resourcesdir" location="src"/>
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
-	<!--><property name="bootcp_jdk_1.6" location= "jdk_1.6/lib/classes.jar"/>-->
 	<property name="version" value="4.0.8"/>
 	
     <path id="ImageAnalysisTools.classpath">
@@ -18,7 +17,7 @@
 		</fileset>
     </path>
 
-	<!--this should be set to the path to a junit jar-->
+	<!--this should be set to include a junit jar-->
 	<path id="ImageAnalysisTools.testclasspath">
 		<fileset dir="${testdir}">
 			<include name="*.jar"/>
@@ -41,11 +40,12 @@
         <delete dir="${builddir}"/>
 		<delete dir="${distdir}"/>
     </target>
-    <target name="cleanall" depends="clean"/>
+    <target name="cleanall" depends="clean">
+		<delete dir="${docdir}"/>
+	</target>
 
     <target name="build" depends="init" >
         <echo message="${ant.project.name}: ${ant.file}"/>
-		<!--><javac target="1.6" source="1.6" srcdir="${srcdir}" destdir="${builddir}" bootclasspath="${bootcp_jdk_1.6}" debug="true" includeantruntime="false">-->
 		<javac srcdir="${srcdir}" destdir="${builddir}" debug="true" includeantruntime="false">
             <src path="${srcdir}"/>
             <classpath refid="ImageAnalysisTools.classpath"/>
@@ -65,6 +65,9 @@
 				<filename name="*.config"/>
 			</fileset>
 		</jar>
+	</target>
+	
+	<target name="install" depends="dist">
 		<copy file="${distdir}/${ant.project.name}_${version}.jar" todir="${ijdir}"/>
 	</target>
 	
@@ -87,7 +90,7 @@
 				<path refid="ImageAnalysisTools.testclasspath"/>
 			</classpath>
 		
-			<test name="edu.stanford.cfuller.test.BisquareLinearFitTest"/>
+			<test name="edu.stanford.cfuller.imageanalysistools.fitting.BisquareLinearFitTest"/>
 			<formatter type="brief" usefile="false"/>
 		</junit>
 	</target>
