@@ -38,7 +38,7 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.List;
 
-import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import edu.stanford.cfuller.imageanalysistools.util.Base64BinaryAdapter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -56,7 +56,7 @@ public abstract class ImageObject implements Serializable {
 	//TODO: maintain the notion that the ImageObject has some location in real space, but reduce
 	//dependence on 5D images.
 
-	public static final long serialVersionUID = 3L;
+	public static final long serialVersionUID = 4L;
 	public final static String OBJECT_ELEMENT = "image_object";
 	public final static String CHANNEL_ELEMENT = "channel";
 	public final static String LABEL_ATTR = "label";
@@ -70,7 +70,7 @@ public abstract class ImageObject implements Serializable {
 	public final static String POSITION_ELEMENT = "position";
 	public final static String SERIAL_ELEMENT = "serialized_form";
 	public final static String ENCODING_ATTR = "encoding";
-	public final static String ENCODING_NAME = "hex_binary";
+	public final static String ENCODING_NAME = "base64";
 
 	Vector3D centroidInMask;
 
@@ -621,7 +621,7 @@ public abstract class ImageObject implements Serializable {
 
 			}
 
-			HexBinaryAdapter adapter = new HexBinaryAdapter();
+			Base64BinaryAdapter adapter = new Base64BinaryAdapter();
 			xsw.writeCharacters(adapter.marshal(bytesOutput.toByteArray()));
 
 			xsw.writeEndElement(); //serial
