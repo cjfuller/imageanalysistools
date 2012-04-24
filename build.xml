@@ -89,9 +89,12 @@
 	 			<path refid="ImageAnalysisTools.classpath"/>
 				<path refid="ImageAnalysisTools.testclasspath"/>
 			</classpath>
-		
-			<test name="edu.stanford.cfuller.imageanalysistools.fitting.BisquareLinearFitTest"/>
-			<formatter type="brief" usefile="false"/>
+			<batchtest>
+				<fileset dir="${testdir}">
+					<filename name="**/*Test.java"/>
+				</fileset>
+				<formatter type="brief" usefile="false"/>
+			</batchtest>
 		</junit>
 	</target>
 	

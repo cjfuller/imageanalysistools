@@ -149,6 +149,24 @@ public class FitParameters implements java.io.Serializable {
 		this.otherParameters.put(parameter, value);
 	}
 	
+	/**
+	* Creates a String representation of the parameters.
+	* Format is amplitude, background, pos in each channel, size in each channel, other parameters.
+	* @return a String containing the parameter information.
+	*/
+	public String toString() {
+		String s = "amp=" + this.getAmplitude();
+		s+= ";bkg="+this.getBackground();
+		for (Integer i : this.positionParameters.keySet()) {
+			s+= ";pos" + i + "=" + this.positionParameters.get(i);
+		}
+		for (Integer i : this.sizeParameters.keySet()) {
+			s+= ";size" + i + "=" + this.sizeParameters.get(i);
+		}
+		for (String s : this.otherParameters.keySet()) {
+			s+= ";" + s + "=" + this.otherParameters.get(s); 
+		}
+	}
 	
 }
 
