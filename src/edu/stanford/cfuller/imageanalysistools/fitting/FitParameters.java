@@ -163,9 +163,10 @@ public class FitParameters implements java.io.Serializable {
 		for (Integer i : this.sizeParameters.keySet()) {
 			s+= ";size" + i + "=" + this.sizeParameters.get(i);
 		}
-		for (String s : this.otherParameters.keySet()) {
-			s+= ";" + s + "=" + this.otherParameters.get(s); 
+		for (String sk : this.otherParameters.keySet()) {
+			s+= ";" + sk + "=" + this.otherParameters.get(sk); 
 		}
+		return s;
 	}
 	
 }
