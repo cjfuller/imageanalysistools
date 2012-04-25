@@ -56,7 +56,7 @@ public abstract class ImageObject implements Serializable {
 	//TODO: maintain the notion that the ImageObject has some location in real space, but reduce
 	//dependence on 5D images.
 
-	public static final long serialVersionUID = 4L;
+	public static final long serialVersionUID = 5L;
 	public final static String OBJECT_ELEMENT = "image_object";
 	public final static String CHANNEL_ELEMENT = "channel";
 	public final static String LABEL_ATTR = "label";
@@ -94,6 +94,7 @@ public abstract class ImageObject implements Serializable {
 	List<Double> nPhotonsByChannel; 
 
 	List<RealVector> positionsByChannel;
+	Map<Integer, RealVector> correctedPositionsByChannel;
 	Map<Integer, RealVector> vectorDifferencesBetweenChannels;
 	Map<Integer, Double> scalarDifferencesBetweenChannels;
 
@@ -151,6 +152,7 @@ public abstract class ImageObject implements Serializable {
 		this.nPhotonsByChannel = null;
 
 		this.positionsByChannel = new java.util.ArrayList<RealVector>();
+		this.correctedPositionsByChannel = new java.util.HashMap<Integer, RealVector>();
 
 		this.vectorDifferencesBetweenChannels = new java.util.HashMap<Integer, RealVector>();
 		this.scalarDifferencesBetweenChannels = new java.util.HashMap<Integer, Double>();
@@ -170,6 +172,8 @@ public abstract class ImageObject implements Serializable {
 		this.imageID = null;
 
 		this.hadFittingError = true;
+		
+		this.numberOfChannels = p.getIntValueForKey("num_wavelengths"); // use this so that if there's extra wavelengths not to be quantified at the end, these won't skew the initial guess
 
 		for (ImageCoordinate i : mask) {
 
@@ -221,7 +225,6 @@ public abstract class ImageObject implements Serializable {
 			int maxZOverall = 0;
 
 			//for (int c = 0; c < parent.getDimensionSizes().getC(); c++) {
-			this.numberOfChannels = p.getIntValueForKey("num_wavelengths"); // use this so that if there's extra wavelengths not to be quantified at the end, these won't skew the initial guess
 
 			for (int c = 0; c < this.numberOfChannels; c++) { 
 				this.parentBoxMin.set(ImageCoordinate.C,c);
@@ -506,6 +509,38 @@ public abstract class ImageObject implements Serializable {
 		return this.positionsByChannel.get(channel);
 
 	}
+	
+	/**
+	 * Gets the corrected position of this object in the specified channel (if there is a corrected position).
+	 * 
+	 * Do not modify the returned RealVector, as it is a reference to the internally stored vector.
+	 * 
+	 * @param channel	The index of the channel, either by order in the original multiwavelength image, or in the order specified for split wavelength images.
+	 * 
+	 * @return	A RealVector containing the x,y,and z coordinates of the position, or null if it has not yet been determined, or the channel is out of range.
+	 */
+	public RealVector getCorrectedPositionForChannel(int channel) {
+
+		if (!(this.correctedPositionsByChannel.containsKey(channel))) {
+			return null;
+		}
+
+		return this.correctedPositionsByChannel.get(channel);
+
+	}
+	
+	/**
+	 * Applies the specified correction vector to the position of the object to generate a corrected position that can be accessed using {@link #getCorrectedPositionForChannel(int)}.
+	 * 
+	 * @param channel	The index of the channel, either by order in the original multiwavelength image, or in the order specified for split wavelength images.
+	 * @param correction a RealVector containing a correction that will be subtracted from the position of the object in the specified channel.
+	 * @return	A RealVector containing the x,y,and z coordinates of the position, or null if it has not yet been determined, or the channel is out of range.
+	 */
+	public void applyCorrectionVectorToChannel(int channel, RealVector correction) {
+
+		this.correctedPositionsByChannel.put(channel, this.getPositionForChannel(channel).subtract(correction));
+
+	}
 
 	/**
 	 * Gets the vector difference between the position of the object in two channels.
@@ -531,6 +566,29 @@ public abstract class ImageObject implements Serializable {
 		}
 
 		return this.vectorDifferencesBetweenChannels.get(key);
+
+	}
+	
+	/**
+	 * Gets the vector difference between the corrected positions of the object in two channels.
+	 * 
+	 * If there is no corrected position for a channel, its uncorrected position is used. 
+	 * 
+	 * Note that there is no unit conversion here, and the distance is returned in image units of pixels or sections.
+	 * 
+	 * @param channel0	The index of one channel to use for the difference.
+	 * @param channel1	The index of the other channel to use for the difference.
+	 * @return			The vector difference between the two channels, as channel1 - channel0, or null if either channel is out of range or has not yet been fit.
+	 */
+	public RealVector getCorrectedVectorDifferenceBetweenChannels(int channel0, int channel1) {
+
+		RealVector c0 = this.correctedPositionsByChannel.get(channel0);
+		RealVector c1 = this.correctedPositionsByChannel.get(channel1);
+					
+		if (c0 == null) c0 = this.positionsByChannel.get(channel0);
+		if (c1 == null) c1 = this.positionsByChannel.get(channel1);
+
+		return c1.subtract(c0);
 
 	}
 
@@ -582,8 +640,8 @@ public abstract class ImageObject implements Serializable {
 			xsw.writeAttribute(LABEL_ATTR, Integer.toString(this.label));
 			xsw.writeAttribute(IMAGE_ATTR, this.imageID);
 			xsw.writeCharacters("\n");
-
 			for (int i = 0; i < this.numberOfChannels; i++) {
+				
 				xsw.writeStartElement(CHANNEL_ELEMENT);
 				xsw.writeAttribute(CH_ID_ATTR, Integer.toString(i));
 				xsw.writeCharacters("\n");

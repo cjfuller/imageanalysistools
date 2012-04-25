@@ -38,7 +38,6 @@ public class BisquareLinearFit {
 	
 	private boolean noIntercept;
 	private double tuningConstant;
-	private boolean debug;
 	
 	final static double DEFAULT_TUNING_CONST = 4.685;
 	final static double CONV_NORM = 1e-5;
@@ -50,12 +49,8 @@ public class BisquareLinearFit {
 	public BisquareLinearFit() {
 		this.noIntercept = false;
 		this.tuningConstant = DEFAULT_TUNING_CONST;
-		this.debug = false;
 	}
-	
-	public void debug() {
-		this.debug = true;
-	}
+
 	
 	/**
 	* Disables the fitting of the y-intercept for this fit.
