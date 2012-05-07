@@ -302,13 +302,13 @@ public class VariableSizeMeanFilter extends Filter {
 		
 		
 		
-		double cutoff = 0.001;
+		double cutoff = 0.0001;
 		
 		double smallerVar = var < l_var ? var : l_var;
 		double largerVar = var > l_var ? var : l_var;
 		try {
+			
 			FDistribution f = new FDistribution(count-1, count-1);
-
 			double valueAtLowerCutoff = f.inverseCumulativeProbability(cutoff);
 			double valueAtUpperCutoff = f.inverseCumulativeProbability(1-cutoff);
 			boolean result =  (smallerVar/largerVar > valueAtUpperCutoff || smallerVar/largerVar < valueAtLowerCutoff);
@@ -316,6 +316,7 @@ public class VariableSizeMeanFilter extends Filter {
 
 		} catch (MathIllegalArgumentException e) {
 			LoggingUtilities.getLogger().severe("Exception while calculating variable size mean QO partition: " + e.getMessage());
+			e.printStackTrace();
 			return false;
 		} 
 	}
