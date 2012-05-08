@@ -56,6 +56,8 @@ public class DimensionSwappingFilter extends Filter {
 		super();
 		this.params = null;
 		this.dimsManuallySet = false;
+		this.dim0 = 0;
+		this.dim1 = 0;
 	}
 	
 	/* (non-Javadoc)
