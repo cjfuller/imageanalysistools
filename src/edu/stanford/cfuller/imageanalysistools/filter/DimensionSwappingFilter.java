@@ -47,6 +47,7 @@ public class DimensionSwappingFilter extends Filter {
 
 	int dim0;
 	int dim1;
+	boolean dimsManuallySet;
 	
 	final static String dim0_param = "first_dimension_to_swap";
 	final static String dim1_param = "second_dimension_to_swap";
@@ -54,6 +55,7 @@ public class DimensionSwappingFilter extends Filter {
 	public DimensionSwappingFilter() {
 		super();
 		this.params = null;
+		this.dimsManuallySet = false;
 	}
 	
 	/* (non-Javadoc)
@@ -62,7 +64,7 @@ public class DimensionSwappingFilter extends Filter {
 	@Override
 	public void apply(Image im) {
 		
-		if (this.params != null && this.params.hasKey(dim0_param) && this.params.hasKey(dim1_param)) {
+		if (! this.dimsManuallySet && this.params != null && this.params.hasKey(dim0_param) && this.params.hasKey(dim1_param)) {
 			this.dim0 = this.params.getIntValueForKey(dim0_param);
 			this.dim1 = this.params.getIntValueForKey(dim1_param);
 		}
@@ -79,7 +81,7 @@ public class DimensionSwappingFilter extends Filter {
 	 * Sets the two dimensions to swap in the image.  These should correspond to the 
 	 * dimension constants defined in {@link edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate} (or, rarely, to a user-defined dimension).
 	 * <p>
-	 * These will be overriden if dimensions are specified in the parameter file.
+	 * These will override any dimensions specified in the parameter file.
 	 * 
 	 * @param dim0	The first dimension to swap.
 	 * @param dim1	The second dimension to swap.
@@ -88,6 +90,7 @@ public class DimensionSwappingFilter extends Filter {
 		
 		this.dim0 = dim0;
 		this.dim1 = dim1;
+		this.dimsManuallySet = true;
 		
 	}
 
