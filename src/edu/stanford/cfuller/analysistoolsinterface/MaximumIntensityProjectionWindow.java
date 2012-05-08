@@ -34,6 +34,8 @@ import javax.swing.LayoutStyle;
  */
 public class MaximumIntensityProjectionWindow extends javax.swing.JFrame {
 
+	final static long serialVersionUID= 1L;
+
     MaximumIntensityProjectionController controller;
 
     /** Creates new form MaximumIntensityProjectionWindow */

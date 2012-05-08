@@ -109,10 +109,11 @@ public class OmeroBrowsingWindowController {
         if (selected.isADataset()) {
             this.loadImages();
             
-            Enumeration<DefaultMutableTreeNode> children = selectedNode.children();
-
+            Enumeration children = selectedNode.children();
+			
             while(children.hasMoreElements()) {
-                DefaultMutableTreeNode child = children.nextElement();
+	
+                DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
 
                 ImageHolder ih = (ImageHolder) child.getUserObject();
 
@@ -202,30 +203,35 @@ public class OmeroBrowsingWindowController {
      */
     public List<Project> getProjectList() {
 
-	//return new Vector<Project>();
+		//return new Vector<Project>();
 
-	List rv = null;
+		List rv = null;
 
-	try {
+		try {
 
-	    if (this.queryService == null)
-		this.queryService = this.serviceFactory.getQueryService();
+		    if (this.queryService == null)
+			this.queryService = this.serviceFactory.getQueryService();
 
-	    String query_string = "select p from Project p left outer join fetch p.datasetLinks dsl left outer join fetch dsl.child ds where p.details.owner.omeName = :name";
-	    ParametersI p = new ParametersI();
-	    p.add("id", rlong(1L));
+		    String query_string = "select p from Project p left outer join fetch p.datasetLinks dsl left outer join fetch dsl.child ds where p.details.owner.omeName = :name";
+		    ParametersI p = new ParametersI();
+		    p.add("id", rlong(1L));
 
-	    rv = queryService.findAllByQuery(
-		    query_string,
-		    new ParametersI().add("name", rstring(this.username)));
+		    rv = queryService.findAllByQuery(
+			    query_string,
+			    new ParametersI().add("name", rstring(this.username)));
 
-	} catch (Exception e) {
-            LoggingUtilities.severe("encountered exception while reading datasets");
-	    this.client.closeSession();
-	}
+		} catch (Exception e) {
+	            LoggingUtilities.severe("encountered exception while reading datasets");
+		    this.client.closeSession();
+		}
 
+		List<Project> toReturn = new java.util.ArrayList<Project>();
 
-	return (List<Project>) rv;
+		for (Object prj : rv) {
+			toReturn.add((Project) prj);
+		}
+		
+		return toReturn;
 
     }
 
@@ -278,11 +284,13 @@ public class OmeroBrowsingWindowController {
      */
     private class ImageComparator implements java.util.Comparator<omero.model.Image>, java.io.Serializable {
 
-	public int compare(omero.model.Image a, omero.model.Image b) {
+		final static long serialVersionUID = 1L;
 
-	    return a.getName().getValue().compareTo(b.getName().getValue());
+		public int compare(omero.model.Image a, omero.model.Image b) {
 
-	}
+		    return a.getName().getValue().compareTo(b.getName().getValue());
+
+		}
 
     }
 
@@ -291,11 +299,13 @@ public class OmeroBrowsingWindowController {
      */
     private class ProjectComparator implements java.util.Comparator<Project>, java.io.Serializable {
 
-	public int compare(Project a, Project b) {
+		final static long serialVersionUID = 1L;
 
-	    return a.getName().getValue().compareTo(b.getName().getValue());
+		public int compare(Project a, Project b) {
 
-	}
+		    return a.getName().getValue().compareTo(b.getName().getValue());
+
+		}
 
     }
 
@@ -304,11 +314,13 @@ public class OmeroBrowsingWindowController {
      */
     private class DatasetComparator implements java.util.Comparator<Dataset>, java.io.Serializable {
 
-	public int compare(Dataset a, Dataset b) {
+		final static long serialVersionUID = 1L;
 
-	    return a.getName().getValue().compareTo(b.getName().getValue());
+		public int compare(Dataset a, Dataset b) {
 
-	}
+		    return a.getName().getValue().compareTo(b.getName().getValue());
+
+		}
 
     }
 

@@ -145,8 +145,8 @@ public class DeschmutzerizerController extends TaskController {
 
 		int[] posCZT = this.colorCodedMaskDisplay.convertIndexToPosition(this.colorCodedMaskDisplay.getSlice());
 
-		ImageCoordinate startCoord = ImageCoordinate.createCoordXYZCT((int) xLower,(int)  yLower, posCZT[1]-1,posCZT[0]-1,posCZT[2]-1);
-		ImageCoordinate endCoord = ImageCoordinate.createCoordXYZCT((int) xLower + width+1,(int) yLower + height +1, posCZT[1],posCZT[0],posCZT[2]);
+		ImageCoordinate startCoord = ImageCoordinate.createCoordXYZCT(xLower, yLower, posCZT[1]-1,posCZT[0]-1,posCZT[2]-1);
+		ImageCoordinate endCoord = ImageCoordinate.createCoordXYZCT(xLower + width+1, yLower + height +1, posCZT[1],posCZT[0],posCZT[2]);
 
 		regionNumberCheck.setBoxOfInterest(startCoord, endCoord);
 
@@ -281,13 +281,13 @@ public class DeschmutzerizerController extends TaskController {
 		//
 		//        this.originalImageWindow = new ImageWindow("Original Image");
 		//        this.originalImageWindow.setLocationRelativeTo(this.dw);
-		//        this.originalImageWindow.setLocation((int) (this.originalImageWindow.getLocation().getX()-this.dw.getWidth()/2), (int) (this.originalImageWindow.getLocation().getY() + this.dw.getHeight()/2));
+		//        this.originalImageWindow.setLocation((int) (this.originalImageWindow.getLocation().get(ImageCoordinate.X)-this.dw.getWidth()/2), (int) (this.originalImageWindow.getLocation().get(ImageCoordinate.Y) + this.dw.getHeight()/2));
 		//
 		//
 		//
 		//        this.maskWindow = new ImageWindow("Mask");
 		//        this.maskWindow.setLocationRelativeTo(this.dw);
-		//        this.maskWindow.setLocation((int) (this.maskWindow.getLocation().getX()+this.dw.getWidth()*0.6), (int) (this.maskWindow.getLocation().getY() - this.dw.getHeight()/2));
+		//        this.maskWindow.setLocation((int) (this.maskWindow.getLocation().get(ImageCoordinate.X)+this.dw.getWidth()*0.6), (int) (this.maskWindow.getLocation().get(ImageCoordinate.Y) - this.dw.getHeight()/2));
 		//
 
 		//       
@@ -679,7 +679,7 @@ public class DeschmutzerizerController extends TaskController {
 
 	public void selectAllButtonPressed() {
 
-		this.processBox(new Point(0,0), new Point(this.currentOriginalImage.getDimensionSizes().getX(), this.currentOriginalImage.getDimensionSizes().getY()));
+		this.processBox(new Point(0,0), new Point(this.currentOriginalImage.getDimensionSizes().get(ImageCoordinate.X), this.currentOriginalImage.getDimensionSizes().get(ImageCoordinate.Y)));
 
 	}
 

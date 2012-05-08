@@ -34,6 +34,8 @@ import javax.swing.LayoutStyle;
  */
 public class MainWindow extends javax.swing.JFrame {
 
+	final static long serialVersionUID= 1L;
+
     MainWindowController controller;
 
     /** Creates new form MainWindow */

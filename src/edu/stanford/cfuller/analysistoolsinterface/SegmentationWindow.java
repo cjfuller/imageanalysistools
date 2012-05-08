@@ -40,6 +40,8 @@ import javax.swing.SwingUtilities;
  */
 public class SegmentationWindow extends javax.swing.JFrame {
 
+	final static long serialVersionUID = 1L;
+
     SegmentationController controller;
     DefaultComboBoxModel methodComboBoxModel;
     TextAreaLogHandler handler;

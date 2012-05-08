@@ -118,6 +118,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @return  The x-component as an integer.
      * @deprecated 	Use {@link #get(int)} instead.
      */
+	@Deprecated
 	public int getX(){return this.get(ImageCoordinate.X);}
 
     /**
@@ -125,6 +126,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @return  The y-component as an integer.
      * @deprecated 	Use {@link #get(int)} instead.
      */
+	@Deprecated
 	public int getY(){return this.get(ImageCoordinate.Y);}
 
     /**
@@ -132,6 +134,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @return  The z-component as an integer.
      * @deprecated 	Use {@link #get(int)} instead.
      */
+	@Deprecated
 	public int getZ(){return this.get(ImageCoordinate.Z);}
 
     /**
@@ -139,6 +142,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @return  The c-component as an integer.
      * @deprecated 	Use {@link #get(int)} instead.
      */
+	@Deprecated
 	public int getC(){return this.get(ImageCoordinate.C);}
 
     /**
@@ -146,6 +150,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @return  The t-component as an integer.
      * @deprecated 	Use {@link #get(int)} instead.
      */
+	@Deprecated
 	public int getT(){return this.get(ImageCoordinate.T);}
 	
 	
@@ -277,6 +282,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @return      An ImageCoordinate whose components have been set to the specified values.
      * @deprecated	use {@link #createCoordXYZCT(int, int, int, int, int)} instead.
      */
+	@Deprecated
 	public static ImageCoordinate createCoord(int x, int y, int z, int c, int t) {
 		
 		return ImageCoordinate.createCoordXYZCT(x, y, z, c, t);
@@ -409,6 +415,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @param t     The new t-component of the ImageCoordinate.
      * @deprecated	use {@link #setCoordXYZCT(int, int, int, int, int)} instead.
      */
+	@Deprecated
 	public void setCoord(int x, int y, int z, int c, int t) {
 		this.set(ImageCoordinate.X, x);
 		this.set(ImageCoordinate.Y, y);
@@ -445,6 +452,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @param x The new x-component of the ImageCoordinate.
      * @deprecated use {@link #set(int, int)} instead.
      */
+	@Deprecated
 	public void setX(int x) {
 		this.set(ImageCoordinate.X, x);
 	}
@@ -454,6 +462,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @param y The new y-component of the ImageCoordinate.
      * @deprecated use {@link #set(int, int)} instead.
      */
+	@Deprecated
 	public void setY(int y) {
 		this.set(ImageCoordinate.Y, y);
 	}
@@ -463,6 +472,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @param z The new z-component of the ImageCoordinate.
      * @deprecated use {@link #set(int, int)} instead.
      */
+	@Deprecated
 	public void setZ(int z) {
 		this.set(ImageCoordinate.Z, z);
 	}
@@ -472,6 +482,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @param c The new c-component of the ImageCoordinate.
      * @deprecated use {@link #set(int, int)} instead.
      */
+	@Deprecated
 	public void setC(int c) {
 		this.set(ImageCoordinate.C, c);
 	}
@@ -481,6 +492,7 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
      * @param t The new t-component of the ImageCoordinate.
      * @deprecated use {@link #set(int, int)} instead.
      */
+	@Deprecated
 	public void setT(int t) {
 		this.set(ImageCoordinate.T, t);
 	}

@@ -79,6 +79,7 @@ public class ReadOnlyImage extends Image {
      * @param col   The column (x-coordinate) to set.
      * @param value The value that the Image will be set to at the specified location.
      */
+	@Deprecated
     @Override
     public void setValue(int row, int col, float value) {
         throw new UnsupportedOperationException("Setting values is not supported for read-only Images.");

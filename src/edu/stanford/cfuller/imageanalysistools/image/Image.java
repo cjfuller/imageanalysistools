@@ -400,6 +400,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 	 * @param col   The column (x-coordinate) to set.
 	 * @param value The value that the Image will be set to at the specified location.
 	 */
+	@Deprecated
 	public void setValue(int row, int col, float value) {
 		pixelData.setPixel(col, row, 0, 0, 0, value);
 	}
@@ -668,7 +669,7 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 
 			ImageProcessor imP = imPl.getProcessor();
 
-			imP.setf(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y), (float) this.getValue(ic));
+			imP.setf(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y), this.getValue(ic));
 
 		}
 

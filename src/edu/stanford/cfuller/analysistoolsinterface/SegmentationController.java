@@ -175,17 +175,17 @@ public class SegmentationController extends TaskController implements OmeroListe
 
         MethodInfo mi = (MethodInfo) this.sw.getMethodComboBoxModel().getElementAt(this.sw.getSelectedMethodIndex());
 
-        Class<? extends Method> c = mi.getMethodClass();
+        Class c = mi.getMethodClass();
                         
         final ParameterDictionary pd = (new ParameterXMLParser()).parseXMLFileToParameterDictionary(parameterFilename);        
         
         if (c == null && !pd.hasKey("method_name")) {
             try {
-                c = (Class<? extends Method>) Class.forName(this.sw.getCustomClassName());
+                c = Class.forName(this.sw.getCustomClassName());
             } catch (ClassNotFoundException e) {
                 LoggingUtilities.warning("Custom class not found with name: " + this.sw.getCustomClassName());
                 return;
-            }
+            } 
         }
 
         pd.addIfNotSet("method_name", c.getName());
@@ -251,17 +251,17 @@ public class SegmentationController extends TaskController implements OmeroListe
 
     protected static class MethodInfo {
         String displayName;
-        Class<? extends Method> methodClass;
+        Class methodClass;
 
         public MethodInfo(String displayName, String className) {
             this.displayName = displayName;
             if (className != null) {
                 try {
-                    this.methodClass = (Class<? extends Method>) Class.forName(className);
+                    this.methodClass =  Class.forName(className);
                 } catch (ClassNotFoundException e) {
                     LoggingUtilities.warning("Valid class not found for method with name: " + displayName);
                     this.methodClass = null;
-                }
+                } 
             } else {
                 this.methodClass = null;
             }
@@ -271,7 +271,7 @@ public class SegmentationController extends TaskController implements OmeroListe
             return this.displayName;
         }
 
-        public Class<? extends Method> getMethodClass() {
+        public Class getMethodClass() {
             return this.methodClass;
         }
 

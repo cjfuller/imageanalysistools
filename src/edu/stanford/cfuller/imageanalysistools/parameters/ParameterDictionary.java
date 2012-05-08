@@ -127,7 +127,8 @@ public class ParameterDictionary implements Serializable {
      * @return          A new ParameterDictionary containing the parsed arguments.
      * @throws IOException  if an exception is encountered while reading the file.
      */
-    public static ParameterDictionary parseParametersFileToParameterDictionary(String filename) throws IOException {
+    @Deprecated
+	public static ParameterDictionary parseParametersFileToParameterDictionary(String filename) throws IOException {
 
         BufferedReader br = new BufferedReader(new FileReader(filename));
 

@@ -40,6 +40,8 @@ import javax.swing.JLabel;
  */
 public class ImageDisplayPanel extends javax.swing.JPanel {
 
+	final static long serialVersionUID= 1L;
+
     BufferedImage currentMaskedImage;
     BufferedImage originalImage;
     BufferedImage originalRescaledImage;

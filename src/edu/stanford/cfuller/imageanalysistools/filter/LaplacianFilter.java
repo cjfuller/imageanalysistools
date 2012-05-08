@@ -101,7 +101,7 @@ public class LaplacianFilter extends Filter{
                 newValue -= (numEl - count) * im.getValue(ic);
             }
 
-            newIm.setValue(ic, (float) newValue);
+            newIm.setValue(ic, newValue);
 
             if (newValue < minValue) minValue = newValue;
 

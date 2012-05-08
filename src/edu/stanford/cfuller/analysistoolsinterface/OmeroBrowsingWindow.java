@@ -37,6 +37,8 @@ import javax.swing.LayoutStyle;
  */
 public class OmeroBrowsingWindow extends javax.swing.JFrame {
 
+	final static long serialVersionUID= 1L;
+
     OmeroBrowsingWindowController controller;
 
     /** Creates new form OmeroBrowsingWindow */

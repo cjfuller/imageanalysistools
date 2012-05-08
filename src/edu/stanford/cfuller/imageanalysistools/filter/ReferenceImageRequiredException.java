@@ -29,6 +29,8 @@ package edu.stanford.cfuller.imageanalysistools.filter;
  */
 public class ReferenceImageRequiredException extends RuntimeException {
 	
+	final static long serialVersionUID = 1L;
+	
 	public ReferenceImageRequiredException() {
 		super();
 	}

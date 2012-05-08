@@ -37,6 +37,8 @@ import javax.swing.LayoutStyle;
  */
 public class ParameterWindow extends javax.swing.JFrame {
 
+	static final long serialVersionUID = 1L;
+
     ParameterSetupController controller;
     DefaultListModel inUseParametersModel;
     Object currentlyBeingEdited;
@@ -163,6 +165,7 @@ public class ParameterWindow extends javax.swing.JFrame {
         jScrollPane1.setHorizontalScrollBar(null);
 
         availableParameterList.setModel(new javax.swing.AbstractListModel() {
+			final static long serialVersionUID = 1L;
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
@@ -174,6 +177,7 @@ public class ParameterWindow extends javax.swing.JFrame {
         jScrollPane2.setHorizontalScrollBar(null);
 
         usedParameterList.setModel(new javax.swing.AbstractListModel() {
+			final static long serialVersionUID = 1L;
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public Object getElementAt(int i) { return strings[i]; }
@@ -251,11 +255,6 @@ public class ParameterWindow extends javax.swing.JFrame {
 
         jLabel3.setText("Parameter Name");
 
-        parameterNameField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                parameterNameFieldActionPerformed(evt);
-            }
-        });
         parameterNameField.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 parameterNameFieldFocusGained(evt);
@@ -313,11 +312,7 @@ public class ParameterWindow extends javax.swing.JFrame {
 
         parameterTypeButtonGroup.add(floatingPointRadioButton);
         floatingPointRadioButton.setText("Decimal Number");
-        floatingPointRadioButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                floatingPointRadioButtonActionPerformed(evt);
-            }
-        });
+
         floatingPointRadioButton.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 floatingPointRadioButtonFocusGained(evt);
@@ -474,10 +469,6 @@ public class ParameterWindow extends javax.swing.JFrame {
         controller.removeButtonPressed();
     }//GEN-LAST:event_removeButtonActionPerformed
 
-    private void parameterNameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parameterNameFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_parameterNameFieldActionPerformed
-
     private void parameterNameFieldFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_parameterNameFieldFocusGained
         this.currentlyBeingEdited = this.usedParameterList.getSelectedValue();
     }//GEN-LAST:event_parameterNameFieldFocusGained
@@ -529,10 +520,6 @@ public class ParameterWindow extends javax.swing.JFrame {
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         this.controller.cancelButtonPressed();
     }//GEN-LAST:event_cancelButtonActionPerformed
-
-    private void floatingPointRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_floatingPointRadioButtonActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_floatingPointRadioButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

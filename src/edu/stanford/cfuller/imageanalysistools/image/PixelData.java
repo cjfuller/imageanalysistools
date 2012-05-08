@@ -343,6 +343,7 @@ public class PixelData implements java.io.Serializable {
      * @deprecated  Use {@link #getDataType()} instead.
      * @return  An integer corresponding to the format of the underlying byte representation of the data.
      */
+	@Deprecated
 	public int getLociDataType() {return this.dataType;}
 
 
@@ -414,7 +415,7 @@ public class PixelData implements java.io.Serializable {
 		case loci.formats.FormatTools.FLOAT:
 			
 			while(in.hasRemaining()) {
-				convertedPixels[counter++] = (float) (in.getFloat());
+				convertedPixels[counter++] = (in.getFloat());
 			}
             break;
 			
