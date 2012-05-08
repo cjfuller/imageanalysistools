@@ -49,7 +49,7 @@
 		<javac srcdir="${srcdir}" destdir="${builddir}" debug="true" includeantruntime="false">
             <src path="${srcdir}"/>
             <classpath refid="ImageAnalysisTools.classpath"/>
-			<compilerarg value="-Xlint"/>
+			<!-- <compilerarg value="-Xlint"/> -->
         </javac>
     </target>
 

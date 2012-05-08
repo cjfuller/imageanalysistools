@@ -205,15 +205,52 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 
 	}
 
-
-
-
 	/**
 	 * Default constructor that subclasses may use to do the initialization themselves.
 	 */
 	protected Image() {}
 
 	//public methods
+	
+	/**
+	* Resizes the image to the size specified in the ImageCoordinate.
+	* <p>
+	* Any image data that is still within the bounds of the new size will be transfered.
+	* Other image data will be discarded; regions previously outside the image will
+	* be filled with zeros.
+	* <p>
+	* Any existing box of interest will be erased on calling this method.
+	* 
+	* @param newSize an ImageCoordinate containing the new size of each dimension of the image.
+	*/
+	public void resize(ImageCoordinate newSize) {
+		final float fillValue = 0.0f;
+		this.clearBoxOfInterest();
+		this.coordinateArrayStorage = null;
+		PixelData oldPixelData = this.pixelData;
+		ImageCoordinate oldDimensionSizes = this.dimensionSizes;
+		this.dimensionSizes = ImageCoordinate.cloneCoord(newSize);
+		this.pixelData= (new PixelDataFactory()).createPixelData(newSize, loci.formats.FormatTools.FLOAT, "XYZCT");
+
+		this.setMetadataPixelCharacteristics(this.pixelData);
+		this.setMetadataDimensionSizes(newSize);
+
+		for (ImageCoordinate i : this) {
+			boolean inBounds = true;
+			for (Integer dim : i) {
+				inBounds &= (i.get(dim) < oldDimensionSizes.get(dim));
+			}
+			if (inBounds) {			
+				this.setValue(i, oldPixelData.getPixel(i.get(ImageCoordinate.X), i.get(ImageCoordinate.Y), i.get(ImageCoordinate.Z), i.get(ImageCoordinate.C), i.get(ImageCoordinate.T)));
+			} else {
+				this.setValue(i, fillValue);
+			}
+		}
+		
+		oldDimensionSizes.recycle();
+		
+	}
+	
 
 	/**
 	 * Sets the region of interest in the Image.
@@ -977,6 +1014,18 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		this.metadata.setImageID("Image:0", 0);
 		this.metadata.setPixelsID("Pixels:0", 0);
 		this.metadata.setPixelsBinDataBigEndian(Boolean.TRUE, 0, 0);
+	
+		this.setMetadataPixelCharacteristics(this.pixelData);
+
+		this.setMetadataDimensionSizes(this.dimensionSizes);
+
+		for (int i =0; i < dimensionSizes.get(ImageCoordinate.C); i++) {
+			this.metadata.setChannelID("Channel:0:"+i, 0, i);
+			this.metadata.setChannelSamplesPerPixel(new PositiveInteger(1), 0, i);
+		}
+	}
+	
+	private void setMetadataPixelCharacteristics(PixelData toUse) {
 		try {
 			this.metadata.setPixelsType(ome.xml.model.enums.PixelType.fromString(loci.formats.FormatTools.getPixelTypeString(this.pixelData.getDataType())), 0);
 		} catch (ome.xml.model.enums.EnumerationException e) {
@@ -988,17 +1037,14 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 		} catch (ome.xml.model.enums.EnumerationException e) {
 			e.printStackTrace();
 		}
-
+	}
+	
+	private void setMetadataDimensionSizes(ImageCoordinate dimensionSizes) {
 		this.metadata.setPixelsSizeC(new PositiveInteger(dimensionSizes.get(ImageCoordinate.C)), 0);
 		this.metadata.setPixelsSizeT(new PositiveInteger(dimensionSizes.get(ImageCoordinate.T)), 0);
 		this.metadata.setPixelsSizeZ(new PositiveInteger(dimensionSizes.get(ImageCoordinate.Z)), 0);
 		this.metadata.setPixelsSizeX(new PositiveInteger(dimensionSizes.get(ImageCoordinate.X)), 0);
 		this.metadata.setPixelsSizeY(new PositiveInteger(dimensionSizes.get(ImageCoordinate.Y)), 0);
-
-		for (int i =0; i < dimensionSizes.get(ImageCoordinate.C); i++) {
-			this.metadata.setChannelID("Channel:0:"+i, 0, i);
-			this.metadata.setChannelSamplesPerPixel(new PositiveInteger(1), 0, i);
-		}
 	}
 
 }

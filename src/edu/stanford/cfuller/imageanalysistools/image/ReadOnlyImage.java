@@ -95,6 +95,15 @@ public class ReadOnlyImage extends Image {
         throw new UnsupportedOperationException("Setting values is not supported for read-only Images.");
     }
 
+	/**
+	* Overrides the resize method to throw an UnsupportedOperationException.
+	* @param newSize an ImageCoordinate containing the new size of each dimension of the image.
+	*/
+	@Override
+	public void resize(ImageCoordinate newSize) {
+		throw new UnsupportedOperationException("Resize is not supported for read-only Images.");
+    }
+
     /**
      * Finalization.
      *

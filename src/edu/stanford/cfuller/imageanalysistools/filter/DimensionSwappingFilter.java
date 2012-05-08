@@ -69,11 +69,9 @@ public class DimensionSwappingFilter extends Filter {
 		
 		Image out = DimensionFlipper.flip(im, this.dim0, this.dim1);
 		
-		im.copy(out);
+		im.resize(out.getDimensionSizes());
 		
-		/*
-			TODO the copy method does not work correctly when the dimensions flipped have different sizes; figure out a way to resize the image.
-		*/
+		im.copy(out);
 
 	}
 	
