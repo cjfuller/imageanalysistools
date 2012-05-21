@@ -158,8 +158,6 @@ public class DeschmutzerizerController extends TaskController {
 			}
 		}
 
-		//for (Integer i : tempSelectedRegions) {System.out.println("selected " + i);}
-
 
 		startCoord.recycle();
 		endCoord.recycle();
@@ -239,6 +237,13 @@ public class DeschmutzerizerController extends TaskController {
 		
 		Roi currentRoi = this.colorCodedMaskDisplay.getRoi();
 		
+			
+		if (currentRoi == null) {
+		
+			currentRoi = this.originalImageDisplay.getRoi();
+			
+		}
+				
 		if (currentRoi == null) return;
 		
 		Point secondCorner = new Point(currentRoi.getBounds().getLocation());
@@ -249,6 +254,7 @@ public class DeschmutzerizerController extends TaskController {
 		//this.processBox(this.maskImageDisplay.translateDisplayPointToImagePoint(this.dieh.getMouseDownPoint()), this.maskImageDisplay.translateDisplayPointToImagePoint(this.dieh.getMouseUpPoint()));
 
 		this.colorCodedMaskDisplay.killRoi();
+		this.originalImageDisplay.killRoi();
 
 	}
 
@@ -278,28 +284,6 @@ public class DeschmutzerizerController extends TaskController {
 		this.originalImageWindow = null;
 		this.maskWindow = null;
 
-		//
-		//        this.originalImageWindow = new ImageWindow("Original Image");
-		//        this.originalImageWindow.setLocationRelativeTo(this.dw);
-		//        this.originalImageWindow.setLocation((int) (this.originalImageWindow.getLocation().get(ImageCoordinate.X)-this.dw.getWidth()/2), (int) (this.originalImageWindow.getLocation().get(ImageCoordinate.Y) + this.dw.getHeight()/2));
-		//
-		//
-		//
-		//        this.maskWindow = new ImageWindow("Mask");
-		//        this.maskWindow.setLocationRelativeTo(this.dw);
-		//        this.maskWindow.setLocation((int) (this.maskWindow.getLocation().get(ImageCoordinate.X)+this.dw.getWidth()*0.6), (int) (this.maskWindow.getLocation().get(ImageCoordinate.Y) - this.dw.getHeight()/2));
-		//
-
-		//       
-		//        this.maskWindow.addKeyListener(this.dieh);
-		//
-		//        
-		//        this.maskWindow.addMouseListener(this.dieh);
-		//
-		//        
-		//        this.maskWindow.addMouseMotionListener(this.dieh);
-		//        
-		//
 
 	}
 
@@ -545,18 +529,20 @@ public class DeschmutzerizerController extends TaskController {
 			channel = this.currentParameters.getIntValueForKey("marker_channel_index");
 		}
 
-		ImageCoordinate start = ImageCoordinate.createCoordXYZCT(0,0,0,channel,0);
-		ImageCoordinate dims = ImageCoordinate.cloneCoord(this.currentOriginalImage.getDimensionSizes());
-		dims.set(ImageCoordinate.C, 1);
+		// ImageCoordinate start = ImageCoordinate.createCoordXYZCT(0,0,0,channel,0);
+		// 		ImageCoordinate dims = ImageCoordinate.cloneCoord(this.currentOriginalImage.getDimensionSizes());
+		// 		dims.set(ImageCoordinate.C, 1);
+		// 
+		// 
+		// 		this.currentOriginalImage = this.currentOriginalImage.subImage(dims, start);
+		// 
+		// 
+		// 
+		// 
+		// 		start.recycle();
+		// 		dims.recycle();
 
-
-		this.currentOriginalImage = this.currentOriginalImage.subImage(dims, start);
-
-
-
-
-		start.recycle();
-		dims.recycle();
+		
 
 
 		Image display = new Image(this.currentMaskImage);
@@ -592,6 +578,9 @@ public class DeschmutzerizerController extends TaskController {
 		}
 
 		ImagePlus orig = this.currentOriginalImage.toImagePlus();
+		this.originalImageDisplay = orig;
+		
+		this.originalImageDisplay.setPosition(channel+1, 1, 1);
 
 		if (this.maskWindow == null || this.originalImageWindow == null) {
 			this.colorCodedMaskDisplay.show();
@@ -606,13 +595,12 @@ public class DeschmutzerizerController extends TaskController {
 			this.maskWindow.setLocationRelativeTo(this.dw);
 			this.maskWindow.setLocationAndSize((int) (this.maskWindow.getLocation().getX()+this.dw.getWidth()*1.1), (int) (this.maskWindow.getLocation().getY()+ this.dw.getHeight()/2), 500, (int) (500.0*this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.Y)/this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.X)));
 
-			this.maskWindow.addKeyListener(this.dieh);
-			this.maskWindow.getCanvas().addKeyListener(this.dieh);
-
 			this.maskWindow.addMouseListener(this.dieh);
 			this.maskWindow.getCanvas().addMouseListener(this.dieh);
+			
+			this.originalImageWindow.addMouseListener(this.dieh);
+			this.originalImageWindow.getCanvas().addMouseListener(this.dieh);
 
-			//this.maskWindow.addMouseMotionListener(this.dieh);
 		} else {
 
 			this.maskWindow.setImage(this.colorCodedMaskDisplay);
@@ -625,6 +613,7 @@ public class DeschmutzerizerController extends TaskController {
 		orig.resetDisplayRange();
 		this.colorCodedMaskDisplay.resetDisplayRange();
 		orig.updateAndDraw();
+		this.originalImageDisplay.updateAndRepaintWindow();
 
 	}
 

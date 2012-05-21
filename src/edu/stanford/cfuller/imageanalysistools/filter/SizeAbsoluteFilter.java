@@ -32,7 +32,7 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 /**
  * A Filter that removes regions from a mask that are larger or smaller than specified size cutoffs.
  * <p>
- * The size cutoffs are retrieved from the ParameterDictionary used for the analysis, in the parameters "maxSize" and "minSize", in units of number
+ * The size cutoffs are retrieved from the ParameterDictionary used for the analysis, in the parameters "max_size" and "min_size", in units of number
  * of pixels. If these are not specified some default values will be used.
  * <p>
  * This Filter does not use a reference Image.

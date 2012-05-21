@@ -9,7 +9,7 @@
 	<property name="docdir" value="doc"/>
 	<property name="resourcesdir" location="src"/>
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
-	<property name="version" value="4.0.8.1"/>
+	<property name="version" value="4.0.9"/>
 	
     <path id="ImageAnalysisTools.classpath">
 		<fileset dir="${libdir}">
