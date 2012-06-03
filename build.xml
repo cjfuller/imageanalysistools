@@ -2,6 +2,7 @@
 
 <project basedir="." default="dist" name="ImageAnalysisTools">
 	<property name="libdir" value="lib"/>
+	<property name="standalone_libdir" value="${libdir}/standalone_only"/>
 	<property name="builddir" value="build"/>
 	<property name="distdir" value="dist"/>
 	<property name="srcdir" value="src"/>
@@ -9,11 +10,13 @@
 	<property name="docdir" value="doc"/>
 	<property name="resourcesdir" location="src"/>
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
-	<property name="version" value="4.0.9"/>
+	<property name="version" value="4.0.10"/>
+	<property name="plugin_jar" value="${distdir}/${ant.project.name}_${version}.jar"/>
+	<property name="standalone_jar" value="${distdir}/${ant.project.name}_${version}_standalone.jar"/>
 	
     <path id="ImageAnalysisTools.classpath">
 		<fileset dir="${libdir}">
-			<include name="*.jar"/>
+			<include name="**/*.jar"/>
 		</fileset>
     </path>
 
@@ -54,11 +57,21 @@
     </target>
 
     <target name="dist" depends="build">
-		<jar jarfile="${distdir}/${ant.project.name}_${version}.jar" basedir="${builddir}">
+		<jar jarfile="${standalone_jar}" basedir="${builddir}">
 			<zipgroupfileset dir="${libdir}" includes="*.jar"/>
+			<zipgroupfileset dir="${standalone_libdir}" includes="*.jar"/>
 			<manifest>
 				<attribute name="Main-Class" value="edu.stanford.cfuller.analysistoolsinterface.Main"/>
 			</manifest>
+			<fileset dir="${resourcesdir}">
+				<filename name="**/*.xml"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="plugin" depends="build">
+		<jar jarfile="${plugin_jar}" basedir="${builddir}">
+			<zipgroupfileset dir="${libdir}" includes="*.jar"/>
 			<fileset dir="${resourcesdir}">
 				<filename name="**/*.xml"/>
 			</fileset>
@@ -68,8 +81,11 @@
 		</jar>
 	</target>
 	
-	<target name="install" depends="dist">
-		<copy file="${distdir}/${ant.project.name}_${version}.jar" todir="${ijdir}"/>
+	<target name="install" depends="plugin">
+		<copy file="${plugin_jar}" todir="${ijdir}"/>
+	</target>
+	
+	<target name="all" depends="plugin,dist">
 	</target>
 	
 	<target name="buildtest" depends="build">

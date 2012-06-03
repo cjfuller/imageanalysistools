@@ -85,8 +85,16 @@ public class Histogram implements Serializable {
 		java.util.Arrays.fill(this.counts, 0);
 		java.util.Arrays.fill(this.cumulativeCounts, 0);
 		
+		boolean suppressNegativeWarning = false;
+		
 		for (ImageCoordinate i : im) {
-			if (im.getValue(i) < 0) {LoggingUtilities.getLogger().warning("negative image value"); continue;}
+			if (im.getValue(i) < 0) {
+				if (!suppressNegativeWarning) {
+					suppressNegativeWarning = true;
+					LoggingUtilities.getLogger().warning("negative image value");
+				}
+				continue;
+			}
 			this.counts[(int) im.getValue(i)]++;
 			this.totalCounts++;
 			this.mean += im.getValue(i);
