@@ -61,6 +61,8 @@ public class GaussianImageObject extends ImageObject {
 	 */
 	
 	static final String NUM_WAVELENGTHS_PARAM = "num_wavelengths";
+	static final String Z_WIDTH_PARAM = "z_width";
+	static final String XY_WIDTH_PARAM = "xy_width";
 		
     /**
      * Creates an empty GaussianImageObject.
@@ -222,6 +224,14 @@ public class GaussianImageObject extends ImageObject {
 
             double sizex = limitedWidthxy / p.getDoubleValueForKey(PIXELSIZE_PARAM);
             double sizez = limitedWidthz / p.getDoubleValueForKey(SECTIONSIZE_PARAM);
+
+			if (p.hasKey(Z_WIDTH_PARAM)) {
+				sizez = p.getDoubleValueForKey(Z_WIDTH_PARAM);
+			}
+			
+			if (p.hasKey(XY_WIDTH_PARAM)) {
+				sizex = p.getDoubleValueForKey(XY_WIDTH_PARAM);
+			}
 
             fitParameters.setEntry(1, sizex/2);
             fitParameters.setEntry(2, sizez/2);

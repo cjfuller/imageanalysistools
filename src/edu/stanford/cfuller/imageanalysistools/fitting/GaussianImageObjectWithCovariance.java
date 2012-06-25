@@ -48,6 +48,15 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
 
 	static final long serialVersionUID =2L;
 		
+		
+	/**
+	* Optional Parameters
+	*/
+	
+	static final String Z_WIDTH_PARAM = "z_width";
+	static final String XY_WIDTH_PARAM = "xy_width";
+
+		
     /**
      * Creates an empty GaussianImageObject.
      */
@@ -213,6 +222,15 @@ public class GaussianImageObjectWithCovariance extends ImageObject {
             double sizex = limitedWidthxy / p.getDoubleValueForKey("pixelsize_nm");
             double sizey = limitedWidthxy / p.getDoubleValueForKey("pixelsize_nm");
             double sizez = limitedWidthz / p.getDoubleValueForKey("z_sectionsize_nm");
+
+			if (p.hasKey(Z_WIDTH_PARAM)) {
+				sizez = p.getDoubleValueForKey(Z_WIDTH_PARAM);
+			}
+			
+			if (p.hasKey(XY_WIDTH_PARAM)) {
+				sizex = p.getDoubleValueForKey(XY_WIDTH_PARAM);
+				sizey = p.getDoubleValueForKey(XY_WIDTH_PARAM);
+			}
 
             fitParameters.setEntry(1, sizex/2);
             fitParameters.setEntry(2, sizey/2);
