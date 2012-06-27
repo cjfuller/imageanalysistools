@@ -187,16 +187,19 @@ public class PixelData implements java.io.Serializable {
 	}
 
     /**
-     * Sets the raw byte representation of the pixel data to the specified array.
-     *<p>
-     * Pixel values should be represented by the numeric type, byte order, and dimension order specified when initializing the PixelData.
-     * This will not be checked for the correct format.
-     *<p>
-     * The internal numerical representation of the pixel data will be updated immediately, and the data in the specified byte array will replace
-     * any existing data.
-     *
-     * @param pixelBytes    A byte array containing the new pixel data.
-     */
+    * @deprecated this method makes it more difficult not to maintain an extra copy of image data in memory.  Use {@link #setPlane(int, int, int, byte[])} instead.
+	* 
+    * Sets the raw byte representation of the pixel data to the specified array.
+    *<p>
+    * Pixel values should be represented by the numeric type, byte order, and dimension order specified when initializing the PixelData.
+    * This will not be checked for the correct format.
+    *<p>
+    * The internal numerical representation of the pixel data will be updated immediately, and the data in the specified byte array will replace
+    * any existing data.
+    *
+    * @param pixelBytes    A byte array containing the new pixel data.
+    */
+	@Deprecated
 	public void setBytes(byte[] pixelBytes) {
 
 		pixels = pixelBytes;
@@ -204,25 +207,190 @@ public class PixelData implements java.io.Serializable {
 		updateConvertedPixelsFromBytes();
 		
 	}
+	
+	
+	/**
+    * Sets the raw byte representation of one plane of the pixel data to the specified array.
+    *<p>
+    * Pixel values should be represented by the numeric type, byte order, and dimension order specified when initializing the PixelData.
+    * This will not be checked for the correct format.
+    *<p>
+    * The internal numerical representation of the pixel data will be updated immediately.
+    * 
+    * @param zIndex	  the z-dimension index of the plane being set (0-indexed)
+    * @param cIndex	  the c-dimension index of the plane being set (0-indexed)
+    * @param tIndex	  the t-dimension index of the plane being set (0-indexed)
+    * @param plane    A byte array containing the new pixel data for the specified plane.
+    */
+	public void setPlane(int zIndex, int cIndex, int tIndex, byte[] plane) {
+		
+		if (!(this.dimensionOrder.startsWith("XY") || this.dimensionOrder.startsWith("YX"))) {
+            throw new UnsupportedOperationException("Setting a single plane as a byte array is not supported for images whose dimension order does not start with XY or YX."); 
+        }
+
+		java.nio.ByteBuffer in = java.nio.ByteBuffer.wrap(plane);
+				
+		in.order(this.byteOrder);
+
+						
+		if (this.dataType == loci.formats.FormatTools.INT8) {
+			
+			java.nio.ByteBuffer convBuffer = in;
+			
+			for (int y = 0; y < this.size_y; y++) {
+				for (int x = 0; x < this.size_x; x++) {
+
+					int offset = x*x_offset + y*y_offset;
+
+					this.setPixel(x, y, zIndex, cIndex, tIndex, (float) (convBuffer.get(offset)));
+
+				}
+			}
+			
+        } else if (this.dataType == loci.formats.FormatTools.UINT8) {
+
+			java.nio.ByteBuffer convBuffer = in;
+
+			for (int y = 0; y < this.size_y; y++) {
+				for (int x = 0; x < this.size_x; x++) {
+
+					int offset = x*x_offset + y*y_offset;
+
+					this.setPixel(x, y, zIndex, cIndex, tIndex, (float) (convBuffer.get(offset)));
+
+				}
+			}			
+			
+		} else if (this.dataType == loci.formats.FormatTools.INT16) {
+		
+			java.nio.ShortBuffer convBuffer = in.asShortBuffer();
+			
+			for (int y = 0; y < this.size_y; y++) {
+				for (int x = 0; x < this.size_x; x++) {
+
+					int offset = x*x_offset + y*y_offset;
+
+					this.setPixel(x, y, zIndex, cIndex, tIndex, (float) (convBuffer.get(offset)));
+
+				}
+			}
+
+
+        } else if (this.dataType == loci.formats.FormatTools.UINT16) {
+
+			java.nio.ShortBuffer convBuffer = in.asShortBuffer();
+
+			for (int y = 0; y < this.size_y; y++) {
+				for (int x = 0; x < this.size_x; x++) {
+
+					int offset = x*x_offset + y*y_offset;
+
+					this.setPixel(x, y, zIndex, cIndex, tIndex, (float) (convBuffer.get(offset)));
+
+				}
+			}
+
+		} else if (this.dataType == loci.formats.FormatTools.INT32) {
+			
+			java.nio.IntBuffer convBuffer = in.asIntBuffer();
+			
+			for (int y = 0; y < this.size_y; y++) {
+				for (int x = 0; x < this.size_x; x++) {
+
+					int offset = x*x_offset + y*y_offset;
+
+					this.setPixel(x, y, zIndex, cIndex, tIndex, (float) (convBuffer.get(offset)));
+
+				}
+			}
+
+        } else if (this.dataType == loci.formats.FormatTools.UINT32) {
+
+			java.nio.IntBuffer convBuffer = in.asIntBuffer();
+
+            for (int y = 0; y < this.size_y; y++) {
+				for (int x = 0; x < this.size_x; x++) {
+
+					int offset = x*x_offset + y*y_offset;
+
+					this.setPixel(x, y, zIndex, cIndex, tIndex, (float) (convBuffer.get(offset)));
+
+				}
+			}
+
+			
+		} else if (this.dataType == loci.formats.FormatTools.FLOAT) {
+			
+			java.nio.FloatBuffer convBuffer = in.asFloatBuffer();
+			
+			for (int y = 0; y < this.size_y; y++) {
+				for (int x = 0; x < this.size_x; x++) {
+
+					int offset = x*x_offset + y*y_offset;
+
+					this.setPixel(x, y, zIndex, cIndex, tIndex, (float) (convBuffer.get(offset)));
+
+				}
+			}
+			
+			
+		} else if (this.dataType == loci.formats.FormatTools.DOUBLE) {
+		
+			java.nio.DoubleBuffer convBuffer = in.asDoubleBuffer();
+		
+			
+			for (int y = 0; y < this.size_y; y++) {
+				for (int x = 0; x < this.size_x; x++) {
+
+					int offset = x*x_offset + y*y_offset;
+
+					this.setPixel(x, y, zIndex, cIndex, tIndex, (float) (convBuffer.get(offset)));
+
+				}
+			}
+
+        } else {
+            
+			java.nio.ByteBuffer convBuffer = in;
+
+
+            for (int y = 0; y < this.size_y; y++) {
+				for (int x = 0; x < this.size_x; x++) {
+
+					int offset = x*x_offset + y*y_offset;
+
+					this.setPixel(x, y, zIndex, cIndex, tIndex, (float) (convBuffer.get(offset)));
+
+				}
+			}
+			
+		}
+
+		
+		
+	}
 
 
     /**
-     * Gets the raw byte representation of the pixel data.
-     *<p>
-     * Pixel values will be represented using the numeric type, byte order, and dimension order specified on initializing the PixelData.
-     *<p>
-     * Calling this function will encode the byte array data from the internal numerical representation, so in particular, if the byte data
-     * was previously set using {@link #setBytes(byte[])}, and then changes were made using {@link #setPixel(int, int, int, int, int, float)}, for example, these changes will be reflected, and this
-     * will not return the same byte data originally passed in.
-     *
-     * @return  A byte array containing the pixel data encoded in the specified format.
-     */
+    * Gets the raw byte representation of the pixel data.
+    *<p>
+    * Pixel values will be represented using the numeric type, byte order, and dimension order specified on initializing the PixelData.
+    *<p>
+    * Calling this function will encode the byte array data from the internal numerical representation, so in particular, if the byte data
+    * was previously set using {@link #setBytes(byte[])}, and then changes were made using {@link #setPixel(int, int, int, int, int, float)}, for example, these changes will be reflected, and this
+    * will not return the same byte data originally passed in.
+    *
+    * @return  A byte array containing the pixel data encoded in the specified format.
+    */
 	public byte[] getBytes() {
 		
 		updateBytesFromConvertedPixels();
 		return this.pixels;
 		
 	}
+	
+
+
 
 
     /**
@@ -323,6 +491,14 @@ public class PixelData implements java.io.Serializable {
 
 		convertedPixels[x*x_offset + y*y_offset + z*z_offset + c*c_offset + t*t_offset] = value;
 		return;
+	}
+	
+	protected int getPixelIndexForCoords(int x, int y, int z, int c, int t, float value) {
+		return x*x_offset + y*y_offset + z*z_offset + c*c_offset + t*t_offset;
+	}
+	
+	protected int getCoordsForPixelIndex(int x, int y, int z, int c, int t, float value) {
+		return x*x_offset + y*y_offset + z*z_offset + c*c_offset + t*t_offset;
 	}
 
     /**

@@ -156,9 +156,13 @@ public class ImageReader {
 				
 		PixelData p = (new PixelDataFactory()).createPixelData(lociReader.getSizeX(), lociReader.getSizeY(), lociReader.getSizeZ(), lociReader.getSizeC(), lociReader.getSizeT(), lociReader.getPixelType(), lociReader.getDimensionOrder());
 		
-		byte[] pixel_bytes = null;
+		if (!((loci.formats.meta.IMetadata) lociReader.getMetadataStore()).getPixelsBinDataBigEndian(0, 0)) {
+			p.setByteOrder(java.nio.ByteOrder.LITTLE_ENDIAN);
+		}
+		
+		//byte[] pixel_bytes = null;
 
-		int byte_position= 0;
+		//int byte_position= 0;
 		
 		try {
             if (!seriesCounts.containsKey(filename) || !hasMoreSeries(filename)) {
@@ -167,12 +171,16 @@ public class ImageReader {
             }
             lociReader.setSeries(currentSeries.get(filename));
 
-            pixel_bytes = new byte[lociReader.getSizeX()*lociReader.getSizeY()*lociReader.getSizeZ()*lociReader.getSizeC()*lociReader.getSizeT()*((int) Math.ceil(lociReader.getBitsPerPixel()*1.0/8))];
+            //pixel_bytes = new byte[lociReader.getSizeX()*lociReader.getSizeY()*lociReader.getSizeZ()*lociReader.getSizeC()*lociReader.getSizeT()*((int) Math.ceil(lociReader.getBitsPerPixel()*1.0/8))];
             
 			for (int i = 0; i < lociReader.getImageCount(); i++) {
 				byte[] currPlane = lociReader.openBytes(i);
-                System.arraycopy(currPlane, 0, pixel_bytes,byte_position,currPlane.length);
-				byte_position += currPlane.length;
+				int[] zct = lociReader.getZCTCoords(i);
+				
+				p.setPlane(zct[0], zct[1], zct[2], currPlane);
+				
+                //System.arraycopy(currPlane, 0, pixel_bytes,byte_position,currPlane.length);
+				//byte_position += currPlane.length;
 			}
 			
 		} catch (loci.formats.FormatException e) {
@@ -183,11 +191,9 @@ public class ImageReader {
 			return null;
 		}
 		
-		if (!((loci.formats.meta.IMetadata) lociReader.getMetadataStore()).getPixelsBinDataBigEndian(0, 0)) {
-			p.setByteOrder(java.nio.ByteOrder.LITTLE_ENDIAN);
-		}
 		
-		p.setBytes(pixel_bytes);
+		
+		//p.setBytes(pixel_bytes);
 								
 		Image toReturn = new Image((loci.formats.meta.IMetadata) lociReader.getMetadataStore(), p);
 		

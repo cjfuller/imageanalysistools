@@ -157,13 +157,16 @@ public class ImagePlusPixelData extends PixelData {
 	}
 
 	/**
-	 * Sets up the PixelData object based on a byte array and the format information.
-	 * <p>
-	 * Don't call this twice to replace the underlying bytes.  After reading the byte array, this will rearrange the ordering of the data, so 
-	 * this will be garbled on a second call.
-	 * 
-	 * @param bytes		The byte array representation of the pixels.
-	 */
+	* @deprecated makes it difficult not to duplicate storage in memory; use {@link #setPlane(int, int, int, byte[])} instead.
+	* 
+	* Sets up the PixelData object based on a byte array and the format information.
+	* <p>
+	* Don't call this twice to replace the underlying bytes.  After reading the byte array, this will rearrange the ordering of the data, so 
+	* this will be garbled on a second call.
+	* 
+	* @param bytes		The byte array representation of the pixels.
+	*/
+	@Deprecated
 	public void setBytes(byte[] bytes) {
 	
 		this.convertedPixels = new float[this.size_x*this.size_y*this.size_z*this.size_c*this.size_t];
@@ -206,6 +209,7 @@ public class ImagePlusPixelData extends PixelData {
 		this.dataType=loci.formats.FormatTools.FLOAT;
 		
 	}
+	
 	
 	public void getBytes(byte[] bytes) throws UnsupportedOperationException {
 		throw new UnsupportedOperationException("Getting values by byte array not supported from ImagePlusPixelData.");
