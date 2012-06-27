@@ -534,7 +534,6 @@ public abstract class ImageObject implements Serializable {
 	 * 
 	 * @param channel	The index of the channel, either by order in the original multiwavelength image, or in the order specified for split wavelength images.
 	 * @param correction a RealVector containing a correction that will be subtracted from the position of the object in the specified channel.
-	 * @return	A RealVector containing the x,y,and z coordinates of the position, or null if it has not yet been determined, or the channel is out of range.
 	 */
 	public void applyCorrectionVectorToChannel(int channel, RealVector correction) {
 
