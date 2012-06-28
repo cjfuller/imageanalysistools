@@ -28,6 +28,8 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 
+import ij.plugin.ZProjector;
+
 import java.io.File;
 
 /**
@@ -50,24 +52,19 @@ public class MaximumIntensityProjection {
      */
     public static Image projectImage(Image im) {
 
-        ImageCoordinate projectionSizes = ImageCoordinate.createCoordXYZCT(im.getDimensionSizes().get(ImageCoordinate.X), im.getDimensionSizes().get(ImageCoordinate.Y), 1, im.getDimensionSizes().get(ImageCoordinate.C), im.getDimensionSizes().get(ImageCoordinate.T));
-        
-        Image imProj = new Image(projectionSizes, 0.0f);
 
-        projectionSizes.recycle();
-
-        for (ImageCoordinate i : im) {
-
-            ImageCoordinate ic = ImageCoordinate.cloneCoord(i);
-            ic.set(ImageCoordinate.Z,0);
-
-            float origValue = im.getValue(i);
-            float projValue = imProj.getValue(ic);
-
-            if (origValue > projValue) {imProj.setValue(ic, origValue);}
-
-            ic.recycle();
-        }
+		ZProjector zp = new ZProjector();
+		
+		zp.setMethod(ZProjector.MAX_METHOD);
+		
+		zp.setImage(im.toImagePlus());
+		
+		zp.setStartSlice(1);
+		zp.setStopSlice(im.getDimensionSizes().get(ImageCoordinate.Z));
+		
+		zp.doHyperStackProjection(true);
+		
+		Image imProj = new Image(zp.getProjection());
 
         return imProj;
     }
