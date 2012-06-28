@@ -1,0 +1,15 @@
+edu.stanford.cfuller.analysistoolsinterface
+edu.stanford.cfuller.imageanalysistools.clustering
+edu.stanford.cfuller.imageanalysistools.filter
+edu.stanford.cfuller.imageanalysistools.filter.morph
+edu.stanford.cfuller.imageanalysistools.fitting
+edu.stanford.cfuller.imageanalysistools.frontend
+edu.stanford.cfuller.imageanalysistools.image
+edu.stanford.cfuller.imageanalysistools.image.io
+edu.stanford.cfuller.imageanalysistools.image.io.omero
+edu.stanford.cfuller.imageanalysistools.matching
+edu.stanford.cfuller.imageanalysistools.method
+edu.stanford.cfuller.imageanalysistools.metric
+edu.stanford.cfuller.imageanalysistools.parameters
+edu.stanford.cfuller.imageanalysistools.random
+edu.stanford.cfuller.imageanalysistools.util
