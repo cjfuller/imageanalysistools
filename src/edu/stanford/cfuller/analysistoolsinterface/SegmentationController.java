@@ -108,6 +108,7 @@ public class SegmentationController extends TaskController implements OmeroListe
         }
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.addChoosableFileFilter(new FileNameExtensionFilter("XML Files", "xml"));
+		fc.addChoosableFileFilter(new FileNameExtensionFilter("ruby scripts", "rb"));
         int retVal = fc.showOpenDialog(this.sw);
 
 
