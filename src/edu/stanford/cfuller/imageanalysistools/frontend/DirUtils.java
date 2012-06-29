@@ -82,6 +82,10 @@ public class DirUtils {
             }
 
             for (java.io.File f : directory.listFiles()) {
+	
+				if (f.isDirectory()) {
+					continue;
+				}
 
 
                 if ((f.getName().matches(".*Thumb.*")) || (! f.getName().toLowerCase().matches(".*" + imageExtension.toLowerCase() + "$")) || (! f.getName().matches(".*" + commonFilenameTag + ".*"))) {
@@ -169,6 +173,10 @@ public class DirUtils {
 
 
             for (java.io.File f : directory.listFiles()) {
+	
+				if (f.isDirectory()) {
+					continue;
+				}
 
                 //added hack here for case insensitive extension
             	
