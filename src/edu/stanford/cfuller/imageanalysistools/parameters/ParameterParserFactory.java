@@ -22,41 +22,30 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.method;
-
-import org.jruby.embed.ScriptingContainer;
-
+package edu.stanford.cfuller.imageanalysistools.parameters;
 
 /**
- * A method that runs a ruby script using jruby, which can be used to script
- * custom analysis methods at rubyime.
- * <p>
- * The method gets the name of the script file from the parameter dictionary, and sets
- * the local variables "parameters", "imageset" and "method" to be the parameter dictionary
- * in use for the analysis, the ImageSet object containing the images being analyzed, and
- * this method object.
- * <p>
+ * A factory for generating an appropriate parameter parser for a given file.
+ * Currently, this just looks at the extension.  A .rb file is treated as a 
+ * ruby script, and a .xml file (or any other extension) is treated as an xml file.
  * 
  * @author Colin J. Fuller
  */
-
-public class ScriptMethod extends Method {
+public class ParameterParserFactory {
 	
-	public static final String SCRIPT_FILENAME_PARAM = edu.stanford.cfuller.imageanalysistools.parameters.ParameterRubyParser.SCRIPT_FILENAME_PARAM;
-	
-	public void go() {
+	/**
+	* Generate a ParameterParser appropriate for the supplied file.
+	* 
+	* @param filename	The filename of the parameter file
+	* @return 	a ParameterParser object appropriate for reading parameters from the file.
+	*/
+	public static ParameterParser createParameterParserForFile(String filename) {
 		
-		String scriptFilename = this.parameters.getValueForKey(SCRIPT_FILENAME_PARAM);
-		
-		ScriptingContainer sc = new ScriptingContainer();
-		
-		sc.put("parameters", this.parameters);
-		sc.put("imageset", this.imageSet);
-		sc.put("method", this);
-		
-		sc.setCompatVersion(org.jruby.CompatVersion.RUBY1_9);
-		
-		sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, scriptFilename);
+		if (filename.endsWith(".rb")) {
+			return new ParameterRubyParser();
+		} else {
+			return new ParameterXMLParser();
+		}
 		
 	}
 	

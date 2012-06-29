@@ -369,7 +369,7 @@ public class ParameterDictionary implements Serializable {
      * @return          A ParameterDictionary containing the parameters parsed from the specified file.
      */
     public static ParameterDictionary readParametersFromFile(String filename) {
-        return (new ParameterXMLParser()).parseXMLFileToParameterDictionary(filename);
+        return ParameterParserFactory.createParameterParserForFile(filename).parseFileToParameterDictionary(filename);
     }
 
 

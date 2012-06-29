@@ -22,43 +22,36 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.method;
-
-import org.jruby.embed.ScriptingContainer;
+package edu.stanford.cfuller.imageanalysistools.parameters;
 
 
 /**
- * A method that runs a ruby script using jruby, which can be used to script
- * custom analysis methods at rubyime.
- * <p>
- * The method gets the name of the script file from the parameter dictionary, and sets
- * the local variables "parameters", "imageset" and "method" to be the parameter dictionary
- * in use for the analysis, the ImageSet object containing the images being analyzed, and
- * this method object.
- * <p>
+ * Utilities for processing analysis parameters from suitably formatted ruby script files.
  * 
+ * Currently this just sets up an empty dictionary with a parameter pointing to the
+ * name of the script file, and a parameter directing it to run the script method.
+ *
  * @author Colin J. Fuller
  */
-
-public class ScriptMethod extends Method {
+public class ParameterRubyParser extends ParameterParser {
 	
-	public static final String SCRIPT_FILENAME_PARAM = edu.stanford.cfuller.imageanalysistools.parameters.ParameterRubyParser.SCRIPT_FILENAME_PARAM;
+	public static final String SCRIPT_FILENAME_PARAM = "script_filename";
 	
-	public void go() {
-		
-		String scriptFilename = this.parameters.getValueForKey(SCRIPT_FILENAME_PARAM);
-		
-		ScriptingContainer sc = new ScriptingContainer();
-		
-		sc.put("parameters", this.parameters);
-		sc.put("imageset", this.imageSet);
-		sc.put("method", this);
-		
-		sc.setCompatVersion(org.jruby.CompatVersion.RUBY1_9);
-		
-		sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, scriptFilename);
-		
+	/**
+     * Parses a ruby file to a list of Parameters; this just sets up the script name parameter
+     * and leaves everything else to the script itself.
+     * 
+     * @param filename      The filename of the ruby source file.
+     * @return              A List containing one Parameter object for each parameter described by the XML file.
+     * 
+     */
+	public java.util.List<Parameter> parseFileToParameterList(String filename) {
+		java.util.List<Parameter> pl = new java.util.ArrayList<Parameter>();
+		Parameter p = new Parameter(SCRIPT_FILENAME_PARAM, SCRIPT_FILENAME_PARAM, Parameter.TYPE_STRING, "", filename, null);
+		pl.add(p);
+		p = new Parameter("method_name", "method_name", Parameter.TYPE_STRING, "", "ScriptMethod", null);
+		pl.add(p);
+		return pl;
 	}
 	
 }
-
