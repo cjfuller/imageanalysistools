@@ -11,8 +11,12 @@
 	<property name="resourcesdir" location="src"/>
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
 	<property name="version" value="trunk"/>
+	<property name="dev_version" value="dev"/>
 	<property name="plugin_jar" value="${distdir}/${ant.project.name}_${version}.jar"/>
 	<property name="standalone_jar" value="${distdir}/${ant.project.name}_${version}_standalone.jar"/>
+	<property name="dev_plugin_jar" value="${distdir}/${ant.project.name}_${dev_version}.jar"/>
+	<property name="dev_standalone_jar" value="${distdir}/${ant.project.name}_${dev_version}_standalone.jar"/>
+	
 	
     <path id="ImageAnalysisTools.classpath">
 		<fileset dir="${libdir}">
@@ -86,6 +90,34 @@
 	</target>
 	
 	<target name="all" depends="plugin,dist">
+	</target>
+	
+	<target name="plugin-dev" depends="build">
+		<jar jarfile="${dev_plugin_jar}" basedir="${builddir}">
+			<zipgroupfileset dir="${libdir}" includes="*.jar"/>
+			<fileset dir="${resourcesdir}">
+				<filename name="**/*.xml"/>
+			</fileset>
+			<fileset dir="${srcdir}">
+				<filename name="*.config"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="dist-dev" depends="build">
+		<jar jarfile="${dev_standalone_jar}" basedir="${builddir}">
+			<zipgroupfileset dir="${libdir}" includes="*.jar"/>
+			<zipgroupfileset dir="${standalone_libdir}" includes="*.jar"/>
+			<manifest>
+				<attribute name="Main-Class" value="edu.stanford.cfuller.analysistoolsinterface.Main"/>
+			</manifest>
+			<fileset dir="${resourcesdir}">
+				<filename name="**/*.xml"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="all-dev" depends="plugin-dev,dist-dev">
 	</target>
 	
 	<target name="buildtest" depends="build">
