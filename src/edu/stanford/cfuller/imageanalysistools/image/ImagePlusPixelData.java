@@ -27,6 +27,8 @@ package edu.stanford.cfuller.imageanalysistools.image;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.process.FloatProcessor;
+import ij.process.ImageProcessor;
+
 
 /**
  * A type of PixelData that uses an ImageJ ImagePlus as its underlying representation.
@@ -209,6 +211,65 @@ public class ImagePlusPixelData extends PixelData {
 		this.dataType=loci.formats.FormatTools.FLOAT;
 		
 	}
+	
+	/**
+    * Sets the raw byte representation of one plane of the pixel data to the specified array.
+    *<p>
+    * Pixel values should be represented by the numeric type, byte order, and dimension order specified when initializing the PixelData.
+    * This will not be checked for the correct format.
+    *<p>
+    * The internal numerical representation of the pixel data will be updated immediately.
+    * 
+    * @param zIndex	  the z-dimension index of the plane being set (0-indexed)
+    * @param cIndex	  the c-dimension index of the plane being set (0-indexed)
+    * @param tIndex	  the t-dimension index of the plane being set (0-indexed)
+    * @param plane    A byte array containing the new pixel data for the specified plane.
+    */
+	public void setPlane(int zIndex, int cIndex, int tIndex, byte[] plane) {
+		
+		if (!(this.dimensionOrder.startsWith("XY"))) {
+            throw new UnsupportedOperationException("Setting a single plane as a byte array is not supported for images whose dimension order does not start with XY."); 
+        }
+
+		Object data = loci.common.DataTools.makeDataArray(plane, loci.formats.FormatTools.getBytesPerPixel(this.dataType), loci.formats.FormatTools.isFloatingPoint(this.dataType), this.byteOrder == java.nio.ByteOrder.LITTLE_ENDIAN);
+		
+		ImageProcessor ip = null;
+		
+		if (data instanceof byte[]) {
+			byte[] conv = (byte[]) data;
+			
+			ip = new ij.process.ByteProcessor(this.size_x, this.size_y, conv, null);
+			
+		} else if (data instanceof short[]) {
+			short[] conv = (short[]) data;
+			
+			ip = new ij.process.ShortProcessor(this.size_x, this.size_y, conv, null);
+			
+		} else if (data instanceof int[]) {
+			
+			int[] conv = (int[]) data;
+			
+			ip = new ij.process.FloatProcessor(this.size_x, this.size_y, conv);
+			
+		} else if (data instanceof float[]) {
+			
+			float[] conv = (float[]) data;
+			
+			ip = new ij.process.FloatProcessor(this.size_x, this.size_y, conv, null);
+			
+		} else if (data instanceof double[]) {
+			double[] conv = (double[]) data;
+			
+			ip = new ij.process.FloatProcessor(this.size_x, this.size_y, conv);
+		}
+		
+		int requestedStackIndex = this.imPl.getStackIndex(cIndex+1, zIndex+1, tIndex+1); //planes are 1-indexed in ImagePlus
+		this.imPl.setSliceWithoutUpdate(requestedStackIndex);
+		this.imPl.setProcessor(ip.convertToFloat());
+	
+		
+	}
+	
 	
 	
 	public void getBytes(byte[] bytes) throws UnsupportedOperationException {
