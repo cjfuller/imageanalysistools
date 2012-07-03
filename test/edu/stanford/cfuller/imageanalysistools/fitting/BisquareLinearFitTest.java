@@ -370,9 +370,7 @@ public class BisquareLinearFitTest {
 		
 		this.expected.setEntry(0,-2.349);
 		this.expected.setEntry(1,11.2717);
-				
-		this.bslf.debug();
-				
+								
 		this.result = this.bslf.fit(x,y);
 				
 		this.success &= (this.result.subtract(this.expected).getNorm() < this.eps);
