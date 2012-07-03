@@ -117,7 +117,7 @@
 				<fileset dir="${testdir}">
 					<filename name="**/*Test.java"/>
 				</fileset>
-				<formatter type="brief" />
+				<formatter type="xml" />
 			</batchtest>
 		</junit>
 	</target>
