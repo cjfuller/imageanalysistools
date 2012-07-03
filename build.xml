@@ -10,9 +10,11 @@
 	<property name="docdir" value="doc"/>
 	<property name="resourcesdir" location="src"/>
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
+	
+	<property name="version" value="4.0.11"/>
+	
 	<property name="plugin_jar" value="${distdir}/${ant.project.name}_${version}.jar"/>
 	<property name="standalone_jar" value="${distdir}/${ant.project.name}_${version}_standalone.jar"/>
-
 	
 	
     <path id="ImageAnalysisTools.classpath">
