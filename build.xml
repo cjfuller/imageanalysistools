@@ -7,12 +7,15 @@
 	<property name="distdir" value="dist"/>
 	<property name="srcdir" value="src"/>
 	<property name="testdir" value="test"/>
+	<property name="testoutputdir" value="test_results"/>
 	<property name="docdir" value="doc"/>
 	<property name="resourcesdir" location="src"/>
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
+	
+	<property name="version" value="4.0.11"/>
+	
 	<property name="plugin_jar" value="${distdir}/${ant.project.name}_${version}.jar"/>
 	<property name="standalone_jar" value="${distdir}/${ant.project.name}_${version}_standalone.jar"/>
-
 	
 	
     <path id="ImageAnalysisTools.classpath">
@@ -43,6 +46,7 @@
     <target name="clean">
         <delete dir="${builddir}"/>
 		<delete dir="${distdir}"/>
+		<delete dir="${testoutputdir}"/>
     </target>
     <target name="cleanall" depends="clean">
 		<delete dir="${docdir}"/>
@@ -102,17 +106,18 @@
 		
 	
 	<target name="test" depends="buildtest">
+		<mkdir dir="${testoutputdir}"/>
 		<junit printsummary="on" showoutput="true">
 			<classpath>
 				<pathelement location="${builddir}"/>
 	 			<path refid="ImageAnalysisTools.classpath"/>
 				<path refid="ImageAnalysisTools.testclasspath"/>
 			</classpath>
-			<batchtest>
+			<batchtest todir="${testoutputdir}">
 				<fileset dir="${testdir}">
 					<filename name="**/*Test.java"/>
 				</fileset>
-				<formatter type="brief" usefile="false"/>
+				<formatter type="xml" />
 			</batchtest>
 		</junit>
 	</target>
