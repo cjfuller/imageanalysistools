@@ -13,6 +13,21 @@
     <![endif]-->
   </head>
   <body>
+	<div id="fb-root"></div>
+	<script>(function(d, s, id) {
+	  var js, fjs = d.getElementsByTagName(s)[0];
+	  if (d.getElementById(id)) return;
+	  js = d.createElement(s); js.id = id;
+	  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+	  fjs.parentNode.insertBefore(js, fjs);
+	}(document, 'script', 'facebook-jssdk'));</script>
+	<script type="text/javascript">
+	  (function() {
+	    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+	    po.src = 'https://apis.google.com/js/plusone.js';
+	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+	  })();
+	</script>
     <div class="wrapper">
       <header>
         <h1>Imageanalysistools</h1>
@@ -45,6 +60,8 @@
 <p>For more information on using the project as a library from your own code see <a href="https://github.com/cjfuller/imageanalysistools/wiki/Developing">Developing with ImageAnalysisTools</a>.</p>
 
 <p>Full javadoc for the library is available <a href="doc/index.html">here</a>.</p>
+
+<div class="fb-like" data-href="http://www.facebook.com/imageanalysistools" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false"></div><g:plusone></g:plusone>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/cjfuller">cjfuller</a></p>
