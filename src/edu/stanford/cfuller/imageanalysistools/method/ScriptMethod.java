@@ -48,7 +48,9 @@ public class ScriptMethod extends Method {
 		
 		String scriptFilename = this.parameters.getValueForKey(SCRIPT_FILENAME_PARAM);
 		
-		ScriptingContainer sc = new ScriptingContainer();
+		ScriptingContainer sc = new ScriptingContainer(org.jruby.embed.LocalContextScope.SINGLETON);
+		
+		sc.setClassLoader(ij.IJ.getClassLoader());
 		
 		sc.put("parameters", this.parameters);
 		sc.put("imageset", this.imageSet);
