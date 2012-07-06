@@ -35,13 +35,36 @@ import org.apache.commons.math3.linear.RealVector;
 
 
 
-
+/**
+* A Filter that takes an image and segments it using an active contour-based method.
+* <p>
+* Currently, only one contour per image is supported, and an initial guess must be supplied.
+* <p>
+* After applying the filter, the argument to the apply method is replaced by a set of points
+* on the contour.  (These are unlikely to be continuous.)
+* <p>
+* This filter does not take a reference image.
+* <p>
+* The initial contour guess must be supplied as a set of point stored in a RealVector, ordered as:
+* {x0, y0, x1, y1, ..., xn, yn}.  These will be circularized for optimizing the contour such that the
+* nth point will be adjacent to the zeroth point.
+* <p>
+* The optimized contour points (in the same format as the initial contour must be applied) are available by
+* calling the {@link #getContourPoints()} method after the apply method has been called.
+* 
+* @author Colin J. Fuller
+*/
 public class ActiveContourFilter extends Filter {
 	
 	RealVector contourPoints;
 	
 	RealVector initialContour;
 	
+	/**
+	* This class is the core of the active contour optimization and provides an "energy"
+	* value given a set of points on the contour.  Implements ObjectiveFunction for use
+	* with optimizers.
+	*/
 	protected class ActiveContourObjectiveFunction implements ObjectiveFunction {
 		
 		Image image;
@@ -58,6 +81,10 @@ public class ActiveContourFilter extends Filter {
 		final double defaultElasticWeight = 0.7;
 		final double defaultContinuityWeight = 0.7;
 		
+		/**
+		* Constructs a new ActiveContourObjectiveFunction.
+		* @param im  the Image that the contour is being used to segment.
+		*/
 		public ActiveContourObjectiveFunction(Image im) {
 			
 			this.image = im;
@@ -109,6 +136,14 @@ public class ActiveContourFilter extends Filter {
 			
 		}
 		
+		/**
+		* Evaluates the ObjectiveFunction, providing the energy value for 
+		* the supplied set of points on the contour.
+		* @param parameters		A RealVector containing the parameters for the
+		* 						objective function, which in this case are the points
+		* 						on the contour in the format listed in the class documentation.
+		* @return 	a double that is the value of the contour energy function
+		*/
 		public double evaluate(RealVector parameters) {
 					
 			return this.internalEnergy(parameters) + this.externalEnergy(parameters);
@@ -236,7 +271,11 @@ public class ActiveContourFilter extends Filter {
 	
 	}
 	
-	
+	/**
+	* Applies the filter, replacing the supplied image by the set of points on the optimized contour.
+	* The image will have value 1 at these points and 0 elsewhere.
+	* @param im  	the Image to be filtered.
+	*/
 	public void apply(Image im) {
 				
 		ActiveContourObjectiveFunction acof = new ActiveContourObjectiveFunction(im);
@@ -266,12 +305,22 @@ public class ActiveContourFilter extends Filter {
 		
 	}
 	
+	/**
+	* Gets the points on the optimized contour after the apply method has been called
+	* in the format specified in the class intro documentation.
+	* @return 	a RealVector containing the points on the contour.
+	*/
 	public RealVector getContourPoints() {
 		
 		return this.contourPoints;
 		
 	}
 	
+	/**
+	* Sets the initial guess for the contour.
+	* @param	points	a RealVector containing the initial contour points in the format specified
+	* 					in the class intro documentation.
+	*/
 	public void setInitialContour(RealVector points) {
 		this.initialContour = points;
 	}
