@@ -1040,11 +1040,24 @@ public class Image implements java.io.Serializable, java.util.Collection<ImageCo
 	}
 	
 	private void setMetadataDimensionSizes(ImageCoordinate dimensionSizes) {
-		this.metadata.setPixelsSizeC(new PositiveInteger(dimensionSizes.get(ImageCoordinate.C)), 0);
-		this.metadata.setPixelsSizeT(new PositiveInteger(dimensionSizes.get(ImageCoordinate.T)), 0);
-		this.metadata.setPixelsSizeZ(new PositiveInteger(dimensionSizes.get(ImageCoordinate.Z)), 0);
-		this.metadata.setPixelsSizeX(new PositiveInteger(dimensionSizes.get(ImageCoordinate.X)), 0);
-		this.metadata.setPixelsSizeY(new PositiveInteger(dimensionSizes.get(ImageCoordinate.Y)), 0);
+		
+		int size_c = dimensionSizes.get(ImageCoordinate.C);
+		if (size_c == 0) size_c++;
+		int size_t = dimensionSizes.get(ImageCoordinate.T);
+		if (size_t == 0) size_t++;
+		int size_z = dimensionSizes.get(ImageCoordinate.Z);
+		if (size_z == 0) size_z++;
+		int size_x = dimensionSizes.get(ImageCoordinate.X);
+		if (size_x == 0) size_x++;
+		int size_y = dimensionSizes.get(ImageCoordinate.Y);
+		if (size_y == 0) size_y++;
+		
+		
+		this.metadata.setPixelsSizeC(new PositiveInteger(size_c), 0);
+		this.metadata.setPixelsSizeT(new PositiveInteger(size_t), 0);
+		this.metadata.setPixelsSizeZ(new PositiveInteger(size_z), 0);
+		this.metadata.setPixelsSizeX(new PositiveInteger(size_x), 0);
+		this.metadata.setPixelsSizeY(new PositiveInteger(size_y), 0);
 	}
 
 }

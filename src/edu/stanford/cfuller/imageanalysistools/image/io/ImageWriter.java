@@ -30,6 +30,9 @@ import ome.xml.model.enums.EnumerationException;
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.PixelData;
+import edu.stanford.cfuller.imageanalysistools.image.ImgLibPixelData;
+
+import net.imglib2.io.ImgSaver;
 
 /**
  * This class writes an Image to disk as one of several possible formats.
@@ -54,7 +57,21 @@ public class ImageWriter {
 	public ImageWriter(Image im) {
 		toWrite = im;
 	}
+	
+	private void imgLibWrite(String filename, ImgLibPixelData p, loci.formats.IFormatWriter writer) throws java.io.IOException {
+		
+		ImgSaver is = new ImgSaver();
+		try {
+			is.saveImg(writer, p.getImg());
+		} catch (net.imglib2.io.ImgIOException e) {
+			throw new java.io.IOException(e);
+		} catch (net.imglib2.exception.IncompatibleTypeException e) {
+			throw new java.io.IOException(e);
+		}
 
+	}
+	
+	
     /**
      * Writes the specified pixels to disk with the ImageWriter's Image's metadata.
      * <p>
@@ -92,14 +109,22 @@ public class ImageWriter {
 			}
 			
 			writer.setId(filename);
-						
-			for (int i = 0; i < imagePixels.getNumPlanes(); i++) {
-				
-				byte[] bytes = imagePixels.getPlane(i);
-								
-				writer.savePlane(i, bytes);
-				
+			
+			//until I phase out other types of pixel data
+			if (imagePixels instanceof ImgLibPixelData) {
+				this.imgLibWrite(filename, (ImgLibPixelData) imagePixels, writer);
+			} else {
+				for (int i = 0; i < imagePixels.getNumPlanes(); i++) {
+
+					byte[] bytes = imagePixels.getPlane(i);
+
+					writer.savePlane(i, bytes);
+
+				}
 			}
+			
+						
+			
 			
 		} catch (loci.formats.FormatException e) {
 			LoggingUtilities.getLogger().severe("Encountered exception " + e.toString() + " while writing " + filename + " skipping write and proceeding.");

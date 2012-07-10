@@ -60,6 +60,8 @@ public class ImageCoordinate implements java.io.Serializable, Collection<Integer
 	public static final int C = 3;
 	public static final int T = 4;
 	
+	public static final String defaultDimensionOrder = "XYZCT";
+	
 	static final long serialVersionUID = 1L;
 	
 	static final int initialStaticCoordCount = 8;
