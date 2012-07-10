@@ -16,7 +16,7 @@ To run the standalone version from the command line (you will likely need the ex
 
 java -Xmx500M -jar ImageAnalysisTools_version_standalone.jar
 
-For documentation on using the software, see the pages at http://code.google.com/p/imageanalysistools
+For documentation on using the software, see the pages at http://cjfuller.github.com/imageanalysistools
 
 
 ImageAnalysisTools is distributed under the MIT/X11 license.  See LICENSES/ImageAnalysisTools-license.txt for the full license text.
