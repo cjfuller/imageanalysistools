@@ -25,8 +25,6 @@
 package edu.stanford.cfuller.imageanalysistools.method;
 
 
-import edu.stanford.cfuller.imageanalysistools.matching.KinetochoreMatcher;
-
 /**
  * A veritable playground of image analysis that will sit in the GUI and allow
  * easy testing of new methods.
@@ -91,12 +89,6 @@ public class TestMethod extends Method {
 ////        Image toProcess = new Image(QOSeg);
 //
 //        iterateOnFiltersAndStoreResult(filters, input, new ZeroMetric());
-		
-        KinetochoreMatcher km = new KinetochoreMatcher();
-        
-        km.setParameters(this.parameters);
-        
-        km.makePairs(this.images.get(0), this.images.get(2));
         
        
 //        java.util.Vector<Filter> filters = new java.util.Vector<Filter>();
