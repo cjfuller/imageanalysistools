@@ -24,8 +24,9 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.RealMatrix;
 
@@ -69,12 +70,12 @@ public class LocalBackgroundEstimationFilter extends Filter {
      * @param im    The Image that will be replaced by the output Image.  This can be anything of the correct dimensions except a shallow copy of the reference Image.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
-		if (this.referenceImage == null) return;
-		
-		//RealVector localArea = new org.apache.commons.math3.linear.ArrayRealVector();
-		
+		if (this.referenceImage == null) {
+			throw new ReferenceImageRequiredException("LocalBackgroundEstimationFilter requires a reference image.");
+		}
+				
 		edu.stanford.cfuller.imageanalysistools.image.Histogram h = new edu.stanford.cfuller.imageanalysistools.image.Histogram(this.referenceImage);
 		
 		int numPixelsInBox = boxSize*boxSize;
@@ -83,7 +84,7 @@ public class LocalBackgroundEstimationFilter extends Filter {
 		
 		ImageCoordinate icnew = ImageCoordinate.createCoordXYZCT(ic.get(ImageCoordinate.X)+2*boxSize, ic.get(ImageCoordinate.Y)+2*boxSize, ic.get(ImageCoordinate.Z), ic.get(ImageCoordinate.C), ic.get(ImageCoordinate.T));
 
-		Image padded = new Image(icnew, -1.0f);
+		WritableImage padded = ImageFactory.createWritable(icnew, -1.0f);
 		
 		
 		float maxValue = 0;

@@ -31,16 +31,13 @@ import ij.process.ImageProcessor;
 
 
 /**
- * A type of PixelData that uses an ImageJ ImagePlus as its underlying representation.
+ * A type of WritablePixelData that uses an ImageJ ImagePlus as its underlying representation.
  * 
  * @author Colin J. Fuller
  *
  */
-public class ImagePlusPixelData extends PixelData {
+public class ImagePlusPixelData extends WritablePixelData {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 5430441630713231848L;
 
 	private ImagePlus imPl;
@@ -49,12 +46,27 @@ public class ImagePlusPixelData extends PixelData {
 	
 	int currentStackIndex;
 	
+	java.util.Hashtable<String, Integer> dimensionSizes;
+	
+	int dataType;
+	
+	int x_offset;
+	int y_offset;
+	int z_offset;
+	int c_offset;
+	int t_offset;
+	
+	java.util.Hashtable<String, Integer> offsetSizes;
+	
+	java.nio.ByteOrder byteOrder;
+	
+	
 	protected void init(int size_x, int size_y, int size_z, int size_c, int size_t, String dimensionOrder) {
+		
 		dimensionOrder = dimensionOrder.toUpperCase();
-		this.pixels = null;
 		
-		this.dimensionSizes = new java.util.Hashtable<String, Integer>();
-		
+		dimensionSizes = new java.util.Hashtable<String, Integer>();
+
 		this.size_x = size_x;
 		this.size_y = size_y;
 		this.size_z = size_z;
@@ -66,7 +78,7 @@ public class ImagePlusPixelData extends PixelData {
 		dimensionSizes.put("Z", size_z);
 		dimensionSizes.put("C", size_c);
 		dimensionSizes.put("T", size_t);
-		
+				
 		offsetSizes = new java.util.Hashtable<String, Integer>();
 		
 		offsetSizes.put(dimensionOrder.substring(0,1), 1);
@@ -125,7 +137,9 @@ public class ImagePlusPixelData extends PixelData {
 	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#PixelData(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate, int, String)
 	 */
 	public ImagePlusPixelData(ImageCoordinate sizes, int data_type, String dimensionOrder) {
-		super(sizes, data_type, dimensionOrder);
+		super(sizes, dimensionOrder);
+		this.dataType = data_type;
+		
 		this.initNewImagePlus();
 	}
 	
@@ -134,7 +148,9 @@ public class ImagePlusPixelData extends PixelData {
 	 */
 	public ImagePlusPixelData(int size_x, int size_y, int size_z, int size_c, int size_t, int data_type, String dimensionOrder) {
 
-		super(size_x, size_y, size_z, size_c, size_t, data_type, dimensionOrder);
+		super(size_x, size_y, size_z, size_c, size_t, dimensionOrder);
+		this.dataType = data_type;
+		
 		this.initNewImagePlus();
 		
 	}
@@ -148,69 +164,12 @@ public class ImagePlusPixelData extends PixelData {
 		
 		this.imPl = imPl;
 		
-		//ImageConverter ic = new ImageConverter(this.imPl);
-		
-		//ic.convertToGray32();
-		
 		this.init(imPl.getWidth(), imPl.getHeight(), imPl.getNSlices(), imPl.getNChannels(), imPl.getNFrames(), imagePlusDimensionOrder);
 		
 		this.dataType = loci.formats.FormatTools.FLOAT;
 		
 	}
 
-	/**
-	* @deprecated makes it difficult not to duplicate storage in memory; use {@link #setPlane(int, int, int, byte[])} instead.
-	* 
-	* Sets up the PixelData object based on a byte array and the format information.
-	* <p>
-	* Don't call this twice to replace the underlying bytes.  After reading the byte array, this will rearrange the ordering of the data, so 
-	* this will be garbled on a second call.
-	* 
-	* @param bytes		The byte array representation of the pixels.
-	*/
-	@Deprecated
-	public void setBytes(byte[] bytes) {
-	
-		this.convertedPixels = new float[this.size_x*this.size_y*this.size_z*this.size_c*this.size_t];
-		this.pixels = bytes;
-		super.updateConvertedPixelsFromBytes();
-		
-		this.pixels = null;
-		
-		for (int t = 0; t < size_t; t++) {
-			for (int c = 0; c < size_c; c++) {
-				for(int z = 0; z < size_z; z++) {
-					for (int y = 0; y < size_y; y++) {
-						for (int x = 0; x < size_x; x++) {
-							
-							
-							int slice = this.imPl.getStackIndex(c+1, z+1, t+1); //planes are 1-indexed in ImagePlus
-														
-							if (slice != this.currentStackIndex) {
-								this.imPl.setSliceWithoutUpdate(slice);
-								this.currentStackIndex = slice;
-							}
-							
-							this.imPl.getProcessor().setf(x,y,super.getPixel(x,y,z,c,t));
-							
-						}
-					}
-				}
-			}
-		}
-
-		
-		this.convertedPixels = null;
-		this.offsetSizes = null;
-		this.x_offset = -1;
-		this.y_offset = -1;
-		this.z_offset = -1;
-		this.c_offset = -1;
-		this.t_offset = -1;
-		this.dimensionOrder = "XYCZT";
-		this.dataType=loci.formats.FormatTools.FLOAT;
-		
-	}
 	
 	/**
     * Sets the raw byte representation of one plane of the pixel data to the specified array.
@@ -225,7 +184,6 @@ public class ImagePlusPixelData extends PixelData {
     * @param tIndex	  the t-dimension index of the plane being set (0-indexed)
     * @param plane    A byte array containing the new pixel data for the specified plane.
     */
-	@Override
 	public void setPlane(int zIndex, int cIndex, int tIndex, byte[] plane) {
 		
 		if (!(this.dimensionOrder.startsWith("XY") || this.dimensionOrder.startsWith("YX"))) {
@@ -342,7 +300,7 @@ public class ImagePlusPixelData extends PixelData {
 
 					int offset = x*x_offset + y*y_offset;
 
-					imp.setf(x,y, (float) (convBuffer.get(offset)));
+					imp.setf(x,y, (convBuffer.get(offset)));
 
 				}
 			}
@@ -383,11 +341,7 @@ public class ImagePlusPixelData extends PixelData {
 		
 		
 	}
-	
-	public void getBytes(byte[] bytes) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException("Getting values by byte array not supported from ImagePlusPixelData.");
-	}
-	
+
 	public byte[] getPlane(int index) throws UnsupportedOperationException {
 
 		//convert the index to xyczt ordering just in case the ImagePlus representation changes under the hood.
@@ -447,19 +401,6 @@ public class ImagePlusPixelData extends PixelData {
 		imPl.getProcessor().setf(x,y,value);
 	}
 	
-	/**
-	 * Does nothing.
-	 */
-	protected void updateConvertedPixelsFromBytes() {
-		
-	}
-	
-	/**
-	 * Does nothing.
-	 */
-	protected void updateBytesFromConvertedPixels() {
-		
-	}
 	
 	/* (non-Javadoc)
 	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#toImagePlus()
@@ -473,6 +414,13 @@ public class ImagePlusPixelData extends PixelData {
 	 */
 	public String getDimensionOrder() {
 		return imagePlusDimensionOrder;
+	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#getDimensionOrder()
+	 */
+	public int getDataType() {
+		return loci.formats.FormatTools.FLOAT;
 	}
 	
 }

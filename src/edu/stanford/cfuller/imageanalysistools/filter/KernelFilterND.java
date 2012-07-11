@@ -29,7 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -65,11 +67,11 @@ public class KernelFilterND extends Filter {
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.Filter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
 		for (int i = 0; i < this.dimensionsToFilter.size(); i++) {
 			
-			Image original = new Image(im);
+			Image original = ImageFactory.create(im);
 			
 			Integer dim = this.dimensionsToFilter.get(i);
 			int size = halfDimensionSizes.get(dim);
@@ -99,7 +101,14 @@ public class KernelFilterND extends Filter {
 					
 					kernelTotal+= currKernelValue;
 					
-					filterTotal+= currKernelValue*original.getValue(ic2);
+					float imageValue = 0;
+					
+					if (original.inBounds(ic2)) {
+						imageValue = original.getValue(ic2);
+					}
+					
+					filterTotal+= currKernelValue*imageValue;
+					
 				}
 				
 				

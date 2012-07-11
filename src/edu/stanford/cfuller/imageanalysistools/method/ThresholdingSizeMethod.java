@@ -26,6 +26,8 @@ package edu.stanford.cfuller.imageanalysistools.method;
 
 import edu.stanford.cfuller.imageanalysistools.filter.*;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 
 /**
  * A method to find objects based on a gradient histogram thresholding step and a size-exclusion step.
@@ -49,7 +51,7 @@ public class ThresholdingSizeMethod extends Method {
                     f.setReferenceImage(this.images.get(0));
                 }
 
-                Image toProcess = new Image(this.images.get(0));
+                WritableImage toProcess = ImageFactory.createWritable(this.images.get(0));
 
                 iterateOnFiltersAndStoreResult(filters, toProcess, new edu.stanford.cfuller.imageanalysistools.metric.IntensityPerPixelMetric());
 

@@ -31,7 +31,9 @@ import org.apache.commons.math3.distribution.FDistribution;
 import org.apache.commons.math3.exception.MathIllegalArgumentException;
 
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -180,11 +182,11 @@ public class VariableSizeMeanFilter extends Filter {
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.Filter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
 		//calculate Laplacian of Image, calculate pseudo-residual (as in Boulanger, 2010)
 		
-		Image residual = new Image(im);
+		WritableImage residual = ImageFactory.createWritable(im);
 		
 		LaplacianFilterND LF = new LaplacianFilterND();
 				

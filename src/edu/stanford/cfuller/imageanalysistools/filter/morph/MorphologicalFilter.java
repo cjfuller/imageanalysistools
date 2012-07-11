@@ -25,7 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.filter.morph;
 
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 
 /**
  * A Filter representing a binary morphological filter in an arbitrary (i.e. up to 5) number of dimensions.
@@ -62,7 +62,7 @@ public abstract class MorphologicalFilter extends Filter {
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.Filter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
 	@Override
-	public abstract void apply(Image im);
+	public abstract void apply(WritableImage im);
 	
 	/**
 	 * Sets the StructuringElement to be used for the filtering.

@@ -26,6 +26,8 @@ package edu.stanford.cfuller.imageanalysistools.method;
 
 import edu.stanford.cfuller.imageanalysistools.filter.*;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 
 /**
  * Implements the a version of the watershed method that is seeded off of supplied regions.
@@ -84,7 +86,7 @@ public class SeededWatershedMethod extends Method {
             f.setParameters(this.parameters);
         }
 
-        Image toProcess = new Image(this.images.get(0));
+        WritableImage toProcess = ImageFactory.createWritable(this.images.get(0));
 
         iterateOnFiltersAndStoreResult(filters, toProcess, new edu.stanford.cfuller.imageanalysistools.metric.IntensityPerPixelMetric());
 

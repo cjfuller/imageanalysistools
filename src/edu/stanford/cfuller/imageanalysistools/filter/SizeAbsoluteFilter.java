@@ -25,7 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 
@@ -50,7 +50,7 @@ public class SizeAbsoluteFilter extends Filter {
      * @param im    The mask whose regions of unusual size will be removed.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
 
         Histogram h = new Histogram(im);

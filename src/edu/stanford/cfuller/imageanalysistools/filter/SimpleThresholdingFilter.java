@@ -25,7 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -69,7 +69,7 @@ public class SimpleThresholdingFilter extends Filter {
      * @param im    The Image whose pixels wil be set to zero where the reference Image is below the fractional threshold.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
         Histogram h = new Histogram(this.referenceImage);
 

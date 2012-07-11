@@ -23,7 +23,7 @@
  * ***** END LICENSE BLOCK ***** */
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 
@@ -62,7 +62,7 @@ public class ImageSubtractionFilter extends Filter {
      * Appies the filter, subtracting the reference image from the argument to this method.
      * @param im    The Image to be filtered; this will be filtered in place.
      */
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		if (this.referenceImage == null) {
 			throw new ReferenceImageRequiredException("ImageSubtractionFilter requires a reference image.");

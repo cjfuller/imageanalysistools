@@ -26,6 +26,7 @@ package edu.stanford.cfuller.imageanalysistools.frontend;
 
 import ij.ImagePlus;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
@@ -63,7 +64,7 @@ public class IJAnalysis {
     	
     	m.setParameters(params);
     	
-    	Image im_nonsplit = new Image(this.toProcess);
+    	Image im_nonsplit = ImageFactory.create(this.toProcess);
     	
     	java.util.List<Image> split = im_nonsplit.splitChannels();
     	

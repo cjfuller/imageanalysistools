@@ -25,7 +25,9 @@
 package edu.stanford.cfuller.imageanalysistools.clustering;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.LabelFilter;
@@ -419,7 +421,7 @@ public class ObjectClustering {
      * @param clusters          A Vector containing the Clusters comprised of the ClusterObjects that will determine the labels in the output Image.
      * @param k                 The number of Clusters.
      */
-    public static void clustersToMask(Image output, Vector<ClusterObject> clusterObjects, Vector<Cluster> clusters, int k) {
+    public static void clustersToMask(WritableImage output, Vector<ClusterObject> clusterObjects, Vector<Cluster> clusters, int k) {
 
         for (ImageCoordinate i : output) {
 
@@ -443,9 +445,9 @@ public class ObjectClustering {
      * @param input     The Image to be filtered (this will be left unchanged).
      * @return          The filtered Image.
      */
-    public static Image gaussianFilterMask(Image input) {
+    public static WritableImage gaussianFilterMask(Image input) {
 
-        Image origCopy = new Image(input);
+        WritableImage origCopy = ImageFactory.createWritable(input);
         GaussianFilter gf = new GaussianFilter();
 
         final int MAX_VALUE = 4095;
@@ -478,7 +480,7 @@ public class ObjectClustering {
      *                          chiefly useful to save computation time when running the clutering multiple times.
      *                          This will be modified, so if planning to reuse the Gaussian filtered image, pass in a copy.
      */
-    public static Image doBasicClustering(Image input, Image original, Image gaussianFiltered) {
+    public static Image doBasicClustering(WritableImage input, Image original, Image gaussianFiltered) {
 
         RelabelFilter rlf = new RelabelFilter();
         LabelFilter lf = new LabelFilter();
@@ -490,21 +492,20 @@ public class ObjectClustering {
         Histogram h_individualCentromeres = new Histogram(input);
 
 
-        Image origCopy = null;
+        WritableImage origCopy = null;
 
         if (gaussianFiltered == null) {
 
-            origCopy = gaussianFilterMask(input);
+            origCopy = gaussianFilterMask(input).getWritableInstance();
 
         } else {
-            origCopy = gaussianFiltered;
+            origCopy = gaussianFiltered.getWritableInstance();
         }
         
         lf.apply(origCopy);
         
-        //java.util.logging.Logger.getLogger("debug").info("finished with filters");
 
-        Image mapped = new Image(origCopy);
+        WritableImage mapped = ImageFactory.createWritable(origCopy);
 
         Histogram h_mapped_0 = new Histogram(origCopy);
 
@@ -559,55 +560,10 @@ public class ObjectClustering {
         }
 
 
-        //if a centromere lies across a boundary, some of its pixels might be in different regions-- correct this by simple majority
-
-        // hmm... maybe this is not so important... is just choosing the first one encountered faster?
-/*
-
-        Histogram h_mapped = new Histogram(mapped);
-
-        org.apache.commons.math3.linear.RealMatrix mappingcounts = new Array2DRowRealMatrix(h_individualCentromeres.getMaxValue() + 1, h_mapped.getMaxValue() + 1);
-
-        mappingcounts = mappingcounts.scalarMultiply(0.0);
-
-        for (ImageCoordinate i : mapped) {
-
-            if (mapped.getValue(i) > 0) {
-                mappingcounts.setEntry((int) input.getValue(i), (int) mapped.getValue(i), 1+mappingcounts.getEntry((int) input.getValue(i), (int) mapped.getValue(i)));
-            }
-
-        }
-*/
-
 
         int[] centromereAssignments = new int[h_individualCentromeres.getMaxValue()+1];
         java.util.Arrays.fill(centromereAssignments, 0);
-/*
-        for (int i =1; i < centromereAssignments.length; i++) {
-            int maxCounts = 0;
-            int assignment = 0;
 
-            for (int j = 1; j < mappingcounts.getColumnDimension(); j++) {
-                if (mappingcounts.getEntry(i,j) > maxCounts) {
-                    maxCounts = (int) mappingcounts.getEntry(i,j);
-                    assignment = j;
-                }
-            }
-
-            centromereAssignments[i] = assignment;
-        }
-*/
-
-/*
-        for (ImageCoordinate i : mapped) {
-
-            if (input.getValue(i) > 0 ) {
-
-                mapped.setValue(i, centromereAssignments[(int) input.getValue(i)]);
-
-            }
-        }
-*/
         for (ImageCoordinate i : mapped) {
 
             if (input.getValue(i) > 0 ) {
@@ -649,7 +605,7 @@ public class ObjectClustering {
      *                          chiefly useful to save computation time when running the clutering multiple times.
      *                          This will be modified, so if planning to reuse the Gaussian filtered image, pass in a copy.
      */
-    public static void doComplexClustering(Image input, Image original, int maxClusters, Image gaussianFiltered) {
+    public static void doComplexClustering(WritableImage input, Image original, int maxClusters, Image gaussianFiltered) {
 
         //debug output
         //input.writeToFile("/Users/cfuller/Desktop/filter_intermediates/input.ome.tif");
@@ -669,9 +625,9 @@ public class ObjectClustering {
      * @param input             An Image mask labeled such that each object in the Image is assigned a unique nonzero greylevel value.  These should start at 1 and be consecutive.
      * @param original          The original image (not currently used... this is here to maintain the interface with a previous version that used this image)
      * @param maxClusters       A rough upper bound to the number of clusters expected in the Image.  More clusters than this may be found, but if a clustering iteration finds more clusters than this as the best solution, it will terminate the clustering.
-     * @param clusterImage      A version of the Image mask relabeled such that each object in the Image is assigned a greylevel value corresponding to its cluster.  Each cluster should have a uniqe value, these should start at 1, and they should be consecutive.
+     * @param clusterImage      A version of the Image mask relabeled such that each object in the Image is assigned a greylevel value corresponding to its cluster.  Each cluster should have a unique value, these should start at 1, and they should be consecutive.
      */
-    public static void doClusteringWithInitializedClusters(Image input, Image original, int maxClusters, Image clusterImage) {
+    public static void doClusteringWithInitializedClusters(WritableImage input, Image original, int maxClusters, Image clusterImage) {
 
         //input.writeToFile("/Users/cfuller/Desktop/filter_intermediates/input.ome.tif");
         //original.writeToFile("/Users/cfuller/Desktop/filter_intermediates/original.ome.tif");
@@ -697,7 +653,7 @@ public class ObjectClustering {
 
         RelabelFilter rlf = new RelabelFilter();
 
-        Image origCopy = new Image(clusterImage);
+        WritableImage origCopy = ImageFactory.createWritable(clusterImage);
 
         Histogram h_ssf = new Histogram(origCopy);
 
@@ -727,13 +683,13 @@ public class ObjectClustering {
 
                 k = k_init;
 
-                bestImage = new Image(origCopy);
+                bestImage = ImageFactory.create(origCopy);
 
                 bestK = k_init;
                 
             }
 
-            candidateNewBestImage = new Image(bestImage);
+            candidateNewBestImage = ImageFactory.createShallow(bestImage);
 
             Histogram h = new Histogram(bestImage);
 
@@ -741,12 +697,9 @@ public class ObjectClustering {
 
             double sumL = 0;
 
-            Image singleCluster = new Image(input);
+            WritableImage singleCluster = ImageFactory.createWritable(input);
 
-            Image dividedClusterTemp = new Image(singleCluster);
-
-
-            //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Starting Clustering Iteration " + Integer.toString(numAttempts));
+            WritableImage dividedClusterTemp = ImageFactory.createWritable(singleCluster);
             
 
             for (int clusterNumber = 1; clusterNumber <= h.getMaxValue(); clusterNumber++) {
@@ -793,7 +746,7 @@ public class ObjectClustering {
 
                 int origCurrentMaxImageValue = currentMaxImageValue;
 
-                Image tempCandidateNewBestImage = new Image(candidateNewBestImage);
+                WritableImage tempCandidateNewBestImage = ImageFactory.createWritable(candidateNewBestImage);
 
                 int kMax = ((bestK < 3) ? 6 : 4);
 
@@ -868,7 +821,7 @@ public class ObjectClustering {
                 if (accepted) {
 
                     sumL += tempBestL;
-                    candidateNewBestImage.copy(tempCandidateNewBestImage);
+                    candidateNewBestImage = tempCandidateNewBestImage;
                 } else {
 
                     if (nSingleCluster > 0) {
@@ -892,8 +845,6 @@ public class ObjectClustering {
             }
 
             k = currentMaxImageValue;
-
-            //candidateNewBestImage.writeToFile("/Users/cfuller/Desktop/filter_intermediates/candidate.ome.tif");
 
             n = initializeObjectsAndClustersFromClusterImage(input, candidateNewBestImage, clusterObjects, clusters, k);
             L= sumL;
@@ -932,12 +883,14 @@ public class ObjectClustering {
                 repeatThis = 0;
 
  
-                bestImage.copy(input);
-          
+                WritableImage newBestImage = ImageFactory.createWritable(input);
 
-                clustersToMask(bestImage, clusterObjects, clusters, bestK);
+                clustersToMask(newBestImage, clusterObjects, clusters, bestK);
 
-                rlf.apply(bestImage);
+                rlf.apply(newBestImage);
+
+				bestImage = newBestImage;
+
 
                 overallMaxL = tempL;
 
@@ -965,7 +918,6 @@ public class ObjectClustering {
         }
 
         input.copy(bestImage);
-        //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("Best guess number of clusters: " + bestK);
 
     }
 

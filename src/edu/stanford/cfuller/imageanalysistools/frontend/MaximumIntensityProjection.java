@@ -25,6 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.frontend;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 
@@ -64,7 +65,7 @@ public class MaximumIntensityProjection {
 		
 		zp.doHyperStackProjection(true);
 		
-		Image imProj = new Image(zp.getProjection());
+		Image imProj = ImageFactory.create(zp.getProjection());
 
         return imProj;
     }

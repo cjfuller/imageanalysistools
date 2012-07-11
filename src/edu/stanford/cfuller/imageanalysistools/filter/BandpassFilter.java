@@ -36,7 +36,8 @@ import ij.process.ColorProcessor;
 import ij.process.FHT;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -86,213 +87,83 @@ public class BandpassFilter extends Filter {
      * Applies the bandpass filter to an Image, removing the range of frequency space specified by the setBand method.
      * @param im    The Image to be bandpass filtered; it will be replaced by its filtered version.
      */
-    public void apply(Image im) {
-    	
-    	im.clearBoxOfInterest(); //just in case
-    	
-        float oldMin = Float.MAX_VALUE;
-        float oldMax = -1.0f*Float.MAX_VALUE;
-        
-        for (ImageCoordinate ic : im) {
-        	if (im.getValue(ic) < oldMin) {
-        		oldMin = im.getValue(ic);
-        	}
-        	
-        	if (im.getValue(ic) > oldMax) {
-        		oldMax = im.getValue(ic);
-        	}
-        }
-        
-        
-    	
-        if (this.params.hasKey(PARAM_BAND_LOW)) {
-        	this.bandLow = this.params.getDoubleValueForKey(PARAM_BAND_LOW);
-        }
-        
-        if (this.params.hasKey(PARAM_BAND_HIGH)) {
-        	this.bandHigh = this.params.getDoubleValueForKey(PARAM_BAND_HIGH);
-        }
-        
-        ImagePlus imp = im.toImagePlus();
-        
-        IJFFTFilter ijf = new IJFFTFilter();
-        
-        IJFFTFilter.setFilterLargeDia(this.bandHigh);
-        IJFFTFilter.setFilterSmallDia(this.bandLow);
-        
-        ijf.setup("", imp);
-        
-        for (int i = 0; i < imp.getStackSize(); i++) {
-        	
-        	imp.setSliceWithoutUpdate(i+1);
-        	
-        	ImageProcessor proc = imp.getProcessor();
-        	
-        	ijf.run(proc);
-        	
-        }
-                
-       // imp.show();
-        
-        im.copy(new Image(imp));
-        
-        float newMin = Float.MAX_VALUE;
-        float newMax = -1.0f*Float.MAX_VALUE;
-        
-        for (ImageCoordinate ic : im) {
-        	if (im.getValue(ic) < newMin) {
-        		newMin = im.getValue(ic);
-        	}
-        	
-        	if (im.getValue(ic) > newMax) {
-        		newMax = im.getValue(ic);
-        	}
-        }
-        
-        
-        float oldRange = oldMax-oldMin;
-        float newRange = newMax-newMin;
-                        
-        if (this.shouldRescale) {
-        
-	        for (ImageCoordinate ic : im) {
-	        	im.setValue(ic, (im.getValue(ic) - newMin)/newRange*oldRange + oldMin);
-	        }
-	       
-        }
-	        
+	public void apply(WritableImage im) {
 
-//        FastFourierTransformer fft = new org.apache.commons.math3.transform.FastFourierTransformer();
-//
-//        int ydimPowOfTwo = im.getDimensionSizes().get(ImageCoordinate.Y);
-//        int xdimPowOfTwo = im.getDimensionSizes().get(ImageCoordinate.X);
-//
-//        if (!FastFourierTransformer.isPowerOf2(ydimPowOfTwo) || !FastFourierTransformer.isPowerOf2(xdimPowOfTwo)) {
-//
-//            xdimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get(ImageCoordinate.X)) / Math.log(2)));
-//            ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get(ImageCoordinate.Y))/Math.log(2)));
-//        }
-//
-//        for (int p =0; p < im.getPlaneCount(); p++) {
-//
-//            im.selectPlane(p);
-//
-//            double[][] rowImage = new double[ydimPowOfTwo][xdimPowOfTwo];
-//            for (int i =0; i < ydimPowOfTwo; i++) {
-//                java.util.Arrays.fill(rowImage[i], 0); // ensures zero-padding
-//            }
-//            Complex[][] colMajorImage = new Complex[xdimPowOfTwo][ydimPowOfTwo];
-//
-//            for (ImageCoordinate ic : im) {
-//                rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] = im.getValue(ic);
-//            }
-//
-//            for (int r = 0; r < rowImage.length; r++) {
-//                double[] row = rowImage[r];
-//                Complex[] transformedRow = fft.transform(row);
-//
-//                for (int c = 0; c < colMajorImage.length; c++) {
-//                    colMajorImage[c][r] = transformedRow[c];
-//                }
-//            }
-//
-//            for (int c = 0; c < colMajorImage.length; c++) {
-//                colMajorImage[c] = fft.transform(colMajorImage[c]);
-//            }
-//
-//            int NFx = xdimPowOfTwo/2 + 1;
-//            int NFy = ydimPowOfTwo/2 + 1;
-//
-//            double cutoffXUpper = NFx*this.bandHigh;
-//            double cutoffXLower = NFx*this.bandLow;
-//
-//            double cutoffYUpper = NFy* this.bandHigh;
-//            double cutoffYLower = NFy* this.bandLow;
-//
-//            //zero the frequency components
-//
-//            for (int c = 0; c < NFx; c++) {
-//                for (int r = 0; r < NFy; r++) {
-//
-//                    int cOpp = colMajorImage.length - c;
-//
-//                    int rOpp = colMajorImage[0].length - r;
-//
-//                    if (c < cutoffXUpper && c > cutoffXLower) {
-//
-//                        colMajorImage[c][r] = new Complex(0,0);
-//
-//                        if (c > 0) {
-//                            colMajorImage[cOpp][r] = new Complex(0,0);
-//                            if (r > 0) {
-//                                colMajorImage[cOpp][rOpp] = new Complex(0,0);
-//                            }
-//                        }
-//
-//                    } else if (r < cutoffYUpper && r > cutoffYLower) {
-//                        colMajorImage[c][r] = new Complex(0,0);
-//
-//                        if (r > 0) {
-//                            colMajorImage[c][rOpp] = new Complex(0,0);
-//                            if (c > 0) {
-//                                colMajorImage[cOpp][rOpp] = new Complex(0,0);
-//                            }
-//                        }
-//                    }
-//
-//
-//                }
-//
-//            }
-//
-//            //inverse transform
-//
-//            for (int c = 0; c < colMajorImage.length; c++) {
-//                colMajorImage[c] = fft.inversetransform(colMajorImage[c]);
-//            }
-//
-//            Complex[] tempRow = new Complex[rowImage.length];
-//
-//            //also calculate min/max values
-//            double newMin = Double.MAX_VALUE;
-//            double newMax = 0;
-//
-//            for (int r = 0; r < rowImage.length; r++) {
-//
-//                for (int c = 0; c < colMajorImage.length; c++) {
-//                    tempRow[c] = colMajorImage[c][r];
-//                }
-//
-//                Complex[] transformedRow = fft.inversetransform(tempRow);
-//
-//                for (int c = 0; c < colMajorImage.length; c++) {
-//                    rowImage[r][c] = transformedRow[c].abs();
-//                    if (rowImage[r][c] < newMin) newMin = rowImage[r][c];
-//                    if (rowImage[r][c] > newMax) newMax = rowImage[r][c];
-//                }
-//            }
-//
-//            //rescale values to same min/max as before
-//
-//            Histogram h = new Histogram(im);
-//
-//            double oldMin = h.getMinValue();
-//            double oldMax = h.getMaxValue();
-//
-//            double scaleFactor = (oldMax - oldMin)/(newMax - newMin);
-//
-//
-//            for (ImageCoordinate ic : im) {
-//                im.setValue(ic, (float) ((rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] - newMin)*scaleFactor + oldMin));
-//            }
-//
-//
-//        }
-//
-//        im.clearBoxOfInterest();
+		im.clearBoxOfInterest(); //just in case
+
+		float oldMin = Float.MAX_VALUE;
+		float oldMax = -1.0f*Float.MAX_VALUE;
+
+		for (ImageCoordinate ic : im) {
+			if (im.getValue(ic) < oldMin) {
+				oldMin = im.getValue(ic);
+			}
+
+			if (im.getValue(ic) > oldMax) {
+				oldMax = im.getValue(ic);
+			}
+		}
 
 
-    }
+
+		if (this.params.hasKey(PARAM_BAND_LOW)) {
+			this.bandLow = this.params.getDoubleValueForKey(PARAM_BAND_LOW);
+		}
+
+		if (this.params.hasKey(PARAM_BAND_HIGH)) {
+			this.bandHigh = this.params.getDoubleValueForKey(PARAM_BAND_HIGH);
+		}
+
+		ImagePlus imp = im.toImagePlus();
+
+		IJFFTFilter ijf = new IJFFTFilter();
+
+		IJFFTFilter.setFilterLargeDia(this.bandHigh);
+		IJFFTFilter.setFilterSmallDia(this.bandLow);
+
+		ijf.setup("", imp);
+
+		for (int i = 0; i < imp.getStackSize(); i++) {
+
+			imp.setSliceWithoutUpdate(i+1);
+
+			ImageProcessor proc = imp.getProcessor();
+
+			ijf.run(proc);
+
+		}
+
+
+		im.copy(ImageFactory.create(imp));
+
+		float newMin = Float.MAX_VALUE;
+		float newMax = -1.0f*Float.MAX_VALUE;
+
+		for (ImageCoordinate ic : im) {
+			if (im.getValue(ic) < newMin) {
+				newMin = im.getValue(ic);
+			}
+
+			if (im.getValue(ic) > newMax) {
+				newMax = im.getValue(ic);
+			}
+		}
+
+
+		float oldRange = oldMax-oldMin;
+		float newRange = newMax-newMin;
+
+		if (this.shouldRescale) {
+
+			for (ImageCoordinate ic : im) {
+				im.setValue(ic, (im.getValue(ic) - newMin)/newRange*oldRange + oldMin);
+			}
+
+		}
+
+
+
+	}
 
 
     /**

@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -40,7 +40,7 @@ public class ZeroPointFilter extends Filter {
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.Filter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		float min = 0;
 		

@@ -24,7 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 
@@ -38,18 +39,18 @@ import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 public class GradientHistogramThresholdingFilter extends Filter {
 
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
 		GaussianFilter GF = new GaussianFilter();
 		GF.setWidth(21);
 		GF.apply(im);
 		
-		Image gradient = new Image(im);
+		WritableImage gradient = ImageFactory.createWritable(im);
 		
 		GradientFilter GRF = new GradientFilter();
 		GRF.apply(gradient);
 		
-		Image smoothedThresholded = new Image(im);
+		WritableImage smoothedThresholded = ImageFactory.createWritable(im);
 		
 		this.absoluteThreshold(im, 10);
 		
@@ -65,7 +66,7 @@ public class GradientHistogramThresholdingFilter extends Filter {
 		
 	}
 	
-	private void absoluteThreshold(Image im, int level) {
+	private void absoluteThreshold(WritableImage im, int level) {
 		for (ImageCoordinate c : im) {
 			if (im.getValue(c) < level) {
 				im.setValue(c, 0);
@@ -74,7 +75,7 @@ public class GradientHistogramThresholdingFilter extends Filter {
 		}
 	}
 	
-	private void histogramThreshold(Image im, double stddev) {
+	private void histogramThreshold(WritableImage im, double stddev) {
 		
 		Histogram im_hist = new Histogram(im);
 		

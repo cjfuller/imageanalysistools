@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -46,7 +46,7 @@ public class InversionFilter extends Filter {
      * @param im    The Image to invert.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		Histogram h = new Histogram(im);
 		

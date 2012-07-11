@@ -25,8 +25,9 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 
 import java.util.Arrays;
 
@@ -57,7 +58,8 @@ public class RegionThresholdingFilter extends Filter {
      * compared to a threshold.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
+		
 		LabelFilter LF = new LabelFilter();
 
         LF.apply(im);
@@ -84,20 +86,7 @@ public class RegionThresholdingFilter extends Filter {
             }
         }
 
-        Image refCopy = new Image(this.referenceImage);
-
-//        ImageCoordinate newDim = ImageCoordinate.createCoord(n, 1, 1, 1, 1);
-//
-//        Image means_im = new Image(newDim, 0.0);
-//
-//
-//        newDim.recycle();
-//
-//        for (ImageCoordinate i : means_im) {
-//            means_im.setValue(i, means[i.getX()+1]);
-//        }
-
-        //Image copy = new Image(means_im);
+        WritableImage refCopy = ImageFactory.createWritable(this.referenceImage);
 
         MaskFilter mf = new MaskFilter();
 

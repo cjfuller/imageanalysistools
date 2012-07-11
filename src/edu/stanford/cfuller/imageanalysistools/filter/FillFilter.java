@@ -24,7 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
 import edu.stanford.cfuller.imageanalysistools.filter.LabelFilter;
@@ -52,17 +53,15 @@ public class FillFilter extends Filter {
      * @param im    The Image that is a mask whose regions will have any holes filled in.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		LabelFilter LF = new LabelFilter();
 
-		Image copy = new Image(im);
-		Image leftRegions = new Image(im.getDimensionSizes(), 0);
-		Image rightRegions = new Image(im.getDimensionSizes(), 0);
-		Image topRegions = new Image(im.getDimensionSizes(), 0);
-		Image bottomRegions = new Image(im.getDimensionSizes(), 0);
-
-		
+		WritableImage copy = ImageFactory.createWritable(im);
+		WritableImage leftRegions = ImageFactory.createWritable(im.getDimensionSizes(), 0);
+		WritableImage rightRegions = ImageFactory.createWritable(im.getDimensionSizes(), 0);
+		WritableImage topRegions = ImageFactory.createWritable(im.getDimensionSizes(), 0);
+		WritableImage bottomRegions = ImageFactory.createWritable(im.getDimensionSizes(), 0);
 		
 		for (ImageCoordinate c : copy) {
 			if (copy.getValue(c) == 0) {
@@ -71,7 +70,6 @@ public class FillFilter extends Filter {
 				copy.setValue(c, 0);
 			}
 		}
-		
 		
 		//traverse the directional regions manually to ensure defined pixel order
 		

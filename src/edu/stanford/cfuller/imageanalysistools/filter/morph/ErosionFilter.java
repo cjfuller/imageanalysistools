@@ -24,6 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter.morph;
 
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -83,11 +85,11 @@ public class ErosionFilter extends MorphologicalFilter {
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.morph.MorphologicalFilter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		if (this.strel == null) return;
 		
-		Image origCopy = new Image(im);
+		Image origCopy = ImageFactory.create(im);
 		
 		for (ImageCoordinate ic : im) {
 			

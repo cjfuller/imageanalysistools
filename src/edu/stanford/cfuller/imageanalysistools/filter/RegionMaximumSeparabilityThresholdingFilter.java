@@ -25,7 +25,9 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -49,7 +51,7 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.Filter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 				
 		//need a heuristic to figure out whether this is in fact necessary (due to a lot of noise) or not, and will discard a lot
 		//of good regions.
@@ -70,20 +72,6 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		
 		//another try: look at the relation between the mean of foreground and background.  Relate to std. dev?
 		
-		
-//		for (ImageCoordinate ic : im) {
-//			if (im.getValue(ic) > 0) {
-//				if (first) {
-//					first = false;
-//					firstCorner.setCoord(ic);
-//				}
-//				secondCorner.setCoord(ic);
-//			}
-//		}
-		
-//		java.util.Map<Integer, ImageCoordinate> lowerCoordinates = new java.util.HashMap<Integer, ImageCoordinate>();
-//		java.util.Map<Integer, ImageCoordinate> upperCoordinates = new java.util.HashMap<Integer, ImageCoordinate>();
-//		
 		double fgAvg = 0;
 		double bgAvg = 0;
 		int fgCount = 0;
@@ -100,15 +88,6 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 				fgAvg+= this.referenceImage.getValue(ic);
 				fgCount++;
 			}
-			
-//			if (value == 0) continue;
-//			
-//			if (!lowerCoordinates.containsKey(value)) {
-//				lowerCoordinates.put(value, ImageCoordinate.cloneCoord(ic));
-//				upperCoordinates.put(value, ImageCoordinate.cloneCoord(ic));
-//			}
-//			
-//			upperCoordinates.get(value).setCoord(ic);
 			
 		}
 		
@@ -139,85 +118,8 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		System.out.printf("fg mean: %f, bg mean: %f, fg std: %f, bg std: %f\n", fgAvg, bgAvg, fgStd, bgStd);
 		
 		
-		
-		
-//		for (Integer key : lowerCoordinates.keySet()) {
-//			
-//			lowerCoordinates.get(key).set(ImageCoordinate.X, lowerCoordinates.get(key).get(ImageCoordinate.X) - 5);
-//			lowerCoordinates.get(key).set(ImageCoordinate.Y, lowerCoordinates.get(key).get(ImageCoordinate.Y) - 5);
-//			lowerCoordinates.get(key).set(ImageCoordinate.Z, lowerCoordinates.get(key).get(ImageCoordinate.Z) - 5);
-//			
-//			upperCoordinates.get(key).set(ImageCoordinate.X, upperCoordinates.get(key).get(ImageCoordinate.X) + 6);
-//			upperCoordinates.get(key).set(ImageCoordinate.Y, upperCoordinates.get(key).get(ImageCoordinate.Y) + 6);
-//			upperCoordinates.get(key).set(ImageCoordinate.Z, upperCoordinates.get(key).get(ImageCoordinate.Z) + 6);
-//			upperCoordinates.get(key).set(ImageCoordinate.C, upperCoordinates.get(key).get(ImageCoordinate.C) + 1);
-//			upperCoordinates.get(key).set(ImageCoordinate.T, upperCoordinates.get(key).get(ImageCoordinate.T) + 1);
-//
-//		}
-//
-//		int count = 0;
-//		double average = 0;
-//		
-//		for (Integer key : lowerCoordinates.keySet()) {
-//			
-//			ImageCoordinate firstCorner = lowerCoordinates.get(key);
-//			ImageCoordinate secondCorner = upperCoordinates.get(key);
-//			
-//			im.setBoxOfInterest(firstCorner, secondCorner);
-//			
-//			for (ImageCoordinate ic : im) {
-//				if (((int) im.getValue(ic)) == 0) {
-//					average += this.referenceImage.getValue(ic);
-//					count++;
-//				}
-//			}
-//			
-//			im.clearBoxOfInterest();
-//			
-//		}
-//		
-//		for (Integer key : lowerCoordinates.keySet()) {
-//			lowerCoordinates.get(key).recycle();
-//			upperCoordinates.get(key).recycle();
-//		}
-//		
-//		lowerCoordinates = null;
-//		upperCoordinates = null;
-//
-//		
-//		average/=count;
-//		
-//		Histogram href = new Histogram(this.referenceImage);
-//		
-//		int breakpoint = 0;
-//		
-//		int totalPixels = href.getTotalCounts() + href.getCounts(0);
-//		
-//		double average_1_10th = 0;
-//		
-//		for (int i = 0; i < href.getMaxValue(); i++) {
-//						
-//			if (href.getCumulativeCounts(i) > 0.1*totalPixels) {
-//				breakpoint = i-1;
-//				break;
-//			}
-//			
-//			average_1_10th += href.getCounts(i)*i;
-//			
-//		}
-//		
-//		int counts = href.getCumulativeCounts(breakpoint);
-//
-//		System.out.println("breakpoint: " + breakpoint + "   total pixels: " + totalPixels);
-//		
-//		average_1_10th += (((int) (0.1*totalPixels)) - counts)*(breakpoint + 1);
-//		
-//		average_1_10th /= ((int) (0.1*totalPixels));
-//		
 		double thresholdMultiplier = 5;
-		
-		//double thresholdMultiplier = 0;
-		
+				
 		boolean shouldApplyFilter = fgAvg < thresholdMultiplier*bgAvg;
 		
 		System.out.println("Should apply the RMSTF? " + shouldApplyFilter + "  average fg: " + fgAvg + "  average bg: " + bgAvg);
@@ -230,22 +132,14 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		//try grouping all objects, finding average intensity, segmenting into categories based on average intensity of objects
 		//(akin to reduce punctate background of the original centromere finder)
 		
-		Image result = im;
-		
-		
+		WritableImage result = im;
 		
 		Image reference = this.referenceImage;
-		
-
-		
+				
 		Histogram h = new Histogram(result);
 
-
-		
 		int numRegions = h.getMaxValue();
-		
-
-		
+				
 		float[] sums = new float[numRegions];
 		
 		java.util.Arrays.fill(sums, 0.0f);
@@ -266,7 +160,7 @@ public class RegionMaximumSeparabilityThresholdingFilter extends Filter {
 		
 		ImageCoordinate dimensionSizes = ImageCoordinate.createCoordXYZCT(numRegions, 1,1,1,1);
 		
-		Image meanValues = new Image(dimensionSizes, 0.0f);
+		WritableImage meanValues = ImageFactory.createWritable(dimensionSizes, 0.0f);
 		
 
 		

@@ -26,6 +26,8 @@ package edu.stanford.cfuller.imageanalysistools.method;
 
 import edu.stanford.cfuller.imageanalysistools.filter.MaskFilter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
@@ -93,13 +95,13 @@ public class ChromosomeCentromereFindingMethod extends Method {
         //ch1 = centromeres
 
         mf.setReferenceImage(ch1_method.getStoredImage());
-        Image chromosomeCentromereMask = new Image(ch0_method.getStoredImage());
+        WritableImage chromosomeCentromereMask = ImageFactory.createWritable(ch0_method.getStoredImage());
 
         mf.apply(chromosomeCentromereMask);
 
         //now remove all these regions from the chromosome mask
 
-        Image chromosomeNonCentromereMask = new Image(ch0_method.getStoredImage());
+        WritableImage chromosomeNonCentromereMask = ImageFactory.createWritable(ch0_method.getStoredImage());
 
         for (ImageCoordinate ic : chromosomeNonCentromereMask) {
 

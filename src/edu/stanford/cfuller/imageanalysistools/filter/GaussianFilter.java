@@ -26,7 +26,8 @@ package edu.stanford.cfuller.imageanalysistools.filter;
 
 import ij.ImagePlus;
 import ij.plugin.filter.GaussianBlur;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 
 /**
  * A Filter that applies a gaussian blur to a 2D Image.
@@ -62,7 +63,7 @@ public class GaussianFilter extends Filter {
      * @param im    The Image to process, which will be blurred.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
 		int kernelSize = this.width;
 
@@ -80,28 +81,6 @@ public class GaussianFilter extends Filter {
         }
 
 
-//        double powOfTwo = Math.pow(2.0, kernelSize - 1);
-//		
-//		double[] coeffs = new double[kernelSize];
-//
-//        double coeffsSum = 0;
-//
-//		for (int i = 0; i < coeffs.length; i++) {
-//			coeffs[i] = org.apache.commons.math3.util.MathUtils.binomialCoefficientDouble(kernelSize-1, i)/powOfTwo;
-//            coeffsSum+=coeffs[i];
-//        }
-//
-//
-//        float[] kernelCoeffs = new float[kernelSize*kernelSize];
-//
-//        int kernelCounter = 0;
-//
-//        for (int i =0; i < coeffs.length; i++) {
-//            for (int j =0; j < coeffs.length; j++) {
-//                kernelCoeffs[kernelCounter++] = (float) (coeffs[i]*coeffs[j]);
-//            }
-//        }
-
         ImagePlus imP = im.toImagePlus();
         
         GaussianBlur gb = new GaussianBlur();
@@ -111,58 +90,8 @@ public class GaussianFilter extends Filter {
             gb.blur(imP.getProcessor(), width);
         }
         
-        im.copy(new Image(imP));
-        
-//        
-//        
-//		Image intermediate = new Image(im);
-//		
-//		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
-//		
-//		for (ImageCoordinate i : intermediate) {
-//			double sum = 0;
-//            double partialCoeffSum = 0;
-//
-//			for (int offset = -1*halfKernelSize; offset <= halfKernelSize; offset++) {
-//				double imValue = 0;
-//				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
-//				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y) + offset);
-//				
-//				if (im.inBounds(ic)) {
-//                    partialCoeffSum += coeffs[halfKernelSize+offset];
-//					imValue = im.getValue(ic);
-//				}
-//				
-//				
-//				sum+= imValue * coeffs[halfKernelSize + offset];
-//				
-//			}
-//			intermediate.setValue(i, (float) (sum/(partialCoeffSum/coeffsSum)));
-//		}
-//		
-//		for (ImageCoordinate i : intermediate) {
-//			double sum = 0;
-//            double partialCoeffSum = 0;
-//
-//			for (int offset = -1*halfKernelSize; offset <= halfKernelSize; offset++) {
-//				double imValue = 0;
-//				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+offset);
-//				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
-//				
-//				if (intermediate.inBounds(ic)) {
-//                    partialCoeffSum += coeffs[halfKernelSize+offset];
-//					imValue = intermediate.getValue(ic);
-//				}
-//				
-//				
-//				sum+= imValue * coeffs[halfKernelSize + offset];
-//				
-//			}
-//			im.setValue(i, (float) (sum/(partialCoeffSum/coeffsSum)));
-//		}
-//		
-//		ic.recycle();
-	
+        im.copy(ImageFactory.create(imP));
+   
 	}
 
     /**
@@ -177,11 +106,5 @@ public class GaussianFilter extends Filter {
 		
 	}
 
-	
-//	private double gaussPDF(double r, double mean, double stddev) {
-//		return (1.0/(stddev*Math.sqrt(2*Math.PI))*Math.exp(-Math.pow(r - mean,2.0)/(2.0*stddev*stddev)));
-//	}
-//	
-	
 	
 }

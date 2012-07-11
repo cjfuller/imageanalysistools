@@ -63,7 +63,7 @@ public class DimensionFlipper {
         sizes.set(dim1,sizes.get(dim0));
         sizes.set(dim0, temp_1);
 
-        Image newImage = new Image(sizes, 0.0f);
+        WritableImage newImage = ImageFactory.createWritable(sizes, 0.0f);
 
         ImageCoordinate flipCoord = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
 

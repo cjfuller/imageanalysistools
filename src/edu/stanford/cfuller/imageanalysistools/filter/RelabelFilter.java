@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -43,7 +43,7 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 public class RelabelFilter extends Filter {
 
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
 		int maxVal = edu.stanford.cfuller.imageanalysistools.image.Histogram.findMaxVal(im);
 		

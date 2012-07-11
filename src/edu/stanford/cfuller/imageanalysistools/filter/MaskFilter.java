@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -46,7 +46,11 @@ public class MaskFilter extends Filter {
      * @param im    The Image that will be masked by the reference Image.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
+		
+		if (this.referenceImage == null) {
+			throw new ReferenceImageRequiredException("MaskFilter requires a reference image.");
+		}
 		
 		for (ImageCoordinate c : im) {
 			if (this.referenceImage.getValue(c) == 0) {

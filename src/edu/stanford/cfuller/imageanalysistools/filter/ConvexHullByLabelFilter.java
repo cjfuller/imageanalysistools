@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.filter.RelabelFilter;
@@ -58,7 +58,7 @@ public class ConvexHullByLabelFilter extends Filter {
      * @param im    The Image to process-- a mask whose regions will be replaced by their filled convex hulls.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		RelabelFilter RLF = new RelabelFilter();
 

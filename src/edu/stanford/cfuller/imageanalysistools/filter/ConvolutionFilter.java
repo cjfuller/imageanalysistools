@@ -28,6 +28,7 @@ import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -53,7 +54,7 @@ public class ConvolutionFilter extends Filter {
 	Complex[][] transformStorage;
 	
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		Complex[][] transformed = null;
 		
@@ -104,39 +105,37 @@ public class ConvolutionFilter extends Filter {
             ydimPowOfTwo = (int) Math.pow(2, Math.ceil(Math.log(im.getDimensionSizes().get(ImageCoordinate.Y))/Math.log(2)));
         }
 
-        //for (int p =0; p < im.getPlaneCount(); p++) {
-
         int p = z;
         
-            im.selectPlane(p);
+        im.selectPlane(p);
 
-            double[][] rowImage = new double[ydimPowOfTwo][xdimPowOfTwo];
-            for (int i =0; i < ydimPowOfTwo; i++) {
-                java.util.Arrays.fill(rowImage[i], 0); // ensures zero-padding
-            }
-            Complex[][] colMajorImage = new Complex[xdimPowOfTwo][ydimPowOfTwo];
+        double[][] rowImage = new double[ydimPowOfTwo][xdimPowOfTwo];
+        for (int i =0; i < ydimPowOfTwo; i++) {
+            java.util.Arrays.fill(rowImage[i], 0); // ensures zero-padding
+        }
+        Complex[][] colMajorImage = new Complex[xdimPowOfTwo][ydimPowOfTwo];
 
-            for (ImageCoordinate ic : im) {
-                rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] = im.getValue(ic);
-            }
+        for (ImageCoordinate ic : im) {
+            rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] = im.getValue(ic);
+        }
 
-            for (int r = 0; r < rowImage.length; r++) {
-                double[] row = rowImage[r];
-                Complex[] transformedRow = fft.transform(row, org.apache.commons.math3.transform.TransformType.FORWARD);
-
-                for (int c = 0; c < colMajorImage.length; c++) {
-                    colMajorImage[c][r] = transformedRow[c];
-                }
-            }
+        for (int r = 0; r < rowImage.length; r++) {
+            double[] row = rowImage[r];
+            Complex[] transformedRow = fft.transform(row, org.apache.commons.math3.transform.TransformType.FORWARD);
 
             for (int c = 0; c < colMajorImage.length; c++) {
-                colMajorImage[c] = fft.transform(colMajorImage[c], org.apache.commons.math3.transform.TransformType.FORWARD);
+                colMajorImage[c][r] = transformedRow[c];
             }
-            return colMajorImage;
-        //}
+        }
+
+        for (int c = 0; c < colMajorImage.length; c++) {
+            colMajorImage[c] = fft.transform(colMajorImage[c], org.apache.commons.math3.transform.TransformType.FORWARD);
+        }
+        return colMajorImage;
+
 	}
 	
-	public void inverseTransform(Image orig, int z, Complex[][] transformed) {
+	public void inverseTransform(WritableImage orig, int z, Complex[][] transformed) {
 		
 		Complex[][] colMajorImage = transformed;
 		

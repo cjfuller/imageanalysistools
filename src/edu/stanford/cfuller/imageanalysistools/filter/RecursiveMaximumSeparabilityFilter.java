@@ -25,6 +25,8 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.LabelFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.MaskFilter;
@@ -63,17 +65,17 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
      * @param im    The Image mask to process; will be overwritten by the result.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
         Image originalImageReference = this.referenceImage;
 
-        this.referenceImage = new Image(this.referenceImage); // to save having to allocate an Image at every step, this
+        this.referenceImage = ImageFactory.createWritable(this.referenceImage); // to save having to allocate an Image at every step, this
                                                                 // overwrites the reference Image, so make a copy
 		boolean doRecursion = true;
 		
-		Image maskBuffer = new Image(im.getDimensionSizes(), 0.0f);
+		WritableImage maskBuffer = ImageFactory.createWritable(im.getDimensionSizes(), 0.0f);
 		
-		Image imageBuffer = null;
+		WritableImage imageBuffer = null;
 		
 		MaximumSeparabilityThresholdingFilter mstf = new MaximumSeparabilityThresholdingFilter();
 		MaskFilter MF = new MaskFilter();
@@ -192,7 +194,7 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
 
 				
                 maskBuffer.setBoxOfInterest(lowerBound, upperBound);
-                imageBuffer = this.referenceImage;
+                imageBuffer = this.referenceImage.getWritableInstance(); // This is set to be a writable copy above, so not clobbering the reference image.
                 imageBuffer.setBoxOfInterest(lowerBound, upperBound);
 
 				//Image smallMaskBuffer = maskBuffer.subImage(sizes, lowerBound);

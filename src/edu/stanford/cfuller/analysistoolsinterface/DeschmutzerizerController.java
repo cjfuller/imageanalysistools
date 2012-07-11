@@ -27,6 +27,8 @@ package edu.stanford.cfuller.analysistoolsinterface;
 import edu.stanford.cfuller.imageanalysistools.frontend.AnalysisController;
 import edu.stanford.cfuller.imageanalysistools.frontend.DataSummary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
@@ -314,8 +316,8 @@ public class DeschmutzerizerController extends TaskController {
 		this.maskWindow.setVisible(false);
 
 		
-		Image outputImage = new Image(this.currentMaskImage);
-		Image outputImageLabeled = new Image(this.currentLabeledMaskImage);
+		WritableImage outputImage = ImageFactory.createWritable(this.currentMaskImage);
+		WritableImage outputImageLabeled = ImageFactory.createWritable(this.currentLabeledMaskImage);
 		String outputImageFilename = this.getOutputFilename(this.currentMaskFilename);
 		String outputImageLabeledFilename = this.getOutputFilename(this.currentLabeledMaskFilename);
 		this.createOutputDirectory(outputImageFilename);
@@ -529,23 +531,7 @@ public class DeschmutzerizerController extends TaskController {
 			channel = this.currentParameters.getIntValueForKey("marker_channel_index");
 		}
 
-		// ImageCoordinate start = ImageCoordinate.createCoordXYZCT(0,0,0,channel,0);
-		// 		ImageCoordinate dims = ImageCoordinate.cloneCoord(this.currentOriginalImage.getDimensionSizes());
-		// 		dims.set(ImageCoordinate.C, 1);
-		// 
-		// 
-		// 		this.currentOriginalImage = this.currentOriginalImage.subImage(dims, start);
-		// 
-		// 
-		// 
-		// 
-		// 		start.recycle();
-		// 		dims.recycle();
-
-		
-
-
-		Image display = new Image(this.currentMaskImage);
+		WritableImage display = ImageFactory.createWritable(this.currentMaskImage);
 
 		for (ImageCoordinate ic : display) {
 			if (display.getValue(ic) > 0) {
@@ -553,7 +539,7 @@ public class DeschmutzerizerController extends TaskController {
 			}
 		}
 		
-		ImagePlus origMask = (new Image(this.currentMaskImage)).toImagePlus();
+		ImagePlus origMask = (ImageFactory.createWritable(this.currentMaskImage)).toImagePlus();
 		
 		this.colorCodedMaskDisplay = origMask.createHyperStack("mask", this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.C), this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.Z), this.currentMaskImage.getDimensionSizes().get(ImageCoordinate.T), 24); //24 = RGB
 

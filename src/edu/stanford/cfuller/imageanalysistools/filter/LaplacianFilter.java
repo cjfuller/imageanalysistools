@@ -24,7 +24,8 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -61,12 +62,12 @@ public class LaplacianFilter extends Filter{
      * Appies a Laplacian filter to an Image.
      * @param im    The Image to be filtered; this will be replaced by the Laplacian-filtered Image
      */
-    public void apply(Image im) {
+    public void apply(WritableImage im) {
 
         final int numEl = (int) kernel[kernelHalfSize][kernelHalfSize];
 
 
-        Image newIm = new Image(im);
+        WritableImage newIm = ImageFactory.createWritable(im);
 
         float minValue = Float.MAX_VALUE;
 

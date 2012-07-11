@@ -25,6 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 
 /**
@@ -35,7 +36,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
  * during the processing, but should not modify the reference image.  For instance, a filter might take a mask for the Image parameter
  * to the apply function, and operate on this mask, but use the intensity information in a reference image to guide the operation on the mask.
  * <p>
- * In general, classes that extend filter should document exactly what they expect for the reference image and the Image parameter to the apply function. 
+ * Classes that extend filter should document exactly what they expect for the reference image and the Image parameter to the apply function. 
  *
  * @author Colin J. Fuller
  *
@@ -62,7 +63,7 @@ public abstract class Filter {
      * Applies the Filter to the supplied Image.
      * @param im    The Image to process.
      */
-	public abstract void apply(Image im);
+	public abstract void apply(WritableImage im);
 
     /**
      * Sets the reference image for this filter to the specified Image.

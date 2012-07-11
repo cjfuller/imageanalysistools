@@ -27,6 +27,8 @@ package edu.stanford.cfuller.imageanalysistools.method;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
@@ -45,8 +47,8 @@ public abstract class Method implements Runnable {
 	//fields
 	
 	protected ParameterDictionary parameters;
-	protected java.util.Vector<Image> storedImages;
-	protected java.util.Vector<Image> images;
+	protected java.util.List<Image> storedImages;
+	protected java.util.List<Image> images;
     protected ImageSet imageSet;
 	protected Quantification storedDataOutput;
 	protected StatusUpdater updater;
@@ -62,7 +64,7 @@ public abstract class Method implements Runnable {
      * @param toProcess     The Image that will be processed by the Filters; may be overwritten during the filtering process.
      * @param m             The Metric that will be used to quantify the Images.
      */
-	protected void iterateOnFiltersAndStoreResult(java.util.List<Filter> filters, Image toProcess, Metric m) {
+	protected void iterateOnFiltersAndStoreResult(java.util.List<Filter> filters, WritableImage toProcess, Metric m) {
 		
 		
 		int c = 0;
@@ -74,7 +76,7 @@ public abstract class Method implements Runnable {
 			
 			if (ij.IJ.getInstance() == null) {new ij.ImageJ();}
 			
-			ij.ImagePlus ip = (new Image(toProcess)).toImagePlus();
+			ij.ImagePlus ip = (ImageFactory.create(toProcess)).toImagePlus();
 			ip.setTitle(name);
 			ip.show();
 		}
@@ -86,7 +88,7 @@ public abstract class Method implements Runnable {
     			String name = Integer.toString(c);
     			if (this.updater == null) c++;
     			
-    			ij.ImagePlus ip = (new Image(toProcess)).toImagePlus();
+    			ij.ImagePlus ip = (ImageFactory.create(toProcess)).toImagePlus();
     			ip.setTitle(name);
     			ip.show();
 			   //toProcess.writeToFile("/Users/cfuller/Desktop/filter_intermediates/" + Integer.toString(c++) + ".ome.tif");
@@ -100,7 +102,7 @@ public abstract class Method implements Runnable {
 			this.storedDataOutput = m.quantify(toProcess, this.imageSet);
 		}
 				
-		this.storeImageOutput(new Image(toProcess));
+		this.storeImageOutput(ImageFactory.create(toProcess));
 		
 		
 		this.parameters.addIfNotSet("background_calculated", "false");
@@ -128,8 +130,8 @@ public abstract class Method implements Runnable {
      * Default constructor; sets up storage for the Images to be processed/quantified as well as for the output Images.
      */
 	public Method() {
-		this.images = new java.util.Vector<Image>();
-		this.storedImages = new java.util.Vector<Image>();
+		this.images = new java.util.ArrayList<Image>();
+		this.storedImages = new java.util.ArrayList<Image>();
 		this.updater = null;
 	}
 

@@ -30,7 +30,7 @@ import java.util.Map;
 
 import edu.stanford.cfuller.imageanalysistools.fitting.NelderMeadMinimizer;
 import edu.stanford.cfuller.imageanalysistools.fitting.ObjectiveFunction;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import org.apache.commons.math3.linear.ArrayRealVector;
@@ -59,7 +59,7 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
      * @param im    The Image to be thresholded; this will be overwritten by the thresholded Image.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		apply_ext(im, defaultAdaptive, defaultIncrement);
 	}
 
@@ -70,7 +70,7 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
      * @param im    The Image to be thresholded; this will be overwritten by the thresholded Image.
      * @param adaptiveincrement     true to turn on adaptive determination of the threshold increment; false to turn it off and use the default value
      */
-	public void apply_ext(Image im, boolean adaptiveincrement) {
+	public void apply_ext(WritableImage im, boolean adaptiveincrement) {
 		apply_ext(im, adaptiveincrement, defaultIncrement);
 	}
 
@@ -84,7 +84,7 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
      * @param adaptiveincrement     true to turn on adaptive determination of the threshold increment; false to turn it off and use the default value
      * @param increment             the increment size (in greylevels) to use for determining the threshold; must be positive.
      */
-	public void apply_ext(Image im, boolean adaptiveincrement, int increment) {
+	public void apply_ext(WritableImage im, boolean adaptiveincrement, int increment) {
 				
 		Histogram h = new Histogram(im);
 		

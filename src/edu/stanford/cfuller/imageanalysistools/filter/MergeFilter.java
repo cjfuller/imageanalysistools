@@ -25,6 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -52,7 +53,7 @@ public class MergeFilter extends Filter {
      * @param im    The Image whose 8-connected regions will be merged.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
         Histogram h = new Histogram(im);
 

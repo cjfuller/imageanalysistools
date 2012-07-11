@@ -24,6 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -44,7 +45,7 @@ public class TimeAveragingFilter extends Filter{
      * Time-averages the reference Image, overwriting the argument to this method with the result of the averaging.
      * @param output    An Image containing all zeros that will be overwritten that has the same dimension sizes as the reference Image, but a singleton time dimension.
      */
-    public void apply(Image output) {
+    public void apply(WritableImage output) {
 
         Image im = this.referenceImage;
 

@@ -24,7 +24,9 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -51,9 +53,9 @@ public class Label3DFilter extends Filter {
 	 * @param im    The Image mask that will end up with 6-connected regions labeled.
 	 */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
-		Image preliminaryLabeledImage = new Image(im.getDimensionSizes(), 0.0f);
+		WritableImage preliminaryLabeledImage = ImageFactory.createWritable(im.getDimensionSizes(), 0.0f);
 		int labelCounter = 1;
 
 		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
@@ -167,7 +169,7 @@ public class Label3DFilter extends Filter {
 
 	}
 
-	private void updateLabeling(Image preliminaryLabeledImage, ImageCoordinate i, ImageCoordinate ic){
+	private void updateLabeling(WritableImage preliminaryLabeledImage, ImageCoordinate i, ImageCoordinate ic){
 		if (preliminaryLabeledImage.inBounds(ic) && preliminaryLabeledImage.getValue(ic) > 0) {
 			preliminaryLabeledImage.setValue(i, preliminaryLabeledImage.getValue(ic));
 		}

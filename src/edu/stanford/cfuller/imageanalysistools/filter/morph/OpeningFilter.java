@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter.morph;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 
 /**
  * A Filter implementing the operation of binary morphological opening in an arbitrary (i.e. up to 5) number of dimensions.
@@ -42,7 +42,7 @@ public class OpeningFilter extends MorphologicalFilter {
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.morph.MorphologicalFilter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		DilationFilter df = new DilationFilter(this);
 		ErosionFilter ef = new ErosionFilter(this);
 

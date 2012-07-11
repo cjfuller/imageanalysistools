@@ -27,6 +27,8 @@ package edu.stanford.cfuller.imageanalysistools.method;
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 import edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric;
 
@@ -100,7 +102,7 @@ public class DynamicMethod extends Method {
 			m = new ZeroMetric();
 		}
 				
-		iterateOnFiltersAndStoreResult(filters, new Image(this.imageSet.getMarkerImageOrDefault()), m);
+		iterateOnFiltersAndStoreResult(filters, ImageFactory.createWritable(this.imageSet.getMarkerImageOrDefault()), m);
 		
 	}
 	

@@ -25,6 +25,8 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 import org.apache.commons.math3.linear.RealMatrix;
@@ -53,7 +55,7 @@ public class GradientFilter extends Filter {
      * @param im    The Image that will be replaced by its gradient.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		final int kernelSize = 3;
 		int halfKernelSize = (kernelSize -1)/2;
@@ -83,10 +85,8 @@ public class GradientFilter extends Filter {
 		kernel2.setEntry(2, 2, 1);
 		
 		
-		Image copy1 = new Image(im);
-		
-		Image copy2 = new Image(im);
-		
+		Image copy = ImageFactory.create(im);
+				
 		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 		
 		for (ImageCoordinate i : im) {
@@ -95,19 +95,19 @@ public class GradientFilter extends Filter {
 			double output1 = 0;
 			double output2 = 0;
 						
-			if (i.get(ImageCoordinate.X) == 0 || i.get(ImageCoordinate.Y) == 0 || i.get(ImageCoordinate.X) == copy1.getDimensionSizes().get(ImageCoordinate.X)-1 || i.get(ImageCoordinate.Y) == copy1.getDimensionSizes().get(ImageCoordinate.Y)-1) {
+			if (i.get(ImageCoordinate.X) == 0 || i.get(ImageCoordinate.Y) == 0 || i.get(ImageCoordinate.X) == copy.getDimensionSizes().get(ImageCoordinate.X)-1 || i.get(ImageCoordinate.Y) == copy.getDimensionSizes().get(ImageCoordinate.Y)-1) {
 				outputVal = 0;
 			} else {
 				for (int p =-1*halfKernelSize; p < halfKernelSize+1; p++) {
 					for (int q = -1*halfKernelSize; q < halfKernelSize+1; q++) {
 						ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+p);
 						ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+q);
-						output1 += kernel1.getEntry(p+halfKernelSize,q+halfKernelSize) *copy1.getValue(ic);
-						output2 += kernel2.getEntry(p+halfKernelSize,q+halfKernelSize) *copy2.getValue(ic);
+						output1 += kernel1.getEntry(p+halfKernelSize,q+halfKernelSize) *copy.getValue(ic);
+						output2 += kernel2.getEntry(p+halfKernelSize,q+halfKernelSize) *copy.getValue(ic);
 					}
 				}
 				
-				outputVal =Math.hypot(output1, output2);
+				outputVal = Math.hypot(output1, output2);
 			}
 			
 			im.setValue(i, (float) Math.floor(outputVal));

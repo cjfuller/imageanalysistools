@@ -24,6 +24,11 @@
 
 package edu.stanford.cfuller.imageanalysistools.image;
 
+import ij.ImagePlus;
+import net.imglib2.img.ImgPlus;
+import net.imglib2.type.numeric.real.FloatType;
+
+
 /**
  * A factory to construct PixelData objects; the choice of implementation will be made based on the
  * properties of the data.
@@ -35,16 +40,10 @@ public class PixelDataFactory {
 
 	//TODO: reimplement to handle images other than 5D.
 	
-    static final int DEFAULT_MAX_BYTE_SIZE = Integer.MAX_VALUE;  //temporarily disabled due to bug.
-    //static final int DEFAULT_MAX_BYTE_SIZE = 0;
-
-    private int maxByteSize;
-
     /**
      * Constructs a new default PixelDataFactory.
      */
     public PixelDataFactory(){
-        maxByteSize = DEFAULT_MAX_BYTE_SIZE;
     }
 
     /**
@@ -55,7 +54,7 @@ public class PixelDataFactory {
      * @return              A new PixelData with the specified options.
      */
 
-    public PixelData createPixelData(ImageCoordinate sizes, int data_type, String dimensionOrder) {
+    public static WritablePixelData createPixelData(ImageCoordinate sizes, int data_type, String dimensionOrder) {
 
         return createPixelData(sizes.get(ImageCoordinate.X), sizes.get(ImageCoordinate.Y), sizes.get(ImageCoordinate.Z), sizes.get(ImageCoordinate.C), sizes.get(ImageCoordinate.T), data_type, dimensionOrder);
 
@@ -72,17 +71,31 @@ public class PixelDataFactory {
      * @param dimensionOrder    A string made up of the characters "XYZCT" in any order that specifies the order of the dimensions in the on-disk representation.
      * @return          A new PixelData with the specified options.
      */
-    public PixelData createPixelData(int size_x, int size_y, int size_z, int size_c, int size_t, int data_type, String dimensionOrder) {
+    public static WritablePixelData createPixelData(int size_x, int size_y, int size_z, int size_c, int size_t, int data_type, String dimensionOrder) {
 
-        int sizeInBytes = size_x*size_y*size_z*size_c*size_t*loci.formats.FormatTools.getBytesPerPixel(data_type);
-
-        if (sizeInBytes > maxByteSize) {
-            return new LargePixelData(size_x, size_y, size_z, size_c, size_t, data_type, dimensionOrder);
-        } else {
-            return new ImagePlusPixelData(size_x, size_y, size_z, size_c, size_t, data_type, dimensionOrder);
-        }
-        
+        return new ImgLibPixelData(size_x, size_y, size_z, size_c, size_t, dimensionOrder);        
         
     }
+
+	/**
+	 * Creates a new ImagePlusPixelData from an existing ImagePlus.
+	 * 
+	 * @param imPl	The ImagePlus to use.  This will not be copied, but used and potentially modified in place.
+	 * @return          A new PixelData with the specified options.
+	 */
+	public static WritablePixelData createPixelData(ImagePlus imPl) {
+		return new ImagePlusPixelData(imPl);
+	}
+	
+	/**
+	 * Creates a new PixelData from an existing ImgLib2 ImgPlus and a specified dimension order.
+	 * 
+	 * @param imPl	The ImgPlus to use.  This may not be copied, but used and potentially modified in place.
+	 * @param dimensionOrder	a String containing the five characters XYZCT in the order they are in the image (if some dimensions are not present, the can be specified in any order)
+	 * @return          A new PixelData with the specified options.
+	 */
+	public static WritablePixelData createPixelData(ImgPlus<FloatType> imgpl, String dimensionOrder){
+		return new ImgLibPixelData(imgpl, dimensionOrder);
+	}
 
 }

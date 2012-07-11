@@ -25,7 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 
 /**
  * Not yet implemented.
@@ -34,7 +34,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 public class GraphJoiningFilter extends Filter {
 
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		// TODO Auto-generated method stub
 
 	}

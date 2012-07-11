@@ -25,6 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.DimensionFlipper;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 
 /**
@@ -64,7 +65,7 @@ public class DimensionSwappingFilter extends Filter {
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.Filter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		if (! this.dimsManuallySet && this.params != null && this.params.hasKey(dim0_param) && this.params.hasKey(dim1_param)) {
 			this.dim0 = this.params.getIntValueForKey(dim0_param);

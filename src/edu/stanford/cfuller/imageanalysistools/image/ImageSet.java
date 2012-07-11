@@ -356,7 +356,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         }
     }
 
-    /**
+	/**
      * Disposes of the memory-intensive portions of Images.
      *
      * Useful for programs that retain long-term references to the ImageSet for things like naming, but don't need
@@ -364,8 +364,8 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
      *
      */
     public void disposeImages() {
-        for (Image i : this) {
-            i.dispose();
+        for (ImageHolder imh : this.images) {
+            imh.setImage(null);
         }
     }
 

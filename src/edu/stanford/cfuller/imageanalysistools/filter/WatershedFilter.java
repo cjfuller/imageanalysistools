@@ -25,7 +25,9 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
@@ -64,9 +66,9 @@ public class WatershedFilter extends Filter {
      * @param im    The Image to be segmented.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
-        Image imCopy = new Image(im);
+        WritableImage imCopy = ImageFactory.createWritable(im);
 
         InversionFilter invf = new InversionFilter();
 
@@ -88,7 +90,7 @@ public class WatershedFilter extends Filter {
 
         }
 
-        Image processing = getSeedImage(greylevelLookup, imCopy, h);
+        WritableImage processing = getSeedImage(greylevelLookup, imCopy, h);
 
         Histogram hSeed = new Histogram(processing);
 
@@ -150,10 +152,15 @@ public class WatershedFilter extends Filter {
      * @param h                     A Histogram of the Image being segmented, constructed before the beginning of segmentation.
      * @return                      An Image containing the seeds for the watershed algorithm.
      */
-    protected Image getSeedImage(java.util.Hashtable<Double, java.util.Vector<Vector3D> > greylevelLookup, Image im, Histogram h) {
+    protected WritableImage getSeedImage(java.util.Hashtable<Double, java.util.Vector<Vector3D> > greylevelLookup, Image im, Histogram h) {
+		
+		WritableImage tempSeed = null;
 
-        Image tempSeed = this.seedImage;
-        if (tempSeed == null) tempSeed = new Image(im.getDimensionSizes(), 0.0f);
+        if (this.seedImage == null) {
+			tempSeed = ImageFactory.createWritable(im.getDimensionSizes(), 0.0f);
+		} else {
+			tempSeed = ImageFactory.createWritable(this.seedImage);
+		}
 
         double minValue = h.getMinValue();
 
@@ -177,6 +184,8 @@ public class WatershedFilter extends Filter {
 
         lf.apply(tempSeed);
 
+		if (this.seedImage != null) this.seedImage = tempSeed;
+
         return tempSeed;
 
 
@@ -192,7 +201,7 @@ public class WatershedFilter extends Filter {
      * @param nextLabel     The next available label for new regions.
      * @return              The appropriate value for the ImageCoordinate: one of 0, an existing region number, or nextLabel.
      */
-    protected int getCorrectLabel(ImageCoordinate ic,  Image processing, int nextLabel) {
+    protected int getCorrectLabel(ImageCoordinate ic,  WritableImage processing, int nextLabel) {
 
         int x = ic.get(ImageCoordinate.X);
         int y = ic.get(ImageCoordinate.Y);

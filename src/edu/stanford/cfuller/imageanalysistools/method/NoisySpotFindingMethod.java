@@ -26,6 +26,8 @@ package edu.stanford.cfuller.imageanalysistools.method;
 
 import edu.stanford.cfuller.imageanalysistools.filter.*;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 
 
 /**
@@ -52,7 +54,7 @@ public class NoisySpotFindingMethod extends CentromereFindingMethod {
 
 
     @Override
-    protected void normalizeInputImage(Image input) {
+    protected void normalizeInputImage(WritableImage input) {
         
         RenormalizationFilter rnf = new RenormalizationFilter();
         rnf.setParameters(this.parameters);

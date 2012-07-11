@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -46,7 +46,7 @@ public class SeedFilter extends Filter {
      * @param im    The Image to process; regions will be removed from this Image that have no overlap with regions in the reference Image.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		java.util.HashSet<Integer> hasSeedSet = new java.util.HashSet<Integer>();
 				
 		for (ImageCoordinate i : im) {

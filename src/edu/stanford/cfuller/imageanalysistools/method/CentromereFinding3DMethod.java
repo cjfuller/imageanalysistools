@@ -36,6 +36,8 @@ import edu.stanford.cfuller.imageanalysistools.filter.Renormalization3DFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.SizeAbsoluteFilter;
 import edu.stanford.cfuller.imageanalysistools.image.DimensionFlipper;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.metric.Metric;
 
@@ -115,7 +117,7 @@ public class CentromereFinding3DMethod extends Method {
             i.setReferenceImage(this.images.get(0));
         }
 
-        Image toProcess = new Image(input);
+        WritableImage toProcess = ImageFactory.createWritable(input);
         
         iterateOnFiltersAndStoreResult(filters, toProcess, metric);
         

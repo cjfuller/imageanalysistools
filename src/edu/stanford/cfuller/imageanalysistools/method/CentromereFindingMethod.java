@@ -29,6 +29,8 @@ import java.util.List;
 import edu.stanford.cfuller.imageanalysistools.filter.*;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.clustering.ObjectClustering;
@@ -90,14 +92,14 @@ public class CentromereFindingMethod extends Method {
 			i.setReferenceImage(this.images.get(0));
 		}
 
-		Image toProcess = new Image(input);
+		WritableImage toProcess = ImageFactory.createWritable(input);
 
 		iterateOnFiltersAndStoreResult(filters, toProcess, metric);
 
 		return this.getStoredImage();
 	}
 
-	protected void normalizeInputImage(Image input) {
+	protected void normalizeInputImage(WritableImage input) {
 
 		RenormalizationFilter rnf = new RenormalizationFilter();
 		rnf.setParameters(this.parameters);
@@ -128,7 +130,7 @@ public class CentromereFindingMethod extends Method {
 		LF.setParameters(this.parameters);
 		RLF.setParameters(this.parameters);
 
-		Image normalized = new Image(this.images.get(0));
+		WritableImage normalized = ImageFactory.createWritable(this.images.get(0));
 
 		this.normalizeInputImage(normalized);
 
@@ -143,7 +145,7 @@ public class CentromereFindingMethod extends Method {
 
 		bf.apply(normalized);
 
-		Image groupMask = centromereFinding(normalized);
+		WritableImage groupMask = ImageFactory.createWritable(centromereFinding(normalized));
 
 		this.clearImageOutput();
 
@@ -154,7 +156,7 @@ public class CentromereFindingMethod extends Method {
 		ImThF.apply(groupMask);
 
 		LF.apply(groupMask);
-		Image allCentromeres = new Image(groupMask);
+		WritableImage allCentromeres = ImageFactory.createWritable(groupMask);
 
 		Histogram h = new Histogram(groupMask);
 
@@ -178,7 +180,7 @@ public class CentromereFindingMethod extends Method {
 				lf.setParameters(this.parameters);
 				mstf.setParameters(this.parameters);
 
-				groupMask = new Image(dnaImage);
+				groupMask = ImageFactory.createWritable(dnaImage);
 
 				mstf.apply(groupMask);
 				lf.apply(groupMask);
@@ -190,7 +192,7 @@ public class CentromereFindingMethod extends Method {
 
 			} else  {
 
-				Image gaussianFilteredMask = ObjectClustering.gaussianFilterMask(groupMask);
+				WritableImage gaussianFilteredMask = ObjectClustering.gaussianFilterMask(groupMask);
 
 				boolean decreaseBackground = Boolean.parseBoolean(this.parameters.getValueForKey("decrease_speckle_background"));
 
@@ -205,18 +207,18 @@ public class CentromereFindingMethod extends Method {
 					}
 				} else {
 
-					Image output = ObjectClustering.doBasicClustering(groupMask, normalized, new Image(gaussianFilteredMask));
+					WritableImage output = ImageFactory.createWritable(ObjectClustering.doBasicClustering(groupMask, normalized, ImageFactory.create(gaussianFilteredMask)));
 
 					RegionThresholdingFilter rtf = new RegionThresholdingFilter();
 					MaximumSeparabilityThresholdingFilter mstf_clustering = new MaximumSeparabilityThresholdingFilter();
 
 					rtf.setThresholdingFilter(mstf_clustering);
 					rtf.setParameters(this.parameters);
-					Image ch0_copy = new Image(this.images.get(0));
+					WritableImage ch0_copy = ImageFactory.createWritable(this.images.get(0));
 
 					Histogram h_clustered = new Histogram(output);
 
-					Image singleClusterTemp = new Image(output);
+					WritableImage singleClusterTemp = ImageFactory.createWritable(output);
 
 					for (int c = 1; c<= h_clustered.getMaxValue(); c++) {
 
@@ -312,13 +314,13 @@ public class CentromereFindingMethod extends Method {
 
 		this.storeImageOutput(groupMask);
 
-		Image allCentromeresCopy = new Image(allCentromeres);
+		Image allCentromeresCopy = ImageFactory.create(allCentromeres);
 
 		this.storeImageOutput(allCentromeresCopy);
 
 		//background estimation
 
-		Image backgroundMask = new Image(groupMask);
+		WritableImage backgroundMask = ImageFactory.createWritable(groupMask);
 
 		ConvexHullByLabelFilter chblf = new ConvexHullByLabelFilter();
 

@@ -58,11 +58,11 @@ public class ImageWriter {
 		toWrite = im;
 	}
 	
-	private void imgLibWrite(String filename, ImgLibPixelData p, loci.formats.IFormatWriter writer) throws java.io.IOException {
+	private void imgLibWrite(String filename, ImgLibPixelData p) throws java.io.IOException {
 		
 		ImgSaver is = new ImgSaver();
 		try {
-			is.saveImg(writer, p.getImg());
+			is.saveImg(filename, p.getImg());
 		} catch (net.imglib2.io.ImgIOException e) {
 			throw new java.io.IOException(e);
 		} catch (net.imglib2.exception.IncompatibleTypeException e) {
@@ -84,6 +84,13 @@ public class ImageWriter {
      */
 	public void write(String filename, PixelData imagePixels) throws java.io.IOException {
 		
+		//until I phase out other types of pixel data
+		if (imagePixels instanceof ImgLibPixelData) {
+			this.imgLibWrite(filename, (ImgLibPixelData) imagePixels);
+			return;
+		}
+			
+		
 		loci.formats.IFormatWriter writer = new loci.formats.ImageWriter();
 
 		try {
@@ -93,12 +100,10 @@ public class ImageWriter {
 		} catch (EnumerationException e) {
 			LoggingUtilities.getLogger().severe("Exception while trying to update dimension order of pixel data: " + e.getMessage());
 		}
-	
-		writer.setMetadataRetrieve(toWrite.getMetadata());
-		//the next line is a hack... when writing the same image multiple times, there seems to be some sort of issue with 
-		//the pixels data being deleted, but not having a dummy object put in to read the endianness off of.
-		toWrite.getMetadata().setPixelsBinDataBigEndian(imagePixels.getByteOrder() == java.nio.ByteOrder.BIG_ENDIAN, 0, 0);
 		
+		loci.formats.meta.IMetadata m = toWrite.getMetadata();
+			
+		writer.setMetadataRetrieve(toWrite.getMetadata());		
 		
 		try {
 			
@@ -110,17 +115,13 @@ public class ImageWriter {
 			
 			writer.setId(filename);
 			
-			//until I phase out other types of pixel data
-			if (imagePixels instanceof ImgLibPixelData) {
-				this.imgLibWrite(filename, (ImgLibPixelData) imagePixels, writer);
-			} else {
-				for (int i = 0; i < imagePixels.getNumPlanes(); i++) {
+			
+			for (int i = 0; i < imagePixels.getNumPlanes(); i++) {
 
-					byte[] bytes = imagePixels.getPlane(i);
+				byte[] bytes = imagePixels.getPlane(i);
 
-					writer.savePlane(i, bytes);
+				writer.savePlane(i, bytes);
 
-				}
 			}
 			
 						

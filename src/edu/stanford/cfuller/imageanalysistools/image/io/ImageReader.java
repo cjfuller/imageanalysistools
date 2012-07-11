@@ -26,6 +26,7 @@ package edu.stanford.cfuller.imageanalysistools.image.io;
 
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 import edu.stanford.cfuller.imageanalysistools.image.PixelDataFactory;
@@ -124,47 +125,6 @@ public class ImageReader {
      */
 	public synchronized Image read(String filename) throws java.io.IOException {
 
-
-
-		// try {
-		// 
-		// 			loci.formats.meta.IMetadata meta = (new loci.common.services.ServiceFactory()).getInstance(loci.formats.services.OMEXMLService.class).createOMEXMLMetadata();
-		// 			try {
-		// 				lociReader.setMetadataStore(meta);
-		// 			} catch (IllegalStateException e) {
-		// 				lociReader.close();
-		// 				lociReader.setMetadataStore(meta);
-		// 			}
-		// 
-		// 
-		// 		} catch (loci.common.services.ServiceException e) {
-		// 			e.printStackTrace();
-		// 		} catch (loci.common.services.DependencyException e) {
-		// 			e.printStackTrace();
-		// 		}
-		// 
-		// 		try {
-		// 			lock(filename);
-		// 		} catch (InterruptedException e) {
-		// 			LoggingUtilities.getLogger().warning("interrupted while attempting to lock image file");
-		// 			return null;
-		// 		}
-		// 
-		// 		try {
-		// 			try {
-		// 				lociReader.setId(filename);
-		// 			} catch (IllegalStateException e) {
-		// 				lociReader.close();
-		// 				lociReader.setId(filename);
-		// 			}
-		// 		} catch (loci.formats.FormatException e) {
-		// 			throw new java.io.IOException(e);
-		// 		}
-		// 
-		// 		loci.formats.MetadataTools.populatePixels(lociReader.getMetadataStore(), lociReader);
-		
-		//PixelData p = (new PixelDataFactory()).createPixelData(lociReader.getSizeX(), lociReader.getSizeY(), lociReader.getSizeZ(), lociReader.getSizeC(), lociReader.getSizeT(), lociReader.getPixelType(), lociReader.getDimensionOrder());
-
 		ImgOpener o = new ImgOpener();
 		
 		loci.formats.IFormatReader reader = null;
@@ -192,14 +152,9 @@ public class ImageReader {
 			throw new java.io.IOException(e);
 		}
 
-		ImgLibPixelData p = new ImgLibPixelData(new ImgPlus<FloatType>(img), meta.getPixelsDimensionOrder(0).toString());
+		PixelData p = PixelDataFactory.createPixelData(new ImgPlus<FloatType>(img), meta.getPixelsDimensionOrder(0).toString());
 
-		if (!meta.getPixelsBinDataBigEndian(0, 0)) {
-			p.setByteOrder(java.nio.ByteOrder.LITTLE_ENDIAN);
-		}
-
-
-		Image toReturn = new Image(meta, p);
+		Image toReturn = ImageFactory.create(meta, p);
 
 		lociReader.close();
 		seriesCounts.put(filename, 1);

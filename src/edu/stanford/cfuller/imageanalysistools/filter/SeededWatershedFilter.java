@@ -25,6 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -67,7 +68,7 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
      * @return              The correct label for the specified coordinate... 0 if it should be a barrier pixel, the label of an existing region
      *                      if it belongs in that region, or nextLabel if it should start a new region.
      */
-    protected int getCorrectLabel(ImageCoordinate ic,  Image processing, int nextLabel) {
+    protected int getCorrectLabel(ImageCoordinate ic,  WritableImage processing, int nextLabel) {
 
         if (this.flaggedForMerge) {
             this.mgf.apply(processing);

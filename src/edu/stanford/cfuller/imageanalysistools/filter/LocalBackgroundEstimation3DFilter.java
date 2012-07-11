@@ -25,8 +25,9 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 
 /**
  * A Filter that estimates the background locally in an Image, using a local mean filtering approach.  It is intended for use on three-dimensional images.
@@ -53,10 +54,12 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
      * @param im    The Image that will be replaced by the output Image.  This can be anything of the correct dimensions except a shallow copy of the reference Image.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
-		if (this.referenceImage == null) return;
-				
+		if (this.referenceImage == null) {
+			throw new ReferenceImageRequiredException("LocalBackgroundEstimation3DFilter requires a reference image.");
+		}
+						
 		ImageCoordinate boxMin = ImageCoordinate.cloneCoord(this.referenceImage.getDimensionSizes());
 		for (Integer s : boxMin) {
 			boxMin.set(s, 0);
@@ -66,15 +69,15 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 		
 		boolean first = true;
 				
-		Image counts = new Image(this.referenceImage.getDimensionSizes(), 0.0f);
+		WritableImage counts = ImageFactory.createWritable(this.referenceImage.getDimensionSizes(), 0.0f);
 		
 		ImageCoordinate lastCoordinate = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 		
 		for(ImageCoordinate i : im) {
 						
 			if (first) {
+				
 				first = false;
-			//if (i.get(ImageCoordinate.X) == 0 ) {
 			
 				boxMin.set(ImageCoordinate.X, i.get(ImageCoordinate.X) - boxSize);
 				boxMin.set(ImageCoordinate.Y, i.get(ImageCoordinate.Y) - boxSize);
@@ -101,7 +104,6 @@ public class LocalBackgroundEstimation3DFilter extends LocalBackgroundEstimation
 				
 				this.referenceImage.clearBoxOfInterest();
 				
-				//first = false;
 								
 			} else {
 				

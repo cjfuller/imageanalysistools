@@ -24,7 +24,9 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -57,11 +59,11 @@ public class BackgroundEstimationFilter extends Filter {
      * @param im    The Image containing the mask of regions to process.  Each region must be labeled individually.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		// TODO This recapitulates the c++ code, but there's something wrong here (with the c++ as well)
 		
-		Image maskCopy = new Image(im);
+		WritableImage maskCopy = ImageFactory.createWritable(im);
 		
 		MaskFilter mf = new MaskFilter();
 		
@@ -76,7 +78,7 @@ public class BackgroundEstimationFilter extends Filter {
 				}
 			}
 			
-			Image imCopy = new Image(this.referenceImage);
+			WritableImage imCopy = ImageFactory.createWritable(this.referenceImage);
 			
 			mf.setReferenceImage(maskCopy);
 			mf.apply(imCopy);

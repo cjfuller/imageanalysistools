@@ -25,7 +25,8 @@
 package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -45,23 +46,20 @@ public class Renormalization3DFilter extends Filter {
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.Filter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		
 		PlaneNormalizationFilter pnf = new PlaneNormalizationFilter();
 				
 		pnf.apply(im);
 				
-		Image mean = new Image(im);
+		WritableImage mean = ImageFactory.createWritable(im);
 
 		
 		VariableSizeMeanFilter VSMF = new VariableSizeMeanFilter();
 		VSMF.setBoxSize(5); // was 5
 		
         KernelFilterND kf = new KernelFilterND();
-        //double[] d = {0.625, 0.25, 0.375, 0.25, 0.625};
         double[] d = {0.1, 0.2, 0.4, 0.2, 0.1};
-        //kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.X, d);
-        //kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Y, d);
         kf.addDimensionWithKernel(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate.Z, d);
         
         GaussianFilter gf = new GaussianFilter();
@@ -81,14 +79,12 @@ public class Renormalization3DFilter extends Filter {
         lfnd.setParameters(this.params);
         zpf.setParameters(this.params);
 
-        Image lf = new Image(mean);
+        WritableImage lf = ImageFactory.createWritable(mean);
         
         lfnd.apply(lf);
         zpf.apply(lf);
         gf.apply(lf);
         kf.apply(lf);
-		//gf.apply(lf);
-		//kf.apply(lf);
         
 		float min = Float.MAX_VALUE;
 		float max = 0;

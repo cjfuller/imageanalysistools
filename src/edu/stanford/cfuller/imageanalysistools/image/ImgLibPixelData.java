@@ -29,20 +29,17 @@ import ij.ImagePlus;
 import net.imglib2.img.ImgPlus;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.real.FloatType;
-import net.imglib2.img.array.ArrayImgFactory;
+import net.imglib2.img.planar.PlanarImgFactory;
 import net.imglib2.RandomAccess;
 
 /**
- * A type of PixelData that uses an ImgLib2 ImgPlus as its underlying representation.
+ * A type of WritablePixelData that uses an ImgLib2 ImgPlus as its underlying representation.
  * 
  * @author Colin J. Fuller
  *
  */
-public class ImgLibPixelData extends PixelData {
+public class ImgLibPixelData extends WritablePixelData {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1435719453195463339L;
 
 	private ImgPlus<FloatType> imgpl;
@@ -67,6 +64,7 @@ public class ImgLibPixelData extends PixelData {
 	int ci;
 	int ti;
 
+	@Override
 	protected void init(int size_x, int size_y, int size_z, int size_c, int size_t, String dimensionOrder) {
 		
 		this.dimensionOrder = dimensionOrder.toUpperCase();
@@ -77,44 +75,48 @@ public class ImgLibPixelData extends PixelData {
 		this.ci = this.dimensionOrder.indexOf("C");
 		this.ti = this.dimensionOrder.indexOf("T");
 		
-	
-		long[] dimensionSizeArray = new long[numDims];
-		java.util.Arrays.fill(dimensionSizeArray, 0L);
+		if (this.imgpl!= null) {
+			long[] dimensionSizeArray = new long[numDims];
+			java.util.Arrays.fill(dimensionSizeArray, 0L);
+			this.imgpl.dimensions(dimensionSizeArray);
 		
-		this.imgpl.dimensions(dimensionSizeArray);
+			int numImpglDims = this.imgpl.numDimensions();
 		
-		int numImpglDims = this.imgpl.numDimensions();
-		
-		if (this.xi < numImpglDims) {
+			if (this.xi < numImpglDims) {
+				this.has_x = true;
+				size_x = (int) dimensionSizeArray[this.xi];
+			}
+			if (this.yi < numImpglDims) {
+				this.has_y = true;
+				size_y = (int) dimensionSizeArray[this.yi];
+			}
+			if (this.zi < numImpglDims) {
+				this.has_z = true;
+				size_z = (int) dimensionSizeArray[this.zi];
+			}
+			if (this.ci < numImpglDims) {
+				this.has_c = true;
+				size_c = (int) dimensionSizeArray[this.ci];
+			}
+			if (this.ti < numImpglDims) {
+				this.has_t = true;
+				size_t = (int) dimensionSizeArray[this.ti];
+			}
+		} else {
+			
 			this.has_x = true;
-			size_x = (int) dimensionSizeArray[this.xi];
-		}
-		if (this.yi < numImpglDims) {
 			this.has_y = true;
-			size_y = (int) dimensionSizeArray[this.yi];
-		}
-		if (this.zi < numImpglDims) {
 			this.has_z = true;
-			size_z = (int) dimensionSizeArray[this.zi];
-		}
-		if (this.ci < numImpglDims) {
 			this.has_c = true;
-			size_c = (int) dimensionSizeArray[this.ci];
-		}
-		if (this.ti < numImpglDims) {
 			this.has_t = true;
-			size_t = (int) dimensionSizeArray[this.ti];
+			
 		}
 				
-		this.pixels = null;
-
 		this.size_x = size_x;
 		this.size_y = size_y;
 		this.size_z = size_z;
 		this.size_c = size_c;
 		this.size_t = size_t;
-
-		this.byteOrder = java.nio.ByteOrder.BIG_ENDIAN;
 
 	}
 	
@@ -127,15 +129,42 @@ public class ImgLibPixelData extends PixelData {
 		return this.imgpl;
 		
 	}
+	
+	/**
+	* This ensures that the dimension order for the ImgPl object does not have
+	* any unknown dimension types.
+	*/
+	protected void fixDimensionOrder() {
+		for (int i = 0; i < this.dimensionOrder.length(); i++) {
+			if (i >= this.imgpl.numDimensions()) break;
+			char currChar = this.dimensionOrder.charAt(i);
+			if (currChar == 'X') {
+				this.imgpl.setAxis(net.imglib2.meta.Axes.X, i);
+			} else if (currChar == 'Y') {
+				this.imgpl.setAxis(net.imglib2.meta.Axes.Y, i);
+			} else if (currChar == 'Z') {
+				this.imgpl.setAxis(net.imglib2.meta.Axes.Z, i);
+			} else if (currChar == 'C') {
+				this.imgpl.setAxis(net.imglib2.meta.Axes.CHANNEL, i);
+			} else if (currChar == 'T') {
+				this.imgpl.setAxis(net.imglib2.meta.Axes.TIME, i);
+			}
+		}
+		
+	
+	}
 
 	protected void initNewImgPlus() {
 		
 		this.dimensionOrder = this.defaultDimensionOrder;
 		
-		ArrayImgFactory<FloatType> imgf = new ArrayImgFactory<FloatType>();
+		PlanarImgFactory<FloatType> imgf = new PlanarImgFactory<FloatType>();
 		long[] dims = {this.size_x, this.size_y, this.size_z, this.size_c, this.size_t};
 		Img<FloatType> im = imgf.create(dims, new FloatType());
 		this.imgpl = new ImgPlus<FloatType>(im);
+		
+		this.fixDimensionOrder();
+
 		this.ra = this.imgpl.randomAccess();
 		
 	}
@@ -145,17 +174,17 @@ public class ImgLibPixelData extends PixelData {
 	/* (non-Javadoc)
 	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#PixelData(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate, int, String)
 	 */
-	public ImgLibPixelData(ImageCoordinate sizes, int data_type, String dimensionOrder) {
-		super(sizes, data_type, dimensionOrder);
+	public ImgLibPixelData(ImageCoordinate sizes, String dimensionOrder) {
+		super(sizes, dimensionOrder);
 		this.initNewImgPlus();
 	}
 
 	/* (non-Javadoc)
-	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#PixelData(int, int, int, int, int, int, String)
+	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#PixelData(int, int, int, int, int, String)
 	 */
-	public ImgLibPixelData(int size_x, int size_y, int size_z, int size_c, int size_t, int data_type, String dimensionOrder) {
+	public ImgLibPixelData(int size_x, int size_y, int size_z, int size_c, int size_t, String dimensionOrder) {
 
-		super(size_x, size_y, size_z, size_c, size_t, data_type, dimensionOrder);
+		super(size_x, size_y, size_z, size_c, size_t, dimensionOrder);
 		this.initNewImgPlus();
 
 	}
@@ -169,53 +198,13 @@ public class ImgLibPixelData extends PixelData {
 	public ImgLibPixelData(ImgPlus<FloatType> imPl, String dimensionOrder) {
 
 		this.imgpl = imPl;
-		this.ra = this.imgpl.randomAccess();
-
 		this.init(1, 1, 1, 1, 1, dimensionOrder);
-
-		this.dataType = loci.formats.FormatTools.FLOAT;
-
-	}
-
-	/**
-	* @deprecated makes it difficult not to duplicate storage in memory; use {@link #setPlane(int, int, int, byte[])} instead.
-	* 
-	* This will throw an UnsupportedOperationException if called.
-	* 
-	*/
-	@Deprecated
-	public void setBytes(byte[] bytes) {
-
-		throw new UnsupportedOperationException("setBytes is not supported for ImgLibPixelData");
-
-	}
-
-	/**
-	* This will throw an UnsupportedOperationException if called.
-    */
-	@Override
-	public void setPlane(int zIndex, int cIndex, int tIndex, byte[] plane) {
-
-		throw new UnsupportedOperationException("setPlane is not supported for ImgLibPixelData");
+		this.fixDimensionOrder();
 		
+		this.ra = this.imgpl.randomAccess();		
 
 	}
 
-	/**
-	* This will throw an UnsupportedOperationException if called.
-    */
-	public void getBytes(byte[] bytes) throws UnsupportedOperationException {
-		throw new UnsupportedOperationException("getBytes is not supported for ImgLibPixelData");
-	}
-
-	/**
-	* This will throw an UnsupportedOperationException if called.
-    */
-	public byte[] getPlane(int index) throws UnsupportedOperationException {
-
-		throw new UnsupportedOperationException("getPlane is not supported for ImgLibPixelData");
-		
-	}
 
 	/* (non-Javadoc)
 	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#getPixel(int, int, int, int, int)
@@ -251,25 +240,11 @@ public class ImgLibPixelData extends PixelData {
 		
 	}
 
-	/**
-	 * Does nothing.
-	 */
-	protected void updateConvertedPixelsFromBytes() {
-
-	}
-
-	/**
-	 * Does nothing.
-	 */
-	protected void updateBytesFromConvertedPixels() {
-
-	}
-
 	/* (non-Javadoc)
 	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#toImagePlus()
 	 */
 	public ImagePlus toImagePlus() {
-		return net.imglib2.img.display.imagej.ImageJFunctions.wrapFloat(this.imgpl, "");
+		return net.imglib2.img.display.imagej.ImageJFunctions.wrapFloat(this.imgpl, "").duplicate(); //duplicate since I'm not quite sure what's going on under the hood here
 	}
 
 	/* (non-Javadoc)
@@ -278,6 +253,14 @@ public class ImgLibPixelData extends PixelData {
 	public String getDimensionOrder() {
 		return dimensionOrder;
 	}
+	
+	/* (non-Javadoc)
+	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#getDimensionOrder()
+	 */
+	public int getDataType() {
+		return loci.formats.FormatTools.FLOAT;
+	}
+	
 
 }
 

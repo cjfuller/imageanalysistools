@@ -43,7 +43,9 @@ import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 
@@ -60,7 +62,7 @@ public class VoronoiFilter extends Filter {
      * @param im    The Image to whose labeled region will be converted to a Voronoi diagram.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 				
 		Map<Integer, Vector2D> regionCentroids = new java.util.HashMap<Integer, Vector2D>();
 		
@@ -113,7 +115,7 @@ public class VoronoiFilter extends Filter {
 			
 		}
 		
-		Image noBoundaries = new Image(im);
+		Image noBoundaries = ImageFactory.create(im);
 		
 		for (ImageCoordinate ic : im) {
 			if (isOnEightConnectedBoundary(ic, noBoundaries)) {

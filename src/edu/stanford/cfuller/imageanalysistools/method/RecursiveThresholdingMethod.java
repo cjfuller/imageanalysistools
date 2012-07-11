@@ -25,6 +25,8 @@
 package edu.stanford.cfuller.imageanalysistools.method;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.filter.Filter;
 import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.LabelFilter;
@@ -65,7 +67,7 @@ public class RecursiveThresholdingMethod extends Method {
             f.setReferenceImage(this.images.get(0));
         }
 
-        Image toProcess = new Image(this.images.get(0));
+        WritableImage toProcess = ImageFactory.createWritable(this.images.get(0));
 
         iterateOnFiltersAndStoreResult(filters, toProcess, new edu.stanford.cfuller.imageanalysistools.metric.IntensityPerPixelMetric());
 

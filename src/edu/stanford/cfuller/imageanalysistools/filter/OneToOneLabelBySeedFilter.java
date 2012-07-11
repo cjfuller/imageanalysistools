@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 /**
@@ -57,7 +57,7 @@ public class OneToOneLabelBySeedFilter extends Filter {
      * @param im    The Image mask to process, whose regions will be relabeled.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 		java.util.HashMap<Integer, Integer> hasSeedSet = new java.util.HashMap<Integer, Integer>();
 		java.util.HashSet<Integer> seedIsMapped = new java.util.HashSet<Integer>();
 		

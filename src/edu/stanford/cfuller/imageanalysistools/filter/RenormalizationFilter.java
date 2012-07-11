@@ -24,7 +24,9 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.filter.LocalBackgroundEstimationFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.GradientFilter;
@@ -58,12 +60,12 @@ public class RenormalizationFilter extends Filter {
      * @param im    The Image to be normalized; will be overwritten.
      */
 	@Override
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 
-		this.referenceImage = new Image(im);
+		this.referenceImage = ImageFactory.create(im);
 		
 		Image input = this.referenceImage;
-		Image output = im;
+		WritableImage output = im;
 
 		LocalBackgroundEstimationFilter LBEF = new LocalBackgroundEstimationFilter();		
 		
@@ -72,7 +74,7 @@ public class RenormalizationFilter extends Filter {
 		LBEF.setBoxSize((int) Math.ceil(0.5*Math.sqrt(Integer.parseInt(this.params.getValueForKey("max_size")))));
 		LBEF.apply(output);
 		
-		Image gradient = new Image(output);
+		WritableImage gradient = ImageFactory.createWritable(output);
 
 		GradientFilter GF = new GradientFilter();
 		
@@ -85,7 +87,7 @@ public class RenormalizationFilter extends Filter {
 
 		GAUF.apply(gradient);
 		
-		Image tempStorage = new Image(input.getDimensionSizes(), 0.0f);
+		WritableImage tempStorage = ImageFactory.createWritable(input.getDimensionSizes(), 0.0f);
 		
 		float maxValue = 0.0f;
 		float minValue = Float.MAX_VALUE;

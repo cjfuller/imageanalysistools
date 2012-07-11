@@ -26,7 +26,8 @@ package edu.stanford.cfuller.imageanalysistools.filter;
 
 import edu.stanford.cfuller.imageanalysistools.fitting.ObjectiveFunction;
 import edu.stanford.cfuller.imageanalysistools.fitting.NelderMeadMinimizer;
-import edu.stanford.cfuller.imageanalysistools.image.Image;
+import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 import edu.stanford.cfuller.imageanalysistools.filter.GaussianFilter;
 import edu.stanford.cfuller.imageanalysistools.filter.GradientFilter;
@@ -67,8 +68,8 @@ public class ActiveContourFilter extends Filter {
 	*/
 	protected class ActiveContourObjectiveFunction implements ObjectiveFunction {
 		
-		Image image;
-		Image gradientImage;
+		WritableImage image;
+		WritableImage gradientImage;
 		
 		double gradient_weight;
 		double im_weight;
@@ -85,7 +86,7 @@ public class ActiveContourFilter extends Filter {
 		* Constructs a new ActiveContourObjectiveFunction.
 		* @param im  the Image that the contour is being used to segment.
 		*/
-		public ActiveContourObjectiveFunction(Image im) {
+		public ActiveContourObjectiveFunction(WritableImage im) {
 			
 			this.image = im;
 			
@@ -95,7 +96,7 @@ public class ActiveContourFilter extends Filter {
 			
 			GradientFilter gradf = new GradientFilter();
 			
-			this.gradientImage = new Image(im);
+			this.gradientImage = ImageFactory.createWritable(im);
 			
 			gausf.apply(this.gradientImage);
 			
@@ -276,7 +277,7 @@ public class ActiveContourFilter extends Filter {
 	* The image will have value 1 at these points and 0 elsewhere.
 	* @param im  	the Image to be filtered.
 	*/
-	public void apply(Image im) {
+	public void apply(WritableImage im) {
 				
 		ActiveContourObjectiveFunction acof = new ActiveContourObjectiveFunction(im);
 		
