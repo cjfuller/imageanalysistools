@@ -71,6 +71,9 @@
 			<fileset dir="${resourcesdir}">
 				<filename name="**/*.xml"/>
 			</fileset>
+			<fileset dir="${resourcesdir}">
+				<filename name="**/*.rb"/>
+			</fileset>
 		</jar>
 	</target>
 	
@@ -79,6 +82,9 @@
 			<zipgroupfileset dir="${libdir}" includes="*.jar"/>
 			<fileset dir="${resourcesdir}">
 				<filename name="**/*.xml"/>
+			</fileset>
+			<fileset dir="${resourcesdir}">
+				<filename name="**/*.rb"/>
 			</fileset>
 			<fileset dir="${srcdir}">
 				<filename name="*.config"/>

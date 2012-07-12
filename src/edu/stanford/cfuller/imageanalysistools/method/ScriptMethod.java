@@ -29,7 +29,7 @@ import org.jruby.embed.ScriptingContainer;
 
 /**
  * A method that runs a ruby script using jruby, which can be used to script
- * custom analysis methods at rubyime.
+ * custom analysis methods at runtime.
  * <p>
  * The method gets the name of the script file from the parameter dictionary, and sets
  * the local variables "parameters", "imageset" and "method" to be the parameter dictionary
@@ -44,20 +44,23 @@ public class ScriptMethod extends Method {
 	
 	public static final String SCRIPT_FILENAME_PARAM = edu.stanford.cfuller.imageanalysistools.parameters.ParameterRubyParser.SCRIPT_FILENAME_PARAM;
 	
+	final static String SCRIPT_FUNCTIONS_FILE = "edu/stanford/cfuller/imageanalysistools/resources/script_methods.rb";
+	
 	public void go() {
 		
 		String scriptFilename = this.parameters.getValueForKey(SCRIPT_FILENAME_PARAM);
 		
-		ScriptingContainer sc = new ScriptingContainer(org.jruby.embed.LocalContextScope.SINGLETON);
+		ScriptingContainer sc = new ScriptingContainer(org.jruby.embed.LocalContextScope.SINGLETHREAD, org.jruby.embed.LocalVariableBehavior.PERSISTENT);
 		
 		sc.setClassLoader(ij.IJ.getClassLoader());
 		
 		sc.put("parameters", this.parameters);
 		sc.put("imageset", this.imageSet);
 		sc.put("method", this);
-		
+				
 		sc.setCompatVersion(org.jruby.CompatVersion.RUBY1_9);
 		
+		sc.runScriptlet(this.getClass().getClassLoader().getResourceAsStream(SCRIPT_FUNCTIONS_FILE), SCRIPT_FUNCTIONS_FILE);
 		sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, scriptFilename);
 		
 	}
