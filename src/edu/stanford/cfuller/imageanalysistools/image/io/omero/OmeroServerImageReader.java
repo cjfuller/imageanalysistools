@@ -149,16 +149,20 @@ public class OmeroServerImageReader extends ImageReader {
      * @param omeroserverImageId    The ID that the OMERO server as assigned to the desired image; this image will be retrieved.
      * @param info					An OmeroServerInfo object containing the hostname, usenname, and password to use for the connection.  
      * @return                      A String containing the name of the Image.
-     * @throws ServerError          if the Image cannnot be accessed on the server.
+     * @throws IOException         if the Image cannnot be accessed on the server.
      */
-    public String getImageNameForOmeroId(long omeroserverImageId, OmeroServerInfo info) throws ServerError {
+    public String getImageNameForOmeroId(long omeroserverImageId, OmeroServerInfo info) throws IOException {
+		
+		try {
+        	if (this.connection == null || ! this.connection.isConnected()) {
 
-        if (this.connection == null || ! this.connection.isConnected()) {
+	            this.connectToServer(info);
+	        }
 
-            this.connectToServer(info);
-        }
-
-        return this.connection.getGateway().getImage(omeroserverImageId).getName().getValue();
+	        return this.connection.getGateway().getImage(omeroserverImageId).getName().getValue();
+		} catch (ServerError e) {
+			throw new IOException(e);
+		}
 
     }
 
@@ -274,10 +278,8 @@ public class OmeroServerImageReader extends ImageReader {
 
 
 
-        } catch (ServerError serverError) {
-            LoggingUtilities.getLogger().severe("Unable to retrieve image from omero server.");
         } catch (IOException e) {
-            LoggingUtilities.getLogger().severe("Exception while writing temporary image file to disk.");
+            LoggingUtilities.getLogger().severe("Exception while processing omero server images");
         }
 
         String[] toReturn = new String[2];

@@ -28,7 +28,6 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.image.io.omero.OmeroServerImageReader;
 import edu.stanford.cfuller.imageanalysistools.image.io.omero.OmeroServerInfo;
 import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
-import omero.ServerError;
 
 
 /**
@@ -159,7 +158,7 @@ public class DirUtils {
 
                 }
 
-            } catch (ServerError e) {
+            } catch (java.io.IOException e) {
 
                 LoggingUtilities.getLogger().severe("Exception encountered while accessing image on OMERO server: ");
                 e.printStackTrace();

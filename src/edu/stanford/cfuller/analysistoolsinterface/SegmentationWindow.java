@@ -109,6 +109,12 @@ public class SegmentationWindow extends javax.swing.JFrame {
     public void setUseOmeroServer(boolean use) {
         this.useOmeroServerCheckBox.setSelected(use);
     }
+
+	public void disableOmero() {
+		this.setUseOmeroServer(false);
+		this.omeroButton.setEnabled(false);
+		this.useOmeroServerCheckBox.setEnabled(false);
+	}
    
 
     /** This method is called from within the constructor to

@@ -58,6 +58,7 @@ public class SegmentationController extends TaskController implements OmeroListe
     final static String STATUS_PROCESSING = "Processing";
     final static String STATUS_READY = "Ready";
     final static String STATUS_SUMMARY = "Making data summary";
+	final static String STATUS_OMERO_ERR = "OMERO missing; ";
     
     SegmentationWindow sw;
 
@@ -157,13 +158,21 @@ public class SegmentationController extends TaskController implements OmeroListe
     }
 
     public void useOmeroDataSource() {
-        this.omeroBrowser = new OmeroBrowsingWindowController();
-        omeroBrowser.openNewBrowsingWindow(this);
+		try {
+        	Class.forName("omero.api.GatewayPrx");
+		} catch (ClassNotFoundException e) {
+			LoggingUtilities.warning("Could not open OMERO data source; OMERO client plugin missing.");
+			this.sw.setStatus(STATUS_OMERO_ERR + STATUS_READY);
+			this.sw.disableOmero();
+			return;
+		}
+		this.omeroBrowser = new OmeroBrowsingWindowController();
+    	omeroBrowser.openNewBrowsingWindow(this);
     }
 
     public void runButtonPressed() {
 
-        if (! this.sw.getStatus().equals(STATUS_READY)) return;
+        if (! (this.sw.getStatus().equals(STATUS_READY) || this.sw.getStatus().equals(STATUS_OMERO_ERR + STATUS_READY))) return;
 
 
         String parameterFilename = this.sw.getParameterFilename();
@@ -284,6 +293,7 @@ public class SegmentationController extends TaskController implements OmeroListe
     }
 
     protected void initializeMethods() {
+	
         DefaultComboBoxModel model = sw.getMethodComboBoxModel();
 
         String methodResourceLocation = this.getClass().getClassLoader().getResource(METHOD_XML_FILENAME).toString();
