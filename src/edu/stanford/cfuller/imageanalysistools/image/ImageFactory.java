@@ -88,7 +88,7 @@ public class ImageFactory implements java.io.Serializable {
 	 * @param p     A PixelData object containing the actual values at each pixel in the Image.
 	 * @return the constructed WritableImage.
 	 */
-	public static WritableImage createWritable(loci.formats.meta.IMetadata m, PixelData p) {
+	public static WritableImage createWritable(loci.formats.meta.IMetadata m, WritablePixelData p) {
 		return new WritableImageImpl(m,p);
 	}
 

@@ -244,7 +244,19 @@ public class ImgLibPixelData extends WritablePixelData {
 	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#toImagePlus()
 	 */
 	public ImagePlus toImagePlus() {
-		return net.imglib2.img.display.imagej.ImageJFunctions.wrapFloat(this.imgpl, "").duplicate(); //duplicate since I'm not quite sure what's going on under the hood here
+		
+	//	return net.imglib2.img.display.imagej.ImageJFunctions.wrapFloat(this.imgpl, ""); //this only provides a single channel
+	
+		ImagePlusPixelData ippd = new ImagePlusPixelData(this.size_x, this.size_y, this.size_z, this.size_c, this.size_t, loci.formats.FormatTools.FLOAT, this.dimensionOrder);
+	
+		WritableImage a_copy = ImageFactory.createWritable(null, ippd);
+		
+		for (ImageCoordinate ic : a_copy) {
+			a_copy.setValue(ic, this.getPixel(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y), ic.get(ImageCoordinate.Z), ic.get(ImageCoordinate.C), ic.get(ImageCoordinate.T)));
+		}
+	
+		return a_copy.toImagePlus();
+	
 	}
 
 	/* (non-Javadoc)

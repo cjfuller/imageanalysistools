@@ -52,8 +52,9 @@ public class WritableImageImpl extends ReadOnlyImageImpl implements WritableImag
 	 * @param m     An object containing the metadata associated with the Image (as a loci.formats.meta.IMetadata, to ease integration with the LOCI bio-formats library).
 	 * @param p     A PixelData object containing the actual values at each pixel in the Image.
 	 */
-	public WritableImageImpl(loci.formats.meta.IMetadata m, PixelData p) {
+	public WritableImageImpl(loci.formats.meta.IMetadata m, WritablePixelData p) {
 		super(m,p);
+		this.writablePixelData = p;
 	}
 
 	/**

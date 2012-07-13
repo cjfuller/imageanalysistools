@@ -105,6 +105,7 @@ public class LocalAnalysis {
             ImageSetThread nextSet = new ImageSetThread(namedFileSet, new ParameterDictionary(params));
 
             if (threadPool.size() < maxThreads) {
+	
                 LoggingUtilities.getLogger().info("Processing " + namedFileSet.getImageNameForIndex(0));
 
                 threadPool.add(nextSet);
