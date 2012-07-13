@@ -73,9 +73,13 @@ public class LoggingUtilities {
      */
     public static void addHandler(Handler h) {
 
-        addedHandlers.add(h);
-        getLogger().addHandler(h);
 
+		if (!addedHandlers.contains(h)) {
+
+        	addedHandlers.add(h);
+	        getLogger().addHandler(h);
+
+		}
         
     }
 
