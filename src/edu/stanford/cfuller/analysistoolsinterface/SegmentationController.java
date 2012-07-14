@@ -175,82 +175,90 @@ public class SegmentationController extends TaskController implements OmeroListe
         if (! (this.sw.getStatus().equals(STATUS_READY) || this.sw.getStatus().equals(STATUS_OMERO_ERR + STATUS_READY))) return;
 
 
-        String parameterFilename = this.sw.getParameterFilename();
-        String imageFilename = this.sw.getImageFilename();
+        final String parameterFilename = this.sw.getParameterFilename();
+        final String imageFilename = this.sw.getImageFilename();
 
         Preferences.userNodeForPackage(this.getClass()).put("imageFile", imageFilename);
         Preferences.userNodeForPackage(this.getClass()).put("parameterFile", parameterFilename);
         Preferences.userNodeForPackage(this.getClass()).putInt("selectedIndex", this.sw.getSelectedMethodIndex());
 
+		this.sw.setStatus(STATUS_PROCESSING);
 
-        MethodInfo mi = (MethodInfo) this.sw.getMethodComboBoxModel().getElementAt(this.sw.getSelectedMethodIndex());
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			
+			public void run() {
+				
+				MethodInfo mi = (MethodInfo) sw.getMethodComboBoxModel().getElementAt(sw.getSelectedMethodIndex());
 
-        Class c = mi.getMethodClass();
+		        Class c = mi.getMethodClass();
+				
+				final ParameterDictionary pd = ParameterParserFactory.createParameterParserForFile(parameterFilename).parseFileToParameterDictionary(parameterFilename);        
+
+		        if (c == null && !pd.hasKey("method_name")) {
+		            try {
+		                c = Class.forName(sw.getCustomClassName());
+		            } catch (ClassNotFoundException e) {
+		                LoggingUtilities.warning("Custom class not found with name: " + sw.getCustomClassName());
+						sw.setStatus(STATUS_READY);
+		                return;
+		            } 
+		        }
+
+		        pd.addIfNotSet("method_name", c.getName());
+		        if ((new File(imageFilename)).isDirectory()) {
+		            pd.addIfNotSet("local_directory", imageFilename);
+		        } else {
+		            File wholeFilename = new File(imageFilename);
+		            String name = wholeFilename.getName();
+		            String dir = wholeFilename.getParent();
+		            if (!pd.hasKey("common_filename_tag")) {pd.addIfNotSet("common_filename_tag", name);
+		            } else {
+		                pd.setValueForKey("image_extension", name);
+		            }
+		            pd.addIfNotSet("local_directory", dir);
+		        }
+
+		        pd.addIfNotSet("max_threads", Integer.toString(Runtime.getRuntime().availableProcessors()));
+
+		        if (sw.getUseOmeroServer()) {
+		            pd.setValueForKey("use_omero", "true");
+		            pd.addIfNotSet("omero_hostname", omeroBrowser.getHostname());
+		            pd.addIfNotSet("omero_username", omeroBrowser.getUsername());
+		            pd.addIfNotSet("omero_password", omeroBrowser.getPassword());
+		            String omeroImageIdString = null;
+		            for (long l : omeroImageIds) {
+		                if (omeroImageIdString == null) {
+		                    omeroImageIdString = "";
+		                } else {
+		                    omeroImageIdString += " ";
+		                }
+		                omeroImageIdString += Long.toString(l);
+		            }
+
+		            pd.addIfNotSet("omero_image_ids", omeroImageIdString);
+		        }
+
+
+		       	if (! sw.summarizeDataOnly()) {
+                   AnalysisController ac = new AnalysisController();
+                   ac.addAnalysisLoggingHandler(sw.getLogHandler());
+                   ac.runLocal(pd);
+				}
+				
+				sw.setStatus(STATUS_SUMMARY);
+				
+				try {
+				    DataSummary.SummarizeData(pd.getValueForKey("local_directory")+File.separator+AnalysisController.DATA_OUTPUT_DIR, pd.getValueForKey("local_directory")+File.separator+AnalysisController.PARAMETER_OUTPUT_DIR);
+				} catch (IOException e) {
+				    LoggingUtilities.severe("Encountered error while summarizing data.");
+				}
+				
+				sw.setStatus(STATUS_READY);
+	
+			}
+		});
                         
-        final ParameterDictionary pd = ParameterParserFactory.createParameterParserForFile(parameterFilename).parseFileToParameterDictionary(parameterFilename);        
         
-        if (c == null && !pd.hasKey("method_name")) {
-            try {
-                c = Class.forName(this.sw.getCustomClassName());
-            } catch (ClassNotFoundException e) {
-                LoggingUtilities.warning("Custom class not found with name: " + this.sw.getCustomClassName());
-                return;
-            } 
-        }
-
-        pd.addIfNotSet("method_name", c.getName());
-        if ((new File(imageFilename)).isDirectory()) {
-            pd.addIfNotSet("local_directory", imageFilename);
-        } else {
-            File wholeFilename = new File(imageFilename);
-            String name = wholeFilename.getName();
-            String dir = wholeFilename.getParent();
-            if (!pd.hasKey("common_filename_tag")) {pd.addIfNotSet("common_filename_tag", name);
-            } else {
-                pd.setValueForKey("image_extension", name);
-            }
-            pd.addIfNotSet("local_directory", dir);
-        }
-
-        pd.addIfNotSet("max_threads", Integer.toString(Runtime.getRuntime().availableProcessors()));
-
-        if (this.sw.getUseOmeroServer()) {
-            pd.setValueForKey("use_omero", "true");
-            pd.addIfNotSet("omero_hostname", this.omeroBrowser.getHostname());
-            pd.addIfNotSet("omero_username", this.omeroBrowser.getUsername());
-            pd.addIfNotSet("omero_password", this.omeroBrowser.getPassword());
-            String omeroImageIdString = null;
-            for (long l : this.omeroImageIds) {
-                if (omeroImageIdString == null) {
-                    omeroImageIdString = "";
-                } else {
-                    omeroImageIdString += " ";
-                }
-                omeroImageIdString += Long.toString(l);
-            }
-
-            pd.addIfNotSet("omero_image_ids", omeroImageIdString);
-        }
-
-        this.sw.setStatus(STATUS_PROCESSING);
-
-        (new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (! sw.summarizeDataOnly()) {
-                    AnalysisController ac = new AnalysisController();
-                    ac.addAnalysisLoggingHandler(sw.getLogHandler());
-                    ac.runLocal(pd);
-                }
-                sw.setStatus(STATUS_SUMMARY);
-                try {
-                    DataSummary.SummarizeData(pd.getValueForKey("local_directory")+File.separator+AnalysisController.DATA_OUTPUT_DIR, pd.getValueForKey("local_directory")+File.separator+AnalysisController.PARAMETER_OUTPUT_DIR);
-                } catch (IOException e) {
-                    LoggingUtilities.severe("Encountered error while summarizing data.");
-                }
-                sw.setStatus(STATUS_READY);
-            }
-        })).start();
 
         
 

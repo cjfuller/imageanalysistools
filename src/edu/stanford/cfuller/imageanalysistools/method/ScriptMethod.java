@@ -63,6 +63,8 @@ public class ScriptMethod extends Method {
 		sc.runScriptlet(this.getClass().getClassLoader().getResourceAsStream(SCRIPT_FUNCTIONS_FILE), SCRIPT_FUNCTIONS_FILE);
 		sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, scriptFilename);
 		
+		
+		
 	}
 	
 }

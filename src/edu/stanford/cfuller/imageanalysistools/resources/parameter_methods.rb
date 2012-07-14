@@ -32,9 +32,7 @@ require 'edu/stanford/cfuller/imageanalysistools/resources/common_methods'
 # @author Colin J. Fuller
 # 
 module IATScripting
-  
-  Filter_package_name = "edu.stanford.cfuller.imageanalysistools.filter."
-  
+
   ##
   # Specifies a section of parameter defintions contained in an attached block
   #
@@ -42,20 +40,18 @@ module IATScripting
   
     @__parameter_dictionary = p
   
-  end
+    yield
   
+  end
+
   ##
   # Defines the method that will run on the images to be the attached block.
   # 
   # @param [Symbol] name  (optional) a name for the method.
   # @return               nil
   # 
-  def method_definition(name = :ScriptMethod)
-    
-    set_parameter :method_display_name, name.to_s
-    
-    yield
-    
+  def method_definition(name = :ScriptMethod, &bl)
+    nil
   end
       
 end

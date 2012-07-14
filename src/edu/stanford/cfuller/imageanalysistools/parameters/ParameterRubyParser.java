@@ -24,6 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.parameters;
 
+import org.jruby.embed.ScriptingContainer;
 
 /**
  * Utilities for processing analysis parameters from suitably formatted ruby script files.
@@ -36,6 +37,8 @@ package edu.stanford.cfuller.imageanalysistools.parameters;
 public class ParameterRubyParser extends ParameterParser {
 	
 	public static final String SCRIPT_FILENAME_PARAM = "script_filename";
+	final static String SCRIPT_FUNCTIONS_FILE = "edu/stanford/cfuller/imageanalysistools/resources/parameter_methods.rb";
+	
 	
 	/**
      * Parses a ruby file to a list of Parameters; this just sets up the script name parameter
@@ -46,11 +49,31 @@ public class ParameterRubyParser extends ParameterParser {
      * 
      */
 	public java.util.List<Parameter> parseFileToParameterList(String filename) {
+		
 		java.util.List<Parameter> pl = new java.util.ArrayList<Parameter>();
 		Parameter p = new Parameter(SCRIPT_FILENAME_PARAM, SCRIPT_FILENAME_PARAM, Parameter.TYPE_STRING, "", filename, null);
 		pl.add(p);
 		p = new Parameter("method_name", "method_name", Parameter.TYPE_STRING, "", "ScriptMethod", null);
 		pl.add(p);
+		
+		//should eventually change the way ParameterDictionary is implemented to actually use Parameter objects
+		// until then, build the dictionary this way.
+		
+		ParameterDictionary pd = ParameterDictionary.emptyDictionary();
+		
+		ScriptingContainer sc = new ScriptingContainer(org.jruby.embed.LocalContextScope.SINGLETHREAD, org.jruby.embed.LocalVariableBehavior.PERSISTENT);
+		sc.setClassLoader(ij.IJ.getClassLoader());
+		sc.put("parameters", pd);
+				
+		sc.setCompatVersion(org.jruby.CompatVersion.RUBY1_9);
+		
+		sc.runScriptlet(this.getClass().getClassLoader().getResourceAsStream(SCRIPT_FUNCTIONS_FILE), SCRIPT_FUNCTIONS_FILE);
+		sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, filename);
+		
+		for (String key : pd.getKeys()) {
+			pl.add(new Parameter(key, key, pd.getTypeForKey(key), "", pd.getValueForKey(key), null));
+		}
+		
 		return pl;
 	}
 	
