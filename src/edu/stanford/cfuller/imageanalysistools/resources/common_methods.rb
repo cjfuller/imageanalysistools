@@ -28,7 +28,7 @@ module IATScripting
 
   ##
   # Gets an instance of a Filter by its class name.
-  # @param  an object that supplies the name of the filter (relative to the ...filter java package;
+  # @param  filter_name an object that supplies the name of the filter (relative to the ...filter java package;
   #         for morphological filters, supply, e.g. :morph.OpeningFilter)
   # @return an instance of the requested Filter object
   # 
@@ -42,7 +42,7 @@ module IATScripting
 
   ##
   # Creates a read-only (deep) copy of an Image object.
-  # @param  an object that implements the Image interface.
+  # @param  another_image an object that implements the Image interface.
   # @return an object that implements the Image interface and is a deep copy of the supplied Image.
   # 
   def image_copy(another_image)
@@ -55,7 +55,7 @@ module IATScripting
 
   ##
   # Creates a shallow read-only copy of an Image object.
-  # @param  an object that implements the Image interface.
+  # @param  an another_image object that implements the Image interface.
   # @return an object that implements the Image interface and shares the same 
   #         pixeldata and metadata as the supplied Image but can be boxed and 
   #         iterated separately.

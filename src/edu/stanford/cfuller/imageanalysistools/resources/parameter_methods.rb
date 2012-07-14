@@ -50,7 +50,7 @@ module IATScripting
   # @param [Symbol] name  (optional) a name for the method.
   # @return               nil
   # 
-  def method_definition(name = :ScriptMethod, &bl)
+  def method_definition(name = :ScriptMethod)
     nil
   end
       
