@@ -7,7 +7,6 @@ edu.stanford.cfuller.imageanalysistools.frontend
 edu.stanford.cfuller.imageanalysistools.image
 edu.stanford.cfuller.imageanalysistools.image.io
 edu.stanford.cfuller.imageanalysistools.image.io.omero
-edu.stanford.cfuller.imageanalysistools.matching
 edu.stanford.cfuller.imageanalysistools.method
 edu.stanford.cfuller.imageanalysistools.metric
 edu.stanford.cfuller.imageanalysistools.parameters
