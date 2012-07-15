@@ -22,13 +22,13 @@ You will likely need to add additional memory using the `-Xmx` flag to java; to 
 
 Building is handled by Apache Ant (http://ant.apache.org/).  To build the ImageJ plugin, run from the top-level directory containing build.xml and this README file:
 
-ant plugin
+`ant plugin`
 
 The resulting jar file will be placed in the dist subdirectory, and will contain only those dependencies not provided with a standard FIJI installation.
 
 To build a standalone jar for running from the command line, run:
 
-ant dist
+`ant dist`
 
 ##Documentation
 
