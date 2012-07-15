@@ -90,7 +90,7 @@ public class PixelDataFactory {
 	/**
 	 * Creates a new PixelData from an existing ImgLib2 ImgPlus and a specified dimension order.
 	 * 
-	 * @param imPl	The ImgPlus to use.  This may not be copied, but used and potentially modified in place.
+	 * @param imgpl	The ImgPlus to use.  This may not be copied, but used and potentially modified in place.
 	 * @param dimensionOrder	a String containing the five characters XYZCT in the order they are in the image (if some dimensions are not present, the can be specified in any order)
 	 * @return          A new PixelData with the specified options.
 	 */
