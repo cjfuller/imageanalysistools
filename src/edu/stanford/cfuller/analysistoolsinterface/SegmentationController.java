@@ -239,21 +239,27 @@ public class SegmentationController extends TaskController implements OmeroListe
 		        }
 
 
-		       	if (! sw.summarizeDataOnly()) {
-                   AnalysisController ac = new AnalysisController();
-                   ac.addAnalysisLoggingHandler(sw.getLogHandler());
-                   ac.runLocal(pd);
-				}
+				(new Thread(new Runnable() {
+
+
+					public void run() {
+		       			if (! sw.summarizeDataOnly()) {
+		                   AnalysisController ac = new AnalysisController();
+		                   ac.addAnalysisLoggingHandler(sw.getLogHandler());
+		                   ac.runLocal(pd);
+						}
 				
-				sw.setStatus(STATUS_SUMMARY);
+						sw.setStatus(STATUS_SUMMARY);
 				
-				try {
-				    DataSummary.SummarizeData(pd.getValueForKey("local_directory")+File.separator+AnalysisController.DATA_OUTPUT_DIR, pd.getValueForKey("local_directory")+File.separator+AnalysisController.PARAMETER_OUTPUT_DIR);
-				} catch (IOException e) {
-				    LoggingUtilities.severe("Encountered error while summarizing data.");
-				}
+						try {
+						    DataSummary.SummarizeData(pd.getValueForKey("local_directory")+File.separator+AnalysisController.DATA_OUTPUT_DIR, pd.getValueForKey("local_directory")+File.separator+AnalysisController.PARAMETER_OUTPUT_DIR);
+						} catch (IOException e) {
+						    LoggingUtilities.severe("Encountered error while summarizing data.");
+						}
 				
-				sw.setStatus(STATUS_READY);
+						sw.setStatus(STATUS_READY);
+					}
+				})).start();
 	
 			}
 		});
