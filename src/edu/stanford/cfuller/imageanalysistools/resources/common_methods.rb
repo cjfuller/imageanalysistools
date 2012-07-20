@@ -28,7 +28,7 @@ module IATScripting
 
   ##
   # Gets an instance of a Filter by its class name.
-  # @param  filter_name an object that supplies the name of the filter (relative to the ...filter java package;
+  # @param  filter_name a symbol that supplies the name of the filter (relative to the ...filter java package;
   #         for morphological filters, supply, e.g. :morph.OpeningFilter)
   # @return an instance of the requested Filter object
   # 
@@ -36,7 +36,7 @@ module IATScripting
   
     java_import (Filter_package_name + filter_name.to_s)
 
-    const_get(filter_name).new
+    Module.const_get(filter_name).new
     
   end
 

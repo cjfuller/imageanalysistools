@@ -423,4 +423,13 @@ public class ImagePlusPixelData extends WritablePixelData {
 		return loci.formats.FormatTools.FLOAT;
 	}
 	
+	/**
+	* Sets the byte order for the pixel data.
+	* @param b a ByteOrder constant specifying the byte order to be used.
+	*/
+	@Override
+	public void setByteOrder(java.nio.ByteOrder b) {
+		this.byteOrder = b;
+	}
+	
 }

@@ -26,7 +26,12 @@ package edu.stanford.cfuller.imageanalysistools.filter;
 
 import ij.ImagePlus;
 import ij.plugin.filter.GaussianBlur;
+import net.imglib2.img.ImgPlus;
+import net.imglib2.algorithm.gauss.GaussFloat;
+import net.imglib2.type.numeric.real.FloatType;
 import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImgLibPixelData;
+import edu.stanford.cfuller.imageanalysistools.image.ImagePlusPixelData;
 import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 
 /**
@@ -80,6 +85,29 @@ public class GaussianFilter extends Filter {
             return;
         }
 
+		//if we're dealing with an ImgLib image, use the ImgLib gaussian filtering to avoid duplication of image data.
+		
+		if (im.getPixelData() instanceof ImgLibPixelData) {
+		
+			ImgLibPixelData pd = (ImgLibPixelData) im.getPixelData();
+			
+			ImgPlus<FloatType> imP = pd.getImg();
+			
+			int numDim = imP.numDimensions();
+			
+			double [] sigmas = new double[numDim];
+			
+			java.util.Arrays.fill(sigmas, 0.0);
+
+			sigmas[0] = this.width;
+			sigmas[1] = this.width; // only filter in x-y
+			
+			new GaussFloat(sigmas, imP);
+			
+			return;
+			
+		}
+
 
         ImagePlus imP = im.toImagePlus();
         
@@ -90,7 +118,12 @@ public class GaussianFilter extends Filter {
             gb.blur(imP.getProcessor(), width);
         }
         
-        im.copy(ImageFactory.create(imP));
+		//only recopy if not an ImagePlusPixelData underneath, which would make duplicating unnecessary
+
+		if (! (im.getPixelData() instanceof ImagePlusPixelData)) {
+			im.copy(ImageFactory.create(imP));
+		}
+
    
 	}
 

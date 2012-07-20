@@ -223,5 +223,32 @@ public abstract class PixelData implements java.io.Serializable {
 	 */
 	public abstract ImagePlus toImagePlus();
 	
+	
+	/**
+    * Sets the raw byte representation of one plane of the pixel data to the specified array.  (Optional operation.)
+    *<p>
+    * Pixel values should be represented by the numeric type, byte order, and dimension order specified when initializing the PixelData.
+    * This will not be checked for the correct format.
+    *<p>
+    * The internal numerical representation of the pixel data will be updated immediately.
+    * 
+    * @param zIndex	  the z-dimension index of the plane being set (0-indexed)
+    * @param cIndex	  the c-dimension index of the plane being set (0-indexed)
+    * @param tIndex	  the t-dimension index of the plane being set (0-indexed)
+    * @param plane    A byte array containing the new pixel data for the specified plane.
+    */
+	public void setPlane(int zIndex, int cIndex, int tIndex, byte[] plane) throws UnsupportedOperationException {
+		throw new UnsupportedOperationException("Set plane not supported for this PixelData type.");
+	}
+	
+	/**
+	* Sets the byte order for the pixel data representation for those PixelData
+	* types where this is applicable.  Otherwise does nothing.
+	* @param b a ByteOrder constant specifying the byte order to be used.
+	*/
+	public void setByteOrder(java.nio.ByteOrder b) {
+		
+	}
+	
 }
 

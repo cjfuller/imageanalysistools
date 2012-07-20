@@ -73,7 +73,7 @@ public class PixelDataFactory {
      */
     public static WritablePixelData createPixelData(int size_x, int size_y, int size_z, int size_c, int size_t, int data_type, String dimensionOrder) {
 
-        return new ImgLibPixelData(size_x, size_y, size_z, size_c, size_t, dimensionOrder);        
+        return new ImagePlusPixelData(size_x, size_y, size_z, size_c, size_t, data_type, dimensionOrder);        
         
     }
 

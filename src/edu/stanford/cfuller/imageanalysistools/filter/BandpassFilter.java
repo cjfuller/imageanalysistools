@@ -37,6 +37,7 @@ import ij.process.FHT;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
+import edu.stanford.cfuller.imageanalysistools.image.ImagePlusPixelData;
 import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
@@ -133,8 +134,10 @@ public class BandpassFilter extends Filter {
 
 		}
 
-
-		im.copy(ImageFactory.create(imp));
+		//only copy if this wasn't filtered in place.
+		if (!(im.getPixelData() instanceof ImagePlusPixelData)) {
+			im.copy(ImageFactory.create(imp));
+		}
 
 		float newMin = Float.MAX_VALUE;
 		float newMax = -1.0f*Float.MAX_VALUE;

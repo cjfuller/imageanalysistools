@@ -193,6 +193,8 @@ public class LocalAnalysis {
 
             images = loadSplitMutliwavelengthImages(namedFileSet, markerIndex);
 
+			namedFileSet.disposeImages();
+
             String channelNames = "";
 
             for (Image i : images) {
@@ -264,8 +266,9 @@ public class LocalAnalysis {
             e.printStackTrace();
         }
 
-        namedFileSet.disposeImages();
         images.disposeImages();
+        namedFileSet.disposeImages();
+
 
     }
 
