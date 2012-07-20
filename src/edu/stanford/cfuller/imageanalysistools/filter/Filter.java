@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.filter;
 
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 

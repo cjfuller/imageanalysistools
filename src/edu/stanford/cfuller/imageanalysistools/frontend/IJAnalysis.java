@@ -29,7 +29,7 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 
 /**
  * Interface to run analysis routines from an ImageJ plugin.
@@ -60,7 +60,7 @@ public class IJAnalysis {
 	 */
     public ImagePlus run(ParameterDictionary params) {
     	
-    	Method m = LocalAnalysis.getMethod(params);
+    	Method m = Method.loadMethod(params.getValueForKey("method_name"));
     	
     	m.setParameters(params);
     	

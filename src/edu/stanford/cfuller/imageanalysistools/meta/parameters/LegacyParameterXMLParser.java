@@ -22,7 +22,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.parameters;
+package edu.stanford.cfuller.imageanalysistools.meta.parameters;
 
 import java.io.IOException;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -35,12 +35,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadata;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataParser;
+
 /**
- * Utilities for processing analysis parameters from suitably formatted XML files.
+ * Utilities for processing analysis parameters from suitably formatted XML files; this
+ * processor uses the old format, which is just a list of parameter elements inside some
+ * root element.
  *
- * @author cfuller
+ * @author Colin J. Fuller
  */
-public class ParameterXMLParser extends ParameterParser {
+public class LegacyParameterXMLParser extends AnalysisMetadataParser {
 
     final static String PARAMETER_TAG_NAME = "parameter";
 
@@ -48,24 +53,20 @@ public class ParameterXMLParser extends ParameterParser {
     final static String NAME_ATTR_NAME = "name";
     final static String DISPLAY_ATTR_NAME = "displayname";
     final static String VALUE_ATTR_NAME = "value";
-    final static String DEFAULT_ATTR_NAME = "default";
     final static String DESCRIPTION_NODE_NAME = "description";
 
-    final static String BOOL_TYPE_NAME = "boolean";
-    final static String INT_TYPE_NAME = "integer";
-    final static String FLOAT_TYPE_NAME = "floating";
-    final static String STRING_TYPE_NAME = "string";
 
     final static String KNOWN_PARAMETER_XML_FILE = "edu/stanford/cfuller/imageanalysistools/resources/knownparameters.xml";
 
-    /**
+	/**
      * Parses the list of some of the known Parameters from an XML file to a List of Parameters; useful for allowing users to interacitively
      * select from known parameters.
      * @return      A List containing a Parameter object for each Parameter described in the known parameters file.
      */
-    public java.util.List<Parameter> parseKnownParametersToParameterList() {
-        return parseXMLFileToParameterList(this.getClass().getClassLoader().getResource(KNOWN_PARAMETER_XML_FILE).toString());
+    public ParameterDictionary parseKnownParametersToParameterList() {
+        return parseFileToParameterDictionary(this.getClass().getClassLoader().getResource(KNOWN_PARAMETER_XML_FILE).toString());
     }
+
 
     /**
      * Parses an XML file to a ParameterDictionary.
@@ -80,28 +81,15 @@ public class ParameterXMLParser extends ParameterParser {
     }
 
     /**
-     * Parses an XML file to a list of Parameters, suitable for direct use or for conversion to a ParameterDictionary.
+     * Parses an XML file to an AnalysisMetadata.
      * @param filename      The filename of the XML file describing the parameters.
-     * @return              A List containing one Parameter object for each parameter described by the XML file.
+     * @return              A ParameterDictionary containing one Parameter object for each parameter described by the XML file.
      * 
      */
-	public java.util.List<Parameter> parseFileToParameterList(String filename) {
-		return this.parseXMLFileToParameterList(filename);
-	}
-
-    /**
-     * Parses an XML file to a list of Parameters, suitable for direct use or for conversion to a ParameterDictionary.
-     * @param filename      The filename of the XML file describing the parameters.
-     * @return              A List containing one Parameter object for each parameter described by the XML file.
-     * 
-     * @deprecated			use {@link ParameterParser#parseFileToParameterList(String)} instead
-     */
-	@Deprecated
-    public java.util.List<Parameter> parseXMLFileToParameterList(String filename) {
-
-    	
-        java.util.LinkedList<Parameter> output = new java.util.LinkedList<Parameter>();
-
+	public AnalysisMetadata parseFileToAnalysisMetadata(String filename) {
+		
+		AnalysisMetadata output = new AnalysisMetadata();
+		
         Document taskDoc = null;
 
         try {
@@ -120,7 +108,25 @@ public class ParameterXMLParser extends ParameterParser {
             return null;
         }
 
-        NodeList tasks = taskDoc.getElementsByTagName(PARAMETER_TAG_NAME);
+        ParameterDictionary pd = this.parseDocumentToParameterDictionary(taskDoc);
+
+		output.setInputParameters(pd);
+
+        return output;
+		
+	}
+	
+	
+	/**
+	* Parses an XML document to a ParameterDictionary.
+	* @param taskDoc an XML document containing XML-formatted parameters.
+	* @return a ParameterDictionary containing the parameters read from the XML document.
+	*/
+	public ParameterDictionary parseDocumentToParameterDictionary(Document taskDoc) {
+		
+		ParameterDictionary pd = ParameterDictionary.emptyDictionary();
+		
+		NodeList tasks = taskDoc.getElementsByTagName(PARAMETER_TAG_NAME);
         
         for (int i = 0; i < tasks.getLength(); i++) {
 
@@ -128,13 +134,13 @@ public class ParameterXMLParser extends ParameterParser {
 
             Parameter p = this.parameterWithXMLNode(n);
 
-            output.add(p);
+            pd.addParameter(p);
 
         }
 
-        return output;
+		return pd;
 
-    }
+	}
 
 
     /**
@@ -149,7 +155,7 @@ public class ParameterXMLParser extends ParameterParser {
         String typeString = null;
         String name = "";
         String displayName = "";
-        int type = -1;
+        ParameterType type = ParameterType.STRING_T;
         String descriptionString = "";
         Object value = null;
         Object defaultValue = null;
@@ -159,11 +165,10 @@ public class ParameterXMLParser extends ParameterParser {
         }
 
         if (typeString != null) {
-            if (typeString.equals(BOOL_TYPE_NAME)) type = Parameter.TYPE_BOOLEAN;
-            else if(typeString.equals(INT_TYPE_NAME)) type = Parameter.TYPE_INTEGER;
-            else if (typeString.equals(FLOAT_TYPE_NAME)) type = Parameter.TYPE_FLOATING;
-            else type = Parameter.TYPE_STRING;
-
+            if (typeString.equals(ParameterType.BOOLEAN_T.toString())) type = ParameterType.BOOLEAN_T;
+            else if(typeString.equals(ParameterType.INTEGER_T.toString())) type = ParameterType.INTEGER_T;
+            else if (typeString.equals(ParameterType.FLOATING_T.toString())) type = ParameterType.FLOATING_T;
+            else type = ParameterType.STRING_T;
         }
 
         if (nnm.getNamedItem(NAME_ATTR_NAME) == null && nnm.getNamedItem(DISPLAY_ATTR_NAME) == null) {
@@ -193,45 +198,6 @@ public class ParameterXMLParser extends ParameterParser {
                 }
             }
         }
-
-
-        if (nnm.getNamedItem(DEFAULT_ATTR_NAME) != null) {
-            String defaultString = nnm.getNamedItem(DEFAULT_ATTR_NAME).getNodeValue();
-
-            try {
-
-                switch(type) {
-                    case Parameter.TYPE_BOOLEAN:
-
-                        defaultValue = Boolean.valueOf(defaultString);
-
-                        break;
-
-                    case Parameter.TYPE_INTEGER:
-
-                        defaultValue = Integer.valueOf(defaultString);
-
-                        break;
-
-                    case Parameter.TYPE_FLOATING:
-
-                        defaultValue = Double.valueOf(defaultString);
-
-                        break;
-
-                    case Parameter.TYPE_STRING:
-
-                        defaultValue = defaultString;
-
-                        break;
-
-                }
-
-            } catch (NumberFormatException e) {
-                LoggingUtilities.getLogger().warning("Exception encountered while parsing default value for parameter named: " + name);
-                defaultValue = null;
-            }
-        }
         
         if (nnm.getNamedItem(VALUE_ATTR_NAME) != null) {
             String valueString = nnm.getNamedItem(VALUE_ATTR_NAME).getNodeValue();
@@ -239,25 +205,25 @@ public class ParameterXMLParser extends ParameterParser {
             try {
 
                 switch(type) {
-                    case Parameter.TYPE_BOOLEAN:
+                    case BOOLEAN_T:
 
                         value = Boolean.valueOf(valueString);
 
                         break;
 
-                    case Parameter.TYPE_INTEGER:
+                    case INTEGER_T:
 
                         value = Integer.valueOf(valueString);
 
                         break;
 
-                    case Parameter.TYPE_FLOATING:
+                    case FLOATING_T:
 
                         value = Double.valueOf(valueString);
 
                         break;
 
-                    case Parameter.TYPE_STRING:
+                    case STRING_T:
 
                         value = valueString;
 
@@ -273,7 +239,7 @@ public class ParameterXMLParser extends ParameterParser {
 
         if (value == null) value = defaultValue;
 
-        Parameter p = new Parameter(name, displayName, type, defaultValue, value, descriptionString);
+        Parameter p = new Parameter(name, displayName, type, value, descriptionString);
 
         return p;
 

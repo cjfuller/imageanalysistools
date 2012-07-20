@@ -22,24 +22,19 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.parameters;
+package edu.stanford.cfuller.imageanalysistools.meta.parameters;
 
 /**
- * Represents a single parameter used for data analysis, with a name, a display name, a type, a value, and optionally a default value and description.
+ * Represents a single parameter used for data analysis, with a name, a display name, a type, a value, and optionally a description.
  * 
  * @author cfuller
  */
 public class Parameter {
 
-    public final static int TYPE_BOOLEAN = 0;
-    public final static int TYPE_INTEGER = 1;
-    public final static int TYPE_FLOATING = 2;
-    public final static int TYPE_STRING = 3;
 
     String name;
     String displayName;
-    int type;
-    Object defaultValue;
+    ParameterType type;
     Object value;
     String description;
 
@@ -53,7 +48,6 @@ public class Parameter {
         this.name = p.name;
         this.displayName = p.displayName;
         this.type = p.type;
-        this.defaultValue = p.defaultValue;
         this.value = p.value;
         this.description = p.description;
     }
@@ -62,16 +56,14 @@ public class Parameter {
      * Constructs a new parameter with the supplied fields.
      * @param name              The name of the parameter.
      * @param displayName       A string containing a name for display purposes, in a GUI field, for instance.
-     * @param type              An integer designating the type of the parameter's value; selected from one of the static fields.
-     * @param defaultValue      The default value for the parameter (used in case the value is invalid / not supplied, or in order to use this class to provide defaults for user input).
+     * @param type              An ParameterType designating the type of the parameter's value.
      * @param value             The value of the parameter.  This must be a String, Boolean, Double, or Integer in agreement with the specified type parameter.
      * @param description       An optional description of the parameter's use.  (Supply null or an empty string in order to not use this.)
      */
-    public Parameter(String name, String displayName, int type, Object defaultValue, Object value, String description) {
+    public Parameter(String name, String displayName, ParameterType type, Object value, String description) {
         this.name = name;
         this.displayName = displayName;
         this.type= type;
-        this.defaultValue = defaultValue;
         this.value = value;
         this.description = description;
     }
@@ -98,9 +90,9 @@ public class Parameter {
 
     /**
      * Sets the type of the parameter to a new type.
-     * @param type  The integer corresponding to the new type of the parameter.
+     * @param type  The ParameterType corresponding to the new type of the parameter.
      */
-    public void setType(int type) {this.type = type;}
+    public void setType(ParameterType type) {this.type = type;}
 
     /**
      * Gets the name of the parameter.
@@ -120,11 +112,13 @@ public class Parameter {
      */
     public Object getValue() {return this.value;}
 
-    /**
-     * Gets the default value of the parameter as an Object.
-     * @return  The default value of the parameter;  the appropriate one of a String, Boolean, Double, or Integer, cast to an Object.
+	/**
+     * Gets the value of the parameter as a String.
+     * @return  The value of the parameter converted to a String using the object's toString method.
      */
-    public Object getDefaultValue() {return this.defaultValue;}
+	public String stringValue() {
+		return this.value.toString();
+	}
 
     /**
      * Gets the description of the parameter as a String.
@@ -136,7 +130,7 @@ public class Parameter {
      * Gets the type of the parameter.
      * @return  The type of the parameter as an integer, corresponding to one of the static fields.
      */
-    public int getType() {return this.type;}
+    public ParameterType getType() {return this.type;}
 
     /**
      * Gets a string representation of the parameter.
@@ -145,10 +139,10 @@ public class Parameter {
     public String toString() {return this.getDisplayName();}
 
     private Object convertValue(Object originalValue) {
-        if (this.type == TYPE_STRING) return originalValue.toString();
-        if (this.type == TYPE_BOOLEAN) return Boolean.valueOf(originalValue.toString());
-        if (this.type == TYPE_FLOATING) return Double.valueOf(originalValue.toString());
-        if (this.type == TYPE_INTEGER) return Integer.valueOf(originalValue.toString());
+        if (this.type == ParameterType.STRING_T) return originalValue.toString();
+        if (this.type == ParameterType.BOOLEAN_T) return Boolean.valueOf(originalValue.toString());
+        if (this.type == ParameterType.FLOATING_T) return Double.valueOf(originalValue.toString());
+        if (this.type == ParameterType.INTEGER_T) return Integer.valueOf(originalValue.toString());
         return null;
     }
 

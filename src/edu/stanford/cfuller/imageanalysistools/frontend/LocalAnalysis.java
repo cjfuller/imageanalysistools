@@ -26,7 +26,7 @@ package edu.stanford.cfuller.imageanalysistools.frontend;
 
 import edu.stanford.cfuller.imageanalysistools.image.DimensionFlipper;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
@@ -247,7 +247,7 @@ public class LocalAnalysis {
         }
 
 
-        Method methodToRun = getMethod(params);
+        Method methodToRun = Method.loadMethod(params.getValueForKey("method_name"));
 
         methodToRun.setParameters(params);
         methodToRun.setImages(images);
@@ -285,20 +285,6 @@ public class LocalAnalysis {
      */
 
     public static synchronized int loadImagesFromFileSetWithSeriesCount(ImageSet fileSet) throws java.io.IOException  {
-//
-//        if (reader == null) {
-//            reader = new ImageReader();
-//        }
-//
-//        for (String filename : fileSet) {
-//
-//            Image i = reader.read(filename);
-//
-//
-//            images.add(i);
-//        }
-//
-//        return reader.getSeriesCount(fileSet[0]);
 
         fileSet.loadAllImages();
 
@@ -339,52 +325,7 @@ public class LocalAnalysis {
     }
 
 
-    /**
-     * Retrieves the method to run from a parameter dictionary.
-     * 
-     * @param params	The parameter dictionary containing information about the method to run.
-     * @return			A Method object of the type specified in the parameter dictionary.
-     */
-    public static Method getMethod(ParameterDictionary params) {
-
-        String methodName = params.getValueForKey("method_name");
-        Method method = null;
-        
-        final String dynamicMethodName="DynamicMethod";
-        
-        if (params.hasKeyAndTrue("dynamic_method")) {
-        	methodName= dynamicMethodName;
-        }
-
-        //methodName might be fully qualified, in which case we want to use that; otherwise, we should use the value of the parameter method_package_name
-        //or fall back on a default value for that, which we will add here.
-
-        final String defaultMethodPackageName = "edu.stanford.cfuller.imageanalysistools.method";
-
-        if (! methodName.contains(".")) {
-
-            params.addIfNotSet("method_package_name", defaultMethodPackageName);
-
-            methodName = params.getValueForKey("method_package_name") + "." + methodName;
-
-        }
-
-        try {
-            method = (Method) Class.forName(methodName).newInstance();
-        } catch (ClassNotFoundException e) {
-            LoggingUtilities.getLogger().severe("Could not find method: " + methodName);
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            LoggingUtilities.getLogger().severe("Could not instantiate method: " + methodName);
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            LoggingUtilities.getLogger().severe("Could not access method constructor for: " + methodName);
-            e.printStackTrace();
-        }
-
-        return method;
-
-    }
+    
     
     public static String generateDataOutputString(Quantification data, ParameterDictionary p) {
     	

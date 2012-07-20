@@ -22,7 +22,7 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.parameters;
+package edu.stanford.cfuller.imageanalysistools.meta;
 
 /**
  * A factory for generating an appropriate parameter parser for a given file.
@@ -31,7 +31,7 @@ package edu.stanford.cfuller.imageanalysistools.parameters;
  * 
  * @author Colin J. Fuller
  */
-public class ParameterParserFactory {
+public class AnalysisMetadataParserFactory {
 	
 	/**
 	* Generate a ParameterParser appropriate for the supplied file.
@@ -39,12 +39,12 @@ public class ParameterParserFactory {
 	* @param filename	The filename of the parameter file
 	* @return 	a ParameterParser object appropriate for reading parameters from the file.
 	*/
-	public static ParameterParser createParameterParserForFile(String filename) {
+	public static AnalysisMetadataParser createParserForFile(String filename) {
 		
 		if (filename.endsWith(".rb")) {
-			return new ParameterRubyParser();
+			return new AnalysisMetadataRubyParser();
 		} else {
-			return new ParameterXMLParser();
+			return new AnalysisMetadataXMLParser();
 		}
 		
 	}

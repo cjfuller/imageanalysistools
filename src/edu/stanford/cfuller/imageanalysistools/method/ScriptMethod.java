@@ -42,7 +42,7 @@ import org.jruby.embed.ScriptingContainer;
 
 public class ScriptMethod extends Method {
 	
-	public static final String SCRIPT_FILENAME_PARAM = edu.stanford.cfuller.imageanalysistools.parameters.ParameterRubyParser.SCRIPT_FILENAME_PARAM;
+	public static final String SCRIPT_FILENAME_PARAM = edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataRubyParser.SCRIPT_FILENAME_PARAM;
 	
 	final static String SCRIPT_FUNCTIONS_FILE = "edu/stanford/cfuller/imageanalysistools/resources/script_methods.rb";
 	

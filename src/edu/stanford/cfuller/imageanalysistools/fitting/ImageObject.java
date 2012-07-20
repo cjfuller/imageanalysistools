@@ -27,7 +27,7 @@ package edu.stanford.cfuller.imageanalysistools.fitting;
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.linear.RealVector;
 

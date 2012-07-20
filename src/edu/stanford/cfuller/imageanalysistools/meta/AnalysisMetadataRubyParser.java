@@ -22,9 +22,15 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.parameters;
+package edu.stanford.cfuller.imageanalysistools.meta;
 
 import org.jruby.embed.ScriptingContainer;
+
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterType;
+
+
 
 /**
  * Utilities for processing analysis parameters from suitably formatted ruby script files.
@@ -34,7 +40,7 @@ import org.jruby.embed.ScriptingContainer;
  *
  * @author Colin J. Fuller
  */
-public class ParameterRubyParser extends ParameterParser {
+public class AnalysisMetadataRubyParser extends AnalysisMetadataParser {
 	
 	public static final String SCRIPT_FILENAME_PARAM = "script_filename";
 	final static String SCRIPT_FUNCTIONS_FILE = "edu/stanford/cfuller/imageanalysistools/resources/parameter_methods.rb";
@@ -42,24 +48,32 @@ public class ParameterRubyParser extends ParameterParser {
 	
 	/**
      * Parses a ruby file to a list of Parameters; this just sets up the script name parameter
-     * and leaves everything else to the script itself.
+     * and leaves everything else to the script itself, which is run once during this method.
+     * Anything 
      * 
      * @param filename      The filename of the ruby source file.
-     * @return              A List containing one Parameter object for each parameter described by the XML file.
+     * @return              A ParameterDictionary containing one Parameter object for each parameter described by the XML file.
      * 
      */
-	public java.util.List<Parameter> parseFileToParameterList(String filename) {
+	public AnalysisMetadata parseFileToAnalysisMetadata(String filename) {
 		
-		java.util.List<Parameter> pl = new java.util.ArrayList<Parameter>();
-		Parameter p = new Parameter(SCRIPT_FILENAME_PARAM, SCRIPT_FILENAME_PARAM, Parameter.TYPE_STRING, "", filename, null);
-		pl.add(p);
-		p = new Parameter("method_name", "method_name", Parameter.TYPE_STRING, "", "ScriptMethod", null);
-		pl.add(p);
+		AnalysisMetadata am = new AnalysisMetadata();
+		
+		RubyScript rs = new RubyScript(filename);
+		
+		am.setScript(rs);
+				
+		ParameterDictionary pd = ParameterDictionary.emptyDictionary();
+		
+		Parameter p = new Parameter(SCRIPT_FILENAME_PARAM, SCRIPT_FILENAME_PARAM, ParameterType.STRING_T, filename, null);
+		pd.addParameter(p);
+		p = new Parameter("method_name", "method_name", ParameterType.STRING_T, "ScriptMethod", null);
+		pd.addParameter(p);
+		
+		am.setInputParameters(pd);
 		
 		//should eventually change the way ParameterDictionary is implemented to actually use Parameter objects
 		// until then, build the dictionary this way.
-		
-		ParameterDictionary pd = ParameterDictionary.emptyDictionary();
 		
 		ScriptingContainer sc = new ScriptingContainer(org.jruby.embed.LocalContextScope.SINGLETHREAD, org.jruby.embed.LocalVariableBehavior.PERSISTENT);
 		sc.setClassLoader(ij.IJ.getClassLoader());
@@ -68,13 +82,9 @@ public class ParameterRubyParser extends ParameterParser {
 		sc.setCompatVersion(org.jruby.CompatVersion.RUBY1_9);
 		
 		sc.runScriptlet(this.getClass().getClassLoader().getResourceAsStream(SCRIPT_FUNCTIONS_FILE), SCRIPT_FUNCTIONS_FILE);
-		sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, filename);
+		sc.runScriptlet(rs.getScriptString());
 		
-		for (String key : pd.getKeys()) {
-			pl.add(new Parameter(key, key, pd.getTypeForKey(key), "", pd.getValueForKey(key), null));
-		}
-		
-		return pl;
+		return am;
 	}
 	
 }

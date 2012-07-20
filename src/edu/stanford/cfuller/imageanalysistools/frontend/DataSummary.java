@@ -34,7 +34,7 @@ import java.util.Map;
 
 import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
 import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 
 /**
  * Summarizes the output from analysis routines, combining all output from a directory into a single unified file.

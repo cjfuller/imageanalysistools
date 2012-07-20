@@ -13,10 +13,12 @@
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
 	
 	<property name="version" value="5.0.0"/>
+	<property name="commit_id" value="2c2b534"/>
 	
 	<property name="plugin_jar" value="${distdir}/${ant.project.name}_${version}.jar"/>
 	<property name="standalone_jar" value="${distdir}/${ant.project.name}_${version}_standalone.jar"/>
-	
+	<property name="version_info_file" value="${resourcesdir}/edu/stanford/cfuller/imageanalysistools/resources/version_info.xml"/>
+	<property name="version_info_string" value="&lt;library version=${version} commit=${commit_id}/&gt;"/>
 	
     <path id="ImageAnalysisTools.classpath">
 		<fileset dir="${libdir}">
@@ -31,7 +33,11 @@
 		</fileset>
     </path>
 
-    <target name="init">
+	<target name="update-version">
+		<echo message="${version_info_string}" file="${version_info_file}"/>
+	</target>
+
+    <target name="init" depends="update-version">
         <mkdir dir="${builddir}"/>
 		<mkdir dir="${distdir}"/>
     </target>
@@ -42,12 +48,13 @@
 			<classpath refid="ImageAnalysisTools.classpath"/>
 		</javadoc>
 	</target>
-
+	
     <target name="clean">
         <delete dir="${builddir}"/>
 		<delete dir="${distdir}"/>
 		<delete dir="${testoutputdir}"/>
     </target>
+
     <target name="cleanall" depends="clean">
 		<delete dir="${docdir}"/>
 	</target>
@@ -96,7 +103,7 @@
 		<copy file="${plugin_jar}" todir="${ijdir}"/>
 	</target>
 	
-	<target name="all" depends="plugin,dist">
+	<target name="all" depends="test,plugin,dist">
 	</target>
 	
 	

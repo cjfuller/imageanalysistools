@@ -29,7 +29,7 @@ import java.util.prefs.Preferences;
 
 import javax.swing.JFileChooser;
 
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 
 import ij.ImagePlus;
 import ij.plugin.PlugIn;

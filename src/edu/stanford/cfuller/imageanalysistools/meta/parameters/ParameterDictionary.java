@@ -22,19 +22,22 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-package edu.stanford.cfuller.imageanalysistools.parameters;
+package edu.stanford.cfuller.imageanalysistools.meta.parameters;
 
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
+
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataXMLWriter;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataParserFactory;
+
 
 import java.io.*;
 import java.util.Hashtable;
 import java.util.Vector;
 
 /**
- * Represents a set of key, value string pairs that specify various parameters for the analysis and their values.
- * <p>
- * This is essentially just a hashtable, but contains convenience methods for getting values as different types, as well
- * as for parsing parameters from command line options.
+ * Represents a set of String keys, and associated parameter objects that specify 
+ * various parameters for the analysis and their values.
+ * 
  *
  * @author Colin J. Fuller
  *
@@ -42,10 +45,9 @@ import java.util.Vector;
 
 public class ParameterDictionary implements Serializable {
 
-	public static final long serialVersionUID=1L;
+	public static final long serialVersionUID=1495412129L;
 		
-	private Hashtable<String, String> parameters;
-
+	private Hashtable<String, java.util.List<Parameter> > parameters;
 
 	private ParameterDictionary(){}
 
@@ -55,16 +57,28 @@ public class ParameterDictionary implements Serializable {
      *
      * This will create a new ParameterDictionary using the key, value pairs in another ParameterDictionary.
      *
-     * This only makes a semi-shallow copy.  The internal storage of the two ParameterDictionaries is distinct, so adding
-     * a key, value pair to one will not affect the other.  However, the key and value objects originally present will likely not be copied.
-     * Currently, the implementation exclusively uses Strings as the internal keys and values, and these are immutable, so
-     * this should not cause a problem.
+     * This will make a deep copy.
      *
      * @param toCopy    The ParameterDictionary whose keys/values are to be copied.
      */
 	public ParameterDictionary(ParameterDictionary toCopy) {
 		
-		this.parameters = new Hashtable<String, String>(toCopy.parameters);
+		this.parameters = new Hashtable<String, java.util.List<Parameter> >();
+		
+		for (String key : toCopy.parameters.keySet()) {
+			
+			java.util.List<Parameter> pl = toCopy.parameters.get(key);
+			
+			java.util.List<Parameter> newPl = new java.util.ArrayList<Parameter>();
+			
+			for (Parameter p : pl) {
+				newPl.add(new Parameter(p));
+				
+			}
+			
+			this.parameters.put(key, newPl);
+			
+		}
 	
 	}
 
@@ -78,74 +92,9 @@ public class ParameterDictionary implements Serializable {
 
         ParameterDictionary parameters = new ParameterDictionary();
 
-		parameters.parameters = new Hashtable<String, String>();
+		parameters.parameters = new Hashtable<String, java.util.List<Parameter> >();
 
         return parameters;
-    }
-
-
-    /**
-     * Parses a String array containing command line arguments and creates a new ParameterDictionary containing these entries.
-     *
-     * Each entry in the String array should be a single key-value pair in the format "key=value".  Allowable characters
-     * in the keys and values are alphanumeric characters, underscores, hyphens, periods, forward and backslashes, and colons.
-     *
-     * @param args      The String array containing arguments (can be the string array argument to main(String[])).
-     * @return          A new ParameterDictionary containing the parsed arguments.
-     */
-	public static ParameterDictionary parseArgumentListToParameterDictionary(String[] args) {
-	
-		ParameterDictionary parameters = new ParameterDictionary();
-	
-		parameters.parameters = new Hashtable<String, String>();
-	
-		for (int i = 1; i < args.length; i++) {
-		
-			String currArg = args[i];
-			
-            parseSingleParameter(parameters, currArg);
-			
-		}
-	
-	
-		return parameters;
-	
-	}
-
-    /**
-     * Parses a file containing parameter key-value pairs and creates a new ParameterDictionary containing these entries.
-     *<p>
-     * The parameters file should contain one key-value pair per line in the format "key=value".  Allowable characters
-     * in the keys and values are alphanumeric characters, underscores, hyphens, periods, forward and backslashes, and colons.
-     * <p>
-     *
-     * Empty lines and lines starting with # will be ignored.
-     *
-     * @deprecated      Use {#link readParametersFromFile} instead with XML-format parameters.
-     *
-     * @param filename  The name of the file containing the parameters.
-     * @return          A new ParameterDictionary containing the parsed arguments.
-     * @throws IOException  if an exception is encountered while reading the file.
-     */
-    @Deprecated
-	public static ParameterDictionary parseParametersFileToParameterDictionary(String filename) throws IOException {
-
-        BufferedReader br = new BufferedReader(new FileReader(filename));
-
-        ParameterDictionary parameters = new ParameterDictionary();
-        parameters.parameters = new Hashtable<String, String>();
-
-        String currentLine = br.readLine();
-
-        while(currentLine != null) {
-            parseSingleParameter(parameters, currentLine);
-            currentLine = br.readLine();
-        }
-
-        br.close();
-
-        return parameters;
-
     }
 
 
@@ -156,31 +105,31 @@ public class ParameterDictionary implements Serializable {
 
         if (! (currArg.matches("[A-Za-z0-9_\\-\\.\\/\\\\: ]+=[A-Za-z0-9_\\-\\.\\/\\\\:\\, ]*"))){
 
-				LoggingUtilities.getLogger().warning("Malformed argument: " + currArg + ".  Ignoring.");
+			LoggingUtilities.getLogger().warning("Malformed argument: " + currArg + ".  Ignoring.");
 
-			} else {
+		} else {
 
-				String[] splitArg = currArg.split("=", -1);
+			String[] splitArg = currArg.split("=", -1);
 
-				if (splitArg[1].toLowerCase().equals("true")) {
+			if (splitArg[1].toLowerCase().equals("true")) {
 
-					splitArg[1] = "true";
+				splitArg[1] = "true";
 
-				} else if (splitArg[1].toLowerCase().equals("false")) {
+			} else if (splitArg[1].toLowerCase().equals("false")) {
 
-					splitArg[1] = "false";
-
-				}
-
-                if (parameters.hasKey(splitArg[0])) {
-                    String temp = parameters.getValueForKey(splitArg[0]);
-                    temp += " " + splitArg[1];
-                    splitArg[1] = temp;
-                }
-
-                parameters.setValueForKey(splitArg[0], splitArg[1]);
+				splitArg[1] = "false";
 
 			}
+
+               if (parameters.hasKey(splitArg[0])) {
+                   String temp = parameters.getValueForKey(splitArg[0]);
+                   temp += " " + splitArg[1];
+                   splitArg[1] = temp;
+               }
+
+               parameters.setValueForKey(splitArg[0], splitArg[1]);
+
+		}
     }
 	
 	//public instance methods
@@ -194,9 +143,60 @@ public class ParameterDictionary implements Serializable {
      */
 	public String getValueForKey(String key) {
 	
-		return this.parameters.get(key);
+		return this.getValueForKey(key, 0);
 		
 	}
+	
+	/**
+	* Gets the ith value stored for a given key.  Does not check bounds, so check the number of
+	* values stored using {@link getValueCountForKey(String)} beforehand.
+	* @param key 	The key whose associated value is to be returned.
+	* @param i 		The index of the value associated with this key to return.
+	* @return 		The value of the parameter as a String, or null if there is no value stored.
+	*/
+	public String getValueForKey(String key, int i) {
+		java.util.List<Parameter> pl = this.parameters.get(key);
+		
+		if (pl == null) {
+			return null;
+		}
+		
+		return pl.get(i).stringValue();
+	}
+	
+	/**
+	* Gets the ith value stored for a given key.  Does not check bounds, so check the number of
+	* values stored using {@link getValueCountForKey(String)} beforehand.
+	* @param key 	The key whose associated value is to be returned.
+	* @param i 		The index of the value associated with this key to return.
+	* @return 		The Parameter object associated with the key, or null if there is no value stored.
+	*/
+	public Parameter getParameterForKey(String key, int i) {
+		java.util.List<Parameter> pl = this.parameters.get(key);
+		
+		if (pl == null) {
+			return null;
+		}
+		
+		return pl.get(i);
+	}
+
+	/**
+	* Gets the number of parameters associated with a given key.  
+	* @param key 	The key whose associated value count is to be returned.
+	* @return 		The Parameter object associated with the key, or null if there is no value stored.
+	*/
+	public int getValueCountForKey(String key) {
+		java.util.List<Parameter> pl = this.parameters.get(key);
+		
+		if (pl == null) {
+			return 0;
+		}
+		
+		return pl.size();
+	}
+	
+
 
     /**
      * Gets the value stored for a given key as an int.
@@ -253,13 +253,31 @@ public class ParameterDictionary implements Serializable {
      * not overwrite the existing values.
      *
      * @param key       The key to add to the ParameterDictionary if it is not present.
-     * @param value     The key's associated value.
+     * @param value     The key's associated String value.  A new Parameter object will be constructed.
      */
 	public void addIfNotSet(String key, String value) {
 	
+		this.addIfNotSet(key, this.parameterForStringValue(key, value));
+	
+		return;
+	
+	}
+	
+	/**
+     * Adds a key, value pair to the ParameterDictionary.  Does nothing if the specified key already has an associated
+     * value.
+     *
+     * This method is useful for setting up default values after parsing user-specified options, as the defaults will
+     * not overwrite the existing values.
+     *
+     * @param key       The key to add to the ParameterDictionary if it is not present.
+     * @param value     The key's associated Parameter.
+     */
+	public void addIfNotSet(String key, Parameter value) {
+	
 		if (! this.parameters.containsKey(key) ) {
 		
-			this.parameters.put(key, value);
+			this.addValueForKey(key, value);
 		
 		}
 	
@@ -333,43 +351,83 @@ public class ParameterDictionary implements Serializable {
      */
 	public void setValueForKey(String key, String value) {
 	
-		this.parameters.put(key, value);
+		this.setValueForKey(key, this.parameterForStringValue(key, value));
+	
+	}
+	
+	/**
+     * Adds a key, value pair to the ParameterDictionary.
+     *
+     * This is distinct from {@link #addIfNotSet(String, String)} in that this method will add an additional value for a key if there is one already present.
+     *
+     * @param key   The key to add to the ParameterDictionary.
+     * @param value The Parameter associated with the key
+     */
+	public void addValueForKey(String key, Parameter value) {
+	
+		if (this.parameters.get(key) == null) {
+			this.parameters.put(key, new java.util.ArrayList<Parameter>());
+		}
+	
+		this.parameters.get(key).add(value);
 	
 	}
 
+	/**
+     * Sets a key, value pair in the ParameterDictionary.
+     *
+     * This is distinct from {@link #addIfNotSet(String, String)} in that this method will overwrite existing values.
+     *
+     * @param key   The key to add to the ParameterDictionary.
+     * @param value The Parameter associated with the key
+     */
+	public void setValueForKey(String key, Parameter value) {
+		
+		java.util.List<Parameter> pl = new java.util.ArrayList<Parameter>();
+		
+		pl.add(value);
+		
+		this.parameters.put(key, pl);
+		
+	}
 
     /**
      * Writes the ParameterDictionary's contents to a specified file in plaintext format.
      * 
      * @param filename  The full filename (including path); any existing file with this name will be overwritten without confirmation.
      * @throws java.io.IOException  If an IOException occurs while opening or writing to the file.
+     * @deprecated use an AnalysisMetadata object and write that instead
      */
+	@Deprecated
 	public void writeParametersToFile(String filename) throws java.io.IOException {
 
-        (new ParameterXMLWriter()).writeParameterDictionaryToXMLFile(this, filename);
-
-//
-//		PrintWriter output = new PrintWriter(new FileWriter(filename));
-//
-//		for (String key : this.parameters.keySet()) {
-//
-//			output.println(key + "=" + this.parameters.get(key));
-//
-//		}
-//
-//		output.close();
+        (new AnalysisMetadataXMLWriter()).writeParameterDictionaryToXMLFile(this, filename);
+		
+		System.out.println(filename);
 		
 		return;
 
 	}
 
     /**
+     * Writes the ParameterDictionary's contents to a String as XML suitable for inclusion as a section in a file.
+     * 
+     * @return a String containing the XML representation of the ParameterDictionary.
+     * 
+     */
+	public String writeParametersToXMLString() {
+		return (new AnalysisMetadataXMLWriter()).writeParameterDictionaryToXMLString(this);
+	}
+
+	/**
      * Reads a set of parameters from an XML file.
      * @param filename  The XML file containing the parameter information.
      * @return          A ParameterDictionary containing the parameters parsed from the specified file.
+     * @deprecated use an AnalysisMetadata object instead
      */
+	@Deprecated
     public static ParameterDictionary readParametersFromFile(String filename) {
-        return ParameterParserFactory.createParameterParserForFile(filename).parseFileToParameterDictionary(filename);
+        return AnalysisMetadataParserFactory.createParserForFile(filename).parseFileToParameterDictionary(filename);
     }
 
 
@@ -379,7 +437,7 @@ public class ParameterDictionary implements Serializable {
      */
     public void addParameter(Parameter p) {
     	
-        parseSingleParameter(this, p.getName()+ "=" + p.getValue().toString());
+        this.addValueForKey(p.getName(), p);
     }
 
     /**
@@ -393,11 +451,25 @@ public class ParameterDictionary implements Serializable {
     /**
      * Gets the Parameter type for a given parameter name as one of the values of the static fields in the Parameter class.
      * @param key   The name of the parameter.
-     * @return      An integer corresponding to the type of the parameter.  In the current implementation, which only uses strings, this will always be Parameter.TYPE_STRING, but may change in the future.
+     * @return      A ParameterType corresponding to the type of the parameter.
      */
-    public int getTypeForKey(String key) {
-        return Parameter.TYPE_STRING;
+    public ParameterType getTypeForKey(String key) {
+        return this.getTypeForKey(key, 0);
     }
+
+	/**
+	 * Gets the Parameter type for a given parameter name as one of the values of the static fields in the Parameter class.
+	 * @param key   The name of the parameter.
+	 * @param i 	The index of the value associated with this key whose type will be retrieved.
+	 * @return      A ParameterType corresponding to the type of the parameter. 
+	 */
+    public ParameterType getTypeForKey(String key, int i) {
+        return this.parameters.get(key).get(i).getType();
+    }
+
+	private Parameter parameterForStringValue(String key, String value) {
+		return new Parameter(key, key, ParameterType.STRING_T, value, null);
+	}
 	
 
 }

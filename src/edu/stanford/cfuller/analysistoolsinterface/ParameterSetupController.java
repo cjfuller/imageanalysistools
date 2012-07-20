@@ -26,9 +26,12 @@
 package edu.stanford.cfuller.analysistoolsinterface;
 
 
-import edu.stanford.cfuller.imageanalysistools.parameters.Parameter;
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterXMLParser;
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterXMLWriter;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterType;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataXMLParser;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.LegacyParameterXMLParser;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataXMLWriter;
 import java.io.File;
 import java.util.List;
 import java.util.Vector;
@@ -67,7 +70,13 @@ public class ParameterSetupController extends TaskController {
 
         this.pw = new ParameterWindow(this);
 
-        availableParameters = (new ParameterXMLParser()).parseKnownParametersToParameterList();
+        availableParameters = new Vector<Parameter>();
+
+		ParameterDictionary pdKnown = (new LegacyParameterXMLParser()).parseKnownParametersToParameterList();
+
+		for (String key: pdKnown.getKeys()) {
+			availableParameters.add(pdKnown.getParameterForKey(key, 0));
+		}
 
         java.util.LinkedList<Object> objectParameters = new java.util.LinkedList<Object>();
         objectParameters.addAll(availableParameters);
@@ -92,7 +101,7 @@ public class ParameterSetupController extends TaskController {
 
     public void addSelectedFilter(String name, String classname) {
     	
-    	Parameter p = new Parameter(P_FILTER_ALL, name, Parameter.TYPE_STRING, null, classname, null);
+    	Parameter p = new Parameter(P_FILTER_ALL, name, ParameterType.STRING_T, classname, null);
     	
     	this.useParameter(p);
     	
@@ -100,7 +109,7 @@ public class ParameterSetupController extends TaskController {
     
     public void addSelectedMetric(String name, String classname) {
     	
-    	Parameter p = new Parameter(P_METRIC, name, Parameter.TYPE_STRING, null, classname, null);
+    	Parameter p = new Parameter(P_METRIC, name, ParameterType.STRING_T, classname, null);
     	
     	this.useParameter(p);
     }
@@ -148,16 +157,11 @@ public class ParameterSetupController extends TaskController {
             pw.setCurrentlySelectedValue(p.getValue().toString());
         } else {
             pw.setCurrentlySelectedValue("");
-        }
-        boolean isCustomParameter = p.getType() < 0;
+  		}
 
-        if (isCustomParameter) {
-            p.setDisplayName("");
-        }
+        pw.setNameFieldEnabled(true);
 
-        pw.setNameFieldEnabled(isCustomParameter);
-
-        pw.setCurrentlySelectedType(p.getType() < 0 ? Parameter.TYPE_STRING : p.getType(), isCustomParameter);
+        pw.setCurrentlySelectedType(p.getType(), true);
         
     }
 
@@ -213,9 +217,12 @@ public class ParameterSetupController extends TaskController {
 
                 pw.getInUseParametersModel().clear();
 
-                java.util.List<Parameter> pl = (new ParameterXMLParser()).parseXMLFileToParameterList(selected);
-                for (Parameter p : pl) {
-                    this.useParameter(p);
+                ParameterDictionary pd = (new AnalysisMetadataXMLParser()).parseFileToParameterDictionary(selected);
+                for (String key : pd.getKeys()) {
+					int count = pd.getValueCountForKey(key);
+					for (int i = 0; i < count; i++) {
+						this.useParameter(pd.getParameterForKey(key, i));
+					}
                 }
             }
 
@@ -236,14 +243,14 @@ public class ParameterSetupController extends TaskController {
     }
 
     public void doneButtonPressed() {
-        ParameterXMLWriter pxw = new ParameterXMLWriter();
+        AnalysisMetadataXMLWriter pxw = new AnalysisMetadataXMLWriter();
 
         Object[] parameters = pw.getInUseParametersModel().toArray();
 
-        java.util.List<Parameter> pl = new java.util.LinkedList<Parameter>();
+		ParameterDictionary pd = ParameterDictionary.emptyDictionary();
 
         for (Object o : parameters) {
-            pl.add((Parameter) o);
+            pd.addParameter((Parameter) o);
         }
 
 
@@ -253,7 +260,7 @@ public class ParameterSetupController extends TaskController {
             parameterFile += File.separator + DEFAULT_FILENAME;
         }
 
-        pxw.writeParameterListToXMLFile(pl, parameterFile);
+        pxw.writeParameterDictionaryToXMLFile(pd, parameterFile);
 
         Preferences.userNodeForPackage(this.getClass()).put("parameterFile", parameterFile);
 

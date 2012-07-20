@@ -24,7 +24,7 @@
 
 package edu.stanford.cfuller.imageanalysistools.frontend;
 
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 
 import java.util.logging.Handler;
 

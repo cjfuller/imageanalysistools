@@ -33,7 +33,7 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.TransferHandler;
 
-import edu.stanford.cfuller.imageanalysistools.parameters.Parameter;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter;
 
 /**
  * Transfer handler to coordinate drag and drop of parameters into the parameter

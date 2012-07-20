@@ -35,7 +35,7 @@ import org.apache.commons.math3.linear.RealVector;
 
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 
 /**
  * An ImageObject that fits to a three-dimensional Gaussian.  Unlike GaussianImageObject, this 

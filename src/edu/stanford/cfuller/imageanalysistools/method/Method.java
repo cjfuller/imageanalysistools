@@ -25,7 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.method;
 
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
@@ -44,6 +44,9 @@ import edu.stanford.cfuller.imageanalysistools.frontend.StatusUpdater;
 
 public abstract class Method implements Runnable {
 	
+	
+	final static String defaultMethodPackageName = "edu.stanford.cfuller.imageanalysistools.method";
+    
 	//fields
 	
 	protected ParameterDictionary parameters;
@@ -52,6 +55,8 @@ public abstract class Method implements Runnable {
     protected ImageSet imageSet;
 	protected Quantification storedDataOutput;
 	protected StatusUpdater updater;
+	
+	protected String displayName;
 	
 	//protected methods
 
@@ -228,6 +233,62 @@ public abstract class Method implements Runnable {
     @Override
     public void run() {
         this.go();
+    }
+
+	/**
+	* Gets the display name associated with the method.  This will be printed
+	* as part of the output filenames from the method.
+	* @return 	a String containing the display name
+	*/
+	public String getDisplayName() {
+		return this.displayName;
+	}
+	
+	/**
+	* Sets the display name associated with the method.  This will be printed
+	* as part of the output filenames from the method.
+	* @param name a String containing the display name.  This should not
+	* 			contain any characters that might cause problems in filenames.
+	*/
+	public void setDisplayName(String name) {
+		this.displayName = name;
+	}
+	
+	/**
+     * Retrieves the method to run from its name.
+     * 
+     * @param methodName	The name of the method to run, either fully qualified or relative to the default method package.
+     * @return				A Method object of the type specified in the parameter dictionary.
+     */
+    public static Method loadMethod(String methodName) {
+
+        Method method = null;
+       
+        //methodName might be fully qualified, in which case we want to use 
+        //that; otherwise, we should fall back on a default value
+
+
+        if (! methodName.contains(".")) {
+
+            methodName = defaultMethodPackageName + "." + methodName;
+
+        }
+
+        try {
+            method = (Method) Class.forName(methodName).newInstance();
+        } catch (ClassNotFoundException e) {
+            LoggingUtilities.getLogger().severe("Could not find method: " + methodName);
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            LoggingUtilities.getLogger().severe("Could not instantiate method: " + methodName);
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            LoggingUtilities.getLogger().severe("Could not access method constructor for: " + methodName);
+            e.printStackTrace();
+        }
+
+        return method;
+
     }
 
 }

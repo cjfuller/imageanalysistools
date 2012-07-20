@@ -28,7 +28,8 @@ import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import edu.stanford.cfuller.imageanalysistools.image.io.omero.OmeroServerImageReader;
 import edu.stanford.cfuller.imageanalysistools.image.io.omero.OmeroServerInfo;
-import edu.stanford.cfuller.imageanalysistools.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.util.FileHashCalculator;
 
 import java.util.*;
 
@@ -309,6 +310,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         for (ImageHolder imh : this.images) {
 
             if (imh.getImage() != null) {
+				imh.setImageHash("", "");
                 if (imh.getDisplayName() == null) {
                     imh.setDisplayName(imh.getImage().getMetadata().getImageName(0));
                 }
@@ -327,6 +329,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
                 imh.setImage(osir.read(names[1]));
                 imh.setDisplayName(names[0]);
 
+
             } else if (imh.getFilename() != null) {
 
                 ImageReader ir = new ImageReader();
@@ -338,6 +341,8 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
 
 
         }
+
+		this.hashAllImages();
 
 
 
@@ -357,6 +362,45 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
     }
 
 	/**
+     * Gets the image filename associated with the requested Image.
+     * @param index     The index of the Image in the ImageSet to use.
+     * @return          The filename of the requested Image, or null if the Image does not exist.
+     */
+    public String getFilenameForIndex(int index) {
+        if (index >= 0 && index < this.size()) {
+            return this.images.get(index).getFilename();
+        } else {
+            return null;
+        }
+    }
+
+	/**
+     * Gets the file hash associated with the requested Image.
+     * @param index     The index of the Image in the ImageSet to use.
+     * @return          The value of the hash associated with the image, or null if the Image does not exist.
+     */
+	public String getImageHashForIndex(int index) {
+		if (index >= 0 && index < this.size()) {
+		    return this.images.get(index).getHash();
+		} else {
+		    return null;
+		}
+	}
+	
+	/**
+     * Gets the algorithm used to hash the requested Image.
+     * @param index     The index of the Image in the ImageSet to use.
+     * @return          The hash algorithm associated with the image, or null if the Image does not exist.
+     */
+	public String getImageHashAlgorithmForIndex(int index) {
+		if (index >= 0 && index < this.size()) {
+		    return this.images.get(index).getHashAlgorithm();
+		} else {
+		    return null;
+		}
+	}
+
+	/**
      * Disposes of the memory-intensive portions of Images.
      *
      * Useful for programs that retain long-term references to the ImageSet for things like naming, but don't need
@@ -369,6 +413,27 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         }
     }
 
+	/**
+	* Calculates the hash of all the Images in the image set.  For images added
+	* from files, this will calculate an actual hash of the file.  For omero images,
+	* this will produce something based on the server and omero id.  For added Image 
+	* objects, this will do nothing.
+	*/
+	public void hashAllImages() {
+		for (ImageHolder imh : this.images) {
+			if (imh.getFilename() != null) {
+				try {
+					imh.setImageHash(FileHashCalculator.ALG_DEFAULT, FileHashCalculator.calculateHash(FileHashCalculator.ALG_DEFAULT, imh.getFilename()));
+				} catch (java.io.IOException e) {
+					edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities.getLogger().warning("Unable to calculate hash on image: " + imh.getFilename() + "\n" + e.getMessage());
+				}
+			} else if (imh.getOmeroId() != null) {
+				imh.setImageHash("omero://" + this.parameters.getValueForKey("omero_hostname"), Long.toString(imh.getOmeroId()));
+			}
+		}
+		
+	}
+
 
     protected static class ImageHolder {
 
@@ -376,6 +441,9 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         String filename;
         Long omeroId;
         String displayName;
+
+		String hashAlgorithm;
+		String hash;
 
         public ImageHolder(Image theImage, String filename, Long omeroId) {
             this.theImage = theImage;
@@ -388,11 +456,14 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         public void setFilename(String filename) {this.filename = filename;}
         public void setOmeroId(Long omeroId) {this.omeroId = omeroId;}
         public void setDisplayName(String displayName) {this.displayName = displayName;}
+		public void setImageHash(String algorithm, String hash) {this.hashAlgorithm = algorithm; this.hash = hash;}
 
         public Image getImage(){return this.theImage;}
         public String getFilename(){return this.filename;}
         public Long getOmeroId(){return this.omeroId;}
         public String getDisplayName() {return this.displayName;}
+		public String getHashAlgorithm() {return this.hashAlgorithm;}
+		public String getHash() {return this.hash;}
 
         
     }

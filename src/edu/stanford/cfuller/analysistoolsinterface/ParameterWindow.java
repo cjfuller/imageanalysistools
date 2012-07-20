@@ -25,7 +25,8 @@
 
 package edu.stanford.cfuller.analysistoolsinterface;
 
-import edu.stanford.cfuller.imageanalysistools.parameters.Parameter;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterType;
 import javax.swing.DefaultListModel;
 import javax.swing.DropMode;
 import javax.swing.GroupLayout;
@@ -98,23 +99,23 @@ public class ParameterWindow extends javax.swing.JFrame {
         this.usedParameterListMouseClicked(null);
     }
 
-    public void setCurrentlySelectedType(int type, boolean enabled) {
-        this.booleanRadioButton.setSelected(type == Parameter.TYPE_BOOLEAN);
-        this.integerRadioButton.setSelected(type == Parameter.TYPE_INTEGER);
-        this.floatingPointRadioButton.setSelected(type == Parameter.TYPE_FLOATING);
-        this.textRadioButton.setSelected(type == Parameter.TYPE_STRING);
+    public void setCurrentlySelectedType(ParameterType type, boolean enabled) {
+        this.booleanRadioButton.setSelected(type == ParameterType.BOOLEAN_T);
+        this.integerRadioButton.setSelected(type == ParameterType.INTEGER_T);
+        this.floatingPointRadioButton.setSelected(type == ParameterType.FLOATING_T);
+        this.textRadioButton.setSelected(type == ParameterType.STRING_T);
         this.booleanRadioButton.setEnabled(enabled);
         this.integerRadioButton.setEnabled(enabled);
         this.floatingPointRadioButton.setEnabled(enabled);
         this.textRadioButton.setEnabled(enabled);
     }
     
-    public int getCurrentlySelectedType() {
-        if (this.booleanRadioButton.isSelected()) return Parameter.TYPE_BOOLEAN;
-        if (this.integerRadioButton.isSelected()) return Parameter.TYPE_INTEGER;
-        if (this.floatingPointRadioButton.isSelected()) return Parameter.TYPE_FLOATING;
-        if (this.textRadioButton.isSelected()) return Parameter.TYPE_STRING;
-        return Parameter.TYPE_STRING;
+    public ParameterType getCurrentlySelectedType() {
+        if (this.booleanRadioButton.isSelected()) return ParameterType.BOOLEAN_T;
+        if (this.integerRadioButton.isSelected()) return ParameterType.INTEGER_T;
+        if (this.floatingPointRadioButton.isSelected()) return ParameterType.FLOATING_T;
+        if (this.textRadioButton.isSelected()) return ParameterType.STRING_T;
+        return ParameterType.STRING_T;
     }
 
     public void setNameFieldEnabled(boolean enabled) {
