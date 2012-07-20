@@ -67,13 +67,9 @@ public class AnalysisMetadataRubyParser extends AnalysisMetadataParser {
 		
 		Parameter p = new Parameter(SCRIPT_FILENAME_PARAM, SCRIPT_FILENAME_PARAM, ParameterType.STRING_T, filename, null);
 		pd.addParameter(p);
-		p = new Parameter("method_name", "method_name", ParameterType.STRING_T, "ScriptMethod", null);
-		pd.addParameter(p);
+		
 		
 		am.setInputParameters(pd);
-		
-		//should eventually change the way ParameterDictionary is implemented to actually use Parameter objects
-		// until then, build the dictionary this way.
 		
 		ScriptingContainer sc = new ScriptingContainer(org.jruby.embed.LocalContextScope.SINGLETHREAD, org.jruby.embed.LocalVariableBehavior.PERSISTENT);
 		sc.setClassLoader(ij.IJ.getClassLoader());
@@ -83,6 +79,9 @@ public class AnalysisMetadataRubyParser extends AnalysisMetadataParser {
 		
 		sc.runScriptlet(this.getClass().getClassLoader().getResourceAsStream(SCRIPT_FUNCTIONS_FILE), SCRIPT_FUNCTIONS_FILE);
 		sc.runScriptlet(rs.getScriptString());
+		
+		p = new Parameter("method_name", "method_name", ParameterType.STRING_T, "ScriptMethod", null);
+		pd.addIfNotSet("method_name", p);
 		
 		return am;
 	}

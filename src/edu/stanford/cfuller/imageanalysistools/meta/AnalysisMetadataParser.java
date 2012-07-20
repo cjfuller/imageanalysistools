@@ -27,7 +27,13 @@ package edu.stanford.cfuller.imageanalysistools.meta;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterParser;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 
-
+/**
+* An AnalysisMetadatParser should be able to read a file and fill an AnalysisMetadata object
+* from the information contained in it.
+* 
+* @author Colin J. Fuller
+* 
+*/
 public abstract class AnalysisMetadataParser implements ParameterParser {
 	
 	/**

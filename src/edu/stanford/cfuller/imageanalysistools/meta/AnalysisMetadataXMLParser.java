@@ -39,6 +39,15 @@ import edu.stanford.cfuller.imageanalysistools.meta.parameters.LegacyParameterXM
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterType;
 
 
+/**
+* A parser for new-format XML analysis metadata files.
+* <p>
+* If an old-format XML parameter file is passed in instead, it will be passed
+* off to a {@link edu.stanford.cfuller.imageanalysistools.meta.parameters.LegacyParameterXMLParser LegacyParameterXMLParser}.
+* 
+* @author Colin J. Fuller
+* 
+*/
 public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 	
 	//XML tags
@@ -77,7 +86,12 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 	static final java.util.regex.Pattern versionStringPattern = java.util.regex.Pattern.compile("version=([a-zA-Z_0-9.\\-])");
 	static final java.util.regex.Pattern commitStringPattern = java.util.regex.Pattern.compile("commit=([a-f0-9])");
 	
-	
+	/**
+     * Parses a parameter file to an AnalysisMetadata object.
+     * @param filename  The XML-formatted file to parse.
+     * @return          An AnalysisMetadata containing the information described in the file.
+     */
+	@Override
 	public AnalysisMetadata parseFileToAnalysisMetadata(String filename) {
 		
 		Document metaDoc = this.getDocumentForFilename(filename);
@@ -276,7 +290,6 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 		}
 		
 	}
-	
 	
 	private void processScriptNode(Node script, AnalysisMetadata meta) {
 		Node scriptCData = script.getChildNodes().item(0);

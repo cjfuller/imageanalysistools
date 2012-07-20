@@ -57,6 +57,11 @@ public class AnalysisMetadata implements java.io.Serializable {
 		
 		public FileHash(String algorithm, String value) {this.algorithm = algorithm; this.value = value;}
 		
+		public FileHash(FileHash other) {
+			this.algorithm = other.algorithm;
+			this.value = other.value;
+		}
+		
 		public String getAlgorithm() {return this.value;}
 		public String getValue() {return this.value;}
 		
@@ -87,18 +92,55 @@ public class AnalysisMetadata implements java.io.Serializable {
 	* Creates an empty AnalysisMetadata object.
 	*/
 	public AnalysisMetadata() {
+		this.inputState = null;
+		this.outputState = null;
+		this.inputImages = null;
+		this.outputImages = null;
 		this.inputImageHashes = new java.util.HashMap<String, FileHash>();
 		this.outputFilenames = new java.util.ArrayList<String>();
 		this.outputFileHashes = new java.util.HashMap<String, FileHash>();
 		this.script = null;
+		this.time = null;
+		this.method = null;
+		this.hasRunPreviously = false;
+		this.outputMetadataFile= null;
 	}
 	
 	/**
-	* Makes a deep copy of this AnalysisMetadata object.
+	* Makes a copy of this AnalysisMetadata object.  Everything is deep copied
+	* except the contents of ImageSets storing input/output images, and the Method objects, 
+	* both of which might contain image data.  (The ImageSet objects themselves are copied.)
+	* 
 	* @return another AnalysisMetadata object that is a copy of this one.
 	*/
 	public AnalysisMetadata makeCopy() {
-		return null; //TODO
+		AnalysisMetadata other = new AnalysisMetadata();
+		if (this.inputState != null) other.inputState = new ParameterDictionary(this.inputState);
+		if (this.outputState != null) other.outputState = new ParameterDictionary(this.outputState);
+		if (this.inputImages != null) other.inputImages = new ImageSet(this.inputImages);
+		if (this.outputImages != null) other.outputImages = new ImageSet(this.outputImages);
+		for (String key : this.inputImageHashes.keySet()) {
+			other.inputImageHashes.put(key, new FileHash(this.inputImageHashes.get(key)));
+		}
+		
+		for (String outputFilename : this.outputFilenames) {
+			other.outputFilenames.add(outputFilename);
+			other.outputFileHashes.put(outputFilename, new FileHash(this.outputFileHashes.get(outputFilename)));			
+		}
+		
+		if (this.script != null) {
+			other.script = new RubyScript(this.script.getScriptString(), this.script.getName());
+		}
+		
+		if (this.time != null) {
+			other.time = new java.util.Date(this.time.getTime());
+		}
+		
+		other.method = this.method;
+		other.hasRunPreviously = this.hasRunPreviously;
+		other.outputMetadataFile = this.outputMetadataFile;
+		
+		return other;
 	}
 	
 	/**

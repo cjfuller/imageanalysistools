@@ -38,7 +38,6 @@ import java.util.Vector;
  * Represents a set of String keys, and associated parameter objects that specify 
  * various parameters for the analysis and their values.
  * 
- *
  * @author Colin J. Fuller
  *
  */

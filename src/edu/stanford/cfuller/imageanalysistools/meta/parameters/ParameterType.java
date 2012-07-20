@@ -23,6 +23,13 @@
  * ***** END LICENSE BLOCK ***** */
 package edu.stanford.cfuller.imageanalysistools.meta.parameters;
 
+/**
+* Parameters for storage in a ParameterDictionary can be one of four types:
+* boolean, integer, floating-point, or String.  ParameterType specifies these
+* and handles converting their names to strings.
+* 
+* @author Colin J. Fuller
+*/
 public enum ParameterType {
 	
 	BOOLEAN_T("boolean"),
@@ -35,6 +42,10 @@ public enum ParameterType {
 		this.stringRep = stringRep;
 	}
 	
+	/**
+	* Gets the name of the ParameterType as a String
+	* @return the String naming the parameter type: one of boolean, integer, floating, or string.
+	*/
 	public String toString() {
 		return this.stringRep;
 	}
