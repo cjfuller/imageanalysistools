@@ -30,6 +30,11 @@ To build a standalone jar for running from the command line, run:
 
 `ant dist`
 
+Versions post-5.1.0 enable tracking which commit to the git repository was used to run analysis.  If you checked out the source using git and want to compile with this information, supply a `commit_id` property to ant when building.  To automatically use the current commit information from git when building, use the option:
+
+    -Dcommit_id=`git log -n 1 --format="%H"`
+
+
 ##Documentation
 
 For documentation on using the software, see the pages linked at http://cjfuller.github.com/imageanalysistools
