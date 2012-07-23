@@ -35,6 +35,8 @@ import java.util.Map;
 import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
 import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataParserFactory;
+
 
 /**
  * Summarizes the output from analysis routines, combining all output from a directory into a single unified file.
@@ -85,7 +87,9 @@ public class DataSummary {
 
 			File parameterFile = new File(parameterDirectory + File.separator + f.getName().replace(outputFileExtension, AnalysisController.PARAMETER_EXTENSION));
 
-			params = ParameterDictionary.readParametersFromFile(parameterFile.getAbsolutePath());
+			//params = ParameterDictionary.readParametersFromFile(parameterFile.getAbsolutePath());
+
+			params = AnalysisMetadataParserFactory.createParserForFile(parameterFile.getAbsolutePath()).parseFileToAnalysisMetadata(parameterFile.getAbsolutePath()).getOutputParameters();
 
 			ObjectInputStream o = new ObjectInputStream(new FileInputStream(f));
 

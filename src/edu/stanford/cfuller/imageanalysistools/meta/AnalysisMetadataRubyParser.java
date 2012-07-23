@@ -83,6 +83,8 @@ public class AnalysisMetadataRubyParser extends AnalysisMetadataParser {
 		p = new Parameter("method_name", "method_name", ParameterType.STRING_T, "ScriptMethod", null);
 		pd.addIfNotSet("method_name", p);
 		
+		am.setOutputParameters(new ParameterDictionary(pd));
+		
 		return am;
 	}
 	

@@ -29,6 +29,8 @@ import java.io.PrintWriter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
@@ -157,7 +159,7 @@ public class AnalysisMetadataXMLWriter extends AnalysisMetadataXMLParser {
 		xsw.writeAttribute(ATTR_TYPE, p.getType().toString());
 		xsw.writeAttribute(ATTR_VALUE, p.stringValue());
 		
-		if (p.getDescription() != null) {
+		if (p.getDescription() != null && ! p.getDescription().trim().equals("")) {
 			xsw.writeCharacters("\n");
 			xsw.writeStartElement(TAG_DESCRIPTION);
 			xsw.writeCharacters("\n");
@@ -201,19 +203,27 @@ public class AnalysisMetadataXMLWriter extends AnalysisMetadataXMLParser {
 		xsw.writeCharacters("\n");
 		for (int i = 0; i < is.getImageCount(); i++) {
 			xsw.writeStartElement(TAG_IMAGE);
-			xsw.writeAttribute(ATTR_FILENAME, is.getFilenameForIndex(i));
-			xsw.writeAttribute(ATTR_HASH_ALG, is.getImageHashAlgorithmForIndex(i));
-			xsw.writeAttribute(ATTR_HASH, is.getImageHashForIndex(i));
+			String filename = is.getFilenameForIndex(i);
+			if (filename == null) {
+				filename = is.getImageNameForIndex(i);
+			}
+			xsw.writeAttribute(ATTR_FILENAME, filename);
+			if (is.getImageHashAlgorithmForIndex(i) != null) {
+				xsw.writeAttribute(ATTR_HASH_ALG, is.getImageHashAlgorithmForIndex(i));
+				xsw.writeAttribute(ATTR_HASH, is.getImageHashForIndex(i));
+			}
 			xsw.writeEndElement();
+			xsw.writeCharacters("\n");
 		}
 		xsw.writeEndElement();
+		xsw.writeCharacters("\n");
 	}
 
 	private void writeInputSectionToXMLStream(AnalysisMetadata am, XMLStreamWriter xsw) throws XMLStreamException {
 		xsw.writeStartElement(TAG_INPUT_STATE);
 		xsw.writeCharacters("\n");
 		this.writeParameterDictionaryToXMLStream(am.getInputParameters(), xsw);
-		this.writeImageSetToXMLStream(am.getInputImages(), xsw);
+		this.writeImageSetToXMLStream(am.getOriginalInputImages(), xsw);
 		xsw.writeEndElement();
 		xsw.writeCharacters("\n");
 	}
@@ -271,7 +281,19 @@ public class AnalysisMetadataXMLWriter extends AnalysisMetadataXMLParser {
 	}
 	
 	private void writeLibrarySectionToXMLStream(AnalysisMetadata am, XMLStreamWriter xsw) throws XMLStreamException {
-		xsw.writeCharacters(AnalysisMetadata.getLibraryVersionXMLString());
+		String libraryInfo = AnalysisMetadata.getLibraryVersionXMLString();
+		Matcher versionMatcher = versionGrabber.matcher(libraryInfo);
+		Matcher commitMatcher = commitGrabber.matcher(libraryInfo);
+		
+		versionMatcher.find();
+		commitMatcher.find();
+		String version = versionMatcher.group(1);
+		String commit = commitMatcher.group(1);
+		
+		xsw.writeStartElement(TAG_LIBRARY);
+		xsw.writeAttribute(ATTR_VERSION, version);
+		xsw.writeAttribute(ATTR_COMMIT, commit);
+		xsw.writeEndElement();
 		xsw.writeCharacters("\n");
 	}
 	
@@ -283,8 +305,13 @@ public class AnalysisMetadataXMLWriter extends AnalysisMetadataXMLParser {
 	}
 	
 	private void writeMethodSectionToXMLStream(AnalysisMetadata am, XMLStreamWriter xsw) throws XMLStreamException {
-		xsw.writeStartElement(TAG_TIMESTAMP);
-		xsw.writeAttribute(ATTR_TIME, am.getTime().toString());
+		xsw.writeStartElement(TAG_METHOD);
+		xsw.writeAttribute(ATTR_NAME, am.getMethod().getClass().getName());
+		String displayName = am.getMethod().getDisplayName();
+		if (displayName == null) {
+			displayName = am.getMethod().getClass().getName();
+		}
+		xsw.writeAttribute(ATTR_DISPLAY_NAME, displayName);
 		xsw.writeEndElement();
 		xsw.writeCharacters("\n");
 	}

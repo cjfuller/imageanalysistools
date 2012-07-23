@@ -27,6 +27,10 @@ package edu.stanford.cfuller.imageanalysistools.frontend;
 import edu.stanford.cfuller.imageanalysistools.image.DimensionFlipper;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter;
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterType;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadata;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataXMLWriter;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
@@ -51,8 +55,6 @@ public class LocalAnalysis {
 
     protected LocalAnalysis() {}
 
-    private static edu.stanford.cfuller.imageanalysistools.image.io.ImageReader reader;
-
     private static java.util.Deque<ImageSetThread> threadPool = new java.util.LinkedList<ImageSetThread>();
 
     private static final int threadWaitTime_ms = 5000;
@@ -63,11 +65,6 @@ public class LocalAnalysis {
     static final String PARAMETER_OUTPUT_DIR=AnalysisController.PARAMETER_OUTPUT_DIR;
     static final String PARAMETER_EXTENSION = AnalysisController.PARAMETER_EXTENSION;
 
-    static{
-        synchronized(LocalAnalysis.class) {
-            reader = null;
-        }
-    }
 
     /**
      * Runs the analysis on the local machine.
@@ -77,18 +74,21 @@ public class LocalAnalysis {
      *
      * Each thread uses {@link #processFileSet(ParameterDictionary,ImageSet)} to do the processing.
      *
-     * @param params    The parameter dictionary specifying the options for the analysis.
+     * @param params    The AnalysisMetadata specifying the options for the analysis.
      */
-
-    public static void run(ParameterDictionary params) {
+    public static void run(AnalysisMetadata am) {
 
         java.util.List<ImageSet> namedFileSets = null;
 
+		ParameterDictionary params = am.getOutputParameters();
+		
+		java.util.List<ImageSet> imageSets = null;
+
         if (params.hasKeyAndTrue("multi_wavelength_file") || ! params.hasKey("multi_wavelength_file")) {
-            namedFileSets = DirUtils.makeMultiwavelengthFileSets(params);
+            imageSets = DirUtils.makeMultiwavelengthFileSets(params);
         } else {
 
-            namedFileSets = DirUtils.makeSetsOfMatchingFiles(params);
+            imageSets = DirUtils.makeSetsOfMatchingFiles(params);
         }
 
         int maxThreads = 1;
@@ -99,14 +99,17 @@ public class LocalAnalysis {
 
         }
 
-        for (ImageSet namedFileSet : namedFileSets) {
+        for (ImageSet images : imageSets) {
 
+			AnalysisMetadata singleSetMeta = am.makeCopy();
 
-            ImageSetThread nextSet = new ImageSetThread(namedFileSet, new ParameterDictionary(params));
+			singleSetMeta.setInputImages(images);
+
+            ImageSetThread nextSet = new ImageSetThread(singleSetMeta);
 
             if (threadPool.size() < maxThreads) {
 	
-                LoggingUtilities.getLogger().info("Processing " + namedFileSet.getImageNameForIndex(0));
+                LoggingUtilities.getLogger().info("Processing " + images.getImageNameForIndex(0));
 
                 threadPool.add(nextSet);
                 nextSet.start();
@@ -135,7 +138,7 @@ public class LocalAnalysis {
 
                 }
 
-                LoggingUtilities.getLogger().info("Processing " + namedFileSet.getImageNameForIndex(0));
+                LoggingUtilities.getLogger().info("Processing " + images.getImageNameForIndex(0));
 
                 threadPool.add(nextSet);
                 nextSet.start();
@@ -157,75 +160,26 @@ public class LocalAnalysis {
 
     /**
      * Processes a single set of image files, corresponding to all the wavelengths of a single 3D (or 4D XYZT image).
+     * This will write the output to disk to subdirectories of the directory containing the images.
      *
-     * If multiple wavelengths are in a single file, this needs to be specified appropriately in the parameter dictionary,
-     * and an array containing the single file name should be passed as the String array parameter.  This will write the output to disk
-     * to subdirectories of the directory containing the images.
-     *
-     * @param params    The parameter dictionary specifying the options for the analysis.
-     * @param namedFileSet   An ImageSet containing the images of each color channel for a particular image. If no reference channel is given in the parameters, then the first image will be used as the reference.
+     * @param am    The AnalysisMetadata specifying the options for the analysis and containing the ImageSet of input images.
      * @throws java.io.IOException  if the images cannot be read or the output cannot be written to disk.
      */
+    public static void processFileSet(AnalysisMetadata am) throws java.io.IOException {
 
-    public static void processFileSet(ParameterDictionary params, ImageSet namedFileSet) throws java.io.IOException {
+		ParameterDictionary params = am.getOutputParameters();
 
-//        String[] fileSet = new String[namedFileSet.length/2];
-//        String[] fileDisplayNames = new String[namedFileSet.length/2];
-//
-//        for (int s = 0; s < fileSet.length; s++) {
-//            fileSet[s] = namedFileSet[s];
-//            fileDisplayNames[s] = namedFileSet[s + fileSet.length];
-//        }
+		params.setValueForKey("filename", am.getInputImages().getImageNameForIndex(0));
 
-
-        namedFileSet.loadAllImages();
-
-        params.setValueForKey("filename", namedFileSet.getImageNameForIndex(0));
-
-        //generate the images to pass to the analysis routine
-
-        ImageSet images = null;
-        
-        int markerIndex = 0;
-
-        if (params.hasKeyAndTrue("multi_wavelength_file") || ! params.hasKey("multi_wavelength_file")) {
-
-
-            images = loadSplitMutliwavelengthImages(namedFileSet, markerIndex);
-
-			namedFileSet.disposeImages();
-
-            String channelNames = "";
-
-            for (Image i : images) {
-                channelNames += i.getMetadata().getChannelName(0,0) + " ";
-            }
-
-            params.setValueForKey("channel_name", channelNames);
-
-        } else {
-        	
-            images = loadImagesFromFileSet(namedFileSet);
-
-        }
-        
-        if (params.hasKey("marker_channel_index")) {
-        	
-            markerIndex = params.getIntValueForKey("marker_channel_index");
-            images.setMarkerImage(markerIndex);
-
-        }
-        
-        
+		loadImages(am);
 
         //set the numberOfChannels and channelName parameters appropriately for the multi-wavelength file
-
-        if (images == null) {throw new java.io.IOException("Unable to load Image Set: " + namedFileSet.getImageNameForIndex(0));}
         
-        params.addIfNotSet("number_of_channels", Integer.toString(images.getImageCount()));
-
+        params.addIfNotSet("number_of_channels", new Parameter("number_of_channels", "number_of_channels", ParameterType.INTEGER_T, am.getInputImages().getImageCount(), null));
 
         if (params.hasKeyAndTrue("process_max_intensity_projections")) {
+	
+			ImageSet images = am.getInputImages();
 
             ImageSet newImages = new ImageSet(params);
 
@@ -245,62 +199,57 @@ public class LocalAnalysis {
             
             newImages.setMarkerImage(images.getMarkerIndex());
 
-            images = newImages;
+			am.getInputImages().disposeImages();
+
+            am.setInputImages(newImages);
         }
 
 
         Method methodToRun = Method.loadMethod(params.getValueForKey("method_name"));
 
+		am.setMethod(methodToRun);
+
         methodToRun.setParameters(params);
-        methodToRun.setImages(images);
+        methodToRun.setImages(am.getInputImages());
 
         methodToRun.go();
 
-        writeDataOutput(methodToRun, params, images);
+		am.timestamp();
+
+        writeDataOutput(am);
 
         try {
-            writeImageOutput(methodToRun,params,images);
-            writeParameterOutput(params, images);
+            writeImageOutput(am);
+            writeParameterOutput(am);
         } catch (java.io.IOException e) {
             LoggingUtilities.getLogger().severe("Error while writing output masks to file; skipping write and continuing.");
             e.printStackTrace();
         }
 
-        images.disposeImages();
-        namedFileSet.disposeImages();
-
-
-    }
-
-    private static ImageSet loadImagesFromFileSet(ImageSet fileSet) throws java.io.IOException {
-
-        loadImagesFromFileSetWithSeriesCount(fileSet);
-
-        return fileSet;
+        am.getInputImages().disposeImages();
+        am.getOutputImages().disposeImages();
 
     }
 
-    /**
-     * Load the images from a specified set of filenames; if these images contain multiple XYZCT series only the first will be read in.
-     * @param fileSet   An ImageSet of the images for each color channel; the reference channel for segmentation must be first (or already specified in the ImageSet).
-     * @return          1.  Currently multi-series image files are not supported.
-     * @throws java.io.IOException      if and error is encountered while reading the images from disk.
-     */
+    private static void loadImages(AnalysisMetadata am) throws java.io.IOException {
 
-    public static synchronized int loadImagesFromFileSetWithSeriesCount(ImageSet fileSet) throws java.io.IOException  {
+		am.validateInputImages(true);
 
-        fileSet.loadAllImages();
-
-        return 1;
+        if (am.getInputParameters().hasKeyAndTrue("multi_wavelength_file")) {
+			ImageSet split = loadSplitMutliwavelengthImages(am.getInputImages());
+			am.getInputImages().disposeImages();
+			am.setInputImages(split);
+		} else {
+			am.getInputImages().loadAllImages();
+		}
+		
+		if (am.getInputParameters().hasKeyAndTrue("marker_channel_index")) {
+			am.getInputImages().setMarkerImage(am.getInputParameters().getIntValueForKey("marker_channel_index"));
+		}
 
     }
 
-
-    private static synchronized ImageSet loadSplitMutliwavelengthImages(ImageSet fileSet, int markerIndex) throws java.io.IOException {
-
-        if (reader == null) {
-            reader = new ImageReader();
-        }
+    private static synchronized ImageSet loadSplitMutliwavelengthImages(ImageSet fileSet) throws java.io.IOException {
 
         fileSet.loadAllImages();
 
@@ -315,21 +264,12 @@ public class LocalAnalysis {
         for (Image i : split) {
             splitSet.addImageWithImageAndName(i, fileSet.getImageNameForIndex(0));
         }
-
-        if (fileSet.getParameters().hasKey("marker_channel_index")) {
-            splitSet.setMarkerImage(fileSet.getParameters().getIntValueForKey("marker_channel_index"));
-        } else {
-            splitSet.setMarkerImage(markerIndex);
-        }
         
         return splitSet;
 
 
     }
 
-
-    
-    
     public static String generateDataOutputString(Quantification data, ParameterDictionary p) {
     	
     	StringBuilder output = new StringBuilder();
@@ -501,11 +441,59 @@ public class LocalAnalysis {
         return output.toString();
     }
 
-    private static void writeDataOutput(Method finishedMethod, ParameterDictionary p, ImageSet fileSet) throws java.io.IOException {
+	private static String getOutputMethodNameString(AnalysisMetadata am) {
+		
+		String longMethodName = am.getMethod().getDisplayName();
+
+		if (longMethodName == null) {
+			longMethodName = am.getMethod().getClass().getName();
+		}
+
+        String[] splitMethodName = longMethodName.split("\\.");
+
+        String shortMethodName = splitMethodName[splitMethodName.length - 1];
+		
+		return shortMethodName;
+		
+	}
+
+	private static String getOutputDataFileSuffix(AnalysisMetadata am) {
+		
+		String shortMethodName = getOutputMethodNameString(am);
+
+        String outputSuffix= "." + shortMethodName + ".out.txt";
+
+		return outputSuffix;
+		
+	}
+	
+	private static String getOutputImageFileSuffix(AnalysisMetadata am) {
+		
+		String shortMethodName = getOutputMethodNameString(am);
+
+        String outputSuffix= "." + shortMethodName + ".out.ome.tif";
+
+		return outputSuffix;
+		
+	}
+
+	private static String getOutputParameterFileSuffix(AnalysisMetadata am) {
+		
+		String shortMethodName = getOutputMethodNameString(am);
+
+        String outputSuffix= "." + shortMethodName + PARAMETER_EXTENSION;
+
+		return outputSuffix;
+		
+	}
+
+    private static void writeDataOutput(AnalysisMetadata am) throws java.io.IOException {
+
+		ParameterDictionary outputParams = am.getOutputParameters();
 
         final String output_dir_suffix = DATA_OUTPUT_DIR;
 
-        java.io.File outputPath=  new java.io.File(finishedMethod.getParameters().getValueForKey("local_directory") + java.io.File.separator + output_dir_suffix);
+        java.io.File outputPath =  new java.io.File(outputParams.getValueForKey("local_directory") + java.io.File.separator + output_dir_suffix);
 
         if (!outputPath.exists()) {outputPath.mkdir();}
         
@@ -513,117 +501,116 @@ public class LocalAnalysis {
 
         if (!serializedOutputPath.exists()) {serializedOutputPath.mkdir();}
         
-        String[] splitMethodName = finishedMethod.getParameters().getValueForKey("method_name").split("\\.");
-
-        String shortMethodName = splitMethodName[splitMethodName.length - 1];
-
-        String outputFilename =  ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.txt";
+		String outputFilename = ((new java.io.File(am.getInputImages().getImageNameForIndex(0))).getName()) + getOutputDataFileSuffix(am);
 
         String relativeOutputFilename = outputPath.getName() + File.separator + outputFilename;
         		
         String dataOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
         
         String serializedOutputFilename = serializedOutputPath.getAbsolutePath() + File.separator + outputFilename;
-
-        p.addIfNotSet("data_output_filename", relativeOutputFilename);
-
+		
         PrintWriter output = new PrintWriter(new FileOutputStream(dataOutputFilename));
         
         ObjectOutputStream serializedOutput = new ObjectOutputStream(new FileOutputStream(serializedOutputFilename));
 
-    	Quantification data = finishedMethod.getStoredDataOutput();
+    	Quantification data = am.getMethod().getStoredDataOutput();
         
         serializedOutput.writeObject(data);
         
         serializedOutput.close();
 
-        output.write(generateDataOutputString(data, p));
+        output.write(generateDataOutputString(data, outputParams));
 
         output.close();
 
+		am.addOutputFile(dataOutputFilename);
 
     }
 
-    private static void writeImageOutput(Method finishedMethod, ParameterDictionary p, ImageSet fileSet) throws java.io.IOException {
+    private static void writeImageOutput(AnalysisMetadata am) throws java.io.IOException {
 
         final String output_dir_suffix = IMAGE_OUTPUT_DIR;
 
-        java.io.File outputPath=  new java.io.File(finishedMethod.getParameters().getValueForKey("local_directory") + java.io.File.separator + output_dir_suffix);
+		ParameterDictionary outputParams = am.getOutputParameters();
+
+        java.io.File outputPath = new java.io.File(outputParams.getValueForKey("local_directory") + java.io.File.separator + output_dir_suffix);
 
         if (!outputPath.exists()) {outputPath.mkdir();}
 
-        String[] splitMethodName = finishedMethod.getParameters().getValueForKey("method_name").split("\\.");
+        String[] splitMethodName = outputParams.getValueForKey("method_name").split("\\.");
 
         String shortMethodName = splitMethodName[splitMethodName.length - 1];
 
-        String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(fileSet.getImageNameForIndex(0))).getName()) + "." + shortMethodName + ".out.ome.tif";
+        String relativeOutputFilename = outputPath.getName() + File.separator + ((new java.io.File(am.getInputImages().getImageNameForIndex(0))).getName()) + getOutputImageFileSuffix(am);
 
         String maskOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
         
-        if (finishedMethod.getStoredImages().size() == 1) {
+		ImageSet outputImages = new ImageSet(outputParams);
 
-            finishedMethod.getStoredImage().writeToFile(maskOutputFilename);
+        if (am.getMethod().getStoredImages().size() == 1) {
 
-            p.addIfNotSet("mask_output_filename", relativeOutputFilename);
+            am.getMethod().getStoredImage().writeToFile(maskOutputFilename);
+
+			outputImages.addImageWithImageAndName(am.getMethod().getStoredImage(), maskOutputFilename);
 
         } else {
-            int imageCounter = 0;
-            for (Image i : finishedMethod.getStoredImages()) {
+	
+			int imageCounter = 0;
+	
+            for (Image i : am.getMethod().getStoredImages()) {
+	
                 String multiMaskOutputFilename = relativeOutputFilename.replace(".out.ome.tif", ".out." + Integer.toString(imageCounter) + ".ome.tif");
-                p.addIfNotSet("mask_output_filename", multiMaskOutputFilename);
+				
+				String fullFilename = outputPath.getParent() + File.separator + multiMaskOutputFilename;
+				
+                i.writeToFile(fullFilename);
 
-                if (imageCounter != 0) {
-                    p.addIfNotSet("secondary_mask_output_filename", multiMaskOutputFilename);
-                }
-                i.writeToFile(outputPath.getParent() + File.separator + multiMaskOutputFilename);
+				outputImages.addImageWithImageAndName(i, fullFilename);
+				
+				++imageCounter;
 
-                imageCounter++;
             }
         }
 
+		am.setOutputImages(outputImages);
+
     }
 
-    private static void writeParameterOutput(ParameterDictionary p, ImageSet fileSet) throws java.io.IOException{
+    private static void writeParameterOutput(AnalysisMetadata am) throws java.io.IOException{
 
         final String parameterDirectory = PARAMETER_OUTPUT_DIR;
-        final String parameterExtension = PARAMETER_EXTENSION;
 
-        File outputPath = new File(p.getValueForKey("local_directory") + File.separator + parameterDirectory);
+		ParameterDictionary pd = am.getOutputParameters();
+
+        File outputPath = new File(pd.getValueForKey("local_directory") + File.separator + parameterDirectory);
 
         if (!outputPath.exists() ) {
             outputPath.mkdir();
         }
 
-        String[] splitMethodName = p.getValueForKey("method_name").split("\\.");
+        String[] splitMethodName = pd.getValueForKey("method_name").split("\\.");
 
         String shortMethodName = splitMethodName[splitMethodName.length - 1];
 
-        String parameterOutputFilename = outputPath.getAbsolutePath() + File.separator + (new File(fileSet.getImageNameForIndex(0))).getName() + "." + shortMethodName + parameterExtension;
+        String parameterOutputFilename = outputPath.getAbsolutePath() + File.separator + (new File(am.getInputImages().getImageNameForIndex(0))).getName() + getOutputParameterFileSuffix(am);
 
-        //java.io.ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(parameterOutputFilename));
-
-        //out.writeObject(p);
-
-        p.writeParametersToFile(parameterOutputFilename);
-
+		(new AnalysisMetadataXMLWriter()).writeAnalysisMetadataToXMLFile(am, parameterOutputFilename);
 
     }
 
     private static class ImageSetThread extends Thread {
 
-        private ImageSet fileSet;
-        private ParameterDictionary p;
+        private AnalysisMetadata am;
 
-        public ImageSetThread(ImageSet fileSet, ParameterDictionary p) {
-            this.fileSet = fileSet;
-            this.p = p;
+        public ImageSetThread(AnalysisMetadata am) {
+            this.am = am;
         }
 
         public void run() {
             try {
-                processFileSet(p, fileSet);
+                processFileSet(am);
             } catch (java.io.IOException e) {
-                LoggingUtilities.getLogger().severe("while processing " + fileSet.getImageNameForIndex(0) + ": " + e.toString());
+                LoggingUtilities.getLogger().severe("while processing " + am.getInputImages().getImageNameForIndex(0) + ": " + e.toString());
                 e.printStackTrace();
             }
         }

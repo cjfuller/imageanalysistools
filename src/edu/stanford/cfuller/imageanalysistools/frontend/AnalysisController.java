@@ -25,6 +25,11 @@
 package edu.stanford.cfuller.imageanalysistools.frontend;
 
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadata;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataParserFactory;
+
+
+
 
 import java.util.logging.Handler;
 
@@ -49,16 +54,39 @@ public class AnalysisController {
      * @param params    The {@link ParameterDictionary} specifying the options for this analysis run.
      */
 	public void runLocal(ParameterDictionary params) {
+	
+
+		AnalysisMetadata am = new AnalysisMetadata();
+		am.setInputParameters(params);
+		am.setOutputParameters(new ParameterDictionary(params));
+		addLocalParameters(am.getOutputParameters());
+		LocalAnalysis.run(am);	
+		
+	}
+	
+	public void runLocal(String parametersFilename) {
+		AnalysisMetadata am = loadMetadataFromFile(parametersFilename);
+		addLocalParameters(am.getOutputParameters());
+		LocalAnalysis.run(am);
+	}
+	
+	private void addLocalParameters(ParameterDictionary params) {
 		params.addIfNotSet("temp_dir", System.getProperty("user.dir") + java.io.File.separator + "temp");
 		params.addIfNotSet("image_extension", "");
 		params.addIfNotSet("DEBUG", "false");
-
-		LocalAnalysis.run(params);	
-		
 	}
 
 
     public void addAnalysisLoggingHandler(Handler h) {
         LoggingUtilities.addHandler(h);
     }
+
+
+	private AnalysisMetadata loadMetadataFromFile(String parametersFilename) {
+		
+		return AnalysisMetadataParserFactory.createParserForFile(parametersFilename).parseFileToAnalysisMetadata(parametersFilename);
+		
+	}
+
+
 }

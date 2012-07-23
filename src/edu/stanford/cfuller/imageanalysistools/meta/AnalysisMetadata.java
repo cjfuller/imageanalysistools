@@ -28,7 +28,7 @@ import edu.stanford.cfuller.imageanalysistools.method.Method;
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.InputStreamReader;
 
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 
@@ -62,7 +62,7 @@ public class AnalysisMetadata implements java.io.Serializable {
 			this.value = other.value;
 		}
 		
-		public String getAlgorithm() {return this.value;}
+		public String getAlgorithm() {return this.algorithm;}
 		public String getValue() {return this.value;}
 		
 	}
@@ -71,6 +71,9 @@ public class AnalysisMetadata implements java.io.Serializable {
 	private ParameterDictionary outputState;
 	
 	private ImageSet inputImages;
+	private ImageSet modifiedInputImages; // the way that multi-channel image files are handled currently is to split them and replace the image set, but
+										// we want to track the initial one as well.  inputImages will be the first thing it was ever set to, 
+										// modifiedInputImages will hold subsequent sets
 	private ImageSet outputImages;
 	
 	private java.util.Map<String, FileHash> inputImageHashes;
@@ -95,6 +98,7 @@ public class AnalysisMetadata implements java.io.Serializable {
 		this.inputState = null;
 		this.outputState = null;
 		this.inputImages = null;
+		this.modifiedInputImages = null;
 		this.outputImages = null;
 		this.inputImageHashes = new java.util.HashMap<String, FileHash>();
 		this.outputFilenames = new java.util.ArrayList<String>();
@@ -177,41 +181,38 @@ public class AnalysisMetadata implements java.io.Serializable {
 	public void setHasPreviousOutput(boolean has) {this.hasRunPreviously = has;}
 	
 	/**
-	* Sets the images used for input to the analysis.
+	* Sets the images used for input to the analysis.  The value of the ImageSet
+	* the first time this is called will be stored separately for the purposes
+	* of tracking the initial input state.
+	* 
 	* @param in an ImageSet containing the input images.
 	*/
-	public void setInputImages(ImageSet in) {this.inputImages = in;}
+	public void setInputImages(ImageSet in) {
+		if (this.inputImages == null) {
+			this.inputImages = in;
+			this.inputImages.hashAllImages();
+		}
+		
+		this.modifiedInputImages = in;
+		this.modifiedInputImages.hashAllImages();
+		
+	}
 	
 	/**
 	* Sets the images to be stored as output from the analysis.
 	* @param out an ImageSet containing the output images.
 	*/
-	public void setOutputImages(ImageSet out) {this.outputImages = out;}
+	public void setOutputImages(ImageSet out) {this.outputImages = out; this.outputImages.hashAllImages();}
 	
-	/**
-	* Gets an XML string containing all the analysis metadata.
-	*/
-	public String toXML() {
-		return "";
-	}
-	
-	/**
-	* @see #toXML
-	*/
-	public String toString() {
-		return this.toXML();
-	}
-	
+
 	/**
 	* Gets an XML-formatted String containing the library version information,
 	* including which commit in the git repository was used to build it.
-	* @return a String containing an XML element called library with version and 
-	* 				commit attributes
+	* @return a String containing a library element with version and commit attributes, in XML format.
 	*/
 	public static String getLibraryVersionXMLString() {
 		try {
-			String resourcePath = AnalysisMetadata.class.getClassLoader().getResource(LIBRARY_VERSION_RESOURCE_PATH).toString();
-			return (new BufferedReader(new FileReader(resourcePath))).readLine();
+			return (new BufferedReader(new InputStreamReader(AnalysisMetadata.class.getClassLoader().getResourceAsStream(LIBRARY_VERSION_RESOURCE_PATH)))).readLine();
 		} catch (java.io.IOException e) {
 			edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities.getLogger().warning("Unable to retrieve library version information: " + e.getMessage());
 			return null;
@@ -239,6 +240,14 @@ public class AnalysisMetadata implements java.io.Serializable {
 	* @return an ImageSet containing the input Images.
 	*/
 	public ImageSet getInputImages() {
+		return this.modifiedInputImages;
+	}
+	
+	/**
+	* Gets the ImageSet that was stored from the first call to setInputImages.
+	* @return an ImageSet containing the original input Images.
+	*/
+	public ImageSet getOriginalInputImages() {
 		return this.inputImages;
 	}
 	
@@ -297,7 +306,7 @@ public class AnalysisMetadata implements java.io.Serializable {
 		try {
 			this.outputFileHashes.put(filename, new FileHash(FileHashCalculator.ALG_DEFAULT, FileHashCalculator.calculateHash(FileHashCalculator.ALG_DEFAULT, filename)));
 		} catch (java.io.IOException e) {
-			edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities.getLogger().warning("Unable to calculate hash on image: " + filename + "\n" + e.getMessage());
+			edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities.getLogger().warning("Unable to calculate hash on file: " + filename + "\n" + e.getMessage());
 		}
 	}
 	
@@ -331,6 +340,60 @@ public class AnalysisMetadata implements java.io.Serializable {
 		if (fh == null) return null;
 		return fh.getAlgorithm();
 	}
+	
+	/**
+	* Validates that the input images are the same as those used on a previous
+	* analysis run; only warns about images with matching filenames but different
+	* hashes.
+	* @param logWarnings specifies whether to log a warning if there is a mismatch.
+	* @return true if the validation was ok or there was no filename match; false if the hash mismatched
+	*/
+	public boolean validateInputImages(boolean logWarnings) {
+		if (! this.hasRunPreviously) {
+			return true;
+		}
+		
+		boolean noErrors = true;
+		
+		for (int i = 0; i < this.inputImages.getImageCount(); i++) {
+			String filename = this.inputImages.getFilenameForIndex(i);
+			if (filename != null && this.inputImageHashes.containsKey(filename)) {
+				FileHash old = this.inputImageHashes.get(filename);
+				String newHash = null;
+				try {
+					newHash = FileHashCalculator.calculateHash(old.getAlgorithm(), filename);
+				} catch (java.io.IOException e) {
+					edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities.getLogger().warning("Unable to calculate hash on file: " + filename + "\n" + e.getMessage());
+				}
+				if (! old.getValue().equals(newHash)){
+					noErrors = false;
+					if (logWarnings) {
+						edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities.getLogger().warning("Input image does not match version run with previous analysis.  Filename: " + filename);
+					}
+				}
+			}
+		}
+		
+		return noErrors;
+		
+	}
+
+	/**
+	* Sets the method to be run for the analysis.
+	* @param m a Method object that will be run, and from which output will be retrieved.
+	*/
+	public void setMethod(Method m) {
+		this.method = m;
+	}
+	
+	/**
+	* Gets the method associated with the analysis.
+	* @return the Method that was run or will be run.
+	*/
+	public Method getMethod() {
+		return this.method;
+	}
+
 	
 }
 

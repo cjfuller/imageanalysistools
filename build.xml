@@ -18,7 +18,7 @@
 	<property name="plugin_jar" value="${distdir}/${ant.project.name}_${version}.jar"/>
 	<property name="standalone_jar" value="${distdir}/${ant.project.name}_${version}_standalone.jar"/>
 	<property name="version_info_file" value="${resourcesdir}/edu/stanford/cfuller/imageanalysistools/resources/version_info.xml"/>
-	<property name="version_info_string" value="&lt;library version=${version} commit=${commit_id}/&gt;"/>
+	<property name="version_info_string" value="&lt;library version=&quot;${version}&quot; commit=&quot;${commit_id}&quot;/&gt;"/>
 	
     <path id="ImageAnalysisTools.classpath">
 		<fileset dir="${libdir}">

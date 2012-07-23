@@ -32,6 +32,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter;
@@ -83,8 +85,8 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 	
 	//library version info
 	
-	static final java.util.regex.Pattern versionStringPattern = java.util.regex.Pattern.compile("version=([a-zA-Z_0-9.\\-])");
-	static final java.util.regex.Pattern commitStringPattern = java.util.regex.Pattern.compile("commit=([a-f0-9])");
+	protected final static Pattern versionGrabber = Pattern.compile(ATTR_VERSION + "=\"(\\S*)\"");
+	protected final static Pattern commitGrabber = Pattern.compile(ATTR_COMMIT + "=\"(\\S*)\"");
 	
 	/**
      * Parses a parameter file to an AnalysisMetadata object.
@@ -112,10 +114,14 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 			
 			loadPreviousAnalysisData(metaDoc, meta);
 			
+			ParameterDictionary outputParameters = this.getOutputParametersFromDocument(metaDoc);
+			
+			meta.setOutputParameters(outputParameters);
+			
 		}
 		
 		meta.setHasPreviousOutput(hasOutput);
-		
+
 		return meta;
 		
 	}
@@ -141,9 +147,9 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 		return metaDoc;
 	}
 	
-	private ParameterDictionary getInputParametersFromDocument(Document analysisMetadataDocument) {
+	private ParameterDictionary getParametersFromDocument(Document analysisMetadataDocument, String tag) {
 		
-		NodeList inputStateList = analysisMetadataDocument.getElementsByTagName(TAG_INPUT_STATE);
+		NodeList inputStateList = analysisMetadataDocument.getElementsByTagName(tag);
 
 		if (inputStateList.getLength() > 0) {
 			
@@ -167,9 +173,19 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 			
 		}
 		
-		return (new LegacyParameterXMLParser()).parseDocumentToParameterDictionary(analysisMetadataDocument); 
+		return (new LegacyParameterXMLParser()).parseDocumentToParameterDictionary(analysisMetadataDocument);
+	}
+	
+	private ParameterDictionary getInputParametersFromDocument(Document analysisMetadataDocument) {
 		
-				
+		return this.getParametersFromDocument(analysisMetadataDocument, TAG_INPUT_STATE);
+		
+	}
+	
+	private ParameterDictionary getOutputParametersFromDocument(Document analysisMetadataDocument) {
+		
+		return this.getParametersFromDocument(analysisMetadataDocument, TAG_OUTPUT_STATE);
+		
 	}
 	
 	private ParameterDictionary parseParametersNodeToParameterDictionary(Node parameters) {
@@ -234,6 +250,8 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 					
 					Node im = allImages.item(i);
 					
+					if (! im.getNodeName().equals(TAG_IMAGE)) continue;
+					
 					NamedNodeMap nnm = im.getAttributes();
 			        
 					String filename = nnm.getNamedItem(ATTR_FILENAME).getNodeValue();
@@ -279,8 +297,12 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 		NamedNodeMap nnm = library.getAttributes();
 		
 		String xmlVersionString =  AnalysisMetadata.getLibraryVersionXMLString();
-		String currentVersion = AnalysisMetadataXMLParser.versionStringPattern.matcher(xmlVersionString).group(1);
-		String currentCommit = AnalysisMetadataXMLParser.commitStringPattern.matcher(xmlVersionString).group(1);
+		Matcher versionMatcher = AnalysisMetadataXMLParser.versionGrabber.matcher(xmlVersionString);
+		Matcher commitMatcher = AnalysisMetadataXMLParser.commitGrabber.matcher(xmlVersionString);
+		versionMatcher.find();
+		commitMatcher.find();
+		String currentVersion = versionMatcher.group(1);
+		String currentCommit = commitMatcher.group(1);
 		
 		String lastVersion = nnm.getNamedItem(ATTR_VERSION).getNodeValue();
 		String lastCommit = nnm.getNamedItem(ATTR_COMMIT).getNodeValue();
