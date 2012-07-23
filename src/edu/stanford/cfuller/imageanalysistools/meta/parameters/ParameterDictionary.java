@@ -148,7 +148,7 @@ public class ParameterDictionary implements Serializable {
 	
 	/**
 	* Gets the ith value stored for a given key.  Does not check bounds, so check the number of
-	* values stored using {@link getValueCountForKey(String)} beforehand.
+	* values stored using {@link #getValueCountForKey(String)} beforehand.
 	* @param key 	The key whose associated value is to be returned.
 	* @param i 		The index of the value associated with this key to return.
 	* @return 		The value of the parameter as a String, or null if there is no value stored.
@@ -165,7 +165,7 @@ public class ParameterDictionary implements Serializable {
 	
 	/**
 	* Gets the ith value stored for a given key.  Does not check bounds, so check the number of
-	* values stored using {@link getValueCountForKey(String)} beforehand.
+	* values stored using {@link #getValueCountForKey(String)} beforehand.
 	* @param key 	The key whose associated value is to be returned.
 	* @param i 		The index of the value associated with this key to return.
 	* @return 		The Parameter object associated with the key, or null if there is no value stored.

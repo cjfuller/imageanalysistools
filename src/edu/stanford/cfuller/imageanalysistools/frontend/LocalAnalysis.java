@@ -72,9 +72,9 @@ public class LocalAnalysis {
      * The current implementation is multithreaded if specified in the parameter dictionary (and currently the default value
      * specifies as many threads as processor cores on the machine), so analysis methods should be thread safe.
      *
-     * Each thread uses {@link #processFileSet(ParameterDictionary,ImageSet)} to do the processing.
+     * Each thread uses {@link #processFileSet(AnalysisMetadata)} to do the processing.
      *
-     * @param params    The AnalysisMetadata specifying the options for the analysis.
+     * @param am    The AnalysisMetadata specifying the options for the analysis.
      */
     public static void run(AnalysisMetadata am) {
 
