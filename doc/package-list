@@ -7,8 +7,9 @@ edu.stanford.cfuller.imageanalysistools.frontend
 edu.stanford.cfuller.imageanalysistools.image
 edu.stanford.cfuller.imageanalysistools.image.io
 edu.stanford.cfuller.imageanalysistools.image.io.omero
+edu.stanford.cfuller.imageanalysistools.meta
+edu.stanford.cfuller.imageanalysistools.meta.parameters
 edu.stanford.cfuller.imageanalysistools.method
 edu.stanford.cfuller.imageanalysistools.metric
-edu.stanford.cfuller.imageanalysistools.parameters
 edu.stanford.cfuller.imageanalysistools.random
 edu.stanford.cfuller.imageanalysistools.util
