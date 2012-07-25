@@ -29,6 +29,7 @@ import edu.stanford.cfuller.imageanalysistools.frontend.AnalysisController;
 import edu.stanford.cfuller.imageanalysistools.frontend.DataSummary;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadata;
 import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataParserFactory;
 import java.io.File;
 import java.io.IOException;
@@ -191,7 +192,9 @@ public class SegmentationController extends TaskController implements OmeroListe
 
 		        Class c = mi.getMethodClass();
 				
-				final ParameterDictionary pd = AnalysisMetadataParserFactory.createParserForFile(parameterFilename).parseFileToParameterDictionary(parameterFilename);        
+				final AnalysisMetadata am = AnalysisMetadataParserFactory.createParserForFile(parameterFilename).parseFileToAnalysisMetadata(parameterFilename);        
+
+				final ParameterDictionary pd = am.getInputParameters();
 
 		        if (c == null && !pd.hasKey("method_name")) {
 		            try {
@@ -245,7 +248,7 @@ public class SegmentationController extends TaskController implements OmeroListe
 		       			if (! sw.summarizeDataOnly()) {
 		                   AnalysisController ac = new AnalysisController();
 		                   ac.addAnalysisLoggingHandler(sw.getLogHandler());
-		                   ac.runLocal(pd);
+		                   ac.runLocal(am);
 						}
 				
 						sw.setStatus(STATUS_SUMMARY);

@@ -64,6 +64,16 @@ public class AnalysisController {
 		
 	}
 	
+	/**
+     * Run analysis on the local machine.
+     * @param am    The {@link AnalysisMetadata} specifying the options for this analysis run.
+     */
+	public void runLocal(AnalysisMetadata am) {
+		am.setOutputParameters(new ParameterDictionary(am.getInputParameters()));
+		addLocalParameters(am.getOutputParameters());
+		LocalAnalysis.run(am);
+	}
+	
 	public void runLocal(String parametersFilename) {
 		AnalysisMetadata am = loadMetadataFromFile(parametersFilename);
 		addLocalParameters(am.getOutputParameters());

@@ -242,8 +242,8 @@ public class LocalAnalysis {
 		} else {
 			am.getInputImages().loadAllImages();
 		}
-		
-		if (am.getInputParameters().hasKeyAndTrue("marker_channel_index")) {
+				
+		if (am.getInputParameters().hasKey("marker_channel_index")) {
 			am.getInputImages().setMarkerImage(am.getInputParameters().getIntValueForKey("marker_channel_index"));
 		}
 
