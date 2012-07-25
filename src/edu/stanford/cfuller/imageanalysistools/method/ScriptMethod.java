@@ -46,6 +46,8 @@ public class ScriptMethod extends Method {
 	
 	final static String SCRIPT_FUNCTIONS_FILE = "edu/stanford/cfuller/imageanalysistools/resources/script_methods.rb";
 	
+	final static String PARAM_METHOD_DISPLAY_NAME = "method_display_name";
+	
 	public void go() {
 		
 		String scriptFilename = this.parameters.getValueForKey(SCRIPT_FILENAME_PARAM);
@@ -62,6 +64,10 @@ public class ScriptMethod extends Method {
 		
 		sc.runScriptlet(this.getClass().getClassLoader().getResourceAsStream(SCRIPT_FUNCTIONS_FILE), SCRIPT_FUNCTIONS_FILE);
 		sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, scriptFilename);
+		
+		if (this.parameters.hasKey(PARAM_METHOD_DISPLAY_NAME)) {
+			this.setDisplayName(this.parameters.getValueForKey(PARAM_METHOD_DISPLAY_NAME));
+		}
 		
 		
 		
