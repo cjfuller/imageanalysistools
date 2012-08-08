@@ -4,8 +4,6 @@
 
 Place the `ImageAnalysisTools_version.jar` file in the ImageJ/FIJI plugins directory.  Analysis tasks will appear in Plugins > ImageAnalysisTools.
 
-###Version 5.0 and later
-
 If using FIJI, and you wish to use jruby scripts for analysis, you will need to uninstall the (outdated) version of jruby that is included with FIJI.  To do this, either delete `jruby.jar` from the jars subdirectory of the FIJI installation, or go to Help > Update FIJI.  Then select "Advanced Mode," and "View installed plugins only."  Select `jars/jruby.jar` and click uninstall.
 
 ##Running as a standalone application
@@ -42,4 +40,6 @@ For documentation on using the software, see the pages linked at http://cjfuller
 ##License
 
 ImageAnalysisTools is distributed under the MIT/X11 license.  See LICENSES/ImageAnalysisTools-license.txt for the full license text.
+
+Several third-party libraries are included in the distributed jar file.  See LICENSES/README_LICENSES.txt for more information on their licenses.
 
