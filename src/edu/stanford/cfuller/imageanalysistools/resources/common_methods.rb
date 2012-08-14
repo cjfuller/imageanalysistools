@@ -24,7 +24,14 @@
 #  * ***** END LICENSE BLOCK ***** */
 #++
 
+##
+# A collection of methods to enhance the ruby scripting interface
+# 
+# @author Colin J. Fuller
+#
 module IATScripting
+
+  Filter_package_name = "edu.stanford.cfuller.imageanalysistools.filter."
 
   ##
   # Gets an instance of a Filter by its class name.

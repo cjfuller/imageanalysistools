@@ -104,7 +104,7 @@ public abstract class Method implements Runnable {
             }
 		}
 		if (m != null) {
-			this.storedDataOutput = m.quantify(toProcess, this.imageSet);
+			this.storeDataOutput(m.quantify(toProcess, this.imageSet));
 		}
 				
 		this.storeImageOutput(ImageFactory.create(toProcess));
@@ -119,6 +119,15 @@ public abstract class Method implements Runnable {
      * @param im    The Image to add to the list of output Images.
      */
 	protected void storeImageOutput(Image im) {this.storedImages.add(im);}
+
+
+	/**
+	* Stores a Quantification to be used as the data for ouptut.
+	* @param q The quantification object that will be used as output.
+	*/
+	protected void storeDataOutput(Quantification q) {
+		this.storedDataOutput = q;
+	}
 
     /**
      * Clears all Images that have been stored for output.

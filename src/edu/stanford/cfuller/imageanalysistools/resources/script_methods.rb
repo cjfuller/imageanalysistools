@@ -33,7 +33,6 @@ require 'edu/stanford/cfuller/imageanalysistools/resources/common_methods'
 # 
 module IATScripting
   
-  Filter_package_name = "edu.stanford.cfuller.imageanalysistools.filter."
   
   ##
   # Specifies a section of parameter defintions contained in an attached block
@@ -57,5 +56,33 @@ module IATScripting
     yield
     
   end
-      
+  
+  java_import Java::edu.stanford.cfuller.imageanalysistools.method.Method
+  
+  class Method
+    
+    ##
+    # Adds an output image to the set of output images from the method.
+    # 
+    # @param [Image] im  the image to be stored
+    # @return               nil
+    #     
+    def add_output_image(im)
+      storeImageOutput(im)
+      nil
+    end
+    
+    ##
+    # Sets the quantification to be used as output from the method
+    # 
+    # @param [Quantification] q  the quantification to be used
+    # @return               nil
+    #   
+    def set_quantification(q)
+      storeDataOutput(q)
+      nil
+    end
+    
+  end
+        
 end
