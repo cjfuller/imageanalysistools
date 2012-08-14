@@ -559,9 +559,7 @@ $(generateTOC);
   <body>
     <div id="content">
       <h1>Documentation by YARD 0.8.2.1</h1>
-      <div id="readme">
-  
-</div><h1>Top Level Namespace
+      <h1>Top Level Namespace
   
   
   
@@ -649,7 +647,17 @@ $(generateTOC);
   
 </ul>
 
-</div>
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="" title="IATScripting::Method (class)">Method</a></span>
+    
+  
+</p>
+
   <h2>Constant Summary</h2>
   
     <dl class="constants">
@@ -909,7 +917,7 @@ $(generateTOC);
       
         &mdash;
         <div class='inline'>
-<p>an object that supplies the name of the filter (relative to the ...filter
+<p>a symbol that supplies the name of the filter (relative to the ...filter
 java package; for morphological filters, supply, e.g. :morph.OpeningFilter)</p>
 </div>
       
@@ -942,22 +950,22 @@ java package; for morphological filters, supply, e.g. :morph.OpeningFilter)</p>
       <pre class="lines">
 
 
-35
-36
-37
-38
-39
-40
-41</pre>
+42
+43
+44
+45
+46
+47
+48</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common_methods.rb', line 35</span>
+      <pre class="code"><span class="info file"># File 'common_methods.rb', line 42</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_filter'>get_filter</span><span class='lparen'>(</span><span class='id identifier rubyid_filter_name'>filter_name</span><span class='rparen'>)</span>
 
   <span class='id identifier rubyid_java_import'>java_import</span> <span class='lparen'>(</span><span class='const'>Filter_package_name</span> <span class='op'>+</span> <span class='id identifier rubyid_filter_name'>filter_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
 
-  <span class='id identifier rubyid_const_get'>const_get</span><span class='lparen'>(</span><span class='id identifier rubyid_filter_name'>filter_name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='const'>Module</span><span class='period'>.</span><span class='id identifier rubyid_const_get'>const_get</span><span class='lparen'>(</span><span class='id identifier rubyid_filter_name'>filter_name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
   
 <span class='kw'>end</span></pre>
     </td>
@@ -1030,16 +1038,16 @@ supplied Image.</p>
       <pre class="lines">
 
 
-48
-49
-50
-51
-52
-53
-54</pre>
+55
+56
+57
+58
+59
+60
+61</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common_methods.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'common_methods.rb', line 55</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_image_copy'>image_copy</span><span class='lparen'>(</span><span class='id identifier rubyid_another_image'>another_image</span><span class='rparen'>)</span>
 
@@ -1076,7 +1084,7 @@ supplied Image.</p>
   
     <li>
       
-        <span class='name'>an</span>
+        <span class='name'>another_image</span>
       
       
         <span class='type'></span>
@@ -1085,7 +1093,7 @@ supplied Image.</p>
       
         &mdash;
         <div class='inline'>
-<p>another_image object that implements the Image interface.</p>
+<p>an object that implements the Image interface.</p>
 </div>
       
     </li>
@@ -1119,16 +1127,16 @@ separately.</p>
       <pre class="lines">
 
 
-63
-64
-65
-66
-67
-68
-69</pre>
+70
+71
+72
+73
+74
+75
+76</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common_methods.rb', line 63</span>
+      <pre class="code"><span class="info file"># File 'common_methods.rb', line 70</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_image_shallow_copy'>image_shallow_copy</span><span class='lparen'>(</span><span class='id identifier rubyid_another_image'>another_image</span><span class='rparen'>)</span>
 
@@ -1208,16 +1216,16 @@ separately.</p>
       <pre class="lines">
 
 
+52
 53
 54
 55
 56
 57
-58
-59</pre>
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'script_methods.rb', line 53</span>
+      <pre class="code"><span class="info file"># File 'script_methods.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_definition'>method_definition</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='symbol'>:ScriptMethod</span><span class='rparen'>)</span>
   
@@ -1296,18 +1304,18 @@ existing value will be overwritten.</p>
       <pre class="lines">
 
 
-108
-109
-110
-111
-112
-113
-114
 115
-116</pre>
+116
+117
+118
+119
+120
+121
+122
+123</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common_methods.rb', line 108</span>
+      <pre class="code"><span class="info file"># File 'common_methods.rb', line 115</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parameter'>parameter</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
 
@@ -1349,14 +1357,14 @@ existing value will be overwritten.</p>
       <pre class="lines">
 
 
+40
 41
 42
 43
-44
-45</pre>
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'script_methods.rb', line 41</span>
+      <pre class="code"><span class="info file"># File 'script_methods.rb', line 40</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_parameter_definitions'>parameter_definitions</span><span class='lparen'>(</span><span class='id identifier rubyid_p'>p</span><span class='rparen'>)</span>
 
@@ -1449,16 +1457,16 @@ existing value will be overwritten.</p>
       <pre class="lines">
 
 
-93
-94
-95
-96
-97
-98
-99</pre>
+100
+101
+102
+103
+104
+105
+106</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common_methods.rb', line 93</span>
+      <pre class="code"><span class="info file"># File 'common_methods.rb', line 100</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_set_parameter'>set_parameter</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
 
@@ -1537,16 +1545,16 @@ of the supplied Image.</p>
       <pre class="lines">
 
 
-77
-78
-79
-80
-81
-82
-83</pre>
+84
+85
+86
+87
+88
+89
+90</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'common_methods.rb', line 77</span>
+      <pre class="code"><span class="info file"># File 'common_methods.rb', line 84</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_writable_image_copy'>writable_image_copy</span><span class='lparen'>(</span><span class='id identifier rubyid_another_image'>another_image</span><span class='rparen'>)</span>
 
@@ -1563,10 +1571,283 @@ of the supplied Image.</p>
   </div>
 
 
+<h1>Class: IATScripting::Method
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">IATScripting::Method</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r2 last">Defined in:</dt>
+    <dd class="r2 last">script_methods.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_output_image-instance_method" title="#add_output_image (instance method)">- (Object) <strong>add_output_image</strong>(im) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Adds an output image to the set of output images from the method.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_quantification-instance_method" title="#set_quantification (instance method)">- (Object) <strong>set_quantification</strong>(q) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Sets the quantification to be used as output from the method.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="add_output_image-instance_method">
+  
+    - (<tt>Object</tt>) <strong>add_output_image</strong>(im) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Adds an output image to the set of output images from the method.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>im</span>
+      
+      
+        <span class='type'>(<tt>Image</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the image to be stored</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'>
+<p>nil</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+70
+71
+72
+73</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'script_methods.rb', line 70</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_output_image'>add_output_image</span><span class='lparen'>(</span><span class='id identifier rubyid_im'>im</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_storeImageOutput'>storeImageOutput</span><span class='lparen'>(</span><span class='id identifier rubyid_im'>im</span><span class='rparen'>)</span>
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_quantification-instance_method">
+  
+    - (<tt>Object</tt>) <strong>set_quantification</strong>(q) 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Sets the quantification to be used as output from the method</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>q</span>
+      
+      
+        <span class='type'>(<tt>Quantification</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the quantification to be used</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'></span>
+      
+      
+      
+        
+        <div class='inline'>
+<p>nil</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+81
+82
+83
+84</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'script_methods.rb', line 81</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_quantification'>set_quantification</span><span class='lparen'>(</span><span class='id identifier rubyid_q'>q</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_storeDataOutput'>storeDataOutput</span><span class='lparen'>(</span><span class='id identifier rubyid_q'>q</span><span class='rparen'>)</span>
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
     </div>
 
     <div id="footer">
-  Generated on Sat Jul 14 16:09:47 2012 by
+  Generated on Mon Aug 13 18:16:33 2012 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.2.1 (ruby-1.9.3).
 </div>
