@@ -107,7 +107,7 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 		boolean hasOutput = false;
 		
 		if (this.hasOutputSection(metaDoc) && this.hasAnalysisSection(metaDoc)) {
-			
+						
 			hasOutput = true;
 			
 			loadInputImageInformation(metaDoc, meta);
@@ -276,12 +276,13 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 			Node analysis = analysisList.item(0); // only one analysis allowed
 			
 			NodeList children = analysis.getChildNodes();
-						
+									
 			for (int i = 0; i < children.getLength(); i++) {
+
 				Node child = children.item(i);
+				
 				if (child.getNodeName().equals(TAG_LIBRARY)) {
 					this.processLibraryNode(child, meta);
-					break;
 				} else if (child.getNodeName().equals(TAG_SCRIPT)) {
 					this.processScriptNode(child, meta);
 				}

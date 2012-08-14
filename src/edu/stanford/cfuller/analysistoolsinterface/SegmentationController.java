@@ -239,7 +239,7 @@ public class SegmentationController extends TaskController implements OmeroListe
 
 		            pd.addIfNotSet("omero_image_ids", omeroImageIdString);
 		        }
-
+		
 
 				(new Thread(new Runnable() {
 
