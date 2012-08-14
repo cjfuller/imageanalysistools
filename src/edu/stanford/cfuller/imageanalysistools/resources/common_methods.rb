@@ -62,7 +62,7 @@ module IATScripting
 
   ##
   # Creates a shallow read-only copy of an Image object.
-  # @param  an another_image object that implements the Image interface.
+  # @param  another_image an object that implements the Image interface.
   # @return an object that implements the Image interface and shares the same 
   #         pixeldata and metadata as the supplied Image but can be boxed and 
   #         iterated separately.
