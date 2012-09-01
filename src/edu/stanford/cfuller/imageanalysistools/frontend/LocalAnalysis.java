@@ -264,6 +264,8 @@ public class LocalAnalysis {
         for (Image i : split) {
             splitSet.addImageWithImageAndName(i, fileSet.getImageNameForIndex(0));
         }
+		
+		splitSet.setCombinedImage(multiwavelength);
         
         return splitSet;
 

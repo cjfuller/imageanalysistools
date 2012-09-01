@@ -51,6 +51,8 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
     final static int defaultMarkerIndex = 0;
     
     List<ImageHolder> images;
+	
+	Image combine;
 
     Integer markerIndex;
 
@@ -65,6 +67,7 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         this.images = new ArrayList<ImageHolder>();
         this.markerIndex = null;
         this.parameters = p;
+		this.combine = null;
     }
 
     /**
@@ -80,7 +83,27 @@ public class ImageSet implements java.io.Serializable, Collection<Image> {
         this.images.addAll(other.images);
         this.markerIndex = other.markerIndex;
         this.parameters = other.parameters;
+		this.combine = other.combine;
     }
+
+
+	/**
+	* Stores an Image that is the combine of each image in this set along the appropriate dimension.
+	*  (e.g. a color combine if all images represent channels)
+	* @param combined the Image that is the combine of the images in the ImageSet.
+	*/ 
+	public void setCombinedImage(Image combined) {
+		this.combine = combined;
+	}
+	
+	/**
+	* Gets a stored Image that is the combine of each image in this set along the appropriate dimension if it has been previously supplied.
+	*  (e.g. a color combine if all images represent channels)
+	* @return the combine of the Images in this set, if it has been set, or null if it has not.
+	*/ 
+	public Image getCombinedImage() {
+		return this.combine;
+	}
 
 
     /**
