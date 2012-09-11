@@ -26,6 +26,7 @@ package edu.stanford.cfuller.imageanalysistools.method;
 
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadata;
 import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
@@ -50,6 +51,7 @@ public abstract class Method implements Runnable {
 	//fields
 	
 	protected ParameterDictionary parameters;
+	protected AnalysisMetadata metadata;
 	protected java.util.List<Image> storedImages;
 	protected java.util.List<Image> images;
     protected ImageSet imageSet;
@@ -147,6 +149,7 @@ public abstract class Method implements Runnable {
 		this.images = new java.util.ArrayList<Image>();
 		this.storedImages = new java.util.ArrayList<Image>();
 		this.updater = null;
+		this.metadata = null;
 	}
 
     /**
@@ -180,6 +183,23 @@ public abstract class Method implements Runnable {
      */
 	public void setParameters(ParameterDictionary params){this.parameters = params;}
 
+
+    /**
+     * Sets the analysis metadata for this method to those found in a supplied {@link ParameterDictionary}.
+     *
+     * This retains a reference to the AnalysisMetadata and does not copy it, so external changes to the AnalysisMetadata
+     * will be reflected in the stored one as well.
+     * 
+     * Also sets the parameters and images associated with this method to be those contained in the AnalysisMetadata object.
+     *
+     * @param am    The AnalysisMetadata containing the metadata for running this method.
+     */
+	public void setAnalysisMetadata(AnalysisMetadata am){
+		this.metadata = am;
+		this.setParameters(am.getOutputParameters());
+		this.setImages(am.getInputImages());
+	}
+	
 
     /**
      * Sets the Images to be quantified/processed for this method.
@@ -222,6 +242,15 @@ public abstract class Method implements Runnable {
      * @return      A reference to the ParameterDictionary used for this method.
      */
 	public ParameterDictionary getParameters() {return this.parameters;}
+	
+    /**
+     * Gets the stored AnalysisMetadata used for this method.
+     *
+     * This will get a reference, not a copy, so modifications will be reflected in the stored AnalysisMetadata.
+     *
+     * @return      A reference to the AnalysisMetadata used for this method.
+     */
+	public AnalysisMetadata getAnalysisMetadata() {return this.metadata;}
 
 
     /**

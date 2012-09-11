@@ -208,9 +208,8 @@ public class LocalAnalysis {
         Method methodToRun = Method.loadMethod(params.getValueForKey("method_name"));
 
 		am.setMethod(methodToRun);
-
-        methodToRun.setParameters(params);
-        methodToRun.setImages(am.getInputImages());
+		
+		methodToRun.setAnalysisMetadata(am);
 
         methodToRun.go();
 

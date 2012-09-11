@@ -25,6 +25,7 @@
 package edu.stanford.cfuller.imageanalysistools.method;
 
 import org.jruby.embed.ScriptingContainer;
+import edu.stanford.cfuller.imageanalysistools.meta.RubyScript;
 
 
 /**
@@ -63,7 +64,20 @@ public class ScriptMethod extends Method {
 		sc.setCompatVersion(org.jruby.CompatVersion.RUBY1_9);
 		
 		sc.runScriptlet(this.getClass().getClassLoader().getResourceAsStream(SCRIPT_FUNCTIONS_FILE), SCRIPT_FUNCTIONS_FILE);
-		sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, scriptFilename);
+		
+		if (this.getAnalysisMetadata() != null) {
+		
+			RubyScript scriptToRun = this.getAnalysisMetadata().getScript();
+			
+			sc.runScriptlet(scriptToRun.getScriptString());
+			
+		} else {
+			
+			sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, scriptFilename);
+			
+		}
+		
+		
 		
 		if (this.parameters.hasKey(PARAM_METHOD_DISPLAY_NAME)) {
 			this.setDisplayName(this.parameters.getValueForKey(PARAM_METHOD_DISPLAY_NAME));
