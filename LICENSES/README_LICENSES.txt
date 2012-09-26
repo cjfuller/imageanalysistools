@@ -11,7 +11,7 @@ jruby is licensed under a CPL/GPL/LGPL tri-license.  See jruby-license.txt for t
 
 In accordance with those licenses that require it, you can obtain the sources from us (though we recommend getting them from their developers) as follows.  When a link to a code repository is provided as our version of the sources, a commit id is provided for the version distributed in binary form with ImageAnalysisTools.
 
-The sources for loci_tools and ome_tools are available from us at https://github.com/cjfuller/bioformats (commit: 05d146f6db25c4cd991310412ff716e437405353). These can be obtained directly from the developers at http://www.loci.wisc.edu/bio-formats/source-code..
+The sources for loci_tools and ome_tools are available from us at https://github.com/cjfuller/bioformats (master branch, commit: 06f686f07fd8250a3d954e46de1a60b203c4a6d4). These can be obtained directly from the developers at http://www.loci.wisc.edu/bio-formats/source-code.
 
 The sources for jruby are available from us at https://github.com/cjfuller/jruby (commit: 4a6bb0a2c641eb2e4da78519971b55777321ba29). These can be obtained directly from the developers at http://jruby.org.
 

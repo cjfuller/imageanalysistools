@@ -1,5 +1,7 @@
 #ImageAnalysisTools README
 
+ImageAnalysisTools is a java library developed for processing and quantifying biological microscopy images that focuses on saving developer time by easing rapid development of application-specific analysis tools and on keeping a detailed record of all analysis to guarantee reproducibility.
+
 ##Plugin installation instructions
 
 Place the `ImageAnalysisTools_version.jar` file in the ImageJ/FIJI plugins directory.  Analysis tasks will appear in Plugins > ImageAnalysisTools.
