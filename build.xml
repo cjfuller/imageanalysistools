@@ -12,8 +12,8 @@
 	<property name="resourcesdir" location="src"/>
 	<property name="ijdir" location="/Applications/Fiji.app/plugins"/>
 	
-	<property name="version" value="5.1.0"/>
-	<property name="commit_id" value="481b75235fee36f4fcfa64c39c0ac1a759e8bc69"/>
+	<property name="version" value="5.1.1"/>
+	<property name="commit_id" value="c77d82277137830b66fc057bacefcc9abcadd959"/>
 	
 	<property name="plugin_jar" value="${distdir}/${ant.project.name}_${version}.jar"/>
 	<property name="standalone_jar" value="${distdir}/${ant.project.name}_${version}_standalone.jar"/>
