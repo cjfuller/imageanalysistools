@@ -228,7 +228,16 @@ public class ImagePlusPixelData extends WritablePixelData {
 
 					int offset = x*x_offset + y*y_offset;
 
-					imp.setf(x,y, (float) (convBuffer.get(offset)));
+
+					float value = (float) convBuffer.get(offset);
+
+					if (value < 0) {
+					    value = Byte.MAX_VALUE + (value + Byte.MAX_VALUE + 1);
+					}
+
+					imp.setf(x,y, value);
+
+
 
 				}
 			}			
@@ -257,7 +266,13 @@ public class ImagePlusPixelData extends WritablePixelData {
 
 					int offset = x*x_offset + y*y_offset;
 
-					imp.setf(x,y, (float) (convBuffer.get(offset)));
+					float value = (float) convBuffer.get(offset);
+
+					if (value < 0) {
+					    value = Short.MAX_VALUE + (value + Short.MAX_VALUE + 1);
+					}
+
+					imp.setf(x,y, value);
 
 				}
 			}
@@ -285,7 +300,14 @@ public class ImagePlusPixelData extends WritablePixelData {
 
 					int offset = x*x_offset + y*y_offset;
 
-					imp.setf(x,y, (float) (convBuffer.get(offset)));
+					float value = (float) convBuffer.get(offset);
+
+					if (value < 0) {
+					    value = Integer.MAX_VALUE + (value + Integer.MAX_VALUE + 1);
+					}
+
+					imp.setf(x,y, value);
+
 
 				}
 			}

@@ -160,7 +160,9 @@ public class ImageReader {
 
 		PixelData p = (new PixelDataFactory()).createPixelData(lociReader.getSizeX(), lociReader.getSizeY(), lociReader.getSizeZ(), lociReader.getSizeC(), lociReader.getSizeT(), lociReader.getPixelType(), lociReader.getDimensionOrder());
 
+
 		if (!((loci.formats.meta.IMetadata) lociReader.getMetadataStore()).getPixelsBinDataBigEndian(0, 0)) {
+	
 			p.setByteOrder(java.nio.ByteOrder.LITTLE_ENDIAN);
 		}
 
