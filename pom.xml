@@ -72,6 +72,13 @@
     </dependency>
 
     <dependency>
+      <groupId>net.imglib2</groupId>
+      <artifactId>imglib2-algorithms</artifactId>
+      <version>${dep.version.imglib}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
       <groupId>loci</groupId>
       <artifactId>ome_tools</artifactId>
       <version>${dep.version.loci}</version>
