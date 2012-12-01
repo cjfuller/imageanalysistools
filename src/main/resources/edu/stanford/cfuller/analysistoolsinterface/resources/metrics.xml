@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : metrics.xml
+    Author     : auto-generated
+-->
+
+
+<root>
+<metric displayname="IntensityPerPixelMetric" class="edu.stanford.cfuller.imageanalysistools.metric.IntensityPerPixelMetric"></metric>
+<metric displayname="ZeroMetric" class="edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric"></metric>
+</root>
