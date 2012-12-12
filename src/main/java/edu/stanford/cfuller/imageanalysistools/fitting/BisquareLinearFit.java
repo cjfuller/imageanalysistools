@@ -80,8 +80,15 @@ public class BisquareLinearFit {
 		RealVector leverages = this.calculateLeverages(indVarValues);
 		
 		int c= 0;
+
+		double norm_mult = 1.0;
 		
-		while (lastParams.subtract(currParams).getNorm() > CONV_NORM) {
+		if (! this.noIntercept) {
+		    norm_mult = 2.0;
+		}
+		
+		while (lastParams.subtract(currParams).getNorm() > CONV_NORM*norm_mult) {
+
 
 			lastParams = currParams;
 			
