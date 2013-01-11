@@ -27,7 +27,13 @@ package edu.stanford.cfuller.imageanalysistools.fitting;
 
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.RealVector;import java.lang.Math;
+import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.util.ArithmeticUtils;
+import java.lang.Math;
+
+import org.apache.commons.math3.optimization.direct.SimplexOptimizer;
+import org.apache.commons.math3.optimization.direct.NelderMeadSimplex;
+import org.apache.commons.math3.optimization.PointValuePair;
 
 /**
  * Performs a three-dimensional gaussian fit to an object in an image using a maximum likelihood method assuming Poisson
@@ -38,20 +44,6 @@ import org.apache.commons.math3.linear.RealVector;import java.lang.Math;
  */
 public class GaussianFitter3D {
 	
-    static RealVector logFactorialLookups;
-
-    static int maxLogFactorialPrecalculated;
-
-    static {
-    	    	
-        synchronized (GaussianFitter3D.class) {
-
-            logFactorialLookups = new ArrayRealVector(65536, 0.0);
-            maxLogFactorialPrecalculated = -1;
-
-        }
-    }
-
 
     /**
      * Fits a 3D Gaussian to a supplied object, starting from an initial guess of the parameters of that Gaussian.
@@ -67,17 +59,17 @@ public class GaussianFitter3D {
 
         //parameter ordering: amplitude, stddev x-y, stddev z, x/y/z coords, background
 
-        //System.out.println("for object " + toFit.getLabel() + " in image: " + toFit.getImageID() + " initial guess is: " + initialGuess.toString());
-
-
         double tol = 1.0e-6;
-        NelderMeadMinimizer nmm = new NelderMeadMinimizer(tol);
-        
-        RealVector result = nmm.optimize(new MLObjectiveFunction(toFit, ppg), initialGuess);
-        //System.out.println("for object " + toFit.getLabel() + " in image: " + toFit.getImageID() + " result iter 1 is: " + result.toString());
+	
+	SimplexOptimizer nmm = new SimplexOptimizer(tol, tol);
 
-        result = nmm.optimize(new MLObjectiveFunction(toFit, ppg), result);
-        //System.out.println("for object " + toFit.getLabel() + " in image: " + toFit.getImageID() + " result iter 2 is: " + result.toString());
+	NelderMeadSimplex nms = new NelderMeadSimplex(initialGuess.getDimension());
+	       
+	nmm.setSimplex(nms);
+
+	PointValuePair pvp = nmm.optimize(10000000, new MLObjectiveFunction(toFit, ppg), org.apache.commons.math3.optimization.GoalType.MINIMIZE, initialGuess.toArray());
+
+	RealVector result = new ArrayRealVector(pvp.getPoint());
 
         return result;
 
@@ -92,8 +84,6 @@ public class GaussianFitter3D {
         double vz = parameters[2];
         double A = parameters[0];
         double b = parameters[6];
-
-
 
         return ( A * Math.exp(-(xmx0*xmx0 + ymy0*ymy0)/(2*vxy*vxy) - zmz0*zmz0/(2*vz*vz)) + b);
 
@@ -165,44 +155,7 @@ public class GaussianFitter3D {
 
         if (n < 0) return 0;
 
-        if (n <= maxLogFactorialPrecalculated) {
-            return logFactorialLookups.getEntry(n);
-        }
-
-        synchronized (GaussianFitter3D.class) {
-
-            if (n > maxLogFactorialPrecalculated) {
-
-                if (n >= logFactorialLookups.getDimension()) {
-
-                    int sizeDiff = n+1 - logFactorialLookups.getDimension();
-
-                    RealVector toAppend = new ArrayRealVector(sizeDiff, 0.0);
-
-                    RealVector newLookups = logFactorialLookups.append(toAppend);
-
-                    logFactorialLookups = newLookups;
-
-                }
-
-                for (int i = maxLogFactorialPrecalculated + 1; i <= n; i++) {
-
-                    if (i == 0) {logFactorialLookups.setEntry(i, 0);} else {
-                        logFactorialLookups.setEntry(i, logFactorialLookups.getEntry(i-1) + Math.log(i));
-                    }
-                }
-
-                maxLogFactorialPrecalculated = n;
-
-
-            }
-
-            
-
-
-        }
-
-        return logFactorialLookups.getEntry(n);
+	return org.apache.commons.math3.special.Gamma.logGamma(n+1);
 
     }
 
