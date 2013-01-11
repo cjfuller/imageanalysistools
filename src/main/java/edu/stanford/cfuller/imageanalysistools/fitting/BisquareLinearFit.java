@@ -86,8 +86,10 @@ public class BisquareLinearFit {
 		if (! this.noIntercept) {
 		    norm_mult = 2.0;
 		}
+
+		int maxiter = 10000;
 		
-		while (lastParams.subtract(currParams).getNorm() > CONV_NORM*norm_mult) {
+		while (lastParams.subtract(currParams).getNorm() > CONV_NORM*norm_mult && c++ < maxiter) {
 
 
 			lastParams = currParams;
