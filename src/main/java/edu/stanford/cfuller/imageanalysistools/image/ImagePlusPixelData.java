@@ -184,7 +184,7 @@ public class ImagePlusPixelData extends WritablePixelData {
     * @param tIndex	  the t-dimension index of the plane being set (0-indexed)
     * @param plane    A byte array containing the new pixel data for the specified plane.
     */
-	public void setPlane(int zIndex, int cIndex, int tIndex, byte[] plane) {
+	public synchronized void setPlane(int zIndex, int cIndex, int tIndex, byte[] plane) {
 		
 		if (!(this.dimensionOrder.startsWith("XY") || this.dimensionOrder.startsWith("YX"))) {
             throw new UnsupportedOperationException("Setting a single plane as a byte array is not supported for images whose dimension order does not start with XY or YX."); 
@@ -364,7 +364,7 @@ public class ImagePlusPixelData extends WritablePixelData {
 		
 	}
 
-	public byte[] getPlane(int index) throws UnsupportedOperationException {
+	public synchronized byte[] getPlane(int index) throws UnsupportedOperationException {
 
 		//convert the index to xyczt ordering just in case the ImagePlus representation changes under the hood.
 		
@@ -399,7 +399,7 @@ public class ImagePlusPixelData extends WritablePixelData {
 	/* (non-Javadoc)
 	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#getPixel(int, int, int, int, int)
 	 */
-	public float getPixel(int x, int y, int z, int c, int t) {
+	public synchronized float getPixel(int x, int y, int z, int c, int t) {
 		int requestedStackIndex = this.imPl.getStackIndex(c+1, z+1, t+1); //planes are 1-indexed in ImagePlus
 		if (requestedStackIndex != this.currentStackIndex) {
 			this.imPl.setSliceWithoutUpdate(requestedStackIndex);
@@ -413,7 +413,7 @@ public class ImagePlusPixelData extends WritablePixelData {
 	/* (non-Javadoc)
 	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#setPixel(int, int, int, int, int, float)
 	 */
-	public void setPixel(int x, int y, int z, int c, int t, float value) {
+	public synchronized void setPixel(int x, int y, int z, int c, int t, float value) {
 		int requestedStackIndex = this.imPl.getStackIndex(c+1, z+1, t+1); //planes are 1-indexed in ImagePlus
 		if (requestedStackIndex != this.currentStackIndex) {
 			this.imPl.setSliceWithoutUpdate(requestedStackIndex);
