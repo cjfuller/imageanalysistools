@@ -28,8 +28,6 @@ package edu.stanford.cfuller.imageanalysistools.fitting;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.RealVector;
-import org.apache.commons.math3.util.ArithmeticUtils;
-import java.lang.Math;
 
 import org.apache.commons.math3.optimization.direct.SimplexOptimizer;
 import org.apache.commons.math3.optimization.direct.NelderMeadSimplex;
