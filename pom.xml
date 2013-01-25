@@ -20,7 +20,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
-  <version>5.1.2</version>
+  <version>5.1.3_dev</version>
 
   <dependencies>
     <dependency>
