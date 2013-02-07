@@ -234,7 +234,7 @@ public class LocalAnalysis {
 
 		am.validateInputImages(true);
 
-        if (am.getInputParameters().hasKeyAndTrue("multi_wavelength_file")) {
+		if ((!am.getInputParameters().hasKey("multi_wavelength_file")) || am.getInputParameters().getBooleanValueForKey("multi_wavelength_file")) {
 			ImageSet split = loadSplitMutliwavelengthImages(am.getInputImages());
 			am.getInputImages().disposeImages();
 			am.setInputImages(split);
