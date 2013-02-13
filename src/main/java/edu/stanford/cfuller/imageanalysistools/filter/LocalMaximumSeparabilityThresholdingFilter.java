@@ -1,6 +1,6 @@
 /* ***** BEGIN LICENSE BLOCK *****
  * 
- * Copyright (c) 2011 Colin J. Fuller
+ * Copyright (c) 2013 Colin J. Fuller
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -110,7 +110,6 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 			if (increment < 1) increment = 1;
 		}
 		
-		
 		for (int k= h.getMinValue(); k < h.getMaxValue() + 1; k+= increment) {
 			
 			if (k==0) continue;
@@ -177,12 +176,9 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 			
 			if (eta_v.getEntry(c) > eta_v.getEntry(lastEntryNotEqual) && eta_v.getEntry(c) > eta_v.getEntry(nextEntryNotEqual)) {
 										
-				if (eta_v.getEntry(c) > 0.5*best_eta) { //require that we're close to the best
 				
-					maxima.add(k);
-					
-				}
-				
+			    maxima.add(k);
+									
 			}
 			
 			c++;
@@ -198,15 +194,59 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 		int position1 = h.getMaxValue();
 		
 		if (maxima.size() > 1) {
+
+		    double best_max = 0;
+		    double second_best_max = 0;
+
+		    int best_pos = 0;
+		    int second_best_pos = 0;
+
+		    for (Integer k : maxima) {
+
+			int ck = c_by_k.get(k);
+
+			double eta_k = eta_v.getEntry(ck);
+
+			if (eta_k > best_max) {
+
+			    second_best_max = best_max;
+			    second_best_pos = best_pos;
+			    
+			    best_max = eta_k;
+			    best_pos = ck;
+
+			} else if (eta_k > second_best_max) {
+			    
+			    second_best_max = eta_k;
+			    second_best_pos = ck;
+
+			}
+
+
+		    }
+
 			
-			position0 = c_by_k.get(maxima.get(0));
-			position1 = c_by_k.get(maxima.get(maxima.size() - 1));
+		    position0 = best_pos;
+
+		    position1 = second_best_pos;
+
+
 			
 		} else {
 			
 			position0 = c_by_k.get(maxima.get(0));
 			position1 = (eta_v.getDimension() - position0)/2 + position0;
 			
+		}
+
+		//make sure that position 1 is larger than position 0
+
+		if (position1 < position0) {
+		 
+		    int temp = position0;
+		    position0 = position1;
+		    position1 = temp;
+   
 		}
 		
 		double s = (position1 - position0)/4.0;
@@ -228,15 +268,15 @@ public class LocalMaximumSeparabilityThresholdingFilter extends Filter {
 		RealVector result = nmm.optimize(dgof, parameters);
 				
 		best_index = (int) result.getEntry(4);
-		
+
 		if (k_by_c.containsKey(best_index)) {
 			best_index = k_by_c.get(best_index);
 		} else {
 			//fall back to the normal global maximum if the fitting seems to have found an invalid value.
 			best_index = orig_method_best_index;
-			System.out.println("falling back to thresholding at: " + best_index);
 		
-		}	
+		}
+	
 		thresholdValue = best_index;
 		
 		if (thresholdValue == Integer.MAX_VALUE) {
