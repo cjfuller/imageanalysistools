@@ -280,6 +280,28 @@ public class Histogram implements Serializable {
      */
 	public double getVarianceNonzero() {return this.varianceNonzero;}
 	
+
+	/**
+	 * Gets a string representation of the histogram: a comma-separated list of ordered pairs
+	 * in the format (value, count).
+	 *
+	 * @return The string representation.
+	 */
+	public String toString() {
+
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < this.getMaxValue(); i++) {
+			if (sb.length() > 0) {
+				sb.append(",");
+			}
+			sb.append("(" + i + "," + this.getCounts(i) + ")");
+		}
+
+		return sb.toString();
+
+	}
+
 	
 	
 }
