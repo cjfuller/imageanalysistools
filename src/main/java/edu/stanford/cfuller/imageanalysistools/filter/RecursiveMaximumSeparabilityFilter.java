@@ -237,9 +237,10 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
 			this.numRecs += 1;
 			
 			if (divided && this.numRecs < MAX_RECURSIONS) {
-				lf.apply(im);
 				doRecursion = true;
 			}
+
+			lf.apply(im);
 			
 		}
 		
