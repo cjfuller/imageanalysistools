@@ -52,11 +52,23 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
  */
 public class RecursiveMaximumSeparabilityFilter extends Filter {
 
-	final int MAX_RECURSIONS = 1;
+	//Required parameters
+
+	final String MAX_SIZE_P = "max_size";
+	final String MIN_SIZE_P = "min_size";
+	
+	//Optional parameters
+
+	final String MAX_REC_P = "max_thresh_recursions";
+
+
+	final int DEFAULT_MAX_RECURSIONS = 1;
 	int numRecs;
+	int maxRecursions;
 	
 	public RecursiveMaximumSeparabilityFilter() {
 		this.numRecs = 0;
+		this.maxRecursions = DEFAULT_MAX_RECURSIONS;
 	}
 
     /**
@@ -70,7 +82,7 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
         Image originalImageReference = this.referenceImage;
 
         this.referenceImage = ImageFactory.createWritable(this.referenceImage); // to save having to allocate an Image at every step, this
-                                                                // overwrites the reference Image, so make a copy
+                                                                				// overwrites the reference Image, so make a copy
 		boolean doRecursion = true;
 		
 		WritableImage maskBuffer = ImageFactory.createWritable(im.getDimensionSizes(), 0.0f);
@@ -90,18 +102,22 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
 		int areaMax = -1;
 		
 		if (this.params != null) {
-			areaMin = Integer.parseInt(this.params.getValueForKey("min_size"));
-			areaMax = Integer.parseInt(this.params.getValueForKey("max_size"));
+			areaMin = Integer.parseInt(this.params.getValueForKey(MIN_SIZE_P));
+			areaMax = Integer.parseInt(this.params.getValueForKey(MAX_SIZE_P));
+
+			if (this.params.hasKey(MAX_REC_P)) {
+				this.maxRecursions = this.params.getIntValueForKey(MAX_REC_P);
+			}
 		}
 		
 		if (areaMin < 0) {
 			areaMin = 25; //orig 25, 5000 for HeLa cells, 5 for centromeres
 			areaMax = 1000; //orig 1000, 100000 for HeLa cells, 50 for centromeres
 		}
+
+
 		
-		
-		
-		while(doRecursion && this.numRecs < MAX_RECURSIONS) {
+		while(doRecursion && this.numRecs < this.maxRecursions) {
 			
 			doRecursion = false;
 			
@@ -236,7 +252,7 @@ public class RecursiveMaximumSeparabilityFilter extends Filter {
 			
 			this.numRecs += 1;
 			
-			if (divided && this.numRecs < MAX_RECURSIONS) {
+			if (divided && this.numRecs < this.maxRecursions) {
 				doRecursion = true;
 			}
 
