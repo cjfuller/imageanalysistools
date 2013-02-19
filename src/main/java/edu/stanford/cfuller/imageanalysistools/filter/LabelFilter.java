@@ -64,7 +64,7 @@ public class LabelFilter extends Filter {
 		
 		for (ImageCoordinate i : im) {
 			
-			if (Math.floor(im.getValue(i)) > 0) {
+			if (im.getValue(i) > 0) {
 				
 				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
 				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
@@ -114,47 +114,56 @@ public class LabelFilter extends Filter {
 		}
 		
 		for (ImageCoordinate i : im) {
+
 			int currValue = (int) preliminaryLabeledImage.getValue(i);
+			
 			if (currValue > 0) {
 				
-				int mappedCurrValue = currValue;
-				
-				while(mappedCurrValue != labelMapping[currValue]) {
-					mappedCurrValue = labelMapping[currValue];
-				}
+				int mappedCurrValue = mapCurrentValue(currValue, labelMapping);
 				
 				
 				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
 				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
+				mappedCurrValue = mapCurrentValue(currValue, labelMapping);
 				
 				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
 				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
-				
+				mappedCurrValue = mapCurrentValue(currValue, labelMapping);
+	
 				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)-1);
 				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
-				
+				mappedCurrValue = mapCurrentValue(currValue, labelMapping);
+
 				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
 				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y));
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
+				mappedCurrValue = mapCurrentValue(currValue, labelMapping);
+
 				
 				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
 				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
+				mappedCurrValue = mapCurrentValue(currValue, labelMapping);
+
 				
 				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+1);
 				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
+				mappedCurrValue = mapCurrentValue(currValue, labelMapping);
+
 				
 				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
 				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)-1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
+				mappedCurrValue = mapCurrentValue(currValue, labelMapping);
 				
 				ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X));
 				ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+1);
 				mapRegions(currValue, mappedCurrValue, labelMapping, preliminaryLabeledImage, ic);
+				mappedCurrValue = mapCurrentValue(currValue, labelMapping);
 				
 			}
 		}
@@ -163,7 +172,7 @@ public class LabelFilter extends Filter {
 		
 		for (int i = 0; i < labelCounter; i++) {
 			int currLabel = i;
-			while(currLabel != labelMapping[currLabel]) currLabel = labelMapping[currLabel];
+			currLabel = mapCurrentValue(currLabel, labelMapping);
 			finalLabelMapping[i] = currLabel;
 		}
 		
@@ -182,15 +191,47 @@ public class LabelFilter extends Filter {
 			preliminaryLabeledImage.setValue(i, preliminaryLabeledImage.getValue(ic));
 		}
 	}
+
+	private int mapCurrentValue(int currValue, int[] labelMapping) {
+
+		int mappedCurrValue = currValue;
+				
+		while(mappedCurrValue != labelMapping[mappedCurrValue]) {
+			mappedCurrValue = labelMapping[mappedCurrValue];
+		}
+
+		return mappedCurrValue;
+
+	}
+
+	private void printMapping(int[] mapping) {
+
+		String sep = " -> ";
+
+		for (int i = 0; i < mapping.length; i++) {
+
+			int currValue = i;
+
+			while (mapping[currValue] != currValue) {
+				System.out.print(currValue);
+				System.out.print(sep);
+				currValue = mapping[currValue];
+			}
+
+			System.out.println(currValue);
+
+		}
+
+	}
 	
 	private void mapRegions(int currValue, int mappedCurrValue, int[] labelMapping, Image preliminaryLabeledImage, ImageCoordinate ic) {
 		if (preliminaryLabeledImage.inBounds(ic) && preliminaryLabeledImage.getValue(ic) > 0) {
+
 			int otherValue = (int) preliminaryLabeledImage.getValue(ic);
 			
 			if (otherValue != currValue && otherValue != mappedCurrValue) {
-				while (otherValue != labelMapping[otherValue]) {
-					otherValue = labelMapping[otherValue];
-				}
+				
+				otherValue = mapCurrentValue(otherValue, labelMapping);
 				
 				if (otherValue != mappedCurrValue) {
 					if (otherValue < mappedCurrValue) {
