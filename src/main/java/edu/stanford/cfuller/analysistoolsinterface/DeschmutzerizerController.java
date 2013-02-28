@@ -30,10 +30,13 @@ import edu.stanford.cfuller.imageanalysistools.image.Image;
 import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
 import edu.stanford.cfuller.imageanalysistools.image.ImageFactory;
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 import edu.stanford.cfuller.imageanalysistools.image.io.ImageReader;
 import edu.stanford.cfuller.imageanalysistools.metric.Measurement;
 import edu.stanford.cfuller.imageanalysistools.metric.Quantification;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadata;
+import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataParserFactory;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
 import ij.gui.Roi;
@@ -440,19 +443,23 @@ public class DeschmutzerizerController extends TaskController {
 			return;
 		}
 		
+
+		AnalysisMetadata am = AnalysisMetadataParserFactory.createParserForFile(parametersFilename).parseFileToAnalysisMetadata(parametersFilename);
 		
 
-		ParameterDictionary p = ParameterDictionary.readParametersFromFile(parametersFilename);
+		ParameterDictionary p = am.getOutputParameters();
 
 		this.currentParameters = p;
 		this.currentParametersFilename = parametersFilename;
 
-		String maskFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("mask_output_filename");
+		ImageSet outputImages = am.getOutputImages();
+
+		String maskFilename = outputImages.getImageNameForIndex(0);
 
 		this.currentMaskFilename = maskFilename;
 		this.currentLabeledMaskFilename = maskFilename;
-		if (p.hasKey("secondary_mask_output_filename")) {
-			this.currentLabeledMaskFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("secondary_mask_output_filename");
+		if (outputImages.size() > 1) {
+			this.currentLabeledMaskFilename = outputImages.getImageNameForIndex(outputImages.size() - 1);
 		}
 		this.currentDataFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("data_output_filename");
 
@@ -462,14 +469,15 @@ public class DeschmutzerizerController extends TaskController {
 	}
 
 	private String getOutputFilename(String inputFilename) {
+
 		File inputFile = new File(inputFilename);
 
 		String outputFilename = inputFile.getParent() + File.separator + OUTPUT_DIR + File.separator + inputFile.getName();
 		return outputFilename;
+
 	}
 
 	private void processNextImage() {
-
 
 		this.selectedRegions.clear();
 
@@ -510,11 +518,11 @@ public class DeschmutzerizerController extends TaskController {
 			}
 			
 		} catch (java.io.IOException e) {
-			LoggingUtilities.warning("encountered exception while reading " + nextToProcess + ".  Continuing.");
+			LoggingUtilities.warning("encountered exception while reading " + nextToProcess + ".  Continuing. " + e.getMessage());
 			this.processNextImage();
 			return;
 		} catch (IllegalArgumentException e) {
-			LoggingUtilities.warning("encountered exception while reading " + nextToProcess + ".  Continuing.");
+			LoggingUtilities.warning("encountered exception while reading " + nextToProcess + ".  Continuing. " + e.getMessage());
 			this.processNextImage();
 			return;
 		}
