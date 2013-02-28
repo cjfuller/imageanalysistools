@@ -25,6 +25,8 @@
 package edu.stanford.cfuller.imageanalysistools.method;
 
 import java.util.List;
+import java.util.HashMap;
+import java.util.PriorityQueue;
 
 import edu.stanford.cfuller.imageanalysistools.filter.*;
 import edu.stanford.cfuller.imageanalysistools.method.Method;
@@ -65,6 +67,8 @@ import edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric;
 
 
 public class CentromereFindingMethod extends Method {
+
+	final String BKG_NUM_PT_PARAM = "bkg_num_points";
 
 	Metric metric;
 
@@ -311,28 +315,147 @@ public class CentromereFindingMethod extends Method {
 
 	}
 
+	protected HashMap<Float, float[]> calculateRegionCentroids(Image mask) {
 
-	protected WritableImage doBackgroundSubtraction(Image groupMask, Image allCentromeres) {
+		HashMap<Float, float[]> centroids = new HashMap<Float, float[]>();
+
+		Histogram h = new Histogram(mask);
+
+		for (ImageCoordinate ic : mask) {
+
+			float value = mask.getValue(ic);
+			if (! (value > 0.0)) { continue; }
+
+			if (! centroids.containsKey(value)) {
+				float[] zeros = new float[2];
+				zeros[0] = 0.0f;
+				zeros[1] = 0.0f;
+				centroids.put(value, zeros);
+			}
+
+			float[] currCen = centroids.get(value);
+
+			currCen[0] += ic.get(ImageCoordinate.X)/h.getCounts((int) value);
+			currCen[1] += ic.get(ImageCoordinate.Y)/h.getCounts((int) value);
+
+		}
+
+		return centroids;
+
+	}
+
+
+	protected void doCentromereBasedBackgroundSubtraction(WritableImage backgroundMask, WritableImage groupMask) {
+
+		int n_points = 3;
+
+		if (this.parameters.hasKey(BKG_NUM_PT_PARAM)) {
+			n_points = this.parameters.getIntValueForKey(BKG_NUM_PT_PARAM);
+		}
+
+		HashMap<Float, float[]> centroids = this.calculateRegionCentroids(backgroundMask);
+
+		float maxValue = 0.0f;
+		float minValue = Float.MAX_VALUE;
+
+		final float DESIRED_RANGE = 4095.0f;
+
+		for (ImageCoordinate ic : backgroundMask) {
+
+			float value = 0.0f;
+
+			PriorityQueue<Float> pq = new PriorityQueue<Float>(n_points+1,
+				new java.util.Comparator<Float>() {
+					public int compare(Float o1, Float o2) {
+						if (o1 < o2) return 1;
+						if (o1 == o2) return 0;
+						return -1;
+					}
+				}
+
+				);
+
+
+			for (Float k : centroids.keySet()) {
+
+				float[] v = centroids.get(k);
+
+				float dist = (float) Math.hypot(v[0] - ic.get(ImageCoordinate.X), v[1] - ic.get(ImageCoordinate.Y));
+
+				if (pq.peek() == null || dist < pq.peek() || pq.size() < n_points) {
+					pq.add(dist);
+				}
+
+				if (pq.size() > n_points) {
+					pq.poll();
+				}
+
+			}
+
+			Float[] firstN = pq.toArray(new Float[1]);
+			
+			float sum = 0.0f;
+
+			for (Float f : firstN) {
+				sum += f;
+			}
+
+			value = n_points / sum;
+
+			if (value < minValue) {
+				minValue = value;
+			}
+
+			if (value > maxValue) {
+				maxValue = value;
+			}
+
+			backgroundMask.setValue(ic, value);
+
+		}
+
+		for (ImageCoordinate ic : backgroundMask) {
+			float newValue = (backgroundMask.getValue(ic) - minValue)/(maxValue - minValue) * DESIRED_RANGE;
+			backgroundMask.setValue(ic, newValue);
+		}
+
+		MaximumSeparabilityThresholdingFilter mstf = new MaximumSeparabilityThresholdingFilter();
+
+		mstf.apply(backgroundMask);
+
+		for (ImageCoordinate ic : backgroundMask) {
+
+			if (backgroundMask.getValue(ic) > 0) {
+				backgroundMask.setValue(ic, 1.0f);
+			}
+
+			if (groupMask.getValue(ic) > 0) {
+				groupMask.setValue(ic, 1.0f);
+			}
+		}
+
+
+	}
+
+	protected WritableImage doBackgroundSubtraction(WritableImage groupMask, Image allCentromeres) {
 
 		WritableImage backgroundMask = ImageFactory.createWritable(groupMask);
 
-		ConvexHullByLabelFilter chblf = new ConvexHullByLabelFilter();
+		if (this.parameters.hasKeyAndTrue("use_clustering")) {
 
-		chblf.setReferenceImage(allCentromeres);
-		chblf.apply(backgroundMask);
+			ConvexHullByLabelFilter chblf = new ConvexHullByLabelFilter();
+
+			chblf.setReferenceImage(allCentromeres);
+			chblf.apply(backgroundMask);
+
+		} else {
+
+			doCentromereBasedBackgroundSubtraction(backgroundMask, groupMask);
+
+		}
 
 		for (ImageCoordinate c : backgroundMask) {
 			if (allCentromeres.getValue(c) > 0) backgroundMask.setValue(c, 0);
-		}
-
-		if (this.parameters.hasKeyAndTrue("use_clustering")) {
-
-			BackgroundEstimationFilter BEF = new BackgroundEstimationFilter();
-
-			BEF.setReferenceImage(this.images.get(0));
-
-			BEF.apply(backgroundMask);
-
 		}
 
 		return backgroundMask;
@@ -348,13 +471,7 @@ public class CentromereFindingMethod extends Method {
 			return;
 		}
 
-		Quantification backgroundResult = null;
-
-		if (this.parameters.hasKeyAndTrue("use_clustering")) {
-
-			backgroundResult = metric.quantify(backgroundMask, this.imageSet);
-
-		}
+		Quantification backgroundResult = metric.quantify(backgroundMask, this.imageSet);
 
 		if (backgroundResult == null) { // either not using clustering or the quantification failed due to no ROIs
 
@@ -434,23 +551,27 @@ public class CentromereFindingMethod extends Method {
 
 		this.doPostFiltering(groupMask, normalized);
 
+		RLF.apply(groupMask);
+
 		WritableImage allCentromeres = ImageFactory.createWritable(groupMask);
+
+		Image allCentromeresCopy = ImageFactory.create(allCentromeres);
+
+		this.storeImageOutput(allCentromeresCopy);
 
 		if (this.parameters.hasKeyAndTrue("use_clustering")) {
 
 			this.doClustering(groupMask, allCentromeres, normalized);
 
+			RLF.apply(groupMask);
+
+			this.storeImageOutput(groupMask);
+
 		}
-
-		RLF.apply(groupMask);
-
-		this.storeImageOutput(groupMask);
-
-		Image allCentromeresCopy = ImageFactory.create(allCentromeres);
-
-		this.storeImageOutput(allCentromeresCopy);
-		
+	
 		WritableImage backgroundMask = this.doBackgroundSubtraction(groupMask, allCentromeres);
+
+		this.storeImageOutput(backgroundMask);
 
 		this.generateOutput(groupMask, allCentromeres, backgroundMask);
 		
