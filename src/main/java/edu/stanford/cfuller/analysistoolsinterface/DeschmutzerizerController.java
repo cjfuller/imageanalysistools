@@ -339,7 +339,6 @@ public class DeschmutzerizerController extends TaskController {
 		String outputDataFilename = this.getOutputFilename(this.currentDataFilename);
 		this.createOutputDirectory(outputDataFilename);
 
-
 		try {
 			BufferedReader input = new BufferedReader(new FileReader(this.currentDataFilename));
 
@@ -374,7 +373,8 @@ public class DeschmutzerizerController extends TaskController {
 			output.close();
 			
 			File data = new File(this.currentDataFilename);
-			
+
+
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(data.getParent() + File.separator + AnalysisController.SERIALIZED_DATA_SUFFIX + File.separator + data.getName()));
 			
 			Quantification q = (Quantification) ois.readObject();
@@ -461,7 +461,7 @@ public class DeschmutzerizerController extends TaskController {
 		if (outputImages.size() > 1) {
 			this.currentLabeledMaskFilename = outputImages.getImageNameForIndex(outputImages.size() - 1);
 		}
-		this.currentDataFilename = nextToProcessFile.getParent() + File.separator + p.getValueForKey("data_output_filename");
+		this.currentDataFilename = am.getOutputFiles().get(0);
 
 		this.lastParametersProcessed = parametersFilename;
 		this.lastDataFilenameProcessed = this.currentDataFilename;
