@@ -208,6 +208,8 @@ public class LocalAnalysis {
         Method methodToRun = Method.loadMethod(params.getValueForKey("method_name"));
 
 		am.setMethod(methodToRun);
+
+        am.getOutputFiles().clear(); // Need to clear out any previous output from the analysis metadata file.
 		
 		methodToRun.setAnalysisMetadata(am);
 

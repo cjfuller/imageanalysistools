@@ -39,6 +39,7 @@ import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictiona
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.LegacyParameterXMLParser;
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterType;
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet;
 
 
 /**
@@ -246,6 +247,8 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 				
 				NodeList allImages = imagesNode.getChildNodes();
 				
+				ImageSet images = new ImageSet(meta.getInputParameters());
+
 				for (int i = 0; i < allImages.getLength(); i++) {
 					
 					Node im = allImages.item(i);
@@ -258,13 +261,111 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 					String hashAlgorithm = nnm.getNamedItem(ATTR_HASH_ALG).getNodeValue();
 					String hash = nnm.getNamedItem(ATTR_HASH).getNodeValue();
 					
+					images.addImageWithFilename(filename);
+
 					meta.setInputImageHash(filename, hashAlgorithm, hash);
 					
 				}	
+
+				meta.setInputImages(images);
+
 			}
 			
 		}
 				
+	}
+
+	private void loadOutputImageInformation(Document metaDoc, AnalysisMetadata meta) {
+
+		NodeList outputStateList = metaDoc.getElementsByTagName(TAG_OUTPUT_STATE);
+
+		if (outputStateList.getLength() > 0) {
+			
+			Node outputState = outputStateList.item(0); // only one input state allowed
+			
+			NodeList children = outputState.getChildNodes();
+			
+			Node imagesNode = null;
+			
+			for (int i = 0; i < children.getLength(); i++) {
+				Node child = children.item(i);
+				if (child.getNodeName().equals(TAG_IMAGES)) {
+					imagesNode = child;
+					break;
+				}
+			}
+			
+			if (imagesNode != null) {
+				
+				NodeList allImages = imagesNode.getChildNodes();
+				
+				ImageSet images = new ImageSet(meta.getOutputParameters());
+
+				for (int i = 0; i < allImages.getLength(); i++) {
+					
+					Node im = allImages.item(i);
+					
+					if (! im.getNodeName().equals(TAG_IMAGE)) continue;
+					
+					NamedNodeMap nnm = im.getAttributes();
+			        
+					String filename = nnm.getNamedItem(ATTR_FILENAME).getNodeValue();
+
+					
+					images.addImageWithFilename(filename);
+					
+				}	
+
+				meta.setOutputImages(images);
+
+			}
+			
+		}
+
+	}
+
+	private void loadNonImageOutputInformation(Document metaDoc, AnalysisMetadata meta) {
+
+		NodeList outputStateList = metaDoc.getElementsByTagName(TAG_OUTPUT_STATE);
+
+		if (outputStateList.getLength() > 0) {
+			
+			Node outputState = outputStateList.item(0); // only one input state allowed
+			
+			NodeList children = outputState.getChildNodes();
+			
+			Node quantNode = null;
+			
+			for (int i = 0; i < children.getLength(); i++) {
+				Node child = children.item(i);
+				if (child.getNodeName().equals(TAG_QUANT)) {
+					quantNode = child;
+					break;
+				}
+			}
+		
+			if (quantNode != null) {
+				
+				NodeList allQuant = quantNode.getChildNodes();
+				
+				for (int i = 0; i < allQuant.getLength(); i++) {
+					
+					Node im = allQuant.item(i);
+					
+					if (! im.getNodeName().equals(TAG_DATAFILE)) continue;
+					
+					NamedNodeMap nnm = im.getAttributes();
+
+					String filename = nnm.getNamedItem(ATTR_FILENAME).getNodeValue();
+					
+					meta.addOutputFile(filename);
+				
+				}	
+
+			}
+			
+		}
+
 	}
 	
 	private void loadPreviousAnalysisData(Document metaDoc, AnalysisMetadata meta) {
@@ -288,7 +389,9 @@ public class AnalysisMetadataXMLParser extends AnalysisMetadataParser {
 				}
 			}
 		
-			
+			loadOutputImageInformation(metaDoc, meta);
+			loadNonImageOutputInformation(metaDoc, meta);
+
 		}
 		
 	}
