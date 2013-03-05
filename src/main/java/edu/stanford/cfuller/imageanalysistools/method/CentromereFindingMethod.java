@@ -429,9 +429,6 @@ public class CentromereFindingMethod extends Method {
 				backgroundMask.setValue(ic, 1.0f);
 			}
 
-			if (groupMask.getValue(ic) > 0) {
-				groupMask.setValue(ic, 1.0f);
-			}
 		}
 
 
@@ -501,7 +498,15 @@ public class CentromereFindingMethod extends Method {
 
 			fullResult.addMeasurement(new Measurement(true, i+1, resultMap[i], "cell_id", Measurement.TYPE_GROUPING, this.imageSet.getMarkerImageName()));
 
-			List<Measurement> background = backgroundResult.getAllMeasurementsForRegion(resultMap[i]);
+			int regionToLookup = resultMap[i];
+
+			if (backgroundResult.getAllRegions().size() == 1) { // only a single background value applied per image
+
+				regionToLookup = 1;
+
+			}
+
+			List<Measurement> background = backgroundResult.getAllMeasurementsForRegion(regionToLookup);
 
 			for (Measurement m : background) {
 
@@ -567,8 +572,9 @@ public class CentromereFindingMethod extends Method {
 
 			this.storeImageOutput(groupMask);
 
+
 		}
-	
+
 		WritableImage backgroundMask = this.doBackgroundSubtraction(groupMask, allCentromeres);
 
 		this.storeImageOutput(backgroundMask);
