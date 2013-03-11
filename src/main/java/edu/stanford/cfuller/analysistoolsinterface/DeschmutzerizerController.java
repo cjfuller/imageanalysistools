@@ -458,9 +458,10 @@ public class DeschmutzerizerController extends TaskController {
 
 		this.currentMaskFilename = maskFilename;
 		this.currentLabeledMaskFilename = maskFilename;
-		if (outputImages.size() > 1) {
-			this.currentLabeledMaskFilename = outputImages.getImageNameForIndex(outputImages.size() - 1);
-		}
+		//temporarily disabling selection by cell due to bugs with the background subtraction masks
+		// if (outputImages.size() > 1) {
+		// 	this.currentLabeledMaskFilename = outputImages.getImageNameForIndex(1);
+		// }
 		this.currentDataFilename = am.getOutputFiles().get(0);
 
 		this.lastParametersProcessed = parametersFilename;
