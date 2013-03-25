@@ -20,48 +20,17 @@
 # SOFTWARE.
 #++
 
-require 'spec_helper'
+RSpec::Matchers.define :be_located_at do |expected|
 
-import Java::edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
+	match do |actual|
 
-describe ImageCoordinate do 
+		matches = true
 
-	before :each do
-		@coord = ImageCoordinate.createCoordXYZCT(0,0,0,0,0)
-		@dims = [ImageCoordinate::X, ImageCoordinate::Y, ImageCoordinate::Z, ImageCoordinate::C, ImageCoordinate::T]
-		@other_coord = ImageCoordinate.createCoordXYZCT(1,2,3,4,5)
-	end
+		expected.each { |c| matches &&= (actual.get(c) == expected.get(c)) }
+		actual.each { |c| matches &&= (actual.get(c) == expected.get(c)) }
 
-	def each_dim
-		@dims.each do |c|
-			yield c
-		end
-	end
+		matches
 
-	it "should provide get access to x,y,z,c,t dimensions" do
-		each_dim do |c|
-			@coord.get(c).should eq 0
-		end
-	end
-
-	it "should provide set access to x,y,z,c,t dimensions" do 
-		each_dim do |c|
-			@coord.set(c, 1)
-		end
-
-		each_dim do |c|
-			@coord.get(c).should eq 1
-		end
-	end
-
-	it "should be able to clone another coordinate" do
-		cloned = ImageCoordinate.cloneCoord(@other_coord)
-		cloned.should be_located_at @other_coord
-	end
-
-	it "should be able to copy another coordinate into itself" do
-		@coord.setCoord(@other_coord)
-		@coord.should be_located_at @other_coord
 	end
 
 end
