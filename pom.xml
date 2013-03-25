@@ -169,6 +169,16 @@
 				<artifactId>rspec-maven-plugin</artifactId>
 				<version>1.0.0-beta</version>
 				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<specSourceDirectory>src/test/spec</specSourceDirectory>
+				</configuration>
 			</plugin>
 
 		</plugins>
