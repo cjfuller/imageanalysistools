@@ -20,4 +20,92 @@
 # SOFTWARE.
 #++
 
+require 'digest'
+require 'open-uri'
+require 'tempfile'
+
 Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f}
+
+PLANAR_IMAGE_URL = "https://s3-us-west-1.amazonaws.com/imageanalysistools/planar_test_image.ome.tif"
+
+PLANAR_MASK_URL = "https://s3-us-west-1.amazonaws.com/imageanalysistools/planar_test_mask.ome.tif"
+
+
+def filter_list_2d
+
+	filters = []
+
+	Dir[File.dirname(__FILE__) + "/../../main/java/edu/stanford/cfuller/imageanalysistools/filter/*Filter.java"].each do |f|
+
+		unless /3D/.match(f) or /filter\/Filter.java/.match(f) then
+
+			filters << File.basename(f).gsub(".java", "")
+
+		end
+
+	end
+
+	filters
+
+end
+
+
+def read_image_from_url(url)
+
+	data = nil
+	im = nil
+
+	open(url) do |f|
+		data = f.read
+	end
+
+	tf = Tempfile.new('url_image_reader')
+
+	begin
+
+		tf.write(data)
+		im = Java::edu.stanford.cfuller.imageanalysistools.image.io.ImageReader.new.read(tf.path)
+
+	ensure
+
+		tf.close
+		tf.unlink
+
+	end
+
+	im
+
+end
+
+
+def hash_image_content(im)
+
+	dims = im.getDimensionSizes
+
+	total_pixels = dims.reduce(1) { |a,e| a * dims.get(e) }
+
+	all_pixels = Array.new(total_pixels + dims.getDimension , 0.0)
+
+	dims.each_with_index { |d, i| all_pixels[i] = dims.get(d) }
+
+	counter = dims.getDimension
+
+	im.each do |ic|
+
+		all_pixels[counter] = im.getValue(ic)
+		counter += 1
+
+	end
+
+	byte_str = all_pixels.pack("g*")
+
+	digest = Digest::SHA2.new
+
+	digest << byte_str
+
+	Digest.hexencode(digest.digest)
+
+end
+
+
+
