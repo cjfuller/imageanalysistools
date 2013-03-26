@@ -101,31 +101,106 @@ public class VoronoiFilter extends Filter {
 			orderedCentroids.add(regionCentroids.get(i));
 		}
 
-		
-		VoronoiDiagram vd = new VoronoiDiagram(orderedCentroids);
-		
-		
-		for (ImageCoordinate ic : im) {
-			
-			Vector2D point2d = new Vector2D(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y));
-			
-			int regionIndex = vd.getRegionNumber(point2d);
-			
-			im.setValue(ic, regionIndex);
-			
+		WritableImage regionCentroidsIm = ImageFactory.createWritable(im.getDimensionSizes(), 0.0f);
+
+		WritableImage diagram = ImageFactory.createWritable(im.getDimensionSizes(), 1.0f);
+
+		ImageCoordinate cenTemp = ImageCoordinate.createCoordXYZCT(0,0,0,0,0);
+
+		for (Integer i : regions) {
+
+			Vector2D cen = regionCentroids.get(i);
+
+			cenTemp.set(ImageCoordinate.X, (int) cen.getX());
+			cenTemp.set(ImageCoordinate.Y, (int) cen.getY());
+
+			regionCentroidsIm.setValue(cenTemp, i);
+
 		}
-		
-		Image noBoundaries = ImageFactory.create(im);
-		
-		for (ImageCoordinate ic : im) {
-			if (isOnEightConnectedBoundary(ic, noBoundaries)) {
-				im.setValue(ic, 0);
+
+		cenTemp.recycle();
+
+		for (ImageCoordinate ic : diagram) {
+
+			if (isOnEightConnectedBoundary(orderedCentroids, ic)) {
+
+				diagram.setValue(ic, 0.0f);
+
 			}
+
 		}
-		
+
+		LabelFilter lf = new LabelFilter();
+		OneToOneLabelBySeedFilter oolbsf = new OneToOneLabelBySeedFilter();
+
+		lf.apply(diagram);
+
+		oolbsf.setReferenceImage(regionCentroidsIm);
+
+		oolbsf.apply(diagram);
+
+		im.copy(diagram);
 		
 	}
+
+	/**
+	* Checks whether a given coordinate would be on a boundary of a 
+	* Voronoi diagram created from the given points.
+	*
+	**/
+	public boolean isOnEightConnectedBoundary(java.util.List<Vector2D> points, ImageCoordinate ic) {
+
+		int x = ic.get(ImageCoordinate.X);
+		int y = ic.get(ImageCoordinate.Y);
+
+		int closestIndex = 0;
+		int nextIndex = 0;
+		double closestDist = Double.MAX_VALUE;
+		double nextDist = Double.MAX_VALUE;
+
+		for (int i = 0; i < points.size(); i++) {
+
+			Vector2D pt = points.get(i);
+
+			double dist = Math.hypot(pt.getX() - x, pt.getY() - y);
+
+			if (dist < closestDist) {
+
+				nextDist = closestDist;
+				nextIndex = closestIndex;
+				closestDist = dist;
+				closestIndex = i;
+
+			} else if (dist < nextDist) {
+				nextDist = dist;
+				nextIndex = i;
+			}
+
+		}
+
+		Vector2D projectedCoordinate = this.projectPointOntoVector(points.get(closestIndex), new Vector2D(x, y), points.get(nextIndex));
+
+		double distToNext = points.get(nextIndex).subtract(projectedCoordinate).getNorm();
+
+		double distToClosest = points.get(closestIndex).subtract(projectedCoordinate).getNorm();
+
+		final double cutoff = 1.3*Math.sqrt(2);
+
+		if (distToNext - distToClosest < cutoff) {
+			return true;
+		}
+
+		return false;
+
+	}
 	
+	protected Vector2D projectPointOntoVector(Vector2D origin, Vector2D pointToProject, Vector2D pointOnVector) {
+		Vector2D onto = pointOnVector.subtract(origin).normalize();
+		Vector2D toProj = pointToProject.subtract(origin);
+		Vector2D projected = origin.add(onto.scalarMultiply(onto.dotProduct(toProj)));
+		return projected;
+	}
+
 	private boolean isOnEightConnectedBoundary(ImageCoordinate ic, Image noBoundaryLabels) {
 		
 		ImageCoordinate icClone = ImageCoordinate.cloneCoord(ic);
