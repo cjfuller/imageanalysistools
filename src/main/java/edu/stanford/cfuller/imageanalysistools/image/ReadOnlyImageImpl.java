@@ -164,9 +164,8 @@ public class ReadOnlyImageImpl implements Image {
 		this.coordinateArrayStorage = null;
 		this.dimensionSizes = ImageCoordinate.cloneCoord(dimensionSizes);
 		this.writablePixelData= PixelDataFactory.createPixelData(dimensionSizes, loci.formats.FormatTools.FLOAT, "XYZCT");
-		setupNewMetadata();
 		this.pixelData = this.writablePixelData;
-		
+		setupNewMetadata();
 
 		dimensionSizes.recycle();
 
