@@ -23,12 +23,15 @@
 require 'digest'
 require 'open-uri'
 require 'tempfile'
+require 'yaml'
 
 Dir[File.dirname(__FILE__) + "/support/**/*.rb"].each {|f| require f}
 
-PLANAR_IMAGE_URL = "https://s3-us-west-1.amazonaws.com/imageanalysistools/planar_test_image.ome.tif"
+PLANAR_IMAGE_URL = "https://s3-us-west-1.amazonaws.com/imageanalysistools/planar_test_image_smaller.ome.tif"
 
-PLANAR_MASK_URL = "https://s3-us-west-1.amazonaws.com/imageanalysistools/planar_test_mask.ome.tif"
+PLANAR_MASK_URL = "https://s3-us-west-1.amazonaws.com/imageanalysistools/planar_test_mask_smaller.ome.tif"
+
+FILTER_REGRESSION_HASHES_FN = File.expand_path('resources/filter_regression_hashes.yml', File.dirname(__FILE__))
 
 
 def filter_list_2d
@@ -37,7 +40,7 @@ def filter_list_2d
 
 	Dir[File.dirname(__FILE__) + "/../../main/java/edu/stanford/cfuller/imageanalysistools/filter/*Filter.java"].each do |f|
 
-		unless /3D/.match(f) or /filter\/Filter.java/.match(f) then
+		unless /3D/.match(f) then
 
 			filters << File.basename(f).gsub(".java", "")
 
@@ -46,6 +49,12 @@ def filter_list_2d
 	end
 
 	filters
+
+end
+
+def filter_regression_hashes
+
+	YAML.load(File.read(FILTER_REGRESSION_HASHES_FN))
 
 end
 
@@ -103,7 +112,7 @@ def hash_image_content(im)
 
 	digest << byte_str
 
-	Digest.hexencode(digest.digest)
+	Digest.hexencode(digest.digest).encode("UTF-8")
 
 end
 

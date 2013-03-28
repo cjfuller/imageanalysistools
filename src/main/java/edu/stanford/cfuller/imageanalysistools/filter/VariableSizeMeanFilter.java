@@ -55,6 +55,10 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 public class VariableSizeMeanFilter extends Filter {
 
 	private int minBoxSize;
+
+	public VariableSizeMeanFilter() {
+		this.minBoxSize = 2;
+	}
 	
 	/**
 	 * Sets the minimum box size of the resulting segmentation.
@@ -210,14 +214,15 @@ public class VariableSizeMeanFilter extends Filter {
 		
 		OcttreeNode root = new OcttreeNode(ImageCoordinate.createCoordXYZCT(0,0,0,0,0), ImageCoordinate.cloneCoord(im.getDimensionSizes()));
 		
-		root.subDivide();
+		if (this.shouldSubDivide(root, im, residual)) {
+			root.subDivide();
+		}
 		
 		Deque<OcttreeNode> queue = new java.util.ArrayDeque<OcttreeNode>();
 		
 		queue.addAll(root.getChildren());
 		
 		List<OcttreeNode> leaves = new java.util.ArrayList<OcttreeNode>();
-		
 		
 		while(!queue.isEmpty()) {
 			
@@ -229,7 +234,6 @@ public class VariableSizeMeanFilter extends Filter {
 				
 			} else {
 				
-								
 				leaves.add(current);
 				
 			}
