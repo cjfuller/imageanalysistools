@@ -7,7 +7,7 @@ jruby
 jruby is licensed under a CPL/GPL/LGPL tri-license.  See jruby-license.txt for the full license for jruby and all its components.
 
 
-Apache commons-math 3.0
+Apache commons-math 3.1.1
 
 commons-math is developed as part of the Apache commons (http://commons.apache.org) under the Apache license (Apache-2.0.txt).
 
@@ -26,7 +26,7 @@ In accordance with those licenses that require it, you can obtain the sources fr
 
 The sources for jruby are available from us at https://github.com/cjfuller/jruby (commit: ff1ebbe9317706fd44e5be7631011bde8f54a935). These can be obtained directly from the developers at http://jruby.org.
 
-The sources for commons-math 3.0 are available from us at https://github.com/downloads/cjfuller/imageanalysistools/commons-math3-3.0-src.tar.gz.  These can be obtained directly from the developers at http://commons.apache.org/math/.
+The sources for commons-math 3.1.1 are available at http://www.us.apache.org/dist//commons/math/source/commons-math3-3.1.1-src.tar.gz
 
 The sources for loci_tools.jar and ome_tools.jar are available from us at https://github.com/cjfuller/bioformats (commit: 03770c08035ec190110736e02bcda6d4e51c347e).  These can be obtained directly from the developers at https://github.com/openmicroscopy/bioformats.  
 

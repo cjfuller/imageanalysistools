@@ -12,7 +12,7 @@
 		<dep.version.loci>4.4.5</dep.version.loci>
 		<dep.version.ij>2.0.0-beta4</dep.version.ij>
 		<dep.version.imglib>2.0.0-beta5</dep.version.imglib>
-		<dep.version.commonsmath>3.0</dep.version.commonsmath>
+		<dep.version.commonsmath>3.1.1</dep.version.commonsmath>
 		<dep.version.jruby>1.7.0</dep.version.jruby>
 		<versioninfo.commit_id>a55138a83a371017a2cc5b714fef244556e779fc</versioninfo.commit_id>
 		<versioninfo.filename>edu/stanford/cfuller/imageanalysistools/resources/version_info.xml</versioninfo.filename>
