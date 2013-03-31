@@ -83,7 +83,10 @@
                       
       .row-fluid
         .span4
-          %h5 All analysis is scriptable using ruby.
+          %h5
+            ="All analysis is "
+            %a{href: scripting_url}> scriptable using ruby
+            ="."
         .span8
           %pre
             ~ "include IATScripting\n\nparameter_definitions do\n  define_parameter :min_size, 20\nend\nmethod_definition do\n  filter = get_filter :SizeAbsoluteFilter\n  filter.apply(imageset.getMarkerImage)\nend"
