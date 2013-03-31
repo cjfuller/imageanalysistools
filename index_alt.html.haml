@@ -1,0 +1,126 @@
+!!!
+%html
+  %head
+    %title Imageanalysistools by cjfuller
+    %meta{name: "viewport", content: "width=device-width, initial-scale=1.0"}
+    %link{rel: "stylesheet", href: "bootstrap/css/bootstrap.min.css" }
+    :css
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+
+    %link{rel: "stylesheet", href: "bootstrap/css/bootstrap-responsive.min.css" }
+
+  %body
+    #fb-root
+    :javascript
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+
+    - version = "5.1.4_dev"
+    - standalone_url = "https://buildhive.cloudbees.com/job/cjfuller/job/imageanalysistools/lastSuccessfulBuild/artifact/target/imageanalysistools-#{version}-standalone.jar"
+    - plugin_url = "https://buildhive.cloudbees.com/job/cjfuller/job/imageanalysistools/lastSuccessfulBuild/artifact/target/imageanalysistools-#{version}-plugin.jar"
+    - library_url = "https://buildhive.cloudbees.com/job/cjfuller/job/imageanalysistools/lastSuccessfulBuild/artifact/target/imageanalysistools-#{version}.jar"
+    - javadoc_url = "doc/index.html"
+    - scripting_url = "https://github.com/cjfuller/imageanalysistools/wiki/JRubyScripting"
+    - wiki_using_url = "https://github.com/cjfuller/imageanalysistools/wiki/using"
+    - wiki_dev_url = "https://github.com/cjfuller/imageanalysistools/wiki/Developing"
+    - ggroup_users_url = "http://groups.google.com/group/imageanalysistools-discuss"
+    - ggroup_dev_url = "http://groups.google.com/group/imageanalysistools-dev"
+
+    %div{class: "navbar navbar-inverse navbar-fixed-top"}
+      .navbar-inner
+        .container-fluid
+          %a.brand ImageAnalysisTools
+          %ul{class: "nav pull-right"}
+            /%li.divider-vertical
+            %li
+              %a{href: "http://github.com/cjfuller/imageanalysistools"} View Source on Github
+            /%li.divider-vertical
+            %li
+              %a{href: javadoc_url} API Documentation
+            %li
+              %a.dropdown-toggle{"data-toggle" => "dropdown", href: "#"}
+                Binary Jar Downloads
+                %span.caret
+              %ul{class: "dropdown-menu", role: "menu", "aria-labelledby" => "dropdownMenu"}
+                %li
+                  %a{href: standalone_url} 
+                    %strong Standalone:
+                    all dependencies included
+                  %a{href: plugin_url}
+                    %strong Plugin:
+                    runs as a FIJI plugin
+                  %a{href: library_url}
+                    %strong Library:
+                    no dependencies included
+            /%li.divider-vertical
+
+
+    .container
+      .hero-unit
+        .row-fluid
+          .span4
+            %img{src: 'hela_actin.jpg'}
+          .span8
+            %h2 ImageAnalysisTools
+            %p A java library for processing and quantifying images with a focus on biological microscopy
+
+
+      .row-fluid
+        .span4
+          %h5 A high-level interface speeds development of new tools.  Simple interfaces are preferred over lots of options.
+        .span8
+          %strong Visit every pixel in an (up to 5D) image:
+          %pre
+            ~ "Image im = ...\nfor (ImageCoordinate ic : im ) {\n  ...\n}"
+                      
+      .row-fluid
+        .span4
+          %h5 All analysis is scriptable using ruby.
+        .span8
+          %pre
+            ~ "include IATScripting\n\nparameter_definitions do\n  define_parameter :min_size, 20\nend\nmethod_definition do\n  filter = get_filter :SizeAbsoluteFilter\n  filter.apply(imageset.getMarkerImage)\nend"
+      .row-fluid
+        .span4
+          %h5 Analysis metadata files are automatically generated that can be executed to repeat the same analysis.
+        .span8
+          %pre
+            &= "<?xml version=\"1.0\" ?>\n<analysis_metadata>\n  <input_state>\n    <parameters>\n      <parameter name=\"method_name\" type=\"string\" value=\"CentromereFindingMethod\">\n ..."
+
+      %p
+        For more information on using the project from its GUI see 
+        %a{href: wiki_using_url} Using ImageAnalysisTools
+        or ask the
+        %a{href: ggroup_users_url} user google group
+        ="."
+
+      %p
+        For more information on using the project as a library from your own code see 
+        %a{href: wiki_dev_url} Developing with ImageAnalysisTools
+        or ask the 
+        %a{href: ggroup_dev_url} developer google group
+        ="."
+
+    .fb-like(data-href="http://www.facebook.com/imageanalysistools" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false")
+    .g-plusone(data-size="medium")
+
+    :javascript
+      (function() {
+        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/plusone.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+      })();
+
+
+    %script{src: "http://code.jquery.com/jquery.js"}
+    %script{src: "bootstrap/js/bootstrap.min.js"}
+
+    
+  
