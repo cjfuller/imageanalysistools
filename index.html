@@ -1,85 +1,147 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Imageanalysistools by cjfuller</title>
+<head>
+<title>Imageanalysistools by cjfuller</title>
+<meta content='width=device-width, initial-scale=1.0' name='viewport'>
+<link href='bootstrap/css/bootstrap.min.css' rel='stylesheet'>
+<style>
+  body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+  }
+</style>
+<link href='bootstrap/css/bootstrap-responsive.min.css' rel='stylesheet'>
+</head>
+<body>
+<div id='fb-root'></div>
+<script>
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+</script>
+<div class='navbar navbar-inverse navbar-fixed-top'>
+<div class='navbar-inner'>
+<div class='container-fluid'>
+<a class='brand'>ImageAnalysisTools</a>
+<ul class='nav pull-right'>
+<!-- %li.divider-vertical -->
+<li>
+<a href='http://github.com/cjfuller/imageanalysistools'>View Source on Github</a>
+</li>
+<!-- %li.divider-vertical -->
+<li>
+<a href='doc/index.html'>API Documentation</a>
+</li>
+<li>
+<a class='dropdown-toggle' data-toggle='dropdown' href='#'>
+Binary Jar Downloads
+<span class='caret'></span>
+</a>
+<ul aria-labelledby='dropdownMenu' class='dropdown-menu' role='menu'>
+<li>
+<a href='https://buildhive.cloudbees.com/job/cjfuller/job/imageanalysistools/lastSuccessfulBuild/artifact/target/imageanalysistools-5.1.4_dev-standalone.jar'>
+<strong>Standalone:</strong>
+all dependencies included
+</a>
+<a href='https://buildhive.cloudbees.com/job/cjfuller/job/imageanalysistools/lastSuccessfulBuild/artifact/target/imageanalysistools-5.1.4_dev-plugin.jar'>
+<strong>Plugin:</strong>
+runs as a FIJI plugin
+</a>
+<a href='https://buildhive.cloudbees.com/job/cjfuller/job/imageanalysistools/lastSuccessfulBuild/artifact/target/imageanalysistools-5.1.4_dev.jar'>
+<strong>Library:</strong>
+no dependencies included
+</a>
+</li>
+</ul>
+</li>
+<!-- %li.divider-vertical -->
+</ul>
+</div>
+</div>
+</div>
+<div class='container'>
+<div class='hero-unit'>
+<div class='row-fluid'>
+<div class='span4'>
+<img src='hela_actin.jpg'>
+</div>
+<div class='span8'>
+<h2>ImageAnalysisTools</h2>
+<p>A java library for processing and quantifying images with a focus on biological microscopy</p>
+</div>
+</div>
+</div>
+<div class='row-fluid'>
+<div class='span4'>
+<h5>A high-level interface speeds development of new tools.  Simple interfaces are preferred over lots of options.</h5>
+</div>
+<div class='span8'>
+<strong>Visit every pixel in an (up to 5D) image:</strong>
+<pre>Image im = ...
+for (ImageCoordinate ic : im ) {
+  ...
+}</pre>
+</div>
+</div>
+<div class='row-fluid'>
+<div class='span4'>
+<h5>All analysis is <a href='https://github.com/cjfuller/imageanalysistools/wiki/JRubyScripting'>scriptable using ruby</a>.
+</h5>
+</div>
+<div class='span8'>
+<pre>include IATScripting
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-	<div id="fb-root"></div>
-	<script>(function(d, s, id) {
-	  var js, fjs = d.getElementsByTagName(s)[0];
-	  if (d.getElementById(id)) return;
-	  js = d.createElement(s); js.id = id;
-	  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
-	  fjs.parentNode.insertBefore(js, fjs);
-	}(document, 'script', 'facebook-jssdk'));</script>
-	<script type="text/javascript">
-	  (function() {
-	    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-	    po.src = 'https://apis.google.com/js/plusone.js';
-	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-	  })();
-	</script>
-    <div class="wrapper">
-      <header>
-        <h1>Imageanalysistools</h1>
-        <p>A java library for processing and quantifying images with a focus on biological microscopy</p>
-
-        <p class="view"><a href="https://github.com/cjfuller/imageanalysistools">View the Project on GitHub <small>cjfuller/imageanalysistools</small></a></p>
-
-<h3>Source:</h3>
-        <ul>
-          <li><a href="https://github.com/cjfuller/imageanalysistools/zipball/master">Download<strong>ZIP</strong></a></li>
-          <li><a href="https://github.com/cjfuller/imageanalysistools/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/cjfuller/imageanalysistools">View On <strong>GitHub</strong></a></li>
-        </ul>
-<h3>Binary jar downloads:</h3>
-	<ul>
-		<li><a href="https://buildhive.cloudbees.com/job/cjfuller/job/imageanalysistools/lastSuccessfulBuild/artifact/target/imageanalysistools-5.1.4_dev-standalone.jar">Continuous build<strong>standalone</strong></a></li>
-		<li><a href="https://buildhive.cloudbees.com/job/cjfuller/job/imageanalysistools/lastSuccessfulBuild/artifact/target/imageanalysistools-5.1.4_dev-plugin.jar">Continuous build<strong>plugin</strong></a></li>
-		<li><a href="https://buildhive.cloudbees.com/job/cjfuller/job/imageanalysistools/lastSuccessfulBuild/artifact/target/imageanalysistools-5.1.4_dev.jar">Continuous build<strong>library</strong></a></li>
-	</ul>
-  
-  <p><strong>Standalone</strong>: all dependencies included
-  <p><strong>Plugin</strong>: dependencies not present in a standard <a href="http://fiji.sc">FIJI</a> installation included
-  <p><strong>Library</strong>: no dependencies included
-  
-	<p>For installation instructions, see the <a href="https://github.com/cjfuller/imageanalysistools#readme">README file</a>.
-	<br>
-	<p>Full javadoc for the library is available <a href="doc/index.html">here</a>.</p>
-      </header>
-      <section>
-        <p><strong>ImageAnalysisTools</strong> is a java library developed for processing and quantifying biological microscopy images. We use it particularly for the identification and quantification of centromeres and kinetochores and provide prebuilt tools for this purpose, but the underlying infrastructure can be used for building tools to process any type of image.</p>
-
-<p>The library has two major goals:
-	<ol>
-		<li><strong>Providing a high-level interface that facilitates rapid development of application-specific image analysis tools:</strong>  Common image processing needs like visiting all pixels in an image or applying common filters can be accomplished with very little code using a simple interface.  Analysis can be <a href="https://github.com/cjfuller/imageanalysistools/wiki/JRubyScripting">scripted using ruby</a>.  Complete javadoc for the interface is provided at every release.</li>
-		<li><strong>Record keeping:</strong> analysis methods run with the library produce an output metadata file that keeps a record of exactly what analysis was run (including code versioning information), and what inputs and outputs are associated with the analysis.  This record is both human- and machine-readable, and can be re-executed by the library providing a guarantee that precisely the same analysis can be systematically reproduced.</li>
-</ol>
-
-<p>For more information on using the project from its GUI see <br><a href="https://github.com/cjfuller/imageanalysistools/wiki/using">Using ImageAnalysisTools</a>, or ask the <a href="http://groups.google.com/group/imageanalysistools-discuss">user google group</a>.</p>
-
-<p>For more information on using the project as a library from your own code see <a href="https://github.com/cjfuller/imageanalysistools/wiki/Developing">Developing with ImageAnalysisTools</a>, or ask the <a href="http://groups.google.com/group/imageanalysistools-dev">developer google group</a>.</p>
-
-
-
-<div class="fb-like" data-href="http://www.facebook.com/imageanalysistools" data-send="true" data-layout="button_count" data-width="450" data-show-faces="false"></div> 
-<div class="g-plusone" data-size="medium"></div> 
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/cjfuller">cjfuller</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
-  </body>
+parameter_definitions do
+  define_parameter :min_size, 20
+end
+method_definition do
+  filter = get_filter :SizeAbsoluteFilter
+  filter.apply(imageset.getMarkerImage)
+end</pre>
+</div>
+</div>
+<div class='row-fluid'>
+<div class='span4'>
+<h5>Analysis metadata files are automatically generated that can be executed to repeat the same analysis.</h5>
+</div>
+<div class='span8'>
+<pre>&lt;?xml version=&quot;1.0&quot; ?&gt;
+&lt;analysis_metadata&gt;
+  &lt;input_state&gt;
+    &lt;parameters&gt;
+      &lt;parameter name=&quot;method_name&quot; type=&quot;string&quot; value=&quot;CentromereFindingMethod&quot;&gt;
+ ...</pre>
+</div>
+</div>
+<p>
+For more information on using the project from its GUI see
+<a href='https://github.com/cjfuller/imageanalysistools/wiki/using'>Using ImageAnalysisTools</a>
+or ask the
+<a href='http://groups.google.com/group/imageanalysistools-discuss'>user google group</a>
+.
+</p>
+<p>
+For more information on using the project as a library from your own code see
+<a href='https://github.com/cjfuller/imageanalysistools/wiki/Developing'>Developing with ImageAnalysisTools</a>
+or ask the
+<a href='http://groups.google.com/group/imageanalysistools-dev'>developer google group</a>
+.
+</p>
+<div class='fb-like' data-href='http://www.facebook.com/imageanalysistools' data-layout='button_count' data-send='false' data-show-faces='false' data-width='450'></div>
+<div class='g-plusone' data-size='medium'></div>
+</div>
+<script>
+  (function() {
+    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+    po.src = 'https://apis.google.com/js/plusone.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+  })();
+</script>
+<script src='http://code.jquery.com/jquery.js'></script>
+<script src='bootstrap/js/bootstrap.min.js'></script>
+</body>
 </html>
