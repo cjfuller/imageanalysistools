@@ -87,7 +87,6 @@ public class WatershedFilter extends Filter {
 
             greylevelLookup.get(value).add(new Vector3D(ic.get(ImageCoordinate.X), ic.get(ImageCoordinate.Y), ic.get(ImageCoordinate.Z)));
 
-
         }
 
         WritableImage processing = getSeedImage(greylevelLookup, imCopy, h);
@@ -144,8 +143,7 @@ public class WatershedFilter extends Filter {
 
     /**
      * Gets the seed Image for the watershed segmentation.  If no seed Image has been set externally, one is created from
-     * the set of pixels at the lowest greylevel.  If a seed Image has been set externally, the seedImage retrieved is the union of the external
-     * Image and the default one.
+     * the set of pixels at the lowest greylevel.  If a seed Image has been set externally, the seedImage retrieved is the external one.
      * 
      * @param greylevelLookup       A hashtable mapping greylevel values in the Image to coordinates in the Image.
      * @param im                    The Image being segmented.
@@ -154,6 +152,10 @@ public class WatershedFilter extends Filter {
      */
     protected WritableImage getSeedImage(java.util.Hashtable<Double, java.util.Vector<Vector3D> > greylevelLookup, Image im, Histogram h) {
 		
+        if (! (this.seedImage == null)) {
+            return ImageFactory.createWritable(this.seedImage);
+        }
+
 		WritableImage tempSeed = null;
 
         if (this.seedImage == null) {

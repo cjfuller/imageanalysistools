@@ -43,7 +43,11 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
 
     boolean flaggedForMerge;
 
-    MergeFilter mgf;
+    java.util.HashMap<Integer, Integer> mergeTable;
+
+    public SeededWatershedFilter() {
+        this.mergeTable = new java.util.HashMap<Integer, Integer>();
+    }
 
     /**
      * Sets the seed Image to the specified Image.  This will not be modified.
@@ -52,11 +56,39 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
     public void setSeed(Image im) {
         this.seedImage = im;
         Histogram h = new Histogram(im);
-
         this.maxSeedLabel = h.getMaxValue();
         this.flaggedForMerge = false;
-        this.mgf = new MergeFilter();
 
+    }
+
+    protected boolean isOnBoundary(int neighbor, int tempNeighbor) {
+        return neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor && neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel;
+    }
+
+    protected boolean needsMerge(int neighbor, int tempNeighbor) {
+        return neighbor != tempNeighbor && neighbor > 0 && tempNeighbor > 0;
+    }
+
+    protected int followMergeChain(int toChain) {
+        if (!this.mergeTable.containsKey(toChain) || this.mergeTable.get(toChain) == toChain) {
+            return toChain;
+        } else {
+            return followMergeChain(this.mergeTable.get(toChain));
+        }
+    }
+
+    protected void doMerge(WritableImage processing, java.util.HashSet<Integer> toMerge) {
+        int min = Integer.MAX_VALUE;
+        for (int i : toMerge) {
+            if (i < min) {
+                min = i;
+            }
+        }
+        min = followMergeChain(min);
+        for (int i : toMerge) {
+            this.mergeTable.put(i, min);
+        }
+        this.flaggedForMerge = false;
     }
 
     /**
@@ -70,10 +102,12 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
      */
     protected int getCorrectLabel(ImageCoordinate ic,  WritableImage processing, int nextLabel) {
 
-        if (this.flaggedForMerge) {
-            this.mgf.apply(processing);
-            this.flaggedForMerge = false;
-        }
+        java.util.HashSet<Integer> mergeRegions = new java.util.HashSet<Integer>();
+
+        // if (this.flaggedForMerge) {
+        //     this.mgf.apply(processing);
+        //     this.flaggedForMerge = false;
+        // }
         
         int x = ic.get(ImageCoordinate.X);
         int y = ic.get(ImageCoordinate.Y);
@@ -92,9 +126,9 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.Y,y - 1);
 
         if (processing.inBounds(ic2)) {
-            int tempNeighbor = (int) processing.getValue(ic2);
-            if (neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor && neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel) {ic2.recycle(); return 0;}
-            if (neighbor != tempNeighbor && neighbor > 0 && tempNeighbor > 0 && (neighbor <= maxSeedLabel || tempNeighbor <= maxSeedLabel)) {this.flaggedForMerge = true;}
+            int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
+            if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
+            if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
         
@@ -102,9 +136,9 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.Y,y);
 
         if (processing.inBounds(ic2)) {
-            int tempNeighbor = (int) processing.getValue(ic2);
-            if (neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor && neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel) {ic2.recycle(); return 0;}
-            if (neighbor != tempNeighbor && neighbor > 0 && tempNeighbor > 0 && (neighbor <= maxSeedLabel || tempNeighbor <= maxSeedLabel)) {this.flaggedForMerge = true;}
+            int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
+            if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
+            if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
@@ -112,9 +146,9 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.Y,y + 1);
 
         if (processing.inBounds(ic2)) {
-            int tempNeighbor = (int) processing.getValue(ic2);
-            if (neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor && neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel) {ic2.recycle(); return 0;}
-            if (neighbor != tempNeighbor && neighbor > 0 && tempNeighbor > 0 && (neighbor <= maxSeedLabel || tempNeighbor <= maxSeedLabel)) {this.flaggedForMerge = true;}
+            int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
+            if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
+            if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
@@ -122,9 +156,9 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.Y,y - 1);
 
         if (processing.inBounds(ic2)) {
-            int tempNeighbor = (int) processing.getValue(ic2);
-            if (neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor && neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel) {ic2.recycle(); return 0;}
-            if (neighbor != tempNeighbor && neighbor > 0 && tempNeighbor > 0 && (neighbor <= maxSeedLabel || tempNeighbor <= maxSeedLabel)) {this.flaggedForMerge = true;}
+            int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
+            if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
+            if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
@@ -132,9 +166,9 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.Y,y + 1);
 
         if (processing.inBounds(ic2)) {
-            int tempNeighbor = (int) processing.getValue(ic2);
-            if (neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor && neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel) {ic2.recycle(); return 0;}
-            if (neighbor != tempNeighbor && neighbor > 0 && tempNeighbor > 0 && (neighbor <= maxSeedLabel || tempNeighbor <= maxSeedLabel)) {this.flaggedForMerge = true;}
+            int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
+            if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
+            if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
         
@@ -142,9 +176,9 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.Y,y - 1);
 
         if (processing.inBounds(ic2)) {
-            int tempNeighbor = (int) processing.getValue(ic2);
-            if (neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor && neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel) {ic2.recycle(); return 0;}
-            if (neighbor != tempNeighbor && neighbor > 0 && tempNeighbor > 0 && (neighbor <= maxSeedLabel || tempNeighbor <= maxSeedLabel)) {this.flaggedForMerge = true;}
+            int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
+            if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
+            if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
@@ -152,9 +186,9 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.Y,y);
 
         if (processing.inBounds(ic2)) {
-            int tempNeighbor = (int) processing.getValue(ic2);
-            if (neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor && neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel) {ic2.recycle(); return 0;}
-            if (neighbor != tempNeighbor && neighbor > 0 && tempNeighbor > 0 && (neighbor <= maxSeedLabel || tempNeighbor <= maxSeedLabel)) {this.flaggedForMerge = true;}
+            int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
+            if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
+            if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
@@ -162,14 +196,17 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.Y,y + 1);
 
         if (processing.inBounds(ic2)) {
-            int tempNeighbor = (int) processing.getValue(ic2);
-            if (neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor && neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel) {ic2.recycle(); return 0;}
-            if (neighbor != tempNeighbor && neighbor > 0 && tempNeighbor > 0 && (neighbor <= maxSeedLabel || tempNeighbor <= maxSeedLabel)) {this.flaggedForMerge = true;}
+            int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
+            if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
+            if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
             if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
         }
 
         if (neighbor > 0) {
             ic2.recycle();
+            if (this.flaggedForMerge) {
+                doMerge(processing, mergeRegions);
+            }
             return neighbor;
         }
 
