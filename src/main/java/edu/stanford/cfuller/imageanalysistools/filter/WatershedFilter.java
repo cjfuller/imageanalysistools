@@ -65,8 +65,8 @@ public class WatershedFilter extends Filter {
      * Applies the WatershedFilter to the specified Image, segmenting it.
      * @param im    The Image to be segmented.
      */
-	@Override
-	public void apply(WritableImage im) {
+    @Override
+    public void apply(WritableImage im) {
 
         WritableImage imCopy = ImageFactory.createWritable(im);
 
@@ -139,7 +139,7 @@ public class WatershedFilter extends Filter {
 
 
 
-	}
+    }
 
     /**
      * Gets the seed Image for the watershed segmentation.  If no seed Image has been set externally, one is created from
@@ -156,13 +156,13 @@ public class WatershedFilter extends Filter {
             return ImageFactory.createWritable(this.seedImage);
         }
 
-		WritableImage tempSeed = null;
+	WritableImage tempSeed = null;
 
         if (this.seedImage == null) {
-			tempSeed = ImageFactory.createWritable(im.getDimensionSizes(), 0.0f);
-		} else {
-			tempSeed = ImageFactory.createWritable(this.seedImage);
-		}
+	    tempSeed = ImageFactory.createWritable(im.getDimensionSizes(), 0.0f);
+	} else {
+	    tempSeed = ImageFactory.createWritable(this.seedImage);
+	}
 
         double minValue = h.getMinValue();
 
@@ -186,7 +186,7 @@ public class WatershedFilter extends Filter {
 
         lf.apply(tempSeed);
 
-		if (this.seedImage != null) this.seedImage = tempSeed;
+	if (this.seedImage != null) this.seedImage = tempSeed;
 
         return tempSeed;
 
