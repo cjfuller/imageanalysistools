@@ -80,9 +80,9 @@ public class LocalAnalysis {
 
         java.util.List<ImageSet> namedFileSets = null;
 
-		ParameterDictionary params = am.getOutputParameters();
+	ParameterDictionary params = am.getOutputParameters();
 		
-		java.util.List<ImageSet> imageSets = null;
+	java.util.List<ImageSet> imageSets = null;
 
         if (params.hasKeyAndTrue("multi_wavelength_file") || ! params.hasKey("multi_wavelength_file")) {
             imageSets = DirUtils.makeMultiwavelengthFileSets(params);
@@ -101,9 +101,9 @@ public class LocalAnalysis {
 
         for (ImageSet images : imageSets) {
 
-			AnalysisMetadata singleSetMeta = am.makeCopy();
+	    AnalysisMetadata singleSetMeta = am.makeCopy();
 
-			singleSetMeta.setInputImages(images);
+	    singleSetMeta.setInputImages(images);
 
             ImageSetThread nextSet = new ImageSetThread(singleSetMeta);
 
@@ -167,11 +167,11 @@ public class LocalAnalysis {
      */
     public static void processFileSet(AnalysisMetadata am) throws java.io.IOException {
 
-		ParameterDictionary params = am.getOutputParameters();
+	ParameterDictionary params = am.getOutputParameters();
 
-		params.setValueForKey("filename", am.getInputImages().getImageNameForIndex(0));
+	params.setValueForKey("filename", am.getInputImages().getImageNameForIndex(0));
 
-		loadImages(am);
+	loadImages(am);
 
         //set the numberOfChannels and channelName parameters appropriately for the multi-wavelength file
         
@@ -179,7 +179,7 @@ public class LocalAnalysis {
 
         if (params.hasKeyAndTrue("process_max_intensity_projections")) {
 	
-			ImageSet images = am.getInputImages();
+	    ImageSet images = am.getInputImages();
 
             ImageSet newImages = new ImageSet(params);
 
@@ -199,7 +199,7 @@ public class LocalAnalysis {
             
             newImages.setMarkerImage(images.getMarkerIndex());
 
-			am.getInputImages().disposeImages();
+	    am.getInputImages().disposeImages();
 
             am.setInputImages(newImages);
         }
@@ -207,15 +207,15 @@ public class LocalAnalysis {
 
         Method methodToRun = Method.loadMethod(params.getValueForKey("method_name"));
 
-		am.setMethod(methodToRun);
+	am.setMethod(methodToRun);
 
         am.getOutputFiles().clear(); // Need to clear out any previous output from the analysis metadata file.
 		
-		methodToRun.setAnalysisMetadata(am);
+	methodToRun.setAnalysisMetadata(am);
 
         methodToRun.go();
 
-		am.timestamp();
+	am.timestamp();
 
         writeDataOutput(am);
 
@@ -234,19 +234,19 @@ public class LocalAnalysis {
 
     private static void loadImages(AnalysisMetadata am) throws java.io.IOException {
 
-		am.validateInputImages(true);
+	am.validateInputImages(true);
 
-		if ((!am.getInputParameters().hasKey("multi_wavelength_file")) || am.getInputParameters().getBooleanValueForKey("multi_wavelength_file")) {
-			ImageSet split = loadSplitMutliwavelengthImages(am.getInputImages());
-			am.getInputImages().disposeImages();
-			am.setInputImages(split);
-		} else {
-			am.getInputImages().loadAllImages();
-		}
+	if ((!am.getInputParameters().hasKey("multi_wavelength_file")) || am.getInputParameters().getBooleanValueForKey("multi_wavelength_file")) {
+	    ImageSet split = loadSplitMutliwavelengthImages(am.getInputImages());
+	    am.getInputImages().disposeImages();
+	    am.setInputImages(split);
+	} else {
+	    am.getInputImages().loadAllImages();
+	}
 				
-		if (am.getInputParameters().hasKey("marker_channel_index")) {
-			am.getInputImages().setMarkerImage(am.getInputParameters().getIntValueForKey("marker_channel_index"));
-		}
+	if (am.getInputParameters().hasKey("marker_channel_index")) {
+	    am.getInputImages().setMarkerImage(am.getInputParameters().getIntValueForKey("marker_channel_index"));
+	}
 
     }
 
@@ -266,7 +266,7 @@ public class LocalAnalysis {
             splitSet.addImageWithImageAndName(i, fileSet.getImageNameForIndex(0));
         }
 		
-		splitSet.setCombinedImage(multiwavelength);
+	splitSet.setCombinedImage(multiwavelength);
         
         return splitSet;
 
@@ -295,122 +295,122 @@ public class LocalAnalysis {
         
         for (Long label : sortedRegions) {
         	
-        	List<Measurement> measurements = data.getAllMeasurementsForRegion(label);
+	    List<Measurement> measurements = data.getAllMeasurementsForRegion(label);
         	
-        	List<Measurement> intensityMeasurements = new java.util.ArrayList<Measurement>();
+	    List<Measurement> intensityMeasurements = new java.util.ArrayList<Measurement>();
         	
-        	List<Measurement> backgroundMeasurements = new java.util.ArrayList<Measurement>();
+	    List<Measurement> backgroundMeasurements = new java.util.ArrayList<Measurement>();
         	
-        	List<Measurement> otherMeasurements = new java.util.ArrayList<Measurement>();
+	    List<Measurement> otherMeasurements = new java.util.ArrayList<Measurement>();
         	
-        	for (Measurement m : measurements) {
+	    for (Measurement m : measurements) {
         		
-        		if (m.getMeasurementType() == Measurement.TYPE_INTENSITY) {
-        			intensityMeasurements.add(m);
-        		} else if (m.getMeasurementType() == Measurement.TYPE_BACKGROUND) {
-        			backgroundMeasurements.add(m);
-        		} else {
-        			otherMeasurements.add(m);
-        		}
+		if (m.getMeasurementType() == Measurement.TYPE_INTENSITY) {
+		    intensityMeasurements.add(m);
+		} else if (m.getMeasurementType() == Measurement.TYPE_BACKGROUND) {
+		    backgroundMeasurements.add(m);
+		} else {
+		    otherMeasurements.add(m);
+		}
         		
-        	}
+	    }
         	
-        	java.util.Collections.sort(intensityMeasurements, new Comparator<Measurement>() {
-        		public int compare(Measurement o1, Measurement o2) {
-        			return o1.getMeasurementName().compareTo(o2.getMeasurementName());
-        		}
+	    java.util.Collections.sort(intensityMeasurements, new Comparator<Measurement>() {
+		    public int compare(Measurement o1, Measurement o2) {
+			return o1.getMeasurementName().compareTo(o2.getMeasurementName());
+		    }
         	});
         	
-        	List<Measurement> orderedMeasurements = new java.util.ArrayList<Measurement>();
+	    List<Measurement> orderedMeasurements = new java.util.ArrayList<Measurement>();
         	
-        	for (int i = 0; i < measurements.size(); i++) {
-        		orderedMeasurements.add(null);
-        	}
+	    for (int i = 0; i < measurements.size(); i++) {
+		orderedMeasurements.add(null);
+	    }
         	
-        	for (Measurement m : intensityMeasurements) {
+	    for (Measurement m : intensityMeasurements) {
         		
-        		int i = columnHeadings.indexOf(m.getMeasurementName());
+		int i = columnHeadings.indexOf(m.getMeasurementName());
         		
-        		if (i == -1) {// not found in list
+		if (i == -1) {// not found in list
         			
-        			columnHeadings.add(m.getMeasurementName());
-        			i = columnHeadings.size() -1;
+		    columnHeadings.add(m.getMeasurementName());
+		    i = columnHeadings.size() -1;
         			
-        		}
+		}
         		
-        		if (i >= orderedMeasurements.size()) {
-        			for (int j = orderedMeasurements.size(); j <= i; j++) {
-        				orderedMeasurements.add(null);
-        			}
-        		}
+		if (i >= orderedMeasurements.size()) {
+		    for (int j = orderedMeasurements.size(); j <= i; j++) {
+			orderedMeasurements.add(null);
+		    }
+		}
         		
-    			orderedMeasurements.set(i, m);
+		orderedMeasurements.set(i, m);
 
         		        		
-        	}
+	    }
         	
         	
-        	for (Measurement m : intensityMeasurements) {
+	    for (Measurement m : intensityMeasurements) {
         	
-        		Measurement bkg = null;
+		Measurement bkg = null;
         		        		
-        		for (Measurement b : backgroundMeasurements) {
+		for (Measurement b : backgroundMeasurements) {
         			        			
-        			if (b.getMeasurementName().equals(m.getMeasurementName())) {
+		    if (b.getMeasurementName().equals(m.getMeasurementName())) {
         				
-        				bkg = b;
+			bkg = b;
         				
-        				break;
+			break;
         				
-        			}
+		    }
         			
-        		}
+		}
         		
-        		if (bkg == null) continue;
+		if (bkg == null) continue;
         		
-        		String backgroundName = bkg.getMeasurementName() + backgroundSuffix;
+		String backgroundName = bkg.getMeasurementName() + backgroundSuffix;
         		
-        		int i = columnHeadings.indexOf(backgroundName);
+		int i = columnHeadings.indexOf(backgroundName);
         		
-        		if (i == -1) {// not found in list
+		if (i == -1) {// not found in list
         			
-        			columnHeadings.add(backgroundName);
-        			i = columnHeadings.size() -1;
+		    columnHeadings.add(backgroundName);
+		    i = columnHeadings.size() -1;
         			
-        		}
+		}
         		
-        		if (i >= orderedMeasurements.size()) {
-        			for (int j = orderedMeasurements.size(); j <= i; j++) {
-        				orderedMeasurements.add(null);
-        			}
-        		}
+		if (i >= orderedMeasurements.size()) {
+		    for (int j = orderedMeasurements.size(); j <= i; j++) {
+			orderedMeasurements.add(null);
+		    }
+		}
         		
-    			orderedMeasurements.set(i, bkg);
+		orderedMeasurements.set(i, bkg);
         	
-        	}
+	    }
         	
-        	for (Measurement m : otherMeasurements) {
+	    for (Measurement m : otherMeasurements) {
         		
-        		int i = columnHeadings.indexOf(m.getMeasurementName());
+		int i = columnHeadings.indexOf(m.getMeasurementName());
         		
-        		if (i == -1) {// not found in list
+		if (i == -1) {// not found in list
         			
-        			columnHeadings.add(m.getMeasurementName());
-        			i = columnHeadings.size() -1;
+		    columnHeadings.add(m.getMeasurementName());
+		    i = columnHeadings.size() -1;
         			
-        		}
+		}
         		
-        		if (i >= orderedMeasurements.size()) {
-        			for (int j = orderedMeasurements.size(); j <= i; j++) {
-        				orderedMeasurements.add(null);
-        			}
-        		}
+		if (i >= orderedMeasurements.size()) {
+		    for (int j = orderedMeasurements.size(); j <= i; j++) {
+			orderedMeasurements.add(null);
+		    }
+		}
         		
-    			orderedMeasurements.set(i, m);
+		orderedMeasurements.set(i, m);
         		
-        	}
+	    }
         	
-        	allOrderedMeasurements.put(label, orderedMeasurements);
+	    allOrderedMeasurements.put(label, orderedMeasurements);
         	
         	
         }
@@ -418,81 +418,81 @@ public class LocalAnalysis {
         output.append("region ");
         
         for (String s : columnHeadings) {
-        	output.append(s);
-        	output.append(" ");
+	    output.append(s);
+	    output.append(" ");
         }
         output.append("\n");
         
         for (Long l : sortedRegions) {
-        	List<Measurement> orderedMeasurements = allOrderedMeasurements.get(l);
+	    List<Measurement> orderedMeasurements = allOrderedMeasurements.get(l);
         	
-        	output.append("" + l + " ");
+	    output.append("" + l + " ");
         	
-        	for (Measurement m : orderedMeasurements) {
-        		if (m == null) {
-        			output.append("N/A ");
-        		} else {
-        			output.append(m.getMeasurement());
-        			output.append(" ");
-        		}
-        	}
+	    for (Measurement m : orderedMeasurements) {
+		if (m == null) {
+		    output.append("N/A ");
+		} else {
+		    output.append(m.getMeasurement());
+		    output.append(" ");
+		}
+	    }
         	
-        	output.append("\n");
+	    output.append("\n");
         	
         }
         
         return output.toString();
     }
 
-	private static String getOutputMethodNameString(AnalysisMetadata am) {
+    private static String getOutputMethodNameString(AnalysisMetadata am) {
 		
-		String longMethodName = am.getMethod().getDisplayName();
+	String longMethodName = am.getMethod().getDisplayName();
 
-		if (longMethodName == null) {
-			longMethodName = am.getMethod().getClass().getName();
-		}
+	if (longMethodName == null) {
+	    longMethodName = am.getMethod().getClass().getName();
+	}
 
         String[] splitMethodName = longMethodName.split("\\.");
 
         String shortMethodName = splitMethodName[splitMethodName.length - 1];
 		
-		return shortMethodName;
+	return shortMethodName;
 		
-	}
+    }
 
-	private static String getOutputDataFileSuffix(AnalysisMetadata am) {
+    private static String getOutputDataFileSuffix(AnalysisMetadata am) {
 		
-		String shortMethodName = getOutputMethodNameString(am);
+	String shortMethodName = getOutputMethodNameString(am);
 
         String outputSuffix= "." + shortMethodName + ".out.txt";
 
-		return outputSuffix;
+	return outputSuffix;
 		
-	}
+    }
 	
-	private static String getOutputImageFileSuffix(AnalysisMetadata am) {
+    private static String getOutputImageFileSuffix(AnalysisMetadata am) {
 		
-		String shortMethodName = getOutputMethodNameString(am);
+	String shortMethodName = getOutputMethodNameString(am);
 
         String outputSuffix= "." + shortMethodName + ".out.ome.tif";
 
-		return outputSuffix;
+	return outputSuffix;
 		
-	}
+    }
 
-	private static String getOutputParameterFileSuffix(AnalysisMetadata am) {
+    private static String getOutputParameterFileSuffix(AnalysisMetadata am) {
 		
-		String shortMethodName = getOutputMethodNameString(am);
+	String shortMethodName = getOutputMethodNameString(am);
 
         String outputSuffix= "." + shortMethodName + PARAMETER_EXTENSION;
 
-		return outputSuffix;
+	return outputSuffix;
 		
-	}
+    }
 
     private static void writeDataOutput(AnalysisMetadata am) throws java.io.IOException {
 
-		ParameterDictionary outputParams = am.getOutputParameters();
+	ParameterDictionary outputParams = am.getOutputParameters();
 
         final String output_dir_suffix = DATA_OUTPUT_DIR;
 
@@ -504,7 +504,7 @@ public class LocalAnalysis {
 
         if (!serializedOutputPath.exists()) {serializedOutputPath.mkdir();}
         
-		String outputFilename = ((new java.io.File(am.getInputImages().getImageNameForIndex(0))).getName()) + getOutputDataFileSuffix(am);
+	String outputFilename = ((new java.io.File(am.getInputImages().getImageNameForIndex(0))).getName()) + getOutputDataFileSuffix(am);
 
         String relativeOutputFilename = outputPath.getName() + File.separator + outputFilename;
         		
@@ -526,7 +526,7 @@ public class LocalAnalysis {
 
         output.close();
 
-		am.addOutputFile(dataOutputFilename);
+	am.addOutputFile(dataOutputFilename);
 
     }
 
@@ -534,7 +534,7 @@ public class LocalAnalysis {
 
         final String output_dir_suffix = IMAGE_OUTPUT_DIR;
 
-		ParameterDictionary outputParams = am.getOutputParameters();
+	ParameterDictionary outputParams = am.getOutputParameters();
 
         java.io.File outputPath = new java.io.File(outputParams.getValueForKey("local_directory") + java.io.File.separator + output_dir_suffix);
 
@@ -548,34 +548,34 @@ public class LocalAnalysis {
 
         String maskOutputFilename = outputPath.getParent() + File.separator + relativeOutputFilename;
         
-		ImageSet outputImages = new ImageSet(outputParams);
+	ImageSet outputImages = new ImageSet(outputParams);
 
         if (am.getMethod().getStoredImages().size() == 1) {
 
             am.getMethod().getStoredImage().writeToFile(maskOutputFilename);
 
-			outputImages.addImageWithImageAndName(am.getMethod().getStoredImage(), maskOutputFilename);
+	    outputImages.addImageWithImageAndName(am.getMethod().getStoredImage(), maskOutputFilename);
 
         } else {
 	
-			int imageCounter = 0;
+	    int imageCounter = 0;
 	
             for (Image i : am.getMethod().getStoredImages()) {
 	
                 String multiMaskOutputFilename = relativeOutputFilename.replace(".out.ome.tif", ".out." + Integer.toString(imageCounter) + ".ome.tif");
 				
-				String fullFilename = outputPath.getParent() + File.separator + multiMaskOutputFilename;
+		String fullFilename = outputPath.getParent() + File.separator + multiMaskOutputFilename;
 				
                 i.writeToFile(fullFilename);
 
-				outputImages.addImageWithImageAndName(i, fullFilename);
+		outputImages.addImageWithImageAndName(i, fullFilename);
 				
-				++imageCounter;
+		++imageCounter;
 
             }
         }
 
-		am.setOutputImages(outputImages);
+	am.setOutputImages(outputImages);
 
     }
 
@@ -583,7 +583,7 @@ public class LocalAnalysis {
 
         final String parameterDirectory = PARAMETER_OUTPUT_DIR;
 
-		ParameterDictionary pd = am.getOutputParameters();
+	ParameterDictionary pd = am.getOutputParameters();
 
         File outputPath = new File(pd.getValueForKey("local_directory") + File.separator + parameterDirectory);
 
@@ -597,7 +597,7 @@ public class LocalAnalysis {
 
         String parameterOutputFilename = outputPath.getAbsolutePath() + File.separator + (new File(am.getInputImages().getImageNameForIndex(0))).getName() + getOutputParameterFileSuffix(am);
 
-		(new AnalysisMetadataXMLWriter()).writeAnalysisMetadataToXMLFile(am, parameterOutputFilename);
+	(new AnalysisMetadataXMLWriter()).writeAnalysisMetadataToXMLFile(am, parameterOutputFilename);
 
     }
 
