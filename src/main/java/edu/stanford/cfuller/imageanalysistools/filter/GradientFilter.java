@@ -31,6 +31,7 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
 
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.util.FastMath;
 
 /**
  * A filter that takes the gradient of a 2D Image.
@@ -107,7 +108,7 @@ public class GradientFilter extends Filter {
 		    }
 		}
 				
-		outputVal = Math.hypot(output1, output2);
+		outputVal = FastMath.hypot(output1, output2);
 	    }
 			
 	    im.setValue(i, (float) Math.floor(outputVal));
