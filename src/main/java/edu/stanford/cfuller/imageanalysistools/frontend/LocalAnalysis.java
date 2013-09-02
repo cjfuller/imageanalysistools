@@ -64,7 +64,8 @@ public class LocalAnalysis {
     static final String IMAGE_OUTPUT_DIR=AnalysisController.IMAGE_OUTPUT_DIR;
     static final String PARAMETER_OUTPUT_DIR=AnalysisController.PARAMETER_OUTPUT_DIR;
     static final String PARAMETER_EXTENSION = AnalysisController.PARAMETER_EXTENSION;
-
+    
+    static final String IMAGE_OUTPUT_DIR_PARAM = "image_output_directory";
 
     /**
      * Runs the analysis on the local machine.
@@ -217,10 +218,10 @@ public class LocalAnalysis {
 
 	am.timestamp();
 
-        writeDataOutput(am);
+	writeDataOutput(am);
 
         try {
-            writeImageOutput(am);
+	    writeImageOutput(am);
             writeParameterOutput(am);
         } catch (java.io.IOException e) {
             LoggingUtilities.getLogger().severe("Error while writing output masks to file; skipping write and continuing.");
@@ -536,8 +537,13 @@ public class LocalAnalysis {
 
 	ParameterDictionary outputParams = am.getOutputParameters();
 
-        java.io.File outputPath = new java.io.File(outputParams.getValueForKey("local_directory") + java.io.File.separator + output_dir_suffix);
+	java.io.File outputPath = null;
 
+	if (outputParams.hasKey(IMAGE_OUTPUT_DIR_PARAM)) {
+	    outputPath = new java.io.File(outputParams.getValueForKey(IMAGE_OUTPUT_DIR_PARAM));
+	} else {
+	    outputPath = new java.io.File(outputParams.getValueForKey("local_directory") + java.io.File.separator + output_dir_suffix);
+	}
         if (!outputPath.exists()) {outputPath.mkdir();}
 
         String[] splitMethodName = outputParams.getValueForKey("method_name").split("\\.");
