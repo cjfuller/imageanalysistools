@@ -37,50 +37,50 @@ import edu.stanford.cfuller.imageanalysistools.image.WritableImage;
  */
 public abstract class MorphologicalFilter extends Filter {
 
-	StructuringElement strel;
-	boolean processAsBinary;
+    StructuringElement strel;
+    boolean processAsBinary;
 	
-	/**
-	 * Constructs a new MorphologicalFilter.
-	 */
-	public MorphologicalFilter() {
-		this.strel = null;
-		this.processAsBinary = true;
-	}
+    /**
+     * Constructs a new MorphologicalFilter.
+     */
+    public MorphologicalFilter() {
+	this.strel = null;
+	this.processAsBinary = true;
+    }
 	
-	/**
-	 * Constructs a new MorphologicalFilter, copying the structuring element and settings from another
-	 * MorphologicalFilter.
-	 * @param copySettings		The MorphologicalFilter whose settings will be copied.
-	 */
-	public MorphologicalFilter(MorphologicalFilter copySettings) {
-		this.strel = copySettings.strel;
-		this.processAsBinary = copySettings.processAsBinary;
-	}
+    /**
+     * Constructs a new MorphologicalFilter, copying the structuring element and settings from another
+     * MorphologicalFilter.
+     * @param copySettings		The MorphologicalFilter whose settings will be copied.
+     */
+    public MorphologicalFilter(MorphologicalFilter copySettings) {
+	this.strel = copySettings.strel;
+	this.processAsBinary = copySettings.processAsBinary;
+    }
 	
-	/* (non-Javadoc)
-	 * @see edu.stanford.cfuller.imageanalysistools.filter.Filter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
-	 */
-	@Override
-	public abstract void apply(WritableImage im);
+    /* (non-Javadoc)
+     * @see edu.stanford.cfuller.imageanalysistools.filter.Filter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
+     */
+    @Override
+    public abstract void apply(WritableImage im);
 	
-	/**
-	 * Sets the StructuringElement to be used for the filtering.
-	 * @param strel		The StructuringElement to be used.
-	 */
-	public void setStructuringElement(StructuringElement strel) {
-		this.strel = strel;
-	}
+    /**
+     * Sets the StructuringElement to be used for the filtering.
+     * @param strel		The StructuringElement to be used.
+     */
+    public void setStructuringElement(StructuringElement strel) {
+	this.strel = strel;
+    }
 	
-	/**
-	 * Sets whether this filter processes images as binary or greyscale.
-	 * <p>
-	 * Currently does not affect anything; all images are processed as binary.
-	 * 
-	 * @param isBinary		Whether the filter should act as if all images are binary.
-	 */
-	public void setProcessAsBinary(boolean isBinary) {
-		this.processAsBinary = isBinary;
-	}
+    /**
+     * Sets whether this filter processes images as binary or greyscale.
+     * <p>
+     * Currently does not affect anything; all images are processed as binary.
+     * 
+     * @param isBinary		Whether the filter should act as if all images are binary.
+     */
+    public void setProcessAsBinary(boolean isBinary) {
+	this.processAsBinary = isBinary;
+    }
 
 }

@@ -41,78 +41,78 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate;
  */
 public class ErosionFilter extends MorphologicalFilter {
 
-	/**
-	 * Constructs a new ErosionFilter, copying the structuring element and settings from another
-	 * MorphologicalFilter.
-	 * @param mf		The MorphologicalFilter whose settings will be copied.
-	 */
-	public ErosionFilter(MorphologicalFilter mf) {
-		super(mf);
-	}
+    /**
+     * Constructs a new ErosionFilter, copying the structuring element and settings from another
+     * MorphologicalFilter.
+     * @param mf		The MorphologicalFilter whose settings will be copied.
+     */
+    public ErosionFilter(MorphologicalFilter mf) {
+	super(mf);
+    }
 
-	/**
-	 * Constructs a new ErosionFilter.
-	 */
-	public ErosionFilter() {
-		super();
+    /**
+     * Constructs a new ErosionFilter.
+     */
+    public ErosionFilter() {
+	super();
+    }
+	
+    private static final int defaultSize = 3;
+	
+    /**
+     * Creates a default structuring element for processing with this filter.
+     * Currently this is an n by n by...n square structuring element set to all ones in the specified dimensions, where 
+     * n is a default size, currently 3.
+     * @param dimList	A list of dimensions (corresponding to their integer indices in ImageCoordinate) over which the structuring element extends.
+     * @return			A StructuringElement suitable for processing an image over the supplied dimensions.
+     */
+    public static StructuringElement getDefaultElement(int[] dimList) {
+	ImageCoordinate strelSize = ImageCoordinate.createCoordXYZCT(1,1,1,1,1);
+	for (int i : dimList) {
+	    strelSize.set(i, defaultSize);
 	}
+		
+	StructuringElement toReturn = new StructuringElement(strelSize);
+		
+	toReturn.setAll(1.0f);
+		
+	strelSize.recycle();
+		
+	return toReturn;
+    }
 	
-	private static final int defaultSize = 3;
-	
-	/**
-	 * Creates a default structuring element for processing with this filter.
-	 * Currently this is an n by n by...n square structuring element set to all ones in the specified dimensions, where 
-	 * n is a default size, currently 3.
-	 * @param dimList	A list of dimensions (corresponding to their integer indices in ImageCoordinate) over which the structuring element extends.
-	 * @return			A StructuringElement suitable for processing an image over the supplied dimensions.
-	 */
-	public static StructuringElement getDefaultElement(int[] dimList) {
-		ImageCoordinate strelSize = ImageCoordinate.createCoordXYZCT(1,1,1,1,1);
-		for (int i : dimList) {
-			strelSize.set(i, defaultSize);
+    /* (non-Javadoc)
+     * @see edu.stanford.cfuller.imageanalysistools.filter.morph.MorphologicalFilter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
+     */
+    @Override
+    public void apply(WritableImage im) {
+		
+	if (this.strel == null) return;
+		
+	Image origCopy = ImageFactory.create(im);
+		
+	for (ImageCoordinate ic : im) {
+			
+	    this.strel.boxImageToElement(ic, origCopy);
+			
+	    boolean included = true;
+			
+	    for (ImageCoordinate boxedCoord : origCopy) {
+		if (this.strel.get(ic, boxedCoord) <= 0.0f || origCopy.getValue(boxedCoord) <= 0.0f) {
+		    included = false;
+		    break;
 		}
-		
-		StructuringElement toReturn = new StructuringElement(strelSize);
-		
-		toReturn.setAll(1.0f);
-		
-		strelSize.recycle();
-		
-		return toReturn;
+	    }
+			
+	    if (included) {
+		im.setValue(ic, 1.0f);	
+	    } else {
+		im.setValue(ic, 0.0f);
+	    }
+			
 	}
-	
-	/* (non-Javadoc)
-	 * @see edu.stanford.cfuller.imageanalysistools.filter.morph.MorphologicalFilter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
-	 */
-	@Override
-	public void apply(WritableImage im) {
-		
-		if (this.strel == null) return;
-		
-		Image origCopy = ImageFactory.create(im);
-		
-		for (ImageCoordinate ic : im) {
-			
-			this.strel.boxImageToElement(ic, origCopy);
-			
-			boolean included = true;
-			
-			for (ImageCoordinate boxedCoord : origCopy) {
-				if (this.strel.get(ic, boxedCoord) <= 0.0f || origCopy.getValue(boxedCoord) <= 0.0f) {
-					included = false;
-					break;
-				}
-			}
-			
-			if (included) {
-				im.setValue(ic, 1.0f);	
-			} else {
-				im.setValue(ic, 0.0f);
-			}
-			
-		}
 		
 
-	}
+    }
 
 }
