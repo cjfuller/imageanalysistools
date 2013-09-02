@@ -48,74 +48,74 @@ import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 
 public class GradientFilter extends Filter {
 
-	//TODO: deal with more dimensions, or refactor to call GradientFilter2D or something similar.
+    //TODO: deal with more dimensions, or refactor to call GradientFilter2D or something similar.
 
     /**
      * Applies the GradientFilter to the specified Image.
      * @param im    The Image that will be replaced by its gradient.
      */
-	@Override
-	public void apply(WritableImage im) {
+    @Override
+    public void apply(WritableImage im) {
 		
-		final int kernelSize = 3;
-		int halfKernelSize = (kernelSize -1)/2;
+	final int kernelSize = 3;
+	int halfKernelSize = (kernelSize -1)/2;
 		
-		RealMatrix kernel1 = new Array2DRowRealMatrix(kernelSize, kernelSize);
+	RealMatrix kernel1 = new Array2DRowRealMatrix(kernelSize, kernelSize);
 		
-		kernel1.setEntry(0, 0, 1);
-		kernel1.setEntry(1, 0, 0);
-		kernel1.setEntry(2, 0, -1);
-		kernel1.setEntry(0, 1, 1);
-		kernel1.setEntry(1, 1, 0);
-		kernel1.setEntry(2, 1, -1);
-		kernel1.setEntry(0, 2, 1);
-		kernel1.setEntry(1, 2, 0);
-		kernel1.setEntry(2, 2, -1);
+	kernel1.setEntry(0, 0, 1);
+	kernel1.setEntry(1, 0, 0);
+	kernel1.setEntry(2, 0, -1);
+	kernel1.setEntry(0, 1, 1);
+	kernel1.setEntry(1, 1, 0);
+	kernel1.setEntry(2, 1, -1);
+	kernel1.setEntry(0, 2, 1);
+	kernel1.setEntry(1, 2, 0);
+	kernel1.setEntry(2, 2, -1);
 		
-		RealMatrix kernel2 = new Array2DRowRealMatrix(kernelSize, kernelSize);
+	RealMatrix kernel2 = new Array2DRowRealMatrix(kernelSize, kernelSize);
 		
-		kernel2.setEntry(0, 0, -1);
-		kernel2.setEntry(1, 0, -1);
-		kernel2.setEntry(2, 0, -1);
-		kernel2.setEntry(0, 1, 0);
-		kernel2.setEntry(1, 1, 0);
-		kernel2.setEntry(2, 1, 0);
-		kernel2.setEntry(0, 2, 1);
-		kernel2.setEntry(1, 2, 1);
-		kernel2.setEntry(2, 2, 1);
+	kernel2.setEntry(0, 0, -1);
+	kernel2.setEntry(1, 0, -1);
+	kernel2.setEntry(2, 0, -1);
+	kernel2.setEntry(0, 1, 0);
+	kernel2.setEntry(1, 1, 0);
+	kernel2.setEntry(2, 1, 0);
+	kernel2.setEntry(0, 2, 1);
+	kernel2.setEntry(1, 2, 1);
+	kernel2.setEntry(2, 2, 1);
 		
 		
-		Image copy = ImageFactory.create(im);
+	Image copy = ImageFactory.create(im);
 				
-		ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
+	ImageCoordinate ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0);
 		
-		for (ImageCoordinate i : im) {
+	for (ImageCoordinate i : im) {
 			
-			double outputVal = 0;
-			double output1 = 0;
-			double output2 = 0;
+	    double outputVal = 0;
+	    double output1 = 0;
+	    double output2 = 0;
 						
-			if (i.get(ImageCoordinate.X) == 0 || i.get(ImageCoordinate.Y) == 0 || i.get(ImageCoordinate.X) == copy.getDimensionSizes().get(ImageCoordinate.X)-1 || i.get(ImageCoordinate.Y) == copy.getDimensionSizes().get(ImageCoordinate.Y)-1) {
-				outputVal = 0;
-			} else {
-				for (int p =-1*halfKernelSize; p < halfKernelSize+1; p++) {
-					for (int q = -1*halfKernelSize; q < halfKernelSize+1; q++) {
-						ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+p);
-						ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+q);
-						output1 += kernel1.getEntry(p+halfKernelSize,q+halfKernelSize) *copy.getValue(ic);
-						output2 += kernel2.getEntry(p+halfKernelSize,q+halfKernelSize) *copy.getValue(ic);
-					}
-				}
-				
-				outputVal = Math.hypot(output1, output2);
-			}
-			
-			im.setValue(i, (float) Math.floor(outputVal));
-			
+	    if (i.get(ImageCoordinate.X) == 0 || i.get(ImageCoordinate.Y) == 0 || i.get(ImageCoordinate.X) == copy.getDimensionSizes().get(ImageCoordinate.X)-1 || i.get(ImageCoordinate.Y) == copy.getDimensionSizes().get(ImageCoordinate.Y)-1) {
+		outputVal = 0;
+	    } else {
+		for (int p =-1*halfKernelSize; p < halfKernelSize+1; p++) {
+		    for (int q = -1*halfKernelSize; q < halfKernelSize+1; q++) {
+			ic.set(ImageCoordinate.X,i.get(ImageCoordinate.X)+p);
+			ic.set(ImageCoordinate.Y,i.get(ImageCoordinate.Y)+q);
+			output1 += kernel1.getEntry(p+halfKernelSize,q+halfKernelSize) *copy.getValue(ic);
+			output2 += kernel2.getEntry(p+halfKernelSize,q+halfKernelSize) *copy.getValue(ic);
+		    }
 		}
-		
-		ic.recycle();
-		
+				
+		outputVal = Math.hypot(output1, output2);
+	    }
+			
+	    im.setValue(i, (float) Math.floor(outputVal));
+			
 	}
+		
+	ic.recycle();
+		
+    }
 
 }
