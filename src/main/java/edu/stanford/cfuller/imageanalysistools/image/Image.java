@@ -70,6 +70,8 @@ public interface Image extends java.util.Collection<ImageCoordinate>, java.io.Se
 	 * @param boxMax    The (exclusive) upper coordinate bound of the boxed region of interest.
 	 */
 	public void setBoxOfInterest(ImageCoordinate boxMin, ImageCoordinate boxMax);
+
+	public void setBoxOfInterest(ImageCoordinate boxMin, ImageCoordinate boxMax);
 	
 	/**
 	 * Clears any existing region of interest that has been set on this Image.
