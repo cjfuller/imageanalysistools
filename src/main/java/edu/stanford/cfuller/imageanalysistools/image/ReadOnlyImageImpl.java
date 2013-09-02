@@ -215,6 +215,16 @@ public class ReadOnlyImageImpl implements Image {
 	
 
     /**
+     * Sets the region of interest in the Image, copying the provided image coordinates.
+     *
+     * @see #setBoxOfInterest(ImageCoordinate, ImageCoordinate, boolean)
+     */
+    public void setBoxOfInterest(ImageCoordinate boxMin, ImageCoordinate boxMax) {
+	this.setBoxOfInterest(boxMin, boxMax, true);
+    }
+
+
+    /**
      * Sets the region of interest in the Image.
      * <p>
      * The region of interest must be a (possibly high-dimensional) rectangle and is represented by two points, the lower bound of the coordinates
@@ -231,13 +241,19 @@ public class ReadOnlyImageImpl implements Image {
      *
      * @param boxMin    The (inclusive) lower coordinate bound of the boxed region of interest.
      * @param boxMax    The (exclusive) upper coordinate bound of the boxed region of interest.
+     * @param copy      Indicates whether to copy the input coordinates; if set to false, do not recycle or further modify the inputs.
      */
-    public void setBoxOfInterest(ImageCoordinate boxMin, ImageCoordinate boxMax) {
+    public void setBoxOfInterest(ImageCoordinate boxMin, ImageCoordinate boxMax, boolean copy) {
 
 	if (this.boxMin != null) {clearBoxOfInterest();}
 
-	this.boxMin = ImageCoordinate.cloneCoord(boxMin);
-	this.boxMax = ImageCoordinate.cloneCoord(boxMax);
+	if (copy) {
+	    this.boxMin = ImageCoordinate.cloneCoord(boxMin);
+	    this.boxMax = ImageCoordinate.cloneCoord(boxMax);
+	} else {
+	    this.boxMin = boxMin;
+	    this.boxMax = boxMax;
+	}
 
 	//bounds checking
 

@@ -67,11 +67,7 @@ public class StructuringElement {
 	    upperBound.set(i, upperBound.get(i) + (size.get(i) - 1)/2 + 1);
 	}
 		
-	toBeBoxed.setBoxOfInterest(lowerBound, upperBound);
-		
-	lowerBound.recycle();
-	upperBound.recycle();
-		
+	toBeBoxed.setBoxOfInterest(lowerBound, upperBound, false);	        
     }
 	
     /**

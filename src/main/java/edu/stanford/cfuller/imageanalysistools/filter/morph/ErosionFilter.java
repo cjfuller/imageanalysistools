@@ -93,6 +93,11 @@ public class ErosionFilter extends MorphologicalFilter {
 		
 	for (ImageCoordinate ic : im) {
 			
+	    if (im.getValue(ic) <= 0.0f) {
+		im.setValue(ic, 0.0f);
+		continue;
+	    }
+
 	    this.strel.boxImageToElement(ic, origCopy);
 			
 	    boolean included = true;
