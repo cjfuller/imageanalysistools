@@ -44,9 +44,11 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
     boolean flaggedForMerge;
 
     java.util.HashMap<Integer, Integer> mergeTable;
+    java.util.HashSet<Integer> mergeRegions;
 
     public SeededWatershedFilter() {
         this.mergeTable = new java.util.HashMap<Integer, Integer>();
+	this.mergeRegions = new java.util.HashSet<Integer>();
     }
 
     /**
@@ -102,12 +104,7 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
      */
     protected int getCorrectLabel(ImageCoordinate ic,  WritableImage processing, int nextLabel) {
 
-        java.util.HashSet<Integer> mergeRegions = new java.util.HashSet<Integer>();
-
-        // if (this.flaggedForMerge) {
-        //     this.mgf.apply(processing);
-        //     this.flaggedForMerge = false;
-        // }
+        mergeRegions.clear();
         
         int x = ic.get(ImageCoordinate.X);
         int y = ic.get(ImageCoordinate.Y);
@@ -121,11 +118,26 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         int neighbor = 0;
 
         ImageCoordinate ic2 = ImageCoordinate.cloneCoord(ic);
+	boolean lowerInBounds = false;
+	boolean upperInBounds = false;
+	boolean bothInBounds = lowerInBounds && upperInBounds;
 
         ic2.set(ImageCoordinate.X,x - 1);
         ic2.set(ImageCoordinate.Y,y - 1);
 
         if (processing.inBounds(ic2)) {
+	    lowerInBounds = true;
+            int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
+            if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
+            if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
+            if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
+        }
+
+        ic2.set(ImageCoordinate.X,x + 1);
+        ic2.set(ImageCoordinate.Y,y + 1);
+
+        if (processing.inBounds(ic2)) {
+	    upperInBounds = true;
             int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
             if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
             if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
@@ -135,7 +147,7 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.X,x - 1);
         ic2.set(ImageCoordinate.Y,y);
 
-        if (processing.inBounds(ic2)) {
+        if (lowerInBounds || processing.inBounds(ic2)) {
             int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
             if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
             if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
@@ -145,7 +157,7 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.X,x - 1);
         ic2.set(ImageCoordinate.Y,y + 1);
 
-        if (processing.inBounds(ic2)) {
+        if (bothInBounds || processing.inBounds(ic2)) {
             int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
             if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
             if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
@@ -155,7 +167,7 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.X,x);
         ic2.set(ImageCoordinate.Y,y - 1);
 
-        if (processing.inBounds(ic2)) {
+        if (lowerInBounds || processing.inBounds(ic2)) {
             int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
             if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
             if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
@@ -165,7 +177,7 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.X,x);
         ic2.set(ImageCoordinate.Y,y + 1);
 
-        if (processing.inBounds(ic2)) {
+        if (upperInBounds || processing.inBounds(ic2)) {
             int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
             if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
             if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
@@ -175,7 +187,7 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.X,x + 1);
         ic2.set(ImageCoordinate.Y,y - 1);
 
-        if (processing.inBounds(ic2)) {
+        if (bothInBounds || processing.inBounds(ic2)) {
             int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
             if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
             if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
@@ -185,17 +197,7 @@ public class SeededWatershedFilter extends WatershedFilter implements SeededFilt
         ic2.set(ImageCoordinate.X,x + 1);
         ic2.set(ImageCoordinate.Y,y);
 
-        if (processing.inBounds(ic2)) {
-            int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
-            if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
-            if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
-            if (neighbor <= 0 || (tempNeighbor < neighbor && tempNeighbor > 0)) neighbor = tempNeighbor;
-        }
-
-        ic2.set(ImageCoordinate.X,x + 1);
-        ic2.set(ImageCoordinate.Y,y + 1);
-
-        if (processing.inBounds(ic2)) {
+        if (upperInBounds || processing.inBounds(ic2)) {
             int tempNeighbor = followMergeChain((int) processing.getValue(ic2));
             if (isOnBoundary(neighbor, tempNeighbor)) {ic2.recycle(); return 0;}
             if (needsMerge(neighbor, tempNeighbor)) {this.flaggedForMerge = true; mergeRegions.add(neighbor); mergeRegions.add(tempNeighbor);}
