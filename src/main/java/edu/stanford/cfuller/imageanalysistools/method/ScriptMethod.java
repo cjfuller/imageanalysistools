@@ -43,49 +43,49 @@ import edu.stanford.cfuller.imageanalysistools.meta.RubyScript;
 
 public class ScriptMethod extends Method {
 	
-	public static final String SCRIPT_FILENAME_PARAM = edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataRubyParser.SCRIPT_FILENAME_PARAM;
+    public static final String SCRIPT_FILENAME_PARAM = edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataRubyParser.SCRIPT_FILENAME_PARAM;
 	
-	final static String SCRIPT_FUNCTIONS_FILE = "edu/stanford/cfuller/imageanalysistools/resources/script_methods.rb";
+    final static String SCRIPT_FUNCTIONS_FILE = "edu/stanford/cfuller/imageanalysistools/resources/script_methods.rb";
 	
-	final static String PARAM_METHOD_DISPLAY_NAME = "method_display_name";
+    final static String PARAM_METHOD_DISPLAY_NAME = "method_display_name";
 	
-	public void go() {
+    public void go() {
 		
-		String scriptFilename = this.parameters.getValueForKey(SCRIPT_FILENAME_PARAM);
+	String scriptFilename = this.parameters.getValueForKey(SCRIPT_FILENAME_PARAM);
 		
-		ScriptingContainer sc = new ScriptingContainer(org.jruby.embed.LocalContextScope.SINGLETHREAD, org.jruby.embed.LocalVariableBehavior.PERSISTENT);
+	ScriptingContainer sc = new ScriptingContainer(org.jruby.embed.LocalContextScope.SINGLETHREAD, org.jruby.embed.LocalVariableBehavior.PERSISTENT);
 		
-		sc.setClassLoader(ij.IJ.getClassLoader());
+	sc.setClassLoader(ij.IJ.getClassLoader());
 		
-		sc.put("parameters", this.parameters);
-		sc.put("imageset", this.imageSet);
-		sc.put("method", this);
+	sc.put("parameters", this.parameters);
+	sc.put("imageset", this.imageSet);
+	sc.put("method", this);
 				
-		sc.setCompatVersion(org.jruby.CompatVersion.RUBY1_9);
+	sc.setCompatVersion(org.jruby.CompatVersion.RUBY1_9);
 		
-		sc.runScriptlet(this.getClass().getClassLoader().getResourceAsStream(SCRIPT_FUNCTIONS_FILE), SCRIPT_FUNCTIONS_FILE);
+	sc.runScriptlet(this.getClass().getClassLoader().getResourceAsStream(SCRIPT_FUNCTIONS_FILE), SCRIPT_FUNCTIONS_FILE);
 		
-		if (this.getAnalysisMetadata() != null) {
+	if (this.getAnalysisMetadata() != null) {
 		
-			RubyScript scriptToRun = this.getAnalysisMetadata().getScript();
+	    RubyScript scriptToRun = this.getAnalysisMetadata().getScript();
 			
-			sc.runScriptlet(scriptToRun.getScriptString());
+	    sc.runScriptlet(scriptToRun.getScriptString());
 			
-		} else {
+	} else {
 			
-			sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, scriptFilename);
+	    sc.runScriptlet(org.jruby.embed.PathType.ABSOLUTE, scriptFilename);
 			
-		}
-		
-		
-		
-		if (this.parameters.hasKey(PARAM_METHOD_DISPLAY_NAME)) {
-			this.setDisplayName(this.parameters.getValueForKey(PARAM_METHOD_DISPLAY_NAME));
-		}
-		
-		
-		
 	}
+		
+		
+		
+	if (this.parameters.hasKey(PARAM_METHOD_DISPLAY_NAME)) {
+	    this.setDisplayName(this.parameters.getValueForKey(PARAM_METHOD_DISPLAY_NAME));
+	}
+		
+		
+		
+    }
 	
 }
 
