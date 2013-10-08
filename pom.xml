@@ -14,13 +14,13 @@
 		<dep.version.imglib>2.0.0-beta5</dep.version.imglib>
 		<dep.version.commonsmath>3.1.1</dep.version.commonsmath>
 		<dep.version.jruby>1.7.0</dep.version.jruby>
-		<versioninfo.commit_id>a55138a83a371017a2cc5b714fef244556e779fc</versioninfo.commit_id>
+		<versioninfo.commit_id>86e5d9aae01965f43fd49f5b3d627e3088de7dc8</versioninfo.commit_id>
 		<versioninfo.filename>edu/stanford/cfuller/imageanalysistools/resources/version_info.xml</versioninfo.filename>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
-	<version>5.1.4_dev</version>
+	<version>5.1.5_dev</version>
 
 	<dependencies>
 		<dependency>
