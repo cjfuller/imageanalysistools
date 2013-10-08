@@ -548,9 +548,9 @@ public class CentromereFindingMethod extends Method {
 
 		WritableImage normalized = ImageFactory.createWritable(this.images.get(0));
 
-		this.normalizeInputImage(normalized);
-
 		this.doBandpassFilter(normalized);
+
+		this.normalizeInputImage(normalized);
 
 		WritableImage groupMask = ImageFactory.createWritable(centromereFinding(normalized));
 
