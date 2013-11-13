@@ -81,28 +81,18 @@
         </div>
         <div class='span8'>
           <strong>Visit every pixel in an (up to 5D) image:</strong>
-          <pre>Image im = ...
-          for (ImageCoordinate ic : im ) {
-            ...
-          }</pre>
+          <pre>Image im = ...&#x000A;for (ImageCoordinate ic : im ) {&#x000A;  ...&#x000A;}</pre>
         </div>
       </div>
       <div class='row-fluid'>
         <div class='span4'>
           <h5>
             All analysis is
-            <a href='https://github.com/cjfuller/imageanalysistools/wiki/JRubyScripting'>scriptable using ruby</a><span>.</span></h5>
+            <a href='https://github.com/cjfuller/imageanalysistools/wiki/JRubyScripting'>scriptable using ruby</a>.
+          </h5>
         </div>
         <div class='span8'>
-          <pre>include IATScripting
-          
-          parameter_definitions do
-            define_parameter :min_size, 20
-          end
-          method_definition do
-            filter = get_filter :SizeAbsoluteFilter
-            filter.apply(imageset.getMarkerImage)
-          end</pre>
+          <pre>include IATScripting&#x000A;&#x000A;parameter_definitions do&#x000A;  define_parameter :min_size, 20&#x000A;end&#x000A;method_definition do&#x000A;  filter = get_filter :SizeAbsoluteFilter&#x000A;  filter.apply(imageset.getMarkerImage)&#x000A;end</pre>
         </div>
       </div>
       <div class='row-fluid'>
@@ -110,24 +100,21 @@
           <h5>Analysis metadata files are automatically generated that can be executed to repeat the same analysis.</h5>
         </div>
         <div class='span8'>
-          <pre>&lt;?xml version=&quot;1.0&quot; ?&gt;
-          &lt;analysis_metadata&gt;
-            &lt;input_state&gt;
-              &lt;parameters&gt;
-                &lt;parameter name=&quot;method_name&quot; type=&quot;string&quot; value=&quot;CentromereFindingMethod&quot;&gt;
-           ...</pre>
+          <pre>&lt;?xml version=&quot;1.0&quot; ?&gt;&#x000A;&lt;analysis_metadata&gt;&#x000A;  &lt;input_state&gt;&#x000A;    &lt;parameters&gt;&#x000A;      &lt;parameter name=&quot;method_name&quot; type=&quot;string&quot; value=&quot;CentromereFindingMethod&quot;&gt;&#x000A; ...</pre>
         </div>
       </div>
       <p>
         For more information on using the project from its GUI see
         <a href='https://github.com/cjfuller/imageanalysistools/wiki/using'>Using ImageAnalysisTools</a>
          or ask the
-        <a href='http://groups.google.com/group/imageanalysistools-discuss'>user google group</a><span>.</span></p>
+        <a href='http://groups.google.com/group/imageanalysistools-discuss'>user google group</a>.
+      </p>
       <p>
         For more information on using the project as a library from your own code see
         <a href='https://github.com/cjfuller/imageanalysistools/wiki/Developing'>Developing with ImageAnalysisTools</a>
          or ask the
-        <a href='http://groups.google.com/group/imageanalysistools-dev'>developer google group</a><span>.</span></p>
+        <a href='http://groups.google.com/group/imageanalysistools-dev'>developer google group</a>.
+      </p>
       <div class='fb-like' data-href='http://www.facebook.com/imageanalysistools' data-layout='button_count' data-send='false' data-show-faces='false' data-width='450'></div>
       <div class='g-plusone' data-size='medium'></div>
     </div>
