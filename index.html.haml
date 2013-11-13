@@ -85,8 +85,8 @@
         .span4
           %h5
             ="All analysis is "
-            %a{href: scripting_url}> scriptable using ruby
-            ="."
+            %a{href: scripting_url} scriptable using ruby
+            %span>< .
         .span8
           %pre
             ~ "include IATScripting\n\nparameter_definitions do\n  define_parameter :min_size, 20\nend\nmethod_definition do\n  filter = get_filter :SizeAbsoluteFilter\n  filter.apply(imageset.getMarkerImage)\nend"
@@ -101,15 +101,15 @@
         For more information on using the project from its GUI see 
         %a{href: wiki_using_url} Using ImageAnalysisTools
         = " or ask the "
-        %a{href: ggroup_users_url}> user google group
-        ="."
+        %a{href: ggroup_users_url} user google group
+        %span>< .
 
       %p
         For more information on using the project as a library from your own code see 
         %a{href: wiki_dev_url} Developing with ImageAnalysisTools
         =" or ask the "
-        %a{href: ggroup_dev_url}> developer google group
-        ="."
+        %a{href: ggroup_dev_url} developer google group
+        %span>< .
 
       .fb-like(data-href="http://www.facebook.com/imageanalysistools" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false")
       .g-plusone(data-size="medium")
