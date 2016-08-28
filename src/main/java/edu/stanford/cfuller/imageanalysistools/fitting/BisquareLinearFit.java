@@ -55,8 +55,9 @@ public class BisquareLinearFit {
 	/**
 	* Disables the fitting of the y-intercept for this fit.
 	*/
-	public void disableIntercept() {
+	public BisquareLinearFit disableIntercept() {
 		this.noIntercept = true;
+		return this;
 	}
 	
 	
