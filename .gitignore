@@ -1,2 +1,3 @@
 .idea
 target
+src/main/resources/edu/stanford/cfuller/imageanalysistools/resources/version_info.xml
