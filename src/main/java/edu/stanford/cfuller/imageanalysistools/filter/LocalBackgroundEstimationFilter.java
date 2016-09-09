@@ -179,7 +179,7 @@ public class LocalBackgroundEstimationFilter extends Filter {
 					icnew.quickSet(ImageCoordinate.Y,j+boxSize);
 					int value = (int) padded.getValue(icnew);
 					
-					if (value == -1) continue;
+					if (value < 0) continue;
 					
 					countsByRow_a[(countsByRow_rowZero_pointer + num_rows - 1) % num_rows][value]+= 1;
 
