@@ -1,0 +1,72 @@
+buildscript {
+    ext.kotlin_version = '1.1.0-rc-91'
+
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            url "http://dl.bintray.com/kotlin/kotlin-eap-1.1"
+        }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.github.jengelman.gradle.plugins:shadow:1.2.4"
+    }
+}
+
+apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: "kotlin"
+apply plugin: "application"
+
+repositories {
+    mavenCentral()
+    maven {
+        url "http://maven.imagej.net/content/repositories/public"
+    }
+    maven {
+        url "http://dl.bintray.com/kotlin/kotlin-eap-1.1"
+    }
+}
+
+def DepVersionLoci = "4.4.5"
+def DepVersionIJ = "2.0.0-beta4"
+def DepVersionImgLib = "2.0.0-beta5"
+def DepVersionCommonsMath = "3.1.1"
+def DepVersionJRuby = "1.7.0"
+def VersionInfoFilename = "src/main/resources/edu/stanford/cfuller/imageanalysistools/resources/version_info.xml"
+
+def Version = "5.1.5-pre.0"
+
+task updateVersionInfo(type: Exec) {
+    commandLine "sh", "-c", (
+            "echo \"<library version=\\\"$Version\\\" commit=\\\"`git log -1 --pretty=format:%H`\\\">" +
+                    "</library>\" > $VersionInfoFilename")
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    compile "org.slf4j:slf4j-simple:1.7.21"
+    testCompile "junit:junit:4.10"
+    testCompile "io.kotlintest:kotlintest:1.3.7"
+    compile "org.apache.commons:commons-math3:$DepVersionCommonsMath"
+    compile "loci:scifio:$DepVersionLoci"
+    compile "loci:bio-formats:$DepVersionLoci"
+    compile "loci:ome_tools:$DepVersionLoci"
+    compile "net.imagej:ij-core:$DepVersionIJ"
+    compile "net.imglib2:imglib2:$DepVersionImgLib"
+    compile "net.imglib2:imglib2-io:$DepVersionImgLib"
+    compile "net.imglib2:imglib2-algorithms:$DepVersionImgLib"
+    compile "org.jruby:jruby:$DepVersionJRuby"
+}
+
+build.dependsOn updateVersionInfo
+
+mainClassName = "edu.stanford.cfuller.analysistoolsinterface.Main"
+
+jar {
+    manifest {
+        attributes "Main-Class": mainClassName
+    }
+}
