@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.analysistoolsinterface
 
 import java.io.IOException
@@ -59,7 +35,7 @@ import java.awt.event.ActionEvent
  * @author cfuller
  */
 class FilterSelectionFrame(internal var psc: ParameterSetupController) : JFrame() {
-    internal var parameterList: JList<*>
+    internal var parameterList: JList<String> = JList()
 
     protected fun addAdditionalFilters() {
         val jfc = JFileChooser(Preferences.userNodeForPackage(this.javaClass).get("additional_filters_filename", ""))
@@ -108,11 +84,13 @@ class FilterSelectionFrame(internal var psc: ParameterSetupController) : JFrame(
                                 .addContainerGap(11, java.lang.Short.MAX_VALUE.toInt()))
         )
 
-        parameterList = JList()
         parameterList.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(arg0: MouseEvent?) {
                 val selected = parameterList.selectedValue as String
-                psc.addSelectedFilter(selected, filterLookupByName[selected])
+                val filter = filterLookupByName[selected]
+                if (filter != null) {
+                    psc.addSelectedFilter(selected, filter)
+                }
                 isVisible = false
                 dispose()
             }
@@ -126,8 +104,8 @@ class FilterSelectionFrame(internal var psc: ParameterSetupController) : JFrame(
 
         private val serialVersionUID = 1L
 
-        internal var filters: MutableList<String>
-        internal var filterLookupByName: MutableMap<String, String>
+        internal var filters: MutableList<String> = ArrayList<String>()
+        internal var filterLookupByName: MutableMap<String, String> = HashMap<String, String>()
 
         internal val FILTERS_XML_FILENAME = "edu/stanford/cfuller/analysistoolsinterface/resources/filters.xml"
         internal val FILTER_TAG_NAME = "filter"
@@ -135,18 +113,11 @@ class FilterSelectionFrame(internal var psc: ParameterSetupController) : JFrame(
         internal val CLASS_ATTR = "class"
 
         init {
-
-            filters = ArrayList<String>()
-            filterLookupByName = HashMap<String, String>()
-
             populateFilterList(FILTERS_XML_FILENAME, true)
-
         }
 
-        protected fun populateFilterList(filename: String, isResource: Boolean) {
-
+        private fun populateFilterList(filename: String, isResource: Boolean) {
             var taskDoc: Document? = null
-
             var taskURLString: String? = null
 
             if (isResource) {
@@ -178,18 +149,11 @@ class FilterSelectionFrame(internal var psc: ParameterSetupController) : JFrame(
             val tasks = taskDoc!!.getElementsByTagName(FILTER_TAG_NAME)
 
             for (i in 0..tasks.length - 1) {
-
                 val n = tasks.item(i)
-
                 val filterName = n.attributes.getNamedItem(NAME_ATTR).nodeValue
-
                 val filterClass = n.attributes.getNamedItem(CLASS_ATTR).nodeValue
-
                 filterLookupByName.put(filterName, filterClass)
-
                 filters.add(filterName)
-
-
             }
         }
     }
