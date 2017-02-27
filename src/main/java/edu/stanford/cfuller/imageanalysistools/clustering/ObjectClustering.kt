@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.clustering
 
 import edu.stanford.cfuller.imageanalysistools.image.Image
@@ -46,8 +22,6 @@ import java.util.Vector
  */
 
 object ObjectClustering {
-
-
     /**
      * Sets up a set of ClusterObjects and a set of Clusters from two Image masks, one labeled with individual objects, and one labeled with all objects in a single cluster grouped with a single label.
 
@@ -64,7 +38,6 @@ object ObjectClustering {
      * @return                      The number of ClusterObjects in the Image.
      */
     fun initializeObjectsAndClustersFromClusterImage(labeledByObject: Image, labeledByCluster: Image, clusterObjects: Vector<ClusterObject>, clusters: Vector<Cluster>, k: Int): Int {
-
         clusters.clear()
 
         for (j in 0..k - 1) {
@@ -75,9 +48,7 @@ object ObjectClustering {
         }
 
         val h = Histogram(labeledByObject)
-
         val n = h.maxValue
-
         clusterObjects.clear()
 
         for (j in 0..n - 1) {
@@ -87,26 +58,18 @@ object ObjectClustering {
         }
 
         for (i in labeledByObject) {
-
             if (labeledByObject.getValue(i) > 0) {
-
                 val value = labeledByObject.getValue(i).toInt()
-
                 clusterObjects[value - 1].incrementnPixels()
                 clusterObjects[value - 1].centroid = clusterObjects[value - 1].centroid.add(Vector3D(i.get(ImageCoordinate.X).toDouble(), i.get(ImageCoordinate.Y).toDouble(), i.get(ImageCoordinate.Z).toDouble()))
-
-
             }
-
         }
 
-        for (j in 0..n - 1) {
-            val current = clusterObjects[j]
-            current.centroid = current.centroid.scalarMultiply(1.0 / current.getnPixels())
-        }
+        (0..n - 1)
+                .map { clusterObjects[it] }
+                .forEach { it.centroid = it.centroid.scalarMultiply(1.0 / it.getnPixels()) }
 
         for (i in labeledByObject) {
-
             val clusterValue = labeledByCluster.getValue(i).toInt()
             val objectValue = labeledByObject.getValue(i).toInt()
             if (clusterValue == 0 || objectValue == 0) {
@@ -114,31 +77,21 @@ object ObjectClustering {
             }
 
             clusters[clusterValue - 1].objectSet.add(clusterObjects[objectValue - 1])
-
         }
 
         for (c in clusters) {
-
             var objectCounter = 0
-
             c.setCentroidComponents(0.0, 0.0, 0.0)
 
             for (co in c.objectSet) {
-
                 objectCounter++
                 co.currentCluster = c
-
                 c.centroid = c.centroid.add(co.centroid)
-
             }
 
             c.centroid = c.centroid.scalarMultiply(1.0 / objectCounter)
-
         }
-
-
         return n
-
     }
 
     /**
@@ -155,102 +108,64 @@ object ObjectClustering {
      * @return                  The number of ClusterObjects in the Image.
      */
     fun initializeObjectsAndClustersFromImage(im: Image, clusterObjects: Vector<ClusterObject>, clusters: Vector<Cluster>, k: Int): Int {
-
         var n = 0
-
         clusters.clear()
 
         for (j in 0..k - 1) {
-
             clusters.add(Cluster())
             clusters[j].id = j + 1
-
         }
 
         val h = Histogram(im)
-
         n = h.maxValue
-
         clusterObjects.clear()
 
         for (j in 0..n - 1) {
-
             clusterObjects.add(ClusterObject())
-
             clusterObjects[j].setCentroidComponents(0.0, 0.0, 0.0)
-
             clusterObjects[j].setnPixels(0)
-
         }
 
         for (i in im) {
-
             if (im.getValue(i) > 0) {
-
                 val current = clusterObjects[im.getValue(i).toInt() - 1]
-
                 current.incrementnPixels()
-
-                current.centroid = current.centroid.add(Vector3D(i.get(ImageCoordinate.X).toDouble(), i.get(ImageCoordinate.Y).toDouble(), i.get(ImageCoordinate.Z).toDouble()))
-
+                current.centroid = current.centroid.add(Vector3D(i[ImageCoordinate.X].toDouble(), i[ImageCoordinate.Y].toDouble(), i[ImageCoordinate.Z].toDouble()))
             }
-
         }
 
-        for (j in 0..n - 1) {
-            val current = clusterObjects[j]
-            current.centroid = current.centroid.scalarMultiply(1.0 / current.getnPixels())
-        }
+        (0..n - 1)
+                .map { clusterObjects[it] }
+                .forEach { it.centroid = it.centroid.scalarMultiply(1.0 / it.getnPixels()) }
 
         //initialize clusters using kmeans++ strategy
-
-        val probs = DoubleArray(n)
-        val cumulativeProbs = DoubleArray(n)
-
-
-        java.util.Arrays.fill(probs, 0.0)
-        java.util.Arrays.fill(cumulativeProbs, 0.0)
+        val probs = DoubleArray(n, { 0.0 })
+        val cumulativeProbs = DoubleArray(n, { 0.0 })
 
         //choose the initial cluster
-
         val initialClusterObject = Math.floor(n * RandomGenerator.rand()).toInt()
-
         clusters[0].centroid = clusterObjects[initialClusterObject].centroid
-
         clusters[0].objectSet.add(clusterObjects[initialClusterObject])
 
         for (j in 0..n - 1) {
-
             clusterObjects[j].currentCluster = clusters[0]
         }
 
         //assign the remainder of the clusters
-
-
         for (j in 1..k - 1) {
-
             var probSum = 0.0
-
             for (m in 0..n - 1) {
                 var minDist = java.lang.Double.MAX_VALUE
-
                 var bestCluster: Cluster? = null
-
                 for (p in 0..j - 1) {
-
                     val tempDist = clusterObjects[m].distanceTo(clusters[p])
-
                     if (tempDist < minDist) {
                         minDist = tempDist
-
                         bestCluster = clusters[p]
                     }
-
                 }
-
                 probs[m] = minDist
                 probSum += minDist
-
                 clusterObjects[m].currentCluster = bestCluster
             }
 
@@ -262,6 +177,7 @@ object ObjectClustering {
                     cumulativeProbs[m] = cumulativeProbs[m - 1] + probs[m]
                 }
             }
+
             val randNum = RandomGenerator.rand()
             var nextCenter = 0
 
@@ -273,22 +189,15 @@ object ObjectClustering {
             }
 
             clusters[j].centroid = clusterObjects[nextCenter].centroid
-
-
         }
 
         for (m in 0..n - 1) {
-
             var minDist = java.lang.Double.MAX_VALUE
-
             var bestCluster: Cluster? = null
 
             for (p in 0..k - 1) {
-
                 val tempDist = clusterObjects[m].distanceTo(clusters[p])
-
                 if (tempDist < minDist) {
-
                     minDist = tempDist
                     bestCluster = clusters[p]
                 }
@@ -296,10 +205,7 @@ object ObjectClustering {
 
             clusterObjects[m].currentCluster = bestCluster
             bestCluster!!.objectSet.add(clusterObjects[m])
-
         }
-
-
         return n
     }
 
@@ -322,39 +228,24 @@ object ObjectClustering {
      * @return                  The result of applying the metric.  A lower score means the clustering is better.
      */
     fun getInterClusterDistances(clusterObjects: Vector<ClusterObject>, clusters: Vector<Cluster>, k: Int, n: Int): Double {
-
-        val intraClusterDists = DoubleArray(k)
-        val intraCounts = IntArray(k)
-        val maxIntra = DoubleArray(k)
-
-        java.util.Arrays.fill(intraClusterDists, 0.0)
-        java.util.Arrays.fill(intraCounts, 0)
-        java.util.Arrays.fill(maxIntra, 0.0)
-
+        val intraClusterDists = DoubleArray(k, { 0.0 })
+        val intraCounts = IntArray(k, { 0 })
+        val maxIntra = DoubleArray(k, { 0.0 })
 
         for (i in 0..n - 1) {
-
-            val i_ID = clusterObjects[i].currentCluster.id
-
+            val i_ID = clusterObjects[i].currentCluster?.id
             for (j in i + 1..n - 1) {
+                val j_ID = clusterObjects[j].currentCluster?.id
 
-                val j_ID = clusterObjects[j].currentCluster.id
-
-
-                if (i_ID == j_ID) {
-
+                if (i_ID == j_ID && i_ID != null) {
                     val dist = clusterObjects[i].distanceTo(clusterObjects[j])
-
                     intraClusterDists[i_ID - 1] += dist
-
                     intraCounts[i_ID - 1]++
 
                     if (dist > maxIntra[i_ID - 1]) {
                         maxIntra[i_ID - 1] = dist
                     }
-
                 }
-
             }
         }
 
@@ -362,34 +253,22 @@ object ObjectClustering {
         var ratio_counts = 0
 
         for (i in 0..k - 1) {
-
             if (clusters[i].objectSet.size == 0) {
-
                 continue
-
             }
 
             for (j in i + 1..k - 1) {
-
                 if (clusters[j].objectSet.size == 0) {
                     continue
                 }
 
                 var maxDist = 0.0
-
                 for (i_obj in clusters[i].objectSet) {
-
-                    for (j_obj in clusters[j].objectSet) {
-
-                        val dist = i_obj.distanceTo(j_obj)
-
-                        if (dist > maxDist) {
-                            maxDist = dist
-                        }
-
-
-                    }
-
+                    clusters[j].objectSet
+                            .asSequence()
+                            .map { i_obj.distanceTo(it) }
+                            .filter { it > maxDist }
+                            .forEach { maxDist = it }
                 }
 
                 val zeroCountScalingFactor = 4.0
@@ -406,22 +285,11 @@ object ObjectClustering {
 
                 ratios += 2 * (intraClusterDists[i] / intraCounts[i] + intraClusterDists[j] / intraCounts[j]) / maxDist
                 ratio_counts++
-
-
             }
-
-
         }
 
-
-
-
         if (ratio_counts == 0) {
-            var maxElement = 0.0
-
-            for (d in maxIntra) {
-                if (d > maxElement) maxElement = d
-            }
+            val maxElement = maxIntra.max() ?: 0.0
 
             ratios = 4 * intraClusterDists[0] / (maxElement + 1e-9)
             ratio_counts = 1
@@ -444,19 +312,12 @@ object ObjectClustering {
      * @param k                 The number of Clusters.
      */
     fun clustersToMask(output: WritableImage, clusterObjects: Vector<ClusterObject>, clusters: Vector<Cluster>, k: Int) {
-
         for (i in output) {
-
             val value = output.getValue(i).toInt()
-
             if (value > 0) {
-
-                output.setValue(i, clusterObjects[value - 1].currentCluster.id.toFloat())
+                output.setValue(i, clusterObjects[value - 1].currentCluster?.id?.toFloat() ?: Float.NaN)
             }
-
         }
-
-
     }
 
     /**
@@ -469,26 +330,18 @@ object ObjectClustering {
      * @return          The filtered Image.
      */
     fun gaussianFilterMask(input: Image): WritableImage {
-
         val origCopy = ImageFactory.createWritable(input)
         val gf = GaussianFilter()
-
         val MAX_VALUE = 4095
 
-        for (i in origCopy) {
-            if (origCopy.getValue(i) > 0) {
-                origCopy.setValue(i, MAX_VALUE.toFloat())
-            }
-        }
+        origCopy
+                .asSequence()
+                .filter { origCopy.getValue(it) > 0 }
+                .forEach { origCopy.setValue(it, MAX_VALUE.toFloat()) }
 
-        gf.setWidth(origCopy.dimensionSizes.get(ImageCoordinate.X) / 5)
-
-
-
+        gf.setWidth(origCopy.dimensionSizes[ImageCoordinate.X] / 5)
         gf.apply(origCopy)
-
         return origCopy
-
     }
 
     /**
@@ -506,42 +359,22 @@ object ObjectClustering {
      * *                          This will be modified, so if planning to reuse the Gaussian filtered image, pass in a copy.
      */
     fun doBasicClustering(input: WritableImage, original: Image, gaussianFiltered: Image?): Image {
-
         val rlf = RelabelFilter()
         val lf = LabelFilter()
         val mf = MaskFilter()
-
         mf.setReferenceImage(input)
-
-
         val h_individualCentromeres = Histogram(input)
+        val origCopy: WritableImage = gaussianFiltered?.writableInstance ?: gaussianFilterMask(input).writableInstance
 
-
-        var origCopy: WritableImage? = null
-
-        if (gaussianFiltered == null) {
-
-            origCopy = gaussianFilterMask(input).writableInstance
-
-        } else {
-            origCopy = gaussianFiltered.writableInstance
-        }
-
-        lf.apply(origCopy!!)
-
+        lf.apply(origCopy)
 
         val mapped = ImageFactory.createWritable(origCopy)
-
         val h_mapped_0 = Histogram(origCopy)
 
         //first, find the centroid of each cluster
-
         val centroids_x = ArrayRealVector(h_mapped_0.maxValue + 1)
         val centroids_y = ArrayRealVector(h_mapped_0.maxValue + 1)
-
         val counts = ArrayRealVector(h_mapped_0.maxValue + 1)
-
-
         centroids_x.mapMultiplyToSelf(0.0)
         centroids_y.mapMultiplyToSelf(0.0)
         counts.mapMultiplyToSelf(0.0)
@@ -549,72 +382,56 @@ object ObjectClustering {
         for (i in origCopy) {
             if (origCopy.getValue(i) > 0) {
                 val value = origCopy.getValue(i).toInt()
-                centroids_x.setEntry(value, centroids_x.getEntry(value) + i.get(ImageCoordinate.X))
-                centroids_y.setEntry(value, centroids_y.getEntry(value) + i.get(ImageCoordinate.Y))
+                centroids_x.setEntry(value, centroids_x.getEntry(value) + i[ImageCoordinate.X])
+                centroids_y.setEntry(value, centroids_y.getEntry(value) + i[ImageCoordinate.Y])
                 counts.setEntry(value, counts.getEntry(value) + 1)
             }
         }
         for (i in 0..counts.dimension - 1) {
             if (counts.getEntry(i) == 0.0) {
                 counts.setEntry(i, 1.0)
-                centroids_x.setEntry(i, (-1 * origCopy.dimensionSizes.get(ImageCoordinate.X)).toDouble())
-                centroids_y.setEntry(i, (-1 * origCopy.dimensionSizes.get(ImageCoordinate.Y)).toDouble())
+                centroids_x.setEntry(i, (-1 * origCopy.dimensionSizes[ImageCoordinate.X]).toDouble())
+                centroids_y.setEntry(i, (-1 * origCopy.dimensionSizes[ImageCoordinate.Y]).toDouble())
             }
             centroids_x.setEntry(i, centroids_x.getEntry(i) / counts.getEntry(i))
             centroids_y.setEntry(i, centroids_y.getEntry(i) / counts.getEntry(i))
-
         }
 
         for (i in origCopy) {
-
             if (mapped.getValue(i) > 0 || input.getValue(i) == 0f) continue
-
             var minDistance = java.lang.Double.MAX_VALUE
             var minIndex = 0
 
             for (j in 0..centroids_x.dimension - 1) {
-                val dist = Math.hypot(centroids_x.getEntry(j) - i.get(ImageCoordinate.X), centroids_y.getEntry(j) - i.get(ImageCoordinate.Y))
+                val dist = Math.hypot(centroids_x.getEntry(j) - i[ImageCoordinate.X], centroids_y.getEntry(j) - i[ImageCoordinate.Y])
                 if (dist < minDistance) {
                     minDistance = dist
                     minIndex = j
                 }
             }
-
             mapped.setValue(i, minIndex.toFloat())
-
         }
 
-
-        val centromereAssignments = IntArray(h_individualCentromeres.maxValue + 1)
-        java.util.Arrays.fill(centromereAssignments, 0)
+        val centromereAssignments = IntArray(h_individualCentromeres.maxValue + 1, { 0 })
 
         for (i in mapped) {
-
             if (input.getValue(i) > 0) {
-
                 val value = input.getValue(i).toInt()
-
                 if (centromereAssignments[value] > 0) {
                     mapped.setValue(i, centromereAssignments[value].toFloat())
                 } else {
                     centromereAssignments[value] = mapped.getValue(i).toInt()
                 }
-
             }
         }
-
-
         mf.apply(mapped)
         origCopy.copy(mapped)
         mf.setReferenceImage(origCopy)
-
         mf.apply(input)
         rlf.apply(input)
         rlf.apply(origCopy)
-
         return origCopy
     }
-
 
     /**
      * Applies complex clustering to an Image with objects.
@@ -633,15 +450,8 @@ object ObjectClustering {
      * *                          This will be modified, so if planning to reuse the Gaussian filtered image, pass in a copy.
      */
     fun doComplexClustering(input: WritableImage, original: Image, maxClusters: Int, gaussianFiltered: Image) {
-
-        //debug output
-        //input.writeToFile("/Users/cfuller/Desktop/filter_intermediates/input.ome.tif");
-
         val output = doBasicClustering(input, original, gaussianFiltered)
-
         doClusteringWithInitializedClusters(input, original, maxClusters, output)
-
-
     }
 
     /**
@@ -658,131 +468,73 @@ object ObjectClustering {
      * @param clusterImage      A version of the Image mask relabeled such that each object in the Image is assigned a greylevel value corresponding to its cluster.  Each cluster should have a unique value, these should start at 1, and they should be consecutive.
      */
     fun doClusteringWithInitializedClusters(input: WritableImage, original: Image, maxClusters: Int, clusterImage: Image) {
-
-        //input.writeToFile("/Users/cfuller/Desktop/filter_intermediates/input.ome.tif");
-        //original.writeToFile("/Users/cfuller/Desktop/filter_intermediates/original.ome.tif");
-        //clusterImage.writeToFile("/Users/cfuller/Desktop/filter_intermediates/clusterImage.ome.tif");
-
         val interdist_cutoff = 0.89
-
-
         val clusterObjects = Vector<ClusterObject>()
         val clusters = Vector<Cluster>()
-
-
         var bestRatio = 1.0
-
         var bestK = 0
-
-        var bestImage: Image? = null
-
+        val origCopy = ImageFactory.createWritable(clusterImage)
+        var bestImage: Image = ImageFactory.create(origCopy)
         var overallMaxL = 1.0 * java.lang.Double.MAX_VALUE
-
         var repeatThis = 0
         val numRepeats = 3
-
         val rlf = RelabelFilter()
-
-        val origCopy = ImageFactory.createWritable(clusterImage)
-
         val h_ssf = Histogram(origCopy)
-
         val k_init = h_ssf.maxValue
-
         var numAttempts = 0
-
         var lastBestK = 0
-
         var k = 1
+
         while (k <= maxClusters) {
-
             numAttempts++
-
             val orig_k = k
-
             var interdist: Double
-
             var currMaxL = -1.0 * java.lang.Double.MAX_VALUE
-
             var n = 0
-
             var L = -1.0 * java.lang.Double.MAX_VALUE
 
-            var candidateNewBestImage: Image? = null
-
-            if (numAttempts == 1 || bestImage == null) {
-
+            if (numAttempts == 1) {
                 k = k_init
-
                 bestImage = ImageFactory.create(origCopy)
-
                 bestK = k_init
-
             }
 
-            candidateNewBestImage = ImageFactory.createShallow(bestImage)
-
+            var candidateNewBestImage: Image = ImageFactory.createShallow(bestImage)
             val h = Histogram(bestImage)
-
             var currentMaxImageValue = h.maxValue
-
             var sumL = 0.0
-
             val singleCluster = ImageFactory.createWritable(input)
-
             val dividedClusterTemp = ImageFactory.createWritable(singleCluster)
 
-
             for (clusterNumber in 1..h.maxValue) {
-
-
                 singleCluster.copy(input)
-
                 dividedClusterTemp.copy(singleCluster)
-
                 val clusterMin = ImageCoordinate.cloneCoord(singleCluster.dimensionSizes)
                 val clusterMax = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0)
-
                 for (i in singleCluster) {
-
-                    if (bestImage!!.getValue(i) != clusterNumber.toFloat()) {
-
+                    if (bestImage.getValue(i) != clusterNumber.toFloat()) {
                         singleCluster.setValue(i, 0f)
-
                     } else {
-
                         //find the min and max bounds of this cluster
-
                         for (dim in i) {
-                            if (i.get(dim!!) < clusterMin.get(dim)) {
-                                clusterMin.set(dim, i.get(dim))
+                            if (i[dim] < clusterMin[dim]) {
+                                clusterMin[dim] = i[dim]
                             }
-                            if (i.get(dim) >= clusterMax.get(dim)) {
-                                clusterMax.set(dim, i.get(dim) + 1)
+                            if (i[dim] >= clusterMax[dim]) {
+                                clusterMax[dim] = i[dim] + 1
                             }
                         }
-
                     }
                 }
-
                 singleCluster.setBoxOfInterest(clusterMin, clusterMax)
-
                 rlf.apply(singleCluster)
-
                 val hSingleCluster = Histogram(singleCluster)
-
                 val nSingleCluster = hSingleCluster.maxValue
-
                 var accepted = false
-
                 var tempBestRatio = java.lang.Double.MAX_VALUE
-
                 var tempBestL = 0.0
-
                 val origCurrentMaxImageValue = currentMaxImageValue
-
                 val tempCandidateNewBestImage = ImageFactory.createWritable(candidateNewBestImage)
-
                 var kMax = if (bestK < 3) 6 else 4
 
                 if (kMax > nSingleCluster) {
@@ -790,153 +542,92 @@ object ObjectClustering {
                 }
 
                 for (tempK in 2..kMax - 1) {
-
-                    //java.util.logging.Logger.getLogger("edu.stanford.cfuller.imageanalysistools").info("tempK: " + Integer.toString(tempK));
-
-
                     for (repeatCounter in 0..numRepeats - 1) {
-
                         var accept = false
-
                         var tempCurrentMaxImageValue = origCurrentMaxImageValue
-
                         n = initializeObjectsAndClustersFromImage(singleCluster, clusterObjects, clusters, tempK)
-
                         L = DEGaussianMixtureModelClustering.go(singleCluster, clusterObjects, clusters, tempK, n)
-
-
                         interdist = getInterClusterDistances(clusterObjects, clusters, tempK, n)
 
                         if (interdist < interdist_cutoff && interdist < tempBestRatio) {
-
                             accept = true
                             accepted = true
                             tempBestRatio = interdist
-
                             tempBestL = L
-
                         }
 
                         if (accept) {
-
-
                             dividedClusterTemp.copy(singleCluster)
-
-
                             dividedClusterTemp.setBoxOfInterest(clusterMin, clusterMax)
-
                             clustersToMask(dividedClusterTemp, clusterObjects, clusters, tempK)
 
-                            //dividedClusterTemp.writeToFile("/Users/cfuller/Desktop/filter_intermediates/divided_" + clusterNumber + ".ome.tif");
-
                             val newClusterValue = tempCurrentMaxImageValue
-
                             tempCandidateNewBestImage.copy(candidateNewBestImage)
 
-                            for (i in singleCluster) {
-
-
-                                if (dividedClusterTemp.getValue(i) > 1) {
-
-                                    tempCandidateNewBestImage.setValue(i, newClusterValue + dividedClusterTemp.getValue(i) - 1)
-
-                                }
-                            }
+                            singleCluster
+                                    .asSequence()
+                                    .filter { dividedClusterTemp.getValue(it) > 1 }
+                                    .forEach { tempCandidateNewBestImage.setValue(it, newClusterValue + dividedClusterTemp.getValue(it) - 1) }
 
                             tempCurrentMaxImageValue = newClusterValue + tempK - 1
-
                             currentMaxImageValue = tempCurrentMaxImageValue
                         }
 
                         clusterObjects.clear()
                         clusters.clear()
-
                     }
-
                 }
 
                 if (accepted) {
-
                     sumL += tempBestL
                     candidateNewBestImage = tempCandidateNewBestImage
                 } else {
-
                     if (nSingleCluster > 0) {
-
                         n = initializeObjectsAndClustersFromImage(singleCluster, clusterObjects, clusters, 1)
                         sumL += DEGaussianMixtureModelClustering.go(singleCluster, clusterObjects, clusters, 1, n)
-
                     }
 
                     clusterObjects.clear()
-
                     clusters.clear()
-
                 }
 
                 dividedClusterTemp.clearBoxOfInterest()
                 singleCluster.clearBoxOfInterest()
                 clusterMin.recycle()
                 clusterMax.recycle()
-
             }
 
             k = currentMaxImageValue
-
             n = initializeObjectsAndClustersFromClusterImage(input, candidateNewBestImage, clusterObjects, clusters, k)
             L = sumL
-
             val tempL = -1.0 * L
-
-            if (numAttempts == 1) {
-
-
-            } else {
-            }
-
             interdist = getInterClusterDistances(clusterObjects, clusters, clusters.size, clusterObjects.size)
 
             if (interdist == -1.0) {
                 interdist = 1.0
             }
-
             val ratio = interdist
 
             if (numAttempts == 1) {
-
                 overallMaxL = tempL
-
                 bestRatio = java.lang.Double.MAX_VALUE
-
             }
 
             if (tempL >= overallMaxL && ratio < bestRatio) {
-
                 bestRatio = ratio
-
                 lastBestK = bestK
                 bestK = k
-
                 repeatThis = 0
-
-
                 val newBestImage = ImageFactory.createWritable(input)
-
                 clustersToMask(newBestImage, clusterObjects, clusters, bestK)
-
                 rlf.apply(newBestImage)
-
                 bestImage = newBestImage
-
-
                 overallMaxL = tempL
-
             }
 
             if (tempL > currMaxL) {
                 currMaxL = tempL
             }
-
             clusters.clear()
             clusterObjects.clear()
 
@@ -947,21 +638,14 @@ object ObjectClustering {
             }
 
             if (orig_k > k) {
-
                 k = orig_k
             }
-
-            candidateNewBestImage = null
 
             if (k > maxClusters) break
             if (repeatThis == 0 && bestK == lastBestK) break
             if (numAttempts >= maxClusters) break
             k++
-
         }
-
         input.copy(bestImage)
-
     }
-
 }

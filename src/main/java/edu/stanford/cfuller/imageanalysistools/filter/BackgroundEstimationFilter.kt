@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.filter
 
 import edu.stanford.cfuller.imageanalysistools.image.ImageFactory
@@ -49,7 +25,6 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
  */
 
 class BackgroundEstimationFilter : Filter() {
-
     var background: Int = 0
         private set
 
@@ -61,13 +36,9 @@ class BackgroundEstimationFilter : Filter() {
      * @param im    The Image containing the mask of regions to process.  Each region must be labeled individually.
      */
     override fun apply(im: WritableImage) {
-
         // TODO This recapitulates the c++ code, but there's something wrong here (with the c++ as well)
-
         val maskCopy = ImageFactory.createWritable(im)
-
         val mf = MaskFilter()
-
         val hMask = Histogram(im)
 
         for (k in 1..hMask.maxValue + 1 - 1) {
@@ -79,59 +50,40 @@ class BackgroundEstimationFilter : Filter() {
                 }
             }
 
-            val imCopy = ImageFactory.createWritable(this.referenceImage)
-
-            mf.setReferenceImage(maskCopy)
+            // TODO(colin): figure out correct null handling with reference images.
+            val imCopy = ImageFactory.createWritable(this.referenceImage!!)
+            mf.referenceImage = maskCopy
             mf.apply(imCopy)
 
             val h = Histogram(imCopy)
-
             val mode = h.mode
-            val stddev = 2
-
             this.background = mode
+            val stddev = 2
             val modeVal = h.countsAtMode
-
             val halfModeVal = modeVal / 2.0
-
             var hw_first = 0
             var hw_second = 0
-
             var firstFound = false
 
-
             for (i in 1..h.maxValue - 1) {
-
                 if (firstFound && h.getCounts(i) < halfModeVal && i > mode) {
                     hw_second = i
                     break
                 }
-
                 if (!firstFound && h.getCounts(i) > halfModeVal) {
-
                     hw_first = i
                     firstFound = true
-
                 }
-
             }
 
             var hwhm = (hw_second - hw_first) / 2
-
             if (hwhm < 1) hwhm = 1
-
             this.background = mode + stddev * hwhm
 
-            //System.out.println("mode: " + mode + " stddev: " + stddev + " threshold: " + this.backgroundLevel);
-
-            for (i in im) {
-                if (imCopy.getValue(i) > this.background) {
-                    im.setValue(i, 0f)
-                }
-            }
-
+            im
+                    .asSequence()
+                    .filter { imCopy.getValue(it) > this.background }
+                    .forEach { im.setValue(it, 0f) }
         }
-
     }
-
 }

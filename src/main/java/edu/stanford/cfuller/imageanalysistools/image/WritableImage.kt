@@ -39,7 +39,6 @@ package edu.stanford.cfuller.imageanalysistools.image
  * @author Colin J. Fuller
  */
 interface WritableImage : Image {
-
     /**
      * Resizes the image to the size specified in the ImageCoordinate.
      *
@@ -89,7 +88,5 @@ interface WritableImage : Image {
      * @return      A List of Images, each with one color channel from the original Image.
      */
     override fun splitChannels(): List<Image>
-
-
 }
 

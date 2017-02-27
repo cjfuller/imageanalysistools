@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.filter
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram
@@ -73,6 +49,8 @@ class RegionMaximumSeparabilityThresholdingFilter : Filter() {
 
         //another try: look at the relation between the mean of foreground and background.  Relate to std. dev?
 
+        // TODO(colin): reference image null handling
+
         var fgAvg = 0.0
         var bgAvg = 0.0
         var fgCount = 0
@@ -83,10 +61,10 @@ class RegionMaximumSeparabilityThresholdingFilter : Filter() {
             val value = im.getValue(ic).toInt()
 
             if (value == 0) {
-                bgAvg += this.referenceImage.getValue(ic).toDouble()
+                bgAvg += this.referenceImage!!.getValue(ic).toDouble()
                 bgCount++
             } else {
-                fgAvg += this.referenceImage.getValue(ic).toDouble()
+                fgAvg += this.referenceImage!!.getValue(ic).toDouble()
                 fgCount++
             }
 
@@ -99,104 +77,64 @@ class RegionMaximumSeparabilityThresholdingFilter : Filter() {
         var bgStd = 0.0
 
         for (ic in im) {
-
             val value = im.getValue(ic).toInt()
-
             if (value == 0) {
-                bgStd += Math.pow(this.referenceImage.getValue(ic) - bgAvg, 2.0)
+                bgStd += Math.pow(this.referenceImage!!.getValue(ic) - bgAvg, 2.0)
             } else {
-                fgStd += Math.pow(this.referenceImage.getValue(ic) - fgAvg, 2.0)
+                fgStd += Math.pow(this.referenceImage!!.getValue(ic) - fgAvg, 2.0)
             }
-
         }
 
         fgStd /= fgCount.toDouble()
         bgStd /= bgCount.toDouble()
-
         fgStd = Math.sqrt(fgStd)
         bgStd = Math.sqrt(bgStd)
-
         System.out.printf("fg mean: %f, bg mean: %f, fg std: %f, bg std: %f\n", fgAvg, bgAvg, fgStd, bgStd)
-
 
         val thresholdMultiplier = 5.0
 
         val shouldApplyFilter = fgAvg < thresholdMultiplier * bgAvg
-
         println("Should apply the RMSTF? $shouldApplyFilter  average fg: $fgAvg  average bg: $bgAvg")
-
-
-
         if (!shouldApplyFilter) return
-
 
         //try grouping all objects, finding average intensity, segmenting into categories based on average intensity of objects
         //(akin to reduce punctate background of the original centromere finder)
-
         val result = im
-
         val reference = this.referenceImage
-
         val h = Histogram(result)
-
         val numRegions = h.maxValue
-
-        val sums = FloatArray(numRegions)
-
-        java.util.Arrays.fill(sums, 0.0f)
+        val sums = FloatArray(numRegions, { 0.0f })
 
         for (ic in result) {
-
             val value = result.getValue(ic).toInt()
-
             if (value == 0) continue
-
-            sums[value - 1] += reference.getValue(ic)
-
+            sums[value - 1] += reference!!.getValue(ic)
         }
 
-
         //construct an image, one pixel per region, containing each region's average value
-
         val dimensionSizes = ImageCoordinate.createCoordXYZCT(numRegions, 1, 1, 1, 1)
-
         val meanValues = ImageFactory.createWritable(dimensionSizes, 0.0f)
 
-
-
         for (ic in meanValues) {
-            meanValues.setValue(ic, sums[ic.get(ImageCoordinate.X)] / h.getCounts(ic.get(ImageCoordinate.X) + 1))
+            meanValues.setValue(ic, sums[ic[ImageCoordinate.X]] / h.getCounts(ic[ImageCoordinate.X] + 1))
         }
 
         dimensionSizes.recycle()
 
-
         //segment the image
-
         val MSTF = MaximumSeparabilityThresholdingFilter()
-
         MSTF.apply(meanValues)
 
-
         //filter based on the average value segmentation
-
         for (ic in result) {
-
             val ic2 = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0)
-
             val value = result.getValue(ic).toInt()
-
             if (value == 0) continue
-
-            ic2.set(ImageCoordinate.X, value - 1)
+            ic2[ImageCoordinate.X] = value - 1
 
             if (meanValues.getValue(ic2).toDouble() == 0.0) {
                 result.setValue(ic, 0f)
             }
-
         }
-
-
     }
-
 }

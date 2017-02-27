@@ -1,31 +1,6 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.clustering
 
 import edu.stanford.cfuller.imageanalysistools.fitting.DifferentialEvolutionMinimizer
-import edu.stanford.cfuller.imageanalysistools.fitting.ObjectiveFunction
 import edu.stanford.cfuller.imageanalysistools.image.Image
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
 
@@ -54,43 +29,33 @@ object DEGaussianMixtureModelClustering {
      * @return                  The negative log likelihood of observing the objects at their locations, given the maximally likely clustering scheme found.  On return, clusterObjects and clusters will have been updated to reflect this maximally likely scheme.
      */
     fun go(singleCluster: Image, clusterObjects: java.util.Vector<ClusterObject>, clusters: java.util.Vector<Cluster>, k: Int, n: Int): Double {
-
         val numParametersEach = 5
-
         val numParameters = k * numParametersEach
-
         val populationSize = numParameters
-
         val tol = 1.0e-3
         val scaleFactor = 0.9
         val crFrq = 0.05
         val maxIterations = 10
-
         val parameterLowerBounds = ArrayRealVector(numParameters)
         val parameterUpperBounds = ArrayRealVector(numParameters)
 
         for (i in 0..k - 1) {
-
-            parameterLowerBounds.setEntry(numParametersEach * i, -0.1 * singleCluster.dimensionSizes.get(ImageCoordinate.X))
-            parameterLowerBounds.setEntry(numParametersEach * i + 1, -0.1 * singleCluster.dimensionSizes.get(ImageCoordinate.Y))
+            parameterLowerBounds.setEntry(numParametersEach * i, -0.1 * singleCluster.dimensionSizes[ImageCoordinate.X])
+            parameterLowerBounds.setEntry(numParametersEach * i + 1, -0.1 * singleCluster.dimensionSizes[ImageCoordinate.Y])
             parameterLowerBounds.setEntry(numParametersEach * i + 2, tol)
             parameterLowerBounds.setEntry(numParametersEach * i + 3, -1.0)
             parameterLowerBounds.setEntry(numParametersEach * i + 4, tol)
 
-            parameterUpperBounds.setEntry(numParametersEach * i, 1.1 * singleCluster.dimensionSizes.get(ImageCoordinate.X))
-            parameterUpperBounds.setEntry(numParametersEach * i + 1, 1.1 * singleCluster.dimensionSizes.get(ImageCoordinate.Y))
-            parameterUpperBounds.setEntry(numParametersEach * i + 2, Math.pow(0.05 * singleCluster.dimensionSizes.get(ImageCoordinate.X), 2.0))
+            parameterUpperBounds.setEntry(numParametersEach * i, 1.1 * singleCluster.dimensionSizes[ImageCoordinate.X])
+            parameterUpperBounds.setEntry(numParametersEach * i + 1, 1.1 * singleCluster.dimensionSizes[ImageCoordinate.Y])
+            parameterUpperBounds.setEntry(numParametersEach * i + 2, Math.pow(0.05 * singleCluster.dimensionSizes[ImageCoordinate.X], 2.0))
             parameterUpperBounds.setEntry(numParametersEach * i + 3, 1.0)
-            parameterUpperBounds.setEntry(numParametersEach * i + 4, Math.pow(0.05 * singleCluster.dimensionSizes.get(ImageCoordinate.Y), 2.0))
-
+            parameterUpperBounds.setEntry(numParametersEach * i + 4, Math.pow(0.05 * singleCluster.dimensionSizes[ImageCoordinate.Y], 2.0))
         }
 
         val f = GaussianLikelihoodObjectiveFunction(clusterObjects)
-
         val dem = DifferentialEvolutionMinimizer()
-
         var output: RealVector? = null
-
         var L = java.lang.Double.MAX_VALUE
 
         while (L == java.lang.Double.MAX_VALUE || output == null) {
@@ -98,9 +63,7 @@ object DEGaussianMixtureModelClustering {
             L = f.evaluate(output)
         }
 
-
         //set up new clusters
-
         for (i in 0..k - 1) {
             clusters[i].setCentroidComponents(output.getEntry(numParametersEach * i), output.getEntry(numParametersEach * i + 1), 0.0)
             clusters[i].id = i + 1
@@ -108,14 +71,11 @@ object DEGaussianMixtureModelClustering {
         }
 
         //assign objects to clusters
-
         for (c in clusterObjects) {
-            c.currentCluster = clusters[c.mostProbableCluster]
-            c.currentCluster.objectSet.add(c)
+            val cluster = clusters[c.mostProbableCluster]
+            cluster.objectSet.add(c)
+            c.currentCluster = cluster
         }
-
         return L
-
     }
-
 }

@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.filter
 
 import org.apache.commons.math3.complex.Complex
@@ -47,30 +23,23 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
  * @author Colin J. Fuller
  */
 class ConvolutionFilter : Filter() {
+    // TODO: deal with boundary conditions of types other than zero.
+    // TODO: deal with something other than single image plane transforms.
 
-    //TODO: deal with boundary conditions of types other than zero.
-
-    //TODO: deal with something other than single image plane transforms.
-
-    internal var k: Kernel
-
+    internal var k: Kernel = Kernel.noOp()
     internal var transformStorage: Array<Array<Complex>>? = null
 
     override fun apply(im: WritableImage) {
-
-        var transformed: Array<Array<Complex>>? = null
-
-        if (this.transformStorage != null) {
-            transformed = Array<Array<Complex>>(this.transformStorage!!.size) { arrayOfNulls<Complex>(this.transformStorage!![0].size) }
-            for (i in transformed.indices) {
-                for (j in transformed.indices) {
-                    transformed[i][j] = this.transformStorage!![i][j]
+        val tfStorage = this.transformStorage
+        val transformed: Array<Array<Complex>> = if (tfStorage != null) {
+            val tf = Array<Array<Complex>>(tfStorage.size) { i ->
+                Array<Complex>(tfStorage[0].size) { j ->
+                    tfStorage[i][j]
                 }
             }
-
+            tf
         } else {
-            transformed = ConvolutionFilter.transform(im, 0)
-
+            ConvolutionFilter.transform(im, 0)
         }
 
         val kernelTransform = this.k.getTransformed2DKernel(transformed[0].size, transformed.size)
@@ -82,7 +51,6 @@ class ConvolutionFilter : Filter() {
         }
 
         inverseTransform(im, 0, transformed)
-
     }
 
     fun setTransform(transformed: Array<Array<Complex>>) {
@@ -94,13 +62,9 @@ class ConvolutionFilter : Filter() {
     }
 
     fun inverseTransform(orig: WritableImage, z: Int, transformed: Array<Array<Complex>>) {
-
         val colMajorImage = transformed
-
         val rowImage = Array(colMajorImage[0].size) { DoubleArray(colMajorImage.size) }
-
         val fft = org.apache.commons.math3.transform.FastFourierTransformer(org.apache.commons.math3.transform.DftNormalization.STANDARD)
-
 
         for (c in colMajorImage.indices) {
             colMajorImage[c] = fft.transform(colMajorImage[c], org.apache.commons.math3.transform.TransformType.INVERSE)
@@ -138,7 +102,7 @@ class ConvolutionFilter : Filter() {
 
         val minCoord = ImageCoordinate.createCoordXYZCT(0, 0, z, 0, 0)
         val maxCoord = ImageCoordinate.cloneCoord(orig.dimensionSizes)
-        maxCoord.set(ImageCoordinate.Z, z + 1)
+        maxCoord[ImageCoordinate.Z] = z + 1
 
         orig.setBoxOfInterest(minCoord, maxCoord)
 
@@ -146,46 +110,36 @@ class ConvolutionFilter : Filter() {
         oldMin = 0.0
 
         for (ic in orig) {
-            orig.setValue(ic, ((rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] - newMin) * scaleFactor + oldMin).toFloat())
+            orig.setValue(ic, ((rowImage[ic[ImageCoordinate.Y]][ic[ImageCoordinate.X]] - newMin) * scaleFactor + oldMin).toFloat())
         }
 
         orig.clearBoxOfInterest()
-
         minCoord.recycle()
         maxCoord.recycle()
-
-
     }
 
     companion object {
-
-
         fun transform(im: Image, z: Int): Array<Array<Complex>> {
-
             val fft = org.apache.commons.math3.transform.FastFourierTransformer(org.apache.commons.math3.transform.DftNormalization.STANDARD)
-
-            var ydimPowOfTwo = im.dimensionSizes.get(ImageCoordinate.Y)
-            var xdimPowOfTwo = im.dimensionSizes.get(ImageCoordinate.X)
+            var ydimPowOfTwo = im.dimensionSizes[ImageCoordinate.Y]
+            var xdimPowOfTwo = im.dimensionSizes[ImageCoordinate.X]
 
             if (!org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(ydimPowOfTwo.toLong()) || !org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(xdimPowOfTwo.toLong())) {
-
-                xdimPowOfTwo = Math.pow(2.0, Math.ceil(Math.log(im.dimensionSizes.get(ImageCoordinate.X).toDouble()) / Math.log(2.0))).toInt()
-                ydimPowOfTwo = Math.pow(2.0, Math.ceil(Math.log(im.dimensionSizes.get(ImageCoordinate.Y).toDouble()) / Math.log(2.0))).toInt()
+                xdimPowOfTwo = Math.pow(2.0, Math.ceil(Math.log(im.dimensionSizes[ImageCoordinate.X].toDouble()) / Math.log(2.0))).toInt()
+                ydimPowOfTwo = Math.pow(2.0, Math.ceil(Math.log(im.dimensionSizes[ImageCoordinate.Y].toDouble()) / Math.log(2.0))).toInt()
             }
 
             val p = z
-
             im.selectPlane(p)
 
             val rowImage = Array(ydimPowOfTwo) { DoubleArray(xdimPowOfTwo) }
             for (i in 0..ydimPowOfTwo - 1) {
                 java.util.Arrays.fill(rowImage[i], 0.0) // ensures zero-padding
             }
-            val colMajorImage = Array<Array<Complex>>(xdimPowOfTwo) { arrayOfNulls<Complex>(ydimPowOfTwo) }
-
             for (ic in im) {
-                rowImage[ic.get(ImageCoordinate.Y)][ic.get(ImageCoordinate.X)] = im.getValue(ic).toDouble()
+                rowImage[ic[ImageCoordinate.Y]][ic[ImageCoordinate.X]] = im.getValue(ic).toDouble()
             }
+            val colMajorImage = Array<Array<Complex>>(xdimPowOfTwo) { Array<Complex>(ydimPowOfTwo, { Complex(0.0, 0.0) }) }
 
             for (r in rowImage.indices) {
                 val row = rowImage[r]
@@ -200,8 +154,6 @@ class ConvolutionFilter : Filter() {
                 colMajorImage[c] = fft.transform(colMajorImage[c], org.apache.commons.math3.transform.TransformType.FORWARD)
             }
             return colMajorImage
-
         }
     }
-
 }

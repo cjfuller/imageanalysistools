@@ -55,7 +55,7 @@ class PlaneNormalizationFilter : Filter() {
             }
         }
 
-        val sums = DoubleArray(im.dimensionSizes.get(ImageCoordinate.Z))
+        val sums = DoubleArray(im.dimensionSizes[ImageCoordinate.Z])
         val counts = IntArray(sums.size)
 
         java.util.Arrays.fill(sums, 0.0)

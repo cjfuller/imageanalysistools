@@ -1,30 +1,4 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2012 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.filter.morph
-
-import edu.stanford.cfuller.imageanalysistools.image.Image
 
 import edu.stanford.cfuller.imageanalysistools.image.WritableImage
 import edu.stanford.cfuller.imageanalysistools.image.ImageFactory
@@ -42,59 +16,33 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
 
  * @author Colin J. Fuller
  */
-class DilationFilter : MorphologicalFilter {
-
-    /**
-     * Constructs a new DilationFilter.
-     */
-    constructor() : super() {
-    }
-
+class DilationFilter() : MorphologicalFilter() {
     /**
      * Constructs a new DilationFilter, copying the structuring element and settings from another
      * MorphologicalFilter.
      * @param mf        The MorphologicalFilter whose settings will be copied.
      */
-    constructor(mf: MorphologicalFilter) : super(mf) {
-    }
+    constructor(mf: MorphologicalFilter) : super(copySettings = mf)
 
     /* (non-Javadoc)
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.morph.MorphologicalFilter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
     override fun apply(im: WritableImage) {
-
-        if (this.strel == null) return
-
+        val strel = this.strel ?: return
         val origCopy = ImageFactory.create(im)
-
         for (ic in im) {
-
-            this.strel!!.boxImageToElement(ic, origCopy)
-
-            var included = false
-
-            for (boxedCoord in origCopy) {
-                if (this.strel!!.get(ic, boxedCoord) > 0 && origCopy.getValue(boxedCoord) > 0) {
-                    included = true
-                    break
-                }
-            }
-
+            strel.boxImageToElement(ic, origCopy)
+            val included = origCopy.any { strel[ic, it] > 0 && origCopy.getValue(it) > 0 }
             if (included) {
                 im.setValue(ic, 1.0f)
             } else {
                 im.setValue(ic, 0.0f)
             }
-
         }
-
-
     }
 
     companion object {
-
         private val defaultSize = 3
-
         /**
          * Creates a default structuring element for processing with this filter.
          * Currently this is an n by n by...n square structuring element set to all ones in the specified dimensions, where
@@ -106,17 +54,12 @@ class DilationFilter : MorphologicalFilter {
         fun getDefaultElement(dimList: IntArray): StructuringElement {
             val strelSize = ImageCoordinate.createCoordXYZCT(1, 1, 1, 1, 1)
             for (i in dimList) {
-                strelSize.set(i, defaultSize)
+                strelSize[i] = defaultSize
             }
-
             val toReturn = StructuringElement(strelSize)
-
             toReturn.setAll(1.0f)
-
             strelSize.recycle()
-
             return toReturn
         }
     }
-
 }

@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2012 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.image
 
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities
@@ -32,6 +8,8 @@ import ij.ImageStack
 import ij.process.FloatProcessor
 import ij.process.ImageProcessor
 import ij.ImagePlus
+import loci.formats.meta.IMetadata
+import net.imglib2.meta.Metadata
 
 import java.awt.image.BufferedImage
 import java.awt.image.WritableRaster
@@ -39,13 +17,10 @@ import java.awt.image.WritableRaster
 /**
  * A basic read-only implementation of [Image].
  *
- *
  * @see Image
-
-
  * @author Colin J. Fuller
  */
-open class ReadOnlyImageImpl : Image {
+open class ReadOnlyImageImpl(m: loci.formats.meta.IMetadata, p: PixelData) : Image {
     internal val defaultDimensionOrder = "xyzct"
 
     /**
@@ -53,22 +28,20 @@ open class ReadOnlyImageImpl : Image {
      * use with the LOCI bio-formats library.
      * @return  The metadata object associated with the Image.
      */
-    override var metadata: loci.formats.meta.IMetadata
+    override var metadata: loci.formats.meta.IMetadata = m
         protected set
 
     /**
      * Gets a PixelData instance that holds the image data.
      */
-    override var pixelData: PixelData? = null
+    override var pixelData: PixelData = p
         protected set
     protected var writablePixelData: WritablePixelData? = null // this is null if it can be written, and the same as pixelData otherwise
 
     /**
      * Returns an ImageCoordinate that contains the size of each dimension of the Image.
      *
-     *
      * This ImageCoordinate should not be modified by users, nor should it be recycled by users.
-
      * @return      An ImageCoordinate containing the size of each dimension of the Image.
      */
     override var dimensionSizes: ImageCoordinate
@@ -78,10 +51,8 @@ open class ReadOnlyImageImpl : Image {
      * Gets the (inclusive) lower bound of any region of interest currently set on this Image, or null if no region is currently
      * set.
      *
-     *
      * This is a reference to the actual internal ImageCoordinate and should not be modified or used after the region of interest has been cleared.
      * As per the specification in [ImageCoordinate], users should *not* recycle the ImageCoordinate returned.
-
      * @return  The ImageCoordinate whose components are the lower bound on the region of interest, or null if there is no region of interest.
      */
     override var boxMin: ImageCoordinate? = null
@@ -90,10 +61,8 @@ open class ReadOnlyImageImpl : Image {
      * Gets the (exclusive) upper bound of any region of interest currently set on this Image, or null if no region is currently
      * set.
      *
-     *
      * This is a reference to the actual internal ImageCoordinate and should not be modified or used after the region of interest has been cleared.
      * As per the specification in [ImageCoordinate], users should *not* recycle the ImageCoordinate returned.
-
      * @return  The ImageCoordinate whose components are the upper bound on the region of interest, or null if there is no region of interest.
      */
     override var boxMax: ImageCoordinate? = null
@@ -109,30 +78,22 @@ open class ReadOnlyImageImpl : Image {
     protected var coordinateArrayStorage: Array<ImageCoordinate>? = null
 
 
-    //constructors
-
-    /**
-     * Constructs a new Image with the specified metadata and PixelData.
-     *
-     *
-     * The metadata and PixelData should already be initialized (and should contain consistent values for things like dimension sizes).
-     * <P>
-     * This constructor is primarily used by classes that read images in binary format; most users will probably want to use a different constructor.
-     * @param m     An object containing the metadata associated with the Image (as a loci.formats.meta.IMetadata, to ease integration with the LOCI bio-formats library).
-     * *
-     * @param p     A PixelData object containing the actual values at each pixel in the Image.
-    </P> */
-    constructor(m: loci.formats.meta.IMetadata, p: PixelData) {
-        this.isBoxed = false
-        this.boxMin = null
-        this.boxMax = null
+    init {
         this.metadata = m
         this.pixelData = p
         this.writablePixelData = null
         this.coordinateArrayStorage = null
         this.dimensionSizes = ImageCoordinate.createCoordXYZCT(p.sizeX, p.sizeY, p.sizeZ, p.sizeC, p.sizeT)
-
     }
+    /**
+     * Constructs a new Image with the specified metadata and PixelData.
+     *
+     *
+     * The metadata and PixelData should already be initialized (and should contain consistent values for things like dimension sizes).
+     * This constructor is primarily used by classes that read images in binary format; most users will probably want to use a different constructor.
+     * @param m     An object containing the metadata associated with the Image (as a loci.formats.meta.IMetadata, to ease integration with the LOCI bio-formats library).
+     * @param p     A PixelData object containing the actual values at each pixel in the Image.
+     */
 
     /**
      * Constructs a new Image that is a (deep) copy of the specified Image.  The pixel data will be copied exactly, but no guarantee

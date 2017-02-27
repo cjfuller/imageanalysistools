@@ -1,28 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
-
 package edu.stanford.cfuller.analysistoolsinterface
 
 import java.util.logging.Formatter
@@ -43,14 +18,7 @@ class SegmentationWindow
 (internal var controller: SegmentationController) : javax.swing.JFrame() {
     var methodComboBoxModel: DefaultComboBoxModel<*>
         internal set
-    internal var handler: TextAreaLogHandler
-
-    init {
-        initComponents()
-        methodComboBoxModel = DefaultComboBoxModel()
-        this.methodComboBox!!.setModel(methodComboBoxModel)
-        this.handler = TextAreaLogHandler(this.loggingTextArea)
-    }
+    private var handler: TextAreaLogHandler
 
     val logHandler: Handler
         get() = this.handler
@@ -111,7 +79,7 @@ class SegmentationWindow
     private // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     fun initComponents() {
 
-        methodComboBox = javax.swing.JComboBox()
+        methodComboBox = javax.swing.JComboBox<String>()
         jLabel2 = javax.swing.JLabel()
         customMethodTextField = javax.swing.JTextField()
         jLabel3 = javax.swing.JLabel()
@@ -132,7 +100,7 @@ class SegmentationWindow
         defaultCloseOperation = javax.swing.WindowConstants.DISPOSE_ON_CLOSE
         title = "Segmentation and Quantification"
 
-        methodComboBox!!.setModel(javax.swing.DefaultComboBoxModel(arrayOf("Item 1", "Item 2", "Item 3", "Item 4")))
+        methodComboBox!!.setModel(javax.swing.DefaultComboBoxModel<String>(arrayOf("Item 1", "Item 2", "Item 3", "Item 4")))
         methodComboBox!!.addActionListener { evt -> methodComboBoxActionPerformed(evt) }
 
         jLabel2!!.text = "Method:"
@@ -296,38 +264,29 @@ class SegmentationWindow
 
 
     private class TextAreaLogHandler(private var textArea: JTextArea?) : Handler() {
-        private var formatter: Formatter? = null
-
-        init {
-
-            this.formatter = java.util.logging.SimpleFormatter()
-
-        }
+        var formatter = java.util.logging.SimpleFormatter()
 
         override fun close() {
-
             this.textArea = null
-            this.formatter = null
-
         }
 
         override fun flush() {
-
         }
 
         override fun publish(record: LogRecord) {
-
-            val s = formatter!!.format(record)
-
+            val s = formatter.format(record)
             SwingUtilities.invokeLater { textArea!!.append(s) }
-
         }
-
     }
 
     companion object {
-
         internal val serialVersionUID = 1L
     }
 
+    init {
+        initComponents()
+        methodComboBoxModel = DefaultComboBoxModel<String>()
+        this.methodComboBox!!.setModel(methodComboBoxModel)
+        this.handler = TextAreaLogHandler(this.loggingTextArea)
+    }
 }

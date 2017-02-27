@@ -1,35 +1,7 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.filter
 
-import edu.stanford.cfuller.imageanalysistools.image.Image
 import edu.stanford.cfuller.imageanalysistools.image.WritableImage
 import edu.stanford.cfuller.imageanalysistools.image.ImageFactory
-import edu.stanford.cfuller.imageanalysistools.filter.MaximumSeparabilityThresholdingFilter
-import edu.stanford.cfuller.imageanalysistools.filter.LabelFilter
-import edu.stanford.cfuller.imageanalysistools.filter.MaskFilter
 import edu.stanford.cfuller.imageanalysistools.image.Histogram
 import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
 
@@ -39,40 +11,26 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
  * regions resulting from that thresholding, and so on), until every region in the Image falls withing a specified range of sizes
  * or has been removed due to being smaller than the smallest acceptable size.
  *
- *
  * Part of the implementation of the recursive Otsu thresholding method described in Xiong et al. (DOI: 10.1109/ICIP.2006.312365).
- *
  *
  * The reference Image for the Filter should be set to the original Image (not a mask); its values will be used to set
  * the threshold in the MaximumSeparabilityThresholdingFilter for each region.  This Image will not be changed.
  *
- *
  * The argument to the apply method should be the mask whose regions are to be individually thresholded.  This mask will contain
  * the mask with thresholded regions after this Filter has been implies; no particular labeling of regions is guaranteed.
-
-
+ *
  * @author Colin J. Fuller
  */
 class RecursiveMaximumSeparabilityFilter : Filter() {
-
     //Required parameters
-
     internal val MAX_SIZE_P = "max_size"
     internal val MIN_SIZE_P = "min_size"
 
     //Optional parameters
-
     internal val MAX_REC_P = "max_thresh_recursions"
-
-
     internal val DEFAULT_MAX_RECURSIONS = 1
     internal var numRecs: Int = 0
-    internal var maxRecursions: Int = 0
-
-    init {
-        this.numRecs = 0
-        this.maxRecursions = DEFAULT_MAX_RECURSIONS
-    }
+    internal var maxRecursions: Int = DEFAULT_MAX_RECURSIONS
 
     /**
      * Applies the Filter to an Image mask, replacing its values by the mask that is the result of thresholding each
@@ -80,35 +38,25 @@ class RecursiveMaximumSeparabilityFilter : Filter() {
      * @param im    The Image mask to process; will be overwritten by the result.
      */
     override fun apply(im: WritableImage) {
-
         val originalImageReference = this.referenceImage
-
-        this.referenceImage = ImageFactory.createWritable(this.referenceImage) // to save having to allocate an Image at every step, this
-        // overwrites the reference Image, so make a copy
+        this.referenceImage = ImageFactory.createWritable(this.referenceImage ?: throw ReferenceImageRequiredException("MaskFilter requires a reference image."))
         var doRecursion = true
-
         val maskBuffer = ImageFactory.createWritable(im.dimensionSizes, 0.0f)
-
         var imageBuffer: WritableImage? = null
-
         val mstf = MaximumSeparabilityThresholdingFilter()
         val MF = MaskFilter()
-
-
-        mstf.setReferenceImage(imageBuffer)
-        mstf.setParameters(this.params)
-
+        mstf.referenceImage = imageBuffer
+        mstf.params = this.params
         val lf = LabelFilter()
-
         var areaMin = -1
         var areaMax = -1
 
-        if (this.params != null) {
-            areaMin = Integer.parseInt(this.params.getValueForKey(MIN_SIZE_P))
-            areaMax = Integer.parseInt(this.params.getValueForKey(MAX_SIZE_P))
+        this.params?.let {
+            areaMin = Integer.parseInt(it.getValueForKey(MIN_SIZE_P))
+            areaMax = Integer.parseInt(it.getValueForKey(MAX_SIZE_P))
 
-            if (this.params.hasKey(MAX_REC_P)) {
-                this.maxRecursions = this.params.getIntValueForKey(MAX_REC_P)
+            if (it.hasKey(MAX_REC_P)) {
+                this.maxRecursions = it.getIntValueForKey(MAX_REC_P)
             }
         }
 
@@ -117,17 +65,11 @@ class RecursiveMaximumSeparabilityFilter : Filter() {
             areaMax = 1000 //orig 1000, 100000 for HeLa cells, 50 for centromeres
         }
 
-
-
         while (doRecursion && this.numRecs < this.maxRecursions) {
-
             doRecursion = false
-
             val h = Histogram(im)
-
             val flags = BooleanArray(h.maxValue + 1)
             val remove = BooleanArray(h.maxValue + 1)
-
             flags[0] = false
             remove[0] = false
 
@@ -136,139 +78,106 @@ class RecursiveMaximumSeparabilityFilter : Filter() {
                 remove[i] = h.getCounts(i) < areaMin
             }
 
-            for (c in im) {
-                if (remove[im.getValue(c).toInt()]) {
-                    im.setValue(c, 0f)
-                }
-            }
+            im.asSequence()
+                    .filter { remove[im.getValue(it).toInt()] }
+                    .forEach { im.setValue(it, 0f) }
 
             var divided = false
 
             //set up points lists
-
-            val xList = java.util.Hashtable<Int, List<Int>>()
-            val yList = java.util.Hashtable<Int, List<Int>>()
+            val xList = java.util.Hashtable<Int, MutableList<Int>>()
+            val yList = java.util.Hashtable<Int, MutableList<Int>>()
 
             for (c in im) {
-
                 val value = im.getValue(c).toInt()
-
                 if (value == 0) continue
 
                 if (!xList.containsKey(value)) {
                     xList.put(value, java.util.Vector<Int>())
                     yList.put(value, java.util.Vector<Int>())
                 }
-
-                xList[value].add(c.get(ImageCoordinate.X))
-                yList[value].add(c.get(ImageCoordinate.Y))
-
+                xList[value]!!.add(c[ImageCoordinate.X])
+                yList[value]!!.add(c[ImageCoordinate.Y])
             }
 
             var lastK = 0
-
             val ic = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0)
 
             for (k in 0..h.maxValue + 1 - 1) {
-
                 if (!flags[k]) continue
-
-
                 if (lastK > 0) {
-                    val xKList = xList[lastK]
-                    val yKList = yList[lastK]
+                    // TODO(colin): figure out proper null handling
+                    val xKList = xList[lastK]!!
+                    val yKList = yList[lastK]!!
                     for (i in xKList.indices) {
-                        ic.set(ImageCoordinate.X, xKList.get(i))
-                        ic.set(ImageCoordinate.Y, yKList.get(i))
+                        ic[ImageCoordinate.X] = xKList[i]
+                        ic[ImageCoordinate.Y] = yKList[i]
                         maskBuffer.setValue(ic, 0f)
                     }
                 }
-
-                //imageBuffer.copy(this.referenceImage);
-
                 divided = true
 
-                var lower_width = im.dimensionSizes.get(ImageCoordinate.X)
-                var lower_height = im.dimensionSizes.get(ImageCoordinate.Y)
+                var lower_width = im.dimensionSizes[ImageCoordinate.X]
+                var lower_height = im.dimensionSizes[ImageCoordinate.Y]
                 var upper_width = 0
                 var upper_height = 0
 
-                val xKList = xList[k]
-                val yKList = yList[k]
+                // TODO(colin): figure out proper null handling
+                val xKList = xList[k]!!
+                val yKList = yList[k]!!
 
-                for (i in 0..xList[k].size - 1) {
-                    ic.set(ImageCoordinate.X, xKList.get(i))
-                    ic.set(ImageCoordinate.Y, yKList.get(i))
+                for (i in 0..xKList.size - 1) {
+                    ic[ImageCoordinate.X] = xKList[i]
+                    ic[ImageCoordinate.Y] = yKList[i]
                     maskBuffer.setValue(ic, k.toFloat())
 
-                    if (ic.get(ImageCoordinate.X) < lower_width) lower_width = ic.get(ImageCoordinate.X)
-                    if (ic.get(ImageCoordinate.X) > upper_width - 1) upper_width = ic.get(ImageCoordinate.X)
-                    if (ic.get(ImageCoordinate.Y) < lower_height) lower_height = ic.get(ImageCoordinate.Y)
-                    if (ic.get(ImageCoordinate.Y) > upper_height - 1) upper_height = ic.get(ImageCoordinate.Y)
+                    if (ic[ImageCoordinate.X] < lower_width) lower_width = ic[ImageCoordinate.X]
+                    if (ic[ImageCoordinate.X] > upper_width - 1) upper_width = ic[ImageCoordinate.X]
+                    if (ic[ImageCoordinate.Y] < lower_height) lower_height = ic[ImageCoordinate.Y]
+                    if (ic[ImageCoordinate.Y] > upper_height - 1) upper_height = ic[ImageCoordinate.Y]
                 }
 
                 val lowerBound = ImageCoordinate.createCoordXYZCT(lower_width, lower_height, 0, 0, 0)
                 val upperBound = ImageCoordinate.createCoordXYZCT(upper_width + 1, upper_height + 1, 1, 1, 1)
 
-
                 maskBuffer.setBoxOfInterest(lowerBound, upperBound)
-                imageBuffer = this.referenceImage.writableInstance // This is set to be a writable copy above, so not clobbering the reference image.
-                imageBuffer!!.setBoxOfInterest(lowerBound, upperBound)
-
-                //Image smallMaskBuffer = maskBuffer.subImage(sizes, lowerBound);
-                //imageBuffer = this.referenceImage.subImage(sizes, lowerBound);
+                imageBuffer = this.referenceImage!!.writableInstance // This is set to be a writable copy above, so not clobbering the reference image.
+                imageBuffer.setBoxOfInterest(lowerBound, upperBound)
 
                 lastK = k
 
-                MF.setReferenceImage(maskBuffer)
-
+                MF.referenceImage = maskBuffer
                 MF.apply(imageBuffer)
-
                 mstf.apply(imageBuffer)
-
-                MF.setReferenceImage(imageBuffer)
-
+                MF.referenceImage = imageBuffer
                 MF.apply(maskBuffer)
 
-                for (i in 0..xList[k].size - 1) {
-                    ic.set(ImageCoordinate.X, xKList.get(i))
-                    ic.set(ImageCoordinate.Y, yKList.get(i))
+                for (i in 0..xKList.size - 1) {
+                    ic[ImageCoordinate.X] = xKList[i]
+                    ic[ImageCoordinate.Y] = yKList[i]
 
                     if (maskBuffer.getValue(ic) == 0f) {
                         im.setValue(ic, 0f)
                     }
-
                 }
 
                 maskBuffer.clearBoxOfInterest()
                 for (ic_restore in imageBuffer) {
-                    imageBuffer.setValue(ic_restore, originalImageReference.getValue(ic_restore))
+                    imageBuffer.setValue(ic_restore, originalImageReference!!.getValue(ic_restore))
                 }
                 imageBuffer.clearBoxOfInterest()
                 lowerBound.recycle()
                 upperBound.recycle()
-
             }
-
             ic.recycle()
-
             this.numRecs += 1
 
             if (divided && this.numRecs < this.maxRecursions) {
                 doRecursion = true
             }
-
             lf.apply(im)
-
         }
-
         this.numRecs = 0
-
         this.referenceImage = originalImageReference
-
-
-        return
-
     }
-
 }

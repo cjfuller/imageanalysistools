@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.filter
 
 import java.awt.Rectangle
@@ -54,10 +30,8 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
  * @author Colin J. Fuller
  */
 class BandpassFilter : Filter() {
-
     internal var bandLow: Double = 0.toDouble()
     internal var bandHigh: Double = 0.toDouble()
-
     internal var shouldRescale: Boolean = false
 
     /**
@@ -69,7 +43,6 @@ class BandpassFilter : Filter() {
         bandLow = 0.0
         bandHigh = 0.0
         this.shouldRescale = false
-
     }
 
     /**
@@ -87,9 +60,7 @@ class BandpassFilter : Filter() {
      * @param im    The Image to be bandpass filtered; it will be replaced by its filtered version.
      */
     override fun apply(im: WritableImage) {
-
         im.clearBoxOfInterest() //just in case
-
         var oldMin = java.lang.Float.MAX_VALUE
         var oldMax = -1.0f * java.lang.Float.MAX_VALUE
 
@@ -97,13 +68,10 @@ class BandpassFilter : Filter() {
             if (im.getValue(ic) < oldMin) {
                 oldMin = im.getValue(ic)
             }
-
             if (im.getValue(ic) > oldMax) {
                 oldMax = im.getValue(ic)
             }
         }
-
-
 
         if (this.params!!.hasKey(PARAM_BAND_LOW)) {
             this.bandLow = this.params!!.getDoubleValueForKey(PARAM_BAND_LOW)
@@ -114,22 +82,15 @@ class BandpassFilter : Filter() {
         }
 
         val imp = im.toImagePlus()
-
         val ijf = IJFFTFilter()
-
-        IJFFTFilter.setFilterLargeDia(this.bandHigh)
-        IJFFTFilter.setFilterSmallDia(this.bandLow)
-
+        IJFFTFilter.filterLargeDia = this.bandHigh
+        IJFFTFilter.filterSmallDia = this.bandLow
         ijf.setup("", imp)
 
         for (i in 0..imp.stackSize - 1) {
-
             imp.setSliceWithoutUpdate(i + 1)
-
             val proc = imp.processor
-
             ijf.run(proc)
-
         }
 
         //only copy if this wasn't filtered in place.
@@ -144,7 +105,6 @@ class BandpassFilter : Filter() {
             if (im.getValue(ic) < newMin) {
                 newMin = im.getValue(ic)
             }
-
             if (im.getValue(ic) > newMax) {
                 newMax = im.getValue(ic)
             }
@@ -155,16 +115,11 @@ class BandpassFilter : Filter() {
         val newRange = newMax - newMin
 
         if (this.shouldRescale) {
-
             for (ic in im) {
                 im.setValue(ic, (im.getValue(ic) - newMin) / newRange * oldRange + oldMin)
             }
-
         }
-
-
     }
-
 
     /**
      * Sets the band in frequency space to be retained in the Fourier transformed Image.
@@ -189,8 +144,7 @@ class BandpassFilter : Filter() {
      * This has been taken directly from the ImageJ class FFTFilter and modified for
      * non-interactive use of the filter.
      */
-    protected class IJFFTFilter : PlugInFilter, Measurements {
-
+    private class IJFFTFilter : PlugInFilter, Measurements {
         private var imp: ImagePlus? = null
         private var fht: FHT? = null
         private var slice: Int = 0
@@ -235,7 +189,7 @@ class BandpassFilter : Filter() {
 
             /* 	tile mirrored image to power of 2 size
     			first determine smallest power 2 >= 1.5 * image width/height
-    		  	factor of 1.5 to avoid wrap-around effects of Fourier Trafo */
+    		  	factor of 1.5 to avoid wrap-around effects of Fourier Transform */
 
             var i = 2
             while (i < 1.5 * maxN) i *= 2
@@ -319,15 +273,14 @@ class BandpassFilter : Filter() {
 
         /** Puts ImageProcessor (ROI) into a new ImageProcessor of size width x height y at position (x,y).
          * The image is mirrored around its edges to avoid wrap around effects of the FFT.  */
-        fun tileMirror(ip: ImageProcessor, width: Int, height: Int, x: Int, y: Int): ImageProcessor? {
+        fun tileMirror(ip: ImageProcessor, width: Int, height: Int, x: Int, y: Int): ImageProcessor {
             if (IJ.debugMode) IJ.log("FFT.tileMirror: " + width + "x" + height + " " + ip)
             if (x < 0 || x > width - 1 || y < 0 || y > height - 1) {
                 IJ.error("Image to be tiled is out of bounds.")
-                return null
+                throw Error("Image to be tiled is out of bounds.")
             }
 
             val ipout = ip.createProcessor(width, height)
-
             val ip2 = ip.crop()
             val w2 = ip2.width
             val h2 = ip2.height
@@ -396,7 +349,6 @@ class BandpassFilter : Filter() {
             return ipout
         }
 
-
         /*
     	filterLarge: down to which size are large structures suppressed?
     	filterSmall: up to which size are small structures suppressed?
@@ -408,9 +360,7 @@ class BandpassFilter : Filter() {
     	*/
         internal fun filterLargeSmall(ip: ImageProcessor, filterLarge: Double, filterSmall: Double, stripesHorVert: Int, scaleStripes: Double) {
             var scaleStripes = scaleStripes
-
             val maxN = ip.width
-
             val fht = ip.pixels as FloatArray
             val filter = FloatArray(maxN * maxN)
             for (i in 0..maxN * maxN - 1)
@@ -433,7 +383,7 @@ class BandpassFilter : Filter() {
 
             val scaleLarge = filterLarge * filterLarge
             val scaleSmall = filterSmall * filterSmall
-            scaleStripes = scaleStripes * scaleStripes
+            scaleStripes *= scaleStripes
             //float FactStripes;
 
             // loop over rows
@@ -603,23 +553,14 @@ class BandpassFilter : Filter() {
         }
 
         companion object {
-
-            private var filterLargeDia = 40.0
-            private var filterSmallDia = 3.0
+            var filterLargeDia = 40.0
+            var filterSmallDia = 3.0
             private var choiceIndex = 0
             private var toleranceDia = 5.0
             private val doScalingDia = false
             private var saturateDia = false
             private var displayFilter = false
-            private var processStack = false
-
-            fun setFilterLargeDia(large: Double) {
-                filterLargeDia = large
-            }
-
-            fun setFilterSmallDia(small: Double) {
-                filterSmallDia = small
-            }
+            var processStack = false
 
             //0 = none, 1 = horizontal, 2 = vertical
             fun setChoice(choice: Int) {
@@ -637,20 +578,11 @@ class BandpassFilter : Filter() {
             fun setDisplay(display: Boolean) {
                 displayFilter = display
             }
-
-            fun setProcessStack(process: Boolean) {
-                processStack = process
-            }
         }
-
     }
 
     companion object {
-
-
         internal val PARAM_BAND_LOW = "bandpass_filter_low"
         internal val PARAM_BAND_HIGH = "bandpass_filter_high"
     }
-
-
 }

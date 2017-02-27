@@ -43,13 +43,15 @@ class StructuringElement
  * @param size    an ImageCoordinate containing the sizes of each dimension.
  */
 (size: ImageCoordinate) {
-
-    internal var size: ImageCoordinate
-    internal var elements: Array<Array<Array<Array<FloatArray>>>>
-
-    init {
-        this.size = ImageCoordinate.cloneCoord(size)
-        this.elements = Array(this.size.get(ImageCoordinate.T)) { Array(this.size.get(ImageCoordinate.C)) { Array(this.size.get(ImageCoordinate.Z)) { Array(this.size.get(ImageCoordinate.Y)) { FloatArray(this.size.get(ImageCoordinate.X)) } } } }
+    internal var size: ImageCoordinate = ImageCoordinate.cloneCoord(size)
+    internal var elements: Array<Array<Array<Array<FloatArray>>>> = Array(this.size[ImageCoordinate.T]) {
+        Array(this.size[ImageCoordinate.C]) {
+            Array(this.size[ImageCoordinate.Z]) {
+                Array(this.size[ImageCoordinate.Y]) {
+                    FloatArray(this.size[ImageCoordinate.X])
+                }
+            }
+        }
     }
 
     /**
@@ -60,15 +62,13 @@ class StructuringElement
      * @param toBeBoxed            The Image that will be boxed.
      */
     fun boxImageToElement(currentPosition: ImageCoordinate, toBeBoxed: Image) {
-
         val lowerBound = ImageCoordinate.cloneCoord(currentPosition)
         val upperBound = ImageCoordinate.cloneCoord(currentPosition)
 
         for (i in currentPosition) {
-            lowerBound.set(i!!, lowerBound.get(i) - (size.get(i) - 1) / 2)
-            upperBound.set(i, upperBound.get(i) + (size.get(i) - 1) / 2 + 1)
+            lowerBound[i] = lowerBound[i] - (size[i] - 1) / 2
+            upperBound[i] = upperBound[i] + (size[i] - 1) / 2 + 1
         }
-
         toBeBoxed.setBoxOfInterest(lowerBound, upperBound, false)
     }
 
@@ -92,11 +92,11 @@ class StructuringElement
      * @return                            The value of the StructuringElement at that point.
      */
     operator fun get(strelCenterImageCoord: ImageCoordinate, imageCoord: ImageCoordinate): Float {
-        val t = imageCoord.get(ImageCoordinate.T) - strelCenterImageCoord.get(ImageCoordinate.T) + (size.get(ImageCoordinate.T) - 1) / 2
-        val c = imageCoord.get(ImageCoordinate.C) - strelCenterImageCoord.get(ImageCoordinate.C) + (size.get(ImageCoordinate.C) - 1) / 2
-        val z = imageCoord.get(ImageCoordinate.Z) - strelCenterImageCoord.get(ImageCoordinate.Z) + (size.get(ImageCoordinate.Z) - 1) / 2
-        val y = imageCoord.get(ImageCoordinate.Y) - strelCenterImageCoord.get(ImageCoordinate.Y) + (size.get(ImageCoordinate.Y) - 1) / 2
-        val x = imageCoord.get(ImageCoordinate.X) - strelCenterImageCoord.get(ImageCoordinate.X) + (size.get(ImageCoordinate.X) - 1) / 2
+        val t = imageCoord[ImageCoordinate.T] - strelCenterImageCoord[ImageCoordinate.T] + (size[ImageCoordinate.T] - 1) / 2
+        val c = imageCoord[ImageCoordinate.C] - strelCenterImageCoord[ImageCoordinate.C] + (size[ImageCoordinate.C] - 1) / 2
+        val z = imageCoord[ImageCoordinate.Z] - strelCenterImageCoord[ImageCoordinate.Z] + (size[ImageCoordinate.Z] - 1) / 2
+        val y = imageCoord[ImageCoordinate.Y] - strelCenterImageCoord[ImageCoordinate.Y] + (size[ImageCoordinate.Y] - 1) / 2
+        val x = imageCoord[ImageCoordinate.X] - strelCenterImageCoord[ImageCoordinate.X] + (size[ImageCoordinate.X] - 1) / 2
         return elements[t][c][z][y][x]
     }
 
@@ -105,11 +105,11 @@ class StructuringElement
      * @param value        The value to which to set the StructuringElement.
      */
     fun setAll(value: Float) {
-        for (t in 0..this.size.get(ImageCoordinate.T) - 1) {
-            for (c in 0..this.size.get(ImageCoordinate.C) - 1) {
-                for (z in 0..this.size.get(ImageCoordinate.Z) - 1) {
-                    for (y in 0..this.size.get(ImageCoordinate.Y) - 1) {
-                        for (x in 0..this.size.get(ImageCoordinate.X) - 1) {
+        for (t in 0..this.size[ImageCoordinate.T] - 1) {
+            for (c in 0..this.size[ImageCoordinate.C] - 1) {
+                for (z in 0..this.size[ImageCoordinate.Z] - 1) {
+                    for (y in 0..this.size[ImageCoordinate.Y] - 1) {
+                        for (x in 0..this.size[ImageCoordinate.X] - 1) {
                             elements[t][c][z][y][x] = value
                         }
                     }
@@ -127,11 +127,11 @@ class StructuringElement
      * @param value                        The value to which to set the structuring element.
      */
     operator fun set(strelCenterImageCoord: ImageCoordinate, imageCoord: ImageCoordinate, value: Float) {
-        val t = imageCoord.get(ImageCoordinate.T) - strelCenterImageCoord.get(ImageCoordinate.T) - (size.get(ImageCoordinate.T) - 1) / 2
-        val c = imageCoord.get(ImageCoordinate.C) - strelCenterImageCoord.get(ImageCoordinate.C) - (size.get(ImageCoordinate.C) - 1) / 2
-        val z = imageCoord.get(ImageCoordinate.Z) - strelCenterImageCoord.get(ImageCoordinate.Z) - (size.get(ImageCoordinate.Z) - 1) / 2
-        val y = imageCoord.get(ImageCoordinate.Y) - strelCenterImageCoord.get(ImageCoordinate.Y) - (size.get(ImageCoordinate.Y) - 1) / 2
-        val x = imageCoord.get(ImageCoordinate.X) - strelCenterImageCoord.get(ImageCoordinate.X) - (size.get(ImageCoordinate.X) - 1) / 2
+        val t = imageCoord[ImageCoordinate.T] - strelCenterImageCoord[ImageCoordinate.T] - (size[ImageCoordinate.T] - 1) / 2
+        val c = imageCoord[ImageCoordinate.C] - strelCenterImageCoord[ImageCoordinate.C] - (size[ImageCoordinate.C] - 1) / 2
+        val z = imageCoord[ImageCoordinate.Z] - strelCenterImageCoord[ImageCoordinate.Z] - (size[ImageCoordinate.Z] - 1) / 2
+        val y = imageCoord[ImageCoordinate.Y] - strelCenterImageCoord[ImageCoordinate.Y] - (size[ImageCoordinate.Y] - 1) / 2
+        val x = imageCoord[ImageCoordinate.X] - strelCenterImageCoord[ImageCoordinate.X] - (size[ImageCoordinate.X] - 1) / 2
         elements[t][c][z][y][x] = value
     }
 
@@ -143,7 +143,6 @@ class StructuringElement
      * @param value            The value to which to set the structuring element.
      */
     operator fun set(strelCoord: ImageCoordinate, value: Float) {
-        elements[strelCoord.get(ImageCoordinate.T)][strelCoord.get(ImageCoordinate.C)][strelCoord.get(ImageCoordinate.Z)][strelCoord.get(ImageCoordinate.Y)][strelCoord.get(ImageCoordinate.X)] = value
+        elements[strelCoord[ImageCoordinate.T]][strelCoord[ImageCoordinate.C]][strelCoord[ImageCoordinate.Z]][strelCoord[ImageCoordinate.Y]][strelCoord[ImageCoordinate.X]] = value
     }
-
 }

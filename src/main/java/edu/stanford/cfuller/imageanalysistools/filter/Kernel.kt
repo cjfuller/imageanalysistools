@@ -33,19 +33,17 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
  * @author Colin J. Fuller
  */
 class Kernel {
-
-    //TODO: implementation of nonzero boundary conditions
-
-    //TODO: complete documentation
+    // TODO: implementation of nonzero boundary conditions
+    // TODO: complete documentation
 
     /**
      * Gets an ImageCoordinate containing the half size of each dimension of the kernel (that is, each dimension is 2*n+1 pixels, if n is the half size).
      * @return        an ImageCoordinate containing the half sizes; a reference, not a copy-- do not modify or recycle.
      */
-    var halfSize: ImageCoordinate
+    var halfSize: ImageCoordinate = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0)
         internal set
 
-    internal var weights: DoubleArray
+    internal var weights: DoubleArray = doubleArrayOf()
 
     internal var transform: Array<Array<Complex>>? = null
 
@@ -56,7 +54,7 @@ class Kernel {
     var boundaryType: Int = 0
         internal set
 
-    protected constructor() {}
+    private constructor() {}
 
     /**
      * Creates a new Kernel object initialized with the specified weights and the specified dimension sizes.
@@ -67,60 +65,43 @@ class Kernel {
      * a zeroth dimension of size n, the zeroth entry is (0,0,0,0,0), the first (1,0,0,0,0), the nth (0,1,0,0,0), etc.
      *
      *
-
      * @param weights            a 1-D matrix of the weights in the kernel for each pixel surrounding a given pixel, whose self-weight is at the midpoint of each dimension.
-     * *
      * @param dimensionSizes    and ImageCoordinate containing the full size of each dimension in the kernel.  All entries must be odd.
-     * *
      * @throws IllegalArgumentException    if the dimensionSizes are not odd, or are negative.
      */
     constructor(weights: DoubleArray, dimensionSizes: ImageCoordinate) {
-
-        for (dim in dimensionSizes) {
-            val size = dimensionSizes.get(dim!!)
-            if (size % 2 == 0 || size < 0) {
-                throw IllegalArgumentException("Kernel size must be odd and positive in all dimensions.")
-            }
-        }
-
+        dimensionSizes
+                .asSequence()
+                .map { dimensionSizes[it] }
+                .filter { it % 2 == 0 || it < 0 }
+                .forEach { throw IllegalArgumentException("Kernel size must be odd and positive in all dimensions.") }
 
         this.weights = weights
-
         this.halfSize = ImageCoordinate.createCoordXYZCT(0, 0, 0, 0, 0)
 
         for (s in this.halfSize) {
-            this.halfSize.set(s!!, (dimensionSizes.get(s) - 1) / 2)
+            this.halfSize[s] = (dimensionSizes[s] - 1) / 2
         }
-
         this.boundaryType = BOUNDARY_ZERO
-
-
     }
 
     fun formatTransformFrom1DInput(size0: Int, size1: Int) {
-
         var ydimPowOfTwo = size0
         var xdimPowOfTwo = size1
 
         if (!org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(ydimPowOfTwo.toLong()) || !org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(xdimPowOfTwo.toLong())) {
-
             xdimPowOfTwo = Math.pow(2.0, Math.ceil(Math.log(size1.toDouble()) / Math.log(2.0))).toInt()
             ydimPowOfTwo = Math.pow(2.0, Math.ceil(Math.log(size0.toDouble()) / Math.log(2.0))).toInt()
         }
 
-        val colMajorImage = Array<Array<Complex>>(xdimPowOfTwo) { arrayOfNulls<Complex>(ydimPowOfTwo) }
-
+        val colMajorImage = Array<Array<Complex>>(xdimPowOfTwo) { Array<Complex>(ydimPowOfTwo, { Complex(0.0, 0.0) }) }
         var counter = 0
 
         for (i in colMajorImage.indices) {
             for (j in 0..colMajorImage[0].size - 1) {
-
                 colMajorImage[i][j] = Complex(this.weights[counter++], this.weights[counter++])
-
             }
-
         }
-
         this.transform = colMajorImage
     }
 
@@ -134,18 +115,17 @@ class Kernel {
      * @return                    The weight of the relativePixel, relative to the currentPixel.
      */
     fun getWeight(currentPixel: ImageCoordinate, relativePixel: ImageCoordinate): Double {
-
         var index = 0
         var accumulatedOffset = 1
 
         for (i in 0..currentPixel.dimension - 1) {
-            val temp = relativePixel.get(i) - currentPixel.get(i)
-            if (temp < -1 * halfSize.get(i) || temp > halfSize.get(i)) {
+            val temp = relativePixel[i] - currentPixel[i]
+            if (temp < -1 * halfSize[i] || temp > halfSize[i]) {
                 return 0.0
             }
-            val tempOffset = temp + halfSize.get(i)
+            val tempOffset = temp + halfSize[i]
             index += tempOffset * accumulatedOffset
-            accumulatedOffset *= halfSize.get(i) * 2 + 1
+            accumulatedOffset *= halfSize[i] * 2 + 1
         }
 
         if (index >= weights.size || index < 0) return 0.0
@@ -153,55 +133,48 @@ class Kernel {
     }
 
     @Throws(Throwable::class)
-    protected fun finalize() {
+    private fun finalize() {
         this.halfSize.recycle()
     }
 
     fun getTransformed2DKernel(size0: Int, size1: Int): Array<Array<Complex>> {
-
-        if (this.transform != null) {
-            return this.transform
+        val transform = this.transform
+        if (transform != null) {
+            return transform
         }
 
         val fft = org.apache.commons.math3.transform.FastFourierTransformer(org.apache.commons.math3.transform.DftNormalization.STANDARD)
-
         var ydimPowOfTwo = size0
         var xdimPowOfTwo = size1
 
         if (!org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(ydimPowOfTwo.toLong()) || !org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(xdimPowOfTwo.toLong())) {
-
             xdimPowOfTwo = Math.pow(2.0, Math.ceil(Math.log(size1.toDouble()) / Math.log(2.0))).toInt()
             ydimPowOfTwo = Math.pow(2.0, Math.ceil(Math.log(size0.toDouble()) / Math.log(2.0))).toInt()
         }
 
         val preTransform = Array(ydimPowOfTwo) { DoubleArray(xdimPowOfTwo) }
-
         var counter = 0
 
-        for (i in 0..this.halfSize.get(ImageCoordinate.Y) + 1 - 1) {
-            for (j in 0..this.halfSize.get(ImageCoordinate.X) + 1 - 1) {
+        for (i in 0..this.halfSize[ImageCoordinate.Y] + 1 - 1) {
+            for (j in 0..this.halfSize[ImageCoordinate.X] + 1 - 1) {
                 preTransform[i][j] = this.weights[counter++]
             }
         }
 
-        for (i in this.halfSize.get(ImageCoordinate.Y) + 1..ydimPowOfTwo - this.halfSize.get(ImageCoordinate.Y) - 1) {
-            for (j in this.halfSize.get(ImageCoordinate.X) + 1..xdimPowOfTwo - this.halfSize.get(ImageCoordinate.X) - 1) {
+        for (i in this.halfSize[ImageCoordinate.Y] + 1..ydimPowOfTwo - this.halfSize[ImageCoordinate.Y] - 1) {
+            for (j in this.halfSize[ImageCoordinate.X] + 1..xdimPowOfTwo - this.halfSize[ImageCoordinate.X] - 1) {
                 preTransform[i][j] = 0.0
             }
         }
 
-
-        for (i in ydimPowOfTwo - this.halfSize.get(ImageCoordinate.Y)..ydimPowOfTwo - 1) {
-            for (j in xdimPowOfTwo - this.halfSize.get(ImageCoordinate.X)..xdimPowOfTwo - 1) {
+        for (i in ydimPowOfTwo - this.halfSize[ImageCoordinate.Y]..ydimPowOfTwo - 1) {
+            for (j in xdimPowOfTwo - this.halfSize[ImageCoordinate.X]..xdimPowOfTwo - 1) {
                 preTransform[i][j] = this.weights[counter++]
             }
         }
 
         val rowImage = preTransform
-
-
-        val colMajorImage = Array<Array<Complex>>(xdimPowOfTwo) { arrayOfNulls<Complex>(ydimPowOfTwo) }
-
+        val colMajorImage = Array<Array<Complex>>(xdimPowOfTwo) { Array<Complex>(ydimPowOfTwo, { Complex(0.0, 0.0) }) }
 
         for (r in rowImage.indices) {
             val row = rowImage[r]
@@ -215,49 +188,38 @@ class Kernel {
         for (c in colMajorImage.indices) {
             colMajorImage[c] = fft.transform(colMajorImage[c], org.apache.commons.math3.transform.TransformType.FORWARD)
         }
-
         this.transform = colMajorImage
-
         return colMajorImage
-
-
     }
 
     companion object {
-
         val BOUNDARY_ZERO = 0
         val BOUNDARY_REPEAT = 1
         val BOUNDARY_CIRCULAR = 2
 
-        fun getRandomSinglePlaneKernelMatrix(size0: Int, size1: Int): Array<Array<Complex>> {
+        fun noOp(): Kernel {
+            return Kernel(doubleArrayOf(1.0), ImageCoordinate.createCoordXYZCT(1,1,1,1,1))
+        }
 
-            val toReturn = Array<Array<Complex>>(size0) { arrayOfNulls<Complex>(size1) }
+        fun getRandomSinglePlaneKernelMatrix(size0: Int, size1: Int): Array<Array<Complex>> {
+            val toReturn = Array<Array<Complex>>(size0) { Array<Complex>(size1, { Complex(0.0, 0.0) }) }
             for (i in 0..size0 - 1) {
                 for (j in 0..size1 - 1) {
                     var angle = Math.random() * 2 - 1
                     angle = Math.acos(angle)
-                    //toReturn[i][j] = new Complex(Math.cos(angle), Math.sin(angle));
                     toReturn[i][j] = Complex(Math.random() * 2 - 1, Math.random() * 2 - 1)
-                    //toReturn[i][j] = new Complex(1,0);
                 }
             }
-
-
             return toReturn
         }
 
         fun getTransformedRandomSinglePlaneKernelMatrix(size0: Int, size1: Int, sizeNonzero: Int): Array<Array<Complex>> {
-
             val halfSize = (sizeNonzero - 1) / 2
-
             val fft = org.apache.commons.math3.transform.FastFourierTransformer(org.apache.commons.math3.transform.DftNormalization.STANDARD)
-
-
             var ydimPowOfTwo = size0
             var xdimPowOfTwo = size1
 
             if (!org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(ydimPowOfTwo.toLong()) || !org.apache.commons.math3.util.ArithmeticUtils.isPowerOfTwo(xdimPowOfTwo.toLong())) {
-
                 xdimPowOfTwo = Math.pow(2.0, Math.ceil(Math.log(size1.toDouble()) / Math.log(2.0))).toInt()
                 ydimPowOfTwo = Math.pow(2.0, Math.ceil(Math.log(size0.toDouble()) / Math.log(2.0))).toInt()
             }
@@ -283,10 +245,7 @@ class Kernel {
             }
 
             val rowImage = preTransform
-
-
-            val colMajorImage = Array<Array<Complex>>(xdimPowOfTwo) { arrayOfNulls<Complex>(ydimPowOfTwo) }
-
+            val colMajorImage = Array<Array<Complex>>(xdimPowOfTwo) { Array<Complex>(ydimPowOfTwo, { Complex(0.0, 0.0) }) }
 
             for (r in rowImage.indices) {
                 val row = rowImage[r]
@@ -301,9 +260,6 @@ class Kernel {
                 colMajorImage[c] = fft.transform(colMajorImage[c], org.apache.commons.math3.transform.TransformType.FORWARD)
             }
             return colMajorImage
-
-
         }
     }
-
 }

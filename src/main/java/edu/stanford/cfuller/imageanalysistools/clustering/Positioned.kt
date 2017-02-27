@@ -33,8 +33,6 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D
  * @author Colin J. Fuller
  */
 interface Positioned {
-
-
     /**
      * Calculates the 3D Euclidean distance to another Positioned object.
      * @param other     The other object with a position.
@@ -48,5 +46,4 @@ interface Positioned {
      * @return  A Vector3D containing the coordinates of the Positioned object.
      */
     val position: Vector3D
-
 }

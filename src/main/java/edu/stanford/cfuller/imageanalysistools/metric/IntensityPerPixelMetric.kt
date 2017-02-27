@@ -1,41 +1,12 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.metric
 
-import org.apache.commons.math3.linear.RealMatrix
-
 import edu.stanford.cfuller.imageanalysistools.image.Image
-import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet
 
 /**
  * A simple Metric that quantifies the total intensity in a region of interest divided by the size of that region of interest.
  *
- *
  * A side note on using intensity per pixel as a metric rather than integrated intensity:
- *
  *
  * When observing objects much smaller than the diffraction limit of light, an increase in brightness of a point source will appear
  * almost the same as multiple point sources of equivalent total brightness close together in that same diffraction-limited volume.  For this reason,
@@ -47,39 +18,27 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageSet
  * This is even more effective when combined with something like the [edu.stanford.cfuller.imageanalysistools.filter.RenormalizationFilter],
  * which tries to locally intensity normalize an image before segmentation, so that differences in brightness will not by themselves
  * lead to changes in apparent object size.
-
-
+ *
  * @author Colin J. Fuller
  */
 
-
-class IntensityPerPixelMetric : Metric() {
-
-
+class IntensityPerPixelMetric : Metric {
     /**
      * Quantifies the (area) average intensity for each region of interest in an image.
-
      * If no regions of interest are present in the supplied mask, this will return null.
-
      * @param mask      A mask that specifies the region of interest.  This should have regions of interest uniquely labeled consecutively, starting with the value 1,
-     * *                  as might be produced by a [edu.stanford.cfuller.imageanalysistools.filter.LabelFilter].
-     * *
+     *                  as might be produced by a [edu.stanford.cfuller.imageanalysistools.filter.LabelFilter].
      * @param images    An ImageSet of Images to be quantified using the same masks (perhaps corresponding to different color channels, for example).
-     * *
      * @return          A RealMatrix containing the average intensity value for each region of interest in each input Image.  A single column of the region labels preceeds a sub-matrix, the (i,j)th
-     * *                  entry of which will contain the quantification of ROI (i+1) in Image j.  This will then be followed by a single column containing the pixel count for that region.
+     *                  entry of which will contain the quantification of ROI (i+1) in Image j.  This will then be followed by a single column containing the pixel count for that region.
      */
-    override fun quantify(mask: Image, images: ImageSet): Quantification? {
-
+    override fun quantify(mask: Image, images: ImageSet): Quantification {
         val h = edu.stanford.cfuller.imageanalysistools.image.Histogram(mask)
-
-        if (h.maxValue == 0) return null
-
+        if (h.maxValue == 0) throw Error("Unable to quantify image; no regions found.")
         val channelIntensities = org.apache.commons.math3.linear.Array2DRowRealMatrix(images.imageCount, h.maxValue).scalarMultiply(0.0)
 
         for (i in mask) {
             val regionNum = mask.getValue(i).toInt()
-
             if (regionNum > 0) {
                 for (c in 0..images.imageCount - 1) {
                     channelIntensities.addToEntry(c, regionNum - 1, images.getImageForIndex(c)!!.getValue(i).toDouble())
@@ -94,19 +53,27 @@ class IntensityPerPixelMetric : Metric() {
         }
 
         val q = Quantification()
-
         for (i in 0..h.maxValue - 1) {
-            for (c in 0..images.imageCount - 1) {
-                val m = Measurement(true, (i + 1).toLong(), channelIntensities.getEntry(c, i), "channel_" + c, Measurement.TYPE_INTENSITY, images.markerImageName)
-                q.addMeasurement(m)
-            }
-
-            val m = Measurement(true, (i + 1).toLong(), h.getCounts(i + 1).toDouble(), "pixel_count", Measurement.TYPE_SIZE, images.markerImageName)
+            (0..images.imageCount - 1)
+                    .asSequence()
+                    .map {
+                        Measurement(
+                                hasFeature = true,
+                                id = (i + 1).toLong(),
+                                measurement = channelIntensities.getEntry(it, i),
+                                name = "channel_" + it,
+                                type = Measurement.TYPE_INTENSITY,
+                                image = images.markerImageName!!) }
+                    .forEach { q.addMeasurement(it) }
+            val m = Measurement(
+                    hasFeature = true,
+                    id = (i + 1).toLong(),
+                    measurement = h.getCounts(i + 1).toDouble(),
+                    name = "pixel_count",
+                    type = Measurement.TYPE_SIZE,
+                    image = images.markerImageName!!)
             q.addMeasurement(m)
         }
-
         return q
-
     }
-
 }

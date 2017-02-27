@@ -41,7 +41,7 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
 
  * @author Colin J. Fuller
  */
-class ErosionFilter : MorphologicalFilter {
+class ErosionFilter() : MorphologicalFilter() {
 
     /**
      * Constructs a new ErosionFilter, copying the structuring element and settings from another
@@ -49,12 +49,6 @@ class ErosionFilter : MorphologicalFilter {
      * @param mf        The MorphologicalFilter whose settings will be copied.
      */
     constructor(mf: MorphologicalFilter) : super(mf) {
-    }
-
-    /**
-     * Constructs a new ErosionFilter.
-     */
-    constructor() : super() {
     }
 
     /* (non-Javadoc)

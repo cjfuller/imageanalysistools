@@ -33,18 +33,10 @@ import java.util.Random
 
  * @author Colin J. Fuller
  */
-class RandomGenerator protected constructor() {
-
-    //    private long randState = 4101842887655102017L;
-
-    private val r: Random
-
-    init {
-        r = Random()
-    }
+class RandomGenerator private constructor() {
+    private val r: Random = Random()
 
     fun randLong(): Long {
-
         return r.nextLong()
     }
 
@@ -58,9 +50,7 @@ class RandomGenerator protected constructor() {
 
     fun randDouble(): Double {
         return Math.random()
-
     }
-
 
     fun randInt(): Int {
         return randLong().toInt()
@@ -72,20 +62,14 @@ class RandomGenerator protected constructor() {
     }
 
     companion object {
-
-        var generator: RandomGenerator? = null
-            private set
+        val generator: RandomGenerator = RandomGenerator()
 
         init {
-            generator = RandomGenerator()
-            generator!!.seed(System.currentTimeMillis())
+            generator.seed(System.currentTimeMillis())
         }
 
         fun rand(): Double {
-
-            return generator!!.randDouble()
-
+            return generator.randDouble()
         }
     }
-
 }

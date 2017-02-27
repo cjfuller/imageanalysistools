@@ -1,30 +1,4 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
-
 package edu.stanford.cfuller.analysistoolsinterface
-
 
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterType
@@ -35,7 +9,6 @@ import edu.stanford.cfuller.imageanalysistools.meta.AnalysisMetadataXMLWriter
 import java.io.File
 import java.util.Vector
 import java.util.prefs.Preferences
-import javax.swing.DefaultListModel
 import javax.swing.JFileChooser
 import javax.swing.filechooser.FileNameExtensionFilter
 
@@ -45,28 +18,18 @@ import javax.swing.filechooser.FileNameExtensionFilter
  */
 class ParameterSetupController : TaskController() {
 
-    internal var pw: ParameterWindow
-
-    internal var availableParameters: MutableList<Parameter>
-
-    internal var parametersInUse: Vector<Parameter>
-
-    init {
-        availableParameters = Vector<Parameter>()
-        parametersInUse = Vector<Parameter>()
-    }
+    internal var pw: ParameterWindow = ParameterWindow(this)
+    internal val availableParameters: MutableList<Parameter> = Vector<Parameter>()
+    internal var parametersInUse: Vector<Parameter> = Vector<Parameter>()
 
     override fun startTask() {
-
-
         this.pw = ParameterWindow(this)
-
-        availableParameters = Vector<Parameter>()
+        availableParameters.clear()
 
         val pdKnown = LegacyParameterXMLParser().parseKnownParametersToParameterList()
 
-        for (key in pdKnown.keys) {
-            availableParameters.add(pdKnown.getParameterForKey(key, 0))
+        pdKnown.keys.forEach { key ->
+            pdKnown.getParameterForKey(key, 0)?.let { availableParameters.add(it) }
         }
 
         val objectParameters = java.util.LinkedList<Any>()
@@ -91,24 +54,17 @@ class ParameterSetupController : TaskController() {
     }
 
     fun addSelectedFilter(name: String, classname: String) {
-
         val p = Parameter(P_FILTER_ALL, name, ParameterType.STRING_T, classname, null)
-
         this.useParameter(p)
-
     }
 
     fun addSelectedMetric(name: String, classname: String) {
-
         val p = Parameter(P_METRIC, name, ParameterType.STRING_T, classname, null)
-
         this.useParameter(p)
     }
 
     fun useParameter(parameter: Any) {
-
         val p = parameter as Parameter
-
 
         if (p.name == P_FILTER_ADD) {
             val sel = FilterSelectionFrame(this)
@@ -122,11 +78,8 @@ class ParameterSetupController : TaskController() {
             return
         }
 
-
         val dlm = pw.inUseParametersModel
-
         dlm.addElement(Parameter(p))
-
         pw.selectMostRecentlyAddedInUseParameter()
 
     }
@@ -215,7 +168,7 @@ class ParameterSetupController : TaskController() {
                 for (key in pd.keys) {
                     val count = pd.getValueCountForKey(key)
                     for (i in 0..count - 1) {
-                        this.useParameter(pd.getParameterForKey(key, i))
+                        pd.getParameterForKey(key, i)?.let { this.useParameter(it) }
                     }
                 }
             }

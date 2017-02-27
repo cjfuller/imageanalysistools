@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2012 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the Software), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.meta
 
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities
@@ -41,59 +17,40 @@ import edu.stanford.cfuller.imageanalysistools.meta.parameters.LegacyParameterXM
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterType
 import edu.stanford.cfuller.imageanalysistools.image.ImageSet
 
-
 /**
  * A parser for new-format XML analysis metadata files.
  *
- *
  * If an old-format XML parameter file is passed in instead, it will be passed
  * off to a [LegacyParameterXMLParser][edu.stanford.cfuller.imageanalysistools.meta.parameters.LegacyParameterXMLParser].
-
+ *
  * @author Colin J. Fuller
  */
 open class AnalysisMetadataXMLParser : AnalysisMetadataParser() {
-
     /**
      * Parses a parameter file to an AnalysisMetadata object.
      * @param filename  The XML-formatted file to parse.
-     * *
      * @return          An AnalysisMetadata containing the information described in the file.
      */
     override fun parseFileToAnalysisMetadata(filename: String): AnalysisMetadata {
-
-        val metaDoc = this.getDocumentForFilename(filename)
-
+        val metaDoc = this.getDocumentForFilename(filename)!!
         val meta = AnalysisMetadata()
-
         val inputParameters = this.getInputParametersFromDocument(metaDoc)
-
         meta.inputParameters = inputParameters
-
         var hasOutput = false
 
         if (this.hasOutputSection(metaDoc) && this.hasAnalysisSection(metaDoc)) {
-
             hasOutput = true
-
             loadInputImageInformation(metaDoc, meta)
-
             loadPreviousAnalysisData(metaDoc, meta)
-
             val outputParameters = this.getOutputParametersFromDocument(metaDoc)
-
             meta.outputParameters = outputParameters
-
         }
-
         meta.setHasPreviousOutput(hasOutput)
-
         return meta
-
     }
 
     protected fun getDocumentForFilename(filename: String): Document? {
         var metaDoc: Document? = null
-
         try {
             metaDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(filename)
         } catch (e: SAXException) {
@@ -109,73 +66,44 @@ open class AnalysisMetadataXMLParser : AnalysisMetadataParser() {
             e.printStackTrace()
             return null
         }
-
         return metaDoc
     }
 
     private fun getParametersFromDocument(analysisMetadataDocument: Document, tag: String): ParameterDictionary {
-
         val inputStateList = analysisMetadataDocument.getElementsByTagName(tag)
-
         if (inputStateList.length > 0) {
-
             val inputState = inputStateList.item(0) // only one input state allowed
-
             val children = inputState.childNodes
-
-            var parametersNode: Node? = null
-
-            for (i in 0..children.length - 1) {
-                val child = children.item(i)
-                if (child.nodeName == TAG_PARAMETERS) {
-                    parametersNode = child
-                    break
-                }
-            }
+            val parametersNode: Node? = (0..children.length - 1)
+                    .asSequence()
+                    .map { children.item(it) }
+                    .firstOrNull { it.nodeName == TAG_PARAMETERS }
 
             if (parametersNode != null) {
                 return parseParametersNodeToParameterDictionary(parametersNode)
             }
-
         }
-
         return LegacyParameterXMLParser().parseDocumentToParameterDictionary(analysisMetadataDocument)
     }
 
     private fun getInputParametersFromDocument(analysisMetadataDocument: Document): ParameterDictionary {
-
         return this.getParametersFromDocument(analysisMetadataDocument, TAG_INPUT_STATE)
-
     }
 
     private fun getOutputParametersFromDocument(analysisMetadataDocument: Document): ParameterDictionary {
-
         return this.getParametersFromDocument(analysisMetadataDocument, TAG_OUTPUT_STATE)
-
     }
 
     private fun parseParametersNodeToParameterDictionary(parameters: Node): ParameterDictionary {
-
-        val tasks = parameters.childNodes
-
         val output = ParameterDictionary.emptyDictionary()
-
         val parameterNodes = parameters.childNodes
-
-        for (i in 0..parameterNodes.length - 1) {
-
-            val n = parameterNodes.item(i)
-
-            if (n.nodeName != TAG_PARAMETER) continue
-
-            val p = this.parameterWithXMLNode(n)
-
-            output.addParameter(p)
-
-        }
-
+        (0..parameterNodes.length - 1)
+                .asSequence()
+                .map { parameterNodes.item(it) }
+                .filter { it.nodeName == TAG_PARAMETER }
+                .map { this.parameterWithXMLNode(it) }
+                .forEach { output.addParameter(it) }
         return output
-
     }
 
     protected fun hasOutputSection(metaDoc: Document): Boolean {
@@ -189,182 +117,106 @@ open class AnalysisMetadataXMLParser : AnalysisMetadataParser() {
     }
 
     private fun loadInputImageInformation(metaDoc: Document, meta: AnalysisMetadata) {
-
         val inputStateList = metaDoc.getElementsByTagName(TAG_INPUT_STATE)
-
         if (inputStateList.length > 0) {
-
             val inputState = inputStateList.item(0) // only one input state allowed
-
             val children = inputState.childNodes
-
-            var imagesNode: Node? = null
-
-            for (i in 0..children.length - 1) {
-                val child = children.item(i)
-                if (child.nodeName == TAG_IMAGES) {
-                    imagesNode = child
-                    break
-                }
-            }
+            val imagesNode: Node? = (0..children.length - 1)
+                    .asSequence()
+                    .map { children.item(it) }
+                    .firstOrNull { it.nodeName == TAG_IMAGES }
 
             if (imagesNode != null) {
-
                 val allImages = imagesNode.childNodes
-
-                val images = ImageSet(meta.inputParameters)
+                val images = ImageSet(meta.inputParameters!!)
 
                 for (i in 0..allImages.length - 1) {
-
                     val im = allImages.item(i)
-
                     if (im.nodeName != TAG_IMAGE) continue
-
                     val nnm = im.attributes
-
                     val filename = nnm.getNamedItem(ATTR_FILENAME).nodeValue
                     val hashAlgorithm = nnm.getNamedItem(ATTR_HASH_ALG).nodeValue
                     val hash = nnm.getNamedItem(ATTR_HASH).nodeValue
-
                     images.addImageWithFilename(filename)
-
                     meta.setInputImageHash(filename, hashAlgorithm, hash)
-
                 }
-
                 meta.inputImages = images
-
             }
-
         }
-
     }
 
     private fun loadOutputImageInformation(metaDoc: Document, meta: AnalysisMetadata) {
-
         val outputStateList = metaDoc.getElementsByTagName(TAG_OUTPUT_STATE)
-
         if (outputStateList.length > 0) {
-
             val outputState = outputStateList.item(0) // only one input state allowed
-
             val children = outputState.childNodes
-
-            var imagesNode: Node? = null
-
-            for (i in 0..children.length - 1) {
-                val child = children.item(i)
-                if (child.nodeName == TAG_IMAGES) {
-                    imagesNode = child
-                    break
-                }
-            }
+            val imagesNode: Node? = (0..children.length - 1)
+                    .asSequence()
+                    .map { children.item(it) }
+                    .firstOrNull { it.nodeName == TAG_IMAGES }
 
             if (imagesNode != null) {
-
                 val allImages = imagesNode.childNodes
+                val images = ImageSet(meta.outputParameters!!)
 
-                val images = ImageSet(meta.outputParameters)
-
-                for (i in 0..allImages.length - 1) {
-
-                    val im = allImages.item(i)
-
-                    if (im.nodeName != TAG_IMAGE) continue
-
-                    val nnm = im.attributes
-
-                    val filename = nnm.getNamedItem(ATTR_FILENAME).nodeValue
-
-
-                    images.addImageWithFilename(filename)
-
-                }
+                (0..allImages.length - 1)
+                        .asSequence()
+                        .map { allImages.item(it) }
+                        .filter { it.nodeName == TAG_IMAGE }
+                        .map { it.attributes }
+                        .map { it.getNamedItem(ATTR_FILENAME).nodeValue }
+                        .forEach { images.addImageWithFilename(it) }
 
                 meta.outputImages = images
-
             }
-
         }
-
     }
 
     private fun loadNonImageOutputInformation(metaDoc: Document, meta: AnalysisMetadata) {
-
         val outputStateList = metaDoc.getElementsByTagName(TAG_OUTPUT_STATE)
-
         if (outputStateList.length > 0) {
-
             val outputState = outputStateList.item(0) // only one input state allowed
-
             val children = outputState.childNodes
-
-            var quantNode: Node? = null
-
-            for (i in 0..children.length - 1) {
-                val child = children.item(i)
-                if (child.nodeName == TAG_QUANT) {
-                    quantNode = child
-                    break
-                }
-            }
+            val quantNode: Node? = (0..children.length - 1)
+                    .asSequence()
+                    .map { children.item(it) }
+                    .firstOrNull { it.nodeName == TAG_QUANT }
 
             if (quantNode != null) {
-
                 val allQuant = quantNode.childNodes
-
-                for (i in 0..allQuant.length - 1) {
-
-                    val im = allQuant.item(i)
-
-                    if (im.nodeName != TAG_DATAFILE) continue
-
-                    val nnm = im.attributes
-
-                    val filename = nnm.getNamedItem(ATTR_FILENAME).nodeValue
-
-                    meta.addOutputFile(filename)
-
-                }
-
+                (0..allQuant.length - 1)
+                        .asSequence()
+                        .map { allQuant.item(it) }
+                        .filter { it.nodeName == TAG_DATAFILE }
+                        .map { it.attributes }
+                        .map { it.getNamedItem(ATTR_FILENAME).nodeValue }
+                        .forEach { meta.addOutputFile(it) }
             }
-
         }
-
     }
 
     private fun loadPreviousAnalysisData(metaDoc: Document, meta: AnalysisMetadata) {
-
         val analysisList = metaDoc.getElementsByTagName(TAG_ANALYSIS)
-
         if (analysisList.length > 0) {
-
             val analysis = analysisList.item(0) // only one analysis allowed
-
             val children = analysis.childNodes
-
-            for (i in 0..children.length - 1) {
-
-                val child = children.item(i)
-
-                if (child.nodeName == TAG_LIBRARY) {
-                    this.processLibraryNode(child, meta)
-                } else if (child.nodeName == TAG_SCRIPT) {
-                    this.processScriptNode(child, meta)
-                }
-            }
-
+            (0..children.length - 1)
+                    .asSequence()
+                    .map { children.item(it) }
+                    .forEach {
+                        if (it.nodeName == TAG_LIBRARY) {
+                            this.processLibraryNode(it, meta)
+                        } else if (it.nodeName == TAG_SCRIPT) {
+                            this.processScriptNode(it, meta)
+                        }
+                    }
             loadOutputImageInformation(metaDoc, meta)
             loadNonImageOutputInformation(metaDoc, meta)
-
         }
-
     }
 
     private fun processLibraryNode(library: Node, meta: AnalysisMetadata) {
-
         val nnm = library.attributes
-
         val xmlVersionString = AnalysisMetadata.libraryVersionXMLString
         val versionMatcher = AnalysisMetadataXMLParser.versionGrabber.matcher(xmlVersionString!!)
         val commitMatcher = AnalysisMetadataXMLParser.commitGrabber.matcher(xmlVersionString!!)
@@ -372,14 +224,11 @@ open class AnalysisMetadataXMLParser : AnalysisMetadataParser() {
         commitMatcher.find()
         val currentVersion = versionMatcher.group(1)
         val currentCommit = commitMatcher.group(1)
-
         val lastVersion = nnm.getNamedItem(ATTR_VERSION).nodeValue
         val lastCommit = nnm.getNamedItem(ATTR_COMMIT).nodeValue
-
         if (!(currentVersion == lastVersion && currentCommit == lastCommit)) {
             LoggingUtilities.logger.warning("library version does not match that used for previous analysis.\nPrevious version info: $lastVersion $lastCommit\nCurrent version info: $currentVersion $currentCommit")
         }
-
     }
 
     private fun processScriptNode(script: Node, meta: AnalysisMetadata) {
@@ -394,20 +243,16 @@ open class AnalysisMetadataXMLParser : AnalysisMetadataParser() {
     /**
      * Parses an XML node from an XML parameter file to a Parameter object.
      * @param node  The node to parse.
-     * *
      * @return      The Parameter described by the supplied node.
      */
     fun parameterWithXMLNode(node: Node): Parameter {
-
         val nnm = node.attributes
-
         var typeString: String? = null
         var name = ""
         var displayName = ""
         var type = ParameterType.STRING_T
         var descriptionString = ""
         var value: Any? = null
-        val defaultValue: Any? = null
 
         if (nnm.getNamedItem(ATTR_TYPE) != null) {
             typeString = nnm.getNamedItem(ATTR_TYPE).nodeValue
@@ -444,55 +289,40 @@ open class AnalysisMetadataXMLParser : AnalysisMetadataParser() {
 
         if (node.childNodes.length > 0) {
             val children = node.childNodes
-            for (i in 0..children.length - 1) {
-                val n = children.item(i)
-
-                if (n.nodeName === TAG_DESCRIPTION) {
-                    descriptionString += n.textContent
-                }
-            }
+            (0..children.length - 1)
+                    .asSequence()
+                    .map { children.item(it) }
+                    .filter { it.nodeName === TAG_DESCRIPTION }
+                    .forEach { descriptionString += it.textContent }
         }
 
         if (nnm.getNamedItem(ATTR_VALUE) != null) {
             val valueString = nnm.getNamedItem(ATTR_VALUE).nodeValue
-
             try {
-
                 when (type) {
                     ParameterType.BOOLEAN_T ->
-
                         value = java.lang.Boolean.valueOf(valueString)
 
                     ParameterType.INTEGER_T ->
-
                         value = Integer.valueOf(valueString)
 
                     ParameterType.FLOATING_T ->
-
                         value = java.lang.Double.valueOf(valueString)
 
                     ParameterType.STRING_T ->
-
                         value = valueString
                 }
-
             } catch (e: NumberFormatException) {
                 LoggingUtilities.logger.warning("Exception encountered while parsing value for parameter named: " + name)
                 value = null
             }
-
         }
-
-        val p = Parameter(name, displayName, type, value, descriptionString)
-
+        val p = Parameter(name, displayName, type, value!!, descriptionString)
         return p
-
     }
 
     companion object {
-
         //XML tags
-
         val TAG_ANALYSIS_METADATA = "analysis_metadata"
         val TAG_INPUT_STATE = "input_state"
         val TAG_PARAMETERS = "parameters"
@@ -510,7 +340,6 @@ open class AnalysisMetadataXMLParser : AnalysisMetadataParser() {
         val TAG_DESCRIPTION = "description"
 
         //tag attributes
-
         val ATTR_TIME = "time"
         val ATTR_VERSION = "version"
         val ATTR_COMMIT = "commit"
@@ -523,10 +352,7 @@ open class AnalysisMetadataXMLParser : AnalysisMetadataParser() {
         val ATTR_TYPE = "type"
 
         //library version info
-
-        protected val versionGrabber = Pattern.compile("$ATTR_VERSION=\"(\\S*)\"")
-        protected val commitGrabber = Pattern.compile("$ATTR_COMMIT=\"(\\S*)\"")
+        val versionGrabber: Pattern = Pattern.compile("$ATTR_VERSION=\"(\\S*)\"")
+        val commitGrabber: Pattern = Pattern.compile("$ATTR_COMMIT=\"(\\S*)\"")
     }
-
-
 }

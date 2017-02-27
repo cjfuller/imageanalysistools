@@ -1,28 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
-
 package edu.stanford.cfuller.analysistoolsinterface
 
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter
@@ -41,21 +16,11 @@ class ParameterWindow
 (internal var controller: ParameterSetupController) : javax.swing.JFrame() {
     var inUseParametersModel: DefaultListModel<*>
         internal set
-    var objectBeingEdited: Any
+    var objectBeingEdited: Any? = null
         internal set
 
-    init {
-        this.inUseParametersModel = DefaultListModel()
-        initComponents()
-        this.usedParameterList!!.setModel(this.inUseParametersModel)
-        this.availableParameterList!!.dragEnabled = true
-        this.usedParameterList!!.dropMode = DropMode.ON_OR_INSERT
-        this.availableParameterList!!.transferHandler = ParameterTransferHandler(this.controller)
-        this.usedParameterList!!.transferHandler = ParameterTransferHandler(this.controller)
-    }
-
-    fun setAvailableParameters(parameters: List<Any>) {
-        val dlm = DefaultListModel()
+    fun setAvailableParameters(parameters: List<String>) {
+        val dlm = DefaultListModel<String>()
         for (o in parameters) {
             dlm.addElement(o)
         }
@@ -125,9 +90,9 @@ class ParameterWindow
 
         parameterTypeButtonGroup = javax.swing.ButtonGroup()
         jScrollPane1 = javax.swing.JScrollPane()
-        availableParameterList = javax.swing.JList()
+        availableParameterList = javax.swing.JList<String>()
         jScrollPane2 = javax.swing.JScrollPane()
-        usedParameterList = javax.swing.JList()
+        usedParameterList = javax.swing.JList<String>()
         jLabel1 = javax.swing.JLabel()
         jLabel2 = javax.swing.JLabel()
         addButton = javax.swing.JButton()
@@ -155,14 +120,14 @@ class ParameterWindow
 
         jScrollPane1!!.horizontalScrollBar = null
 
-        availableParameterList!!.setModel(object : javax.swing.AbstractListModel() {
+        availableParameterList!!.setModel(object : javax.swing.AbstractListModel<String>() {
             internal val serialVersionUID = 1L
             internal var strings = arrayOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
             override fun getSize(): Int {
                 return strings.size
             }
 
-            override fun getElementAt(i: Int): Any {
+            override fun getElementAt(i: Int): String {
                 return strings[i]
             }
         })
@@ -172,14 +137,14 @@ class ParameterWindow
 
         jScrollPane2!!.horizontalScrollBar = null
 
-        usedParameterList!!.setModel(object : javax.swing.AbstractListModel() {
+        usedParameterList!!.setModel(object : javax.swing.AbstractListModel<String>() {
             internal val serialVersionUID = 1L
             internal var strings = arrayOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
             override fun getSize(): Int {
                 return strings.size
             }
 
-            override fun getElementAt(i: Int): Any {
+            override fun getElementAt(i: Int): String {
                 return strings[i]
             }
         })
@@ -230,11 +195,11 @@ class ParameterWindow
 
         parameterNameField!!.addFocusListener(object : java.awt.event.FocusAdapter() {
             override fun focusGained(evt: java.awt.event.FocusEvent?) {
-                parameterNameFieldFocusGained(evt)
+                evt?.let { parameterNameFieldFocusGained(it) }
             }
 
             override fun focusLost(evt: java.awt.event.FocusEvent?) {
-                parameterNameFieldFocusLost(evt)
+                evt?.let { parameterNameFieldFocusLost(it) }
             }
         })
 
@@ -242,11 +207,11 @@ class ParameterWindow
 
         parameterValueField!!.addFocusListener(object : java.awt.event.FocusAdapter() {
             override fun focusGained(evt: java.awt.event.FocusEvent?) {
-                parameterValueFieldFocusGained(evt)
+                evt?.let { parameterValueFieldFocusGained(it) }
             }
 
             override fun focusLost(evt: java.awt.event.FocusEvent?) {
-                parameterValueFieldFocusLost(evt)
+                evt?.let { parameterValueFieldFocusLost(it) }
             }
         })
 
@@ -256,11 +221,11 @@ class ParameterWindow
         textRadioButton!!.text = "Text"
         textRadioButton!!.addFocusListener(object : java.awt.event.FocusAdapter() {
             override fun focusGained(evt: java.awt.event.FocusEvent?) {
-                textRadioButtonFocusGained(evt)
+                evt?.let { textRadioButtonFocusGained(it) }
             }
 
             override fun focusLost(evt: java.awt.event.FocusEvent?) {
-                textRadioButtonFocusLost(evt)
+                evt?.let { textRadioButtonFocusLost(it) }
             }
         })
 
@@ -268,11 +233,11 @@ class ParameterWindow
         booleanRadioButton!!.text = "Boolean"
         booleanRadioButton!!.addFocusListener(object : java.awt.event.FocusAdapter() {
             override fun focusGained(evt: java.awt.event.FocusEvent?) {
-                booleanRadioButtonFocusGained(evt)
+                evt?.let { booleanRadioButtonFocusGained(it) }
             }
 
             override fun focusLost(evt: java.awt.event.FocusEvent?) {
-                booleanRadioButtonFocusLost(evt)
+                evt?.let { booleanRadioButtonFocusLost(it) }
             }
         })
 
@@ -280,11 +245,11 @@ class ParameterWindow
         integerRadioButton!!.text = "Integer"
         integerRadioButton!!.addFocusListener(object : java.awt.event.FocusAdapter() {
             override fun focusGained(evt: java.awt.event.FocusEvent?) {
-                integerRadioButtonFocusGained(evt)
+                evt?.let { integerRadioButtonFocusGained(it) }
             }
 
             override fun focusLost(evt: java.awt.event.FocusEvent?) {
-                integerRadioButtonFocusLost(evt)
+                evt?.let { integerRadioButtonFocusLost(it) }
             }
         })
 
@@ -293,11 +258,11 @@ class ParameterWindow
 
         floatingPointRadioButton!!.addFocusListener(object : java.awt.event.FocusAdapter() {
             override fun focusGained(evt: java.awt.event.FocusEvent?) {
-                floatingPointRadioButtonFocusGained(evt)
+                evt?.let { floatingPointRadioButtonFocusGained(it) }
             }
 
             override fun focusLost(evt: java.awt.event.FocusEvent?) {
-                floatingPointRadioButtonFocusLost(evt)
+                evt?.let { floatingPointRadioButtonFocusLost(it) }
             }
         })
 
@@ -421,11 +386,11 @@ class ParameterWindow
     }//GEN-LAST:event_addButtonActionPerformed
 
     private fun parameterNameFieldFocusLost(evt: java.awt.event.FocusEvent) {//GEN-FIRST:event_parameterNameFieldFocusLost
-        controller.shouldUpdateCurrentlyUsedParameter(this.objectBeingEdited)
+        objectBeingEdited?.let { controller.shouldUpdateCurrentlyUsedParameter(it) }
     }//GEN-LAST:event_parameterNameFieldFocusLost
 
     private fun parameterValueFieldFocusLost(evt: java.awt.event.FocusEvent) {//GEN-FIRST:event_parameterValueFieldFocusLost
-        controller.shouldUpdateCurrentlyUsedParameter(this.objectBeingEdited)
+        objectBeingEdited?.let { controller.shouldUpdateCurrentlyUsedParameter(it) }
     }//GEN-LAST:event_parameterValueFieldFocusLost
 
     private fun usedParameterListMouseClicked(evt: java.awt.event.MouseEvent?) {//GEN-FIRST:event_usedParameterListMouseClicked
@@ -461,7 +426,7 @@ class ParameterWindow
     }//GEN-LAST:event_textRadioButtonFocusGained
 
     private fun textRadioButtonFocusLost(evt: java.awt.event.FocusEvent) {//GEN-FIRST:event_textRadioButtonFocusLost
-        controller.shouldUpdateCurrentlyUsedParameter(this.objectBeingEdited)
+        this.objectBeingEdited?.let { controller.shouldUpdateCurrentlyUsedParameter(it) }
     }//GEN-LAST:event_textRadioButtonFocusLost
 
     private fun booleanRadioButtonFocusGained(evt: java.awt.event.FocusEvent) {//GEN-FIRST:event_booleanRadioButtonFocusGained
@@ -469,7 +434,7 @@ class ParameterWindow
     }//GEN-LAST:event_booleanRadioButtonFocusGained
 
     private fun booleanRadioButtonFocusLost(evt: java.awt.event.FocusEvent) {//GEN-FIRST:event_booleanRadioButtonFocusLost
-        controller.shouldUpdateCurrentlyUsedParameter(this.objectBeingEdited)
+        this.objectBeingEdited?.let { controller.shouldUpdateCurrentlyUsedParameter(it) }
     }//GEN-LAST:event_booleanRadioButtonFocusLost
 
     private fun integerRadioButtonFocusGained(evt: java.awt.event.FocusEvent) {//GEN-FIRST:event_integerRadioButtonFocusGained
@@ -477,7 +442,7 @@ class ParameterWindow
     }//GEN-LAST:event_integerRadioButtonFocusGained
 
     private fun integerRadioButtonFocusLost(evt: java.awt.event.FocusEvent) {//GEN-FIRST:event_integerRadioButtonFocusLost
-        controller.shouldUpdateCurrentlyUsedParameter(this.objectBeingEdited)
+        this.objectBeingEdited?.let { controller.shouldUpdateCurrentlyUsedParameter(it) }
     }//GEN-LAST:event_integerRadioButtonFocusLost
 
     private fun floatingPointRadioButtonFocusGained(evt: java.awt.event.FocusEvent) {//GEN-FIRST:event_floatingPointRadioButtonFocusGained
@@ -485,7 +450,7 @@ class ParameterWindow
     }//GEN-LAST:event_floatingPointRadioButtonFocusGained
 
     private fun floatingPointRadioButtonFocusLost(evt: java.awt.event.FocusEvent) {//GEN-FIRST:event_floatingPointRadioButtonFocusLost
-        controller.shouldUpdateCurrentlyUsedParameter(this.objectBeingEdited)
+        this.objectBeingEdited?.let { controller.shouldUpdateCurrentlyUsedParameter(it) }
     }//GEN-LAST:event_floatingPointRadioButtonFocusLost
 
     private fun browseButtonActionPerformed(evt: java.awt.event.ActionEvent) {//GEN-FIRST:event_browseButtonActionPerformed
@@ -530,9 +495,17 @@ class ParameterWindow
     private var usedParameterList: javax.swing.JList<*>? = null
 
     companion object {
-
         internal val serialVersionUID = 1L
     }
     // End of variables declaration//GEN-END:variables
 
+    init {
+        this.inUseParametersModel = DefaultListModel<String>()
+        initComponents()
+        this.usedParameterList!!.setModel(this.inUseParametersModel)
+        this.availableParameterList!!.dragEnabled = true
+        this.usedParameterList!!.dropMode = DropMode.ON_OR_INSERT
+        this.availableParameterList!!.transferHandler = ParameterTransferHandler(this.controller)
+        this.usedParameterList!!.transferHandler = ParameterTransferHandler(this.controller)
+    }
 }

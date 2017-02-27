@@ -39,18 +39,13 @@ import edu.stanford.cfuller.imageanalysistools.image.WritableImage
  * @author Colin J. Fuller
  */
 class OpeningFilter : MorphologicalFilter() {
-
     /* (non-Javadoc)
 	 * @see edu.stanford.cfuller.imageanalysistools.filter.morph.MorphologicalFilter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
 	 */
     override fun apply(im: WritableImage) {
         val df = DilationFilter(this)
         val ef = ErosionFilter(this)
-
         ef.apply(im)
         df.apply(im)
-
-
     }
-
 }

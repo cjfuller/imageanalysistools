@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2012 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the Software), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.fitting
 
 /**
@@ -30,9 +6,8 @@ package edu.stanford.cfuller.imageanalysistools.fitting
  * @author Colin J. Fuller
  */
 class FitParameters : java.io.Serializable {
-
-    internal var positionParameters: MutableMap<Int, Double>
-    internal var sizeParameters: MutableMap<Int, Double>
+    internal var positionParameters: MutableMap<Int, Double> = mutableMapOf()
+    internal var sizeParameters: MutableMap<Int, Double> = mutableMapOf()
     /**
      * Gets the amplitude of the object associated with these parameters.
 
@@ -43,7 +18,7 @@ class FitParameters : java.io.Serializable {
 
      * @param a the amplitude
      */
-    var amplitude: Double = 0.toDouble()
+    var amplitude: Double = 0.0
     /**
      * Gets the background of the object associated with these parameters.
 
@@ -54,39 +29,22 @@ class FitParameters : java.io.Serializable {
 
      * @param b the background
      */
-    var background: Double = 0.toDouble()
-
-    internal var otherParameters: MutableMap<String, Double>
-
-    /**
-     * Creates a new fit parameters object with no parameter values.
-     */
-    init {
-
-        this.positionParameters = java.util.HashMap<Int, Double>()
-        this.sizeParameters = java.util.HashMap<Int, Double>()
-        this.amplitude = 0.0
-        this.background = 0.0
-        this.otherParameters = java.util.HashMap<String, Double>()
-
-    }
+    var background: Double = 0.0
+    internal var otherParameters: MutableMap<String, Double> = mutableMapOf()
 
     /**
      * Gets the position of the object associated with these parameters in the supplied dimension.
-
      * @param dim an int that specifies the dimension; this should be one of the dimension constants from [ImageCoordinate][edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate] or a user-defined dimension.
-     * *
      * @return the position in that dimension.
      */
     fun getPosition(dim: Int): Double {
-        return this.positionParameters[dim]
+        // TODO(colin): correct null handling
+        return this.positionParameters[dim]!!
     }
 
     /**
      * Sets the position of the object associated with these parameters in the supplied dimension.
-
      * @param dim an int that specifies the dimension; this should be one of the dimension constants from [ImageCoordinate][edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate] or a user-defined dimension.
-     * *
      * @param value the position in the supplied dimension
      */
     fun setPosition(dim: Int, value: Double) {
@@ -95,20 +53,17 @@ class FitParameters : java.io.Serializable {
 
     /**
      * Gets the size of the object associated with these parameters in the supplied dimension.
-
      * @param dim an int that specifies the dimension; this should be one of the dimension constants from [ImageCoordinate][edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate] or a user-defined dimension.
-     * *
      * @return the size in that dimension.
      */
     fun getSize(dim: Int): Double {
-        return this.sizeParameters[dim]
+        // TODO(colin): correct null handling
+        return this.sizeParameters[dim]!!
     }
 
     /**
      * Sets the size of the object associated with these parameters in the supplied dimension.
-
      * @param dim an int that specifies the dimension; this should be one of the dimension constants from [ImageCoordinate][edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate] or a user-defined dimension.
-     * *
      * @param value the size in the supplied dimension
      */
     fun setSize(dim: Int, value: Double) {
@@ -118,11 +73,11 @@ class FitParameters : java.io.Serializable {
     /**
      * Gets the value of a named parameter associated with the fit object.
      * @param parameter a String naming the parameter
-     * *
      * @return the value of the named parameter as a double
      */
     fun getOtherParameters(parameter: String): Double {
-        return this.otherParameters[parameter]
+        // TODO(colin): correct null handling
+        return this.otherParameters[parameter]!!
     }
 
     /**
@@ -156,10 +111,8 @@ class FitParameters : java.io.Serializable {
     }
 
     companion object {
-
         internal const val serialVersionUID = 1L
     }
-
 }
 
 

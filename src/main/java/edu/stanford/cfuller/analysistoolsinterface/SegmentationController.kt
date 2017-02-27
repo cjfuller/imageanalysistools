@@ -48,36 +48,24 @@ import org.xml.sax.SAXException
  * @author cfuller
  */
 class SegmentationController : TaskController(), OmeroListener {
-
-    internal var sw: SegmentationWindow
-
-    internal var omeroImageIds: List<Long>
+    internal var sw: SegmentationWindow = SegmentationWindow(this)
+    internal var omeroImageIds: List<Long> = listOf()
     internal var omeroBrowser: OmeroBrowsingWindowController? = null
 
-
     override fun startTask() {
-
         this.omeroBrowser = null
-
         sw = SegmentationWindow(this)
         sw.addWindowListener(this)
         initializeMethods()
-
-        val imageFilename = Preferences.userNodeForPackage(this.javaClass).get("imageFile", "")
-        val parameterFilename = Preferences.userNodeForPackage(this.javaClass).get("parameterFile", "")
-        val selectedMethodIndex = Preferences.userNodeForPackage(this.javaClass).getInt("selectedIndex", 0)
-
+        val imageFilename = Preferences.userNodeForPackage(this::class.java).get("imageFile", "")
+        val parameterFilename = Preferences.userNodeForPackage(this::class.java).get("parameterFile", "")
+        val selectedMethodIndex = Preferences.userNodeForPackage(this::class.java).getInt("selectedIndex", 0)
         sw.imageFilename = imageFilename
         sw.parameterFilename = parameterFilename
         sw.selectedMethodIndex = selectedMethodIndex
-
         LoggingUtilities.addHandler(sw.logHandler)
-
         this.sw.status = STATUS_READY
-
         sw.isVisible = true
-
-
     }
 
     override fun imageIdsHaveBeenSelected(ids: List<Long>) {
@@ -277,11 +265,8 @@ class SegmentationController : TaskController(), OmeroListener {
     }
 
     protected fun initializeMethods() {
-
         val model = sw.methodComboBoxModel
-
         val methodResourceLocation = this.javaClass.classLoader.getResource(METHOD_XML_FILENAME)!!.toString()
-
         var methodNodes: NodeList? = null
 
         try {
@@ -299,29 +284,20 @@ class SegmentationController : TaskController(), OmeroListener {
 
         for (i in 0..methodNodes!!.length - 1) {
             val n = methodNodes.item(i)
-
             val displayName = n.attributes.getNamedItem(DISPLAY_ATTR_NAME)
             val className = n.attributes.getNamedItem(CLASS_ATTR_NAME)
-
             model.addElement(MethodInfo(displayName?.nodeValue, className?.nodeValue))
         }
-
-
     }
 
     companion object {
-
         internal val METHOD_XML_FILENAME = "edu/stanford/cfuller/analysistoolsinterface/resources/methods.xml"
         internal val METHOD_XML_TAG = "method"
         internal val DISPLAY_ATTR_NAME = "displayname"
         internal val CLASS_ATTR_NAME = "class"
-
-
         internal val STATUS_PROCESSING = "Processing"
         internal val STATUS_READY = "Ready"
         internal val STATUS_SUMMARY = "Making data summary"
         internal val STATUS_OMERO_ERR = "OMERO missing; "
     }
-
-
 }

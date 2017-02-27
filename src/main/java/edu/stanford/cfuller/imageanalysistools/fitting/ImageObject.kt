@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.fitting
 
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities
@@ -49,9 +25,7 @@ import javax.xml.stream.XMLStreamWriter
  * @author Colin J. Fuller
  */
 abstract class ImageObject : Serializable {
-
-    internal var centroidInMask: Vector3D
-
+    internal var centroidInMask: Vector3D = Vector3D(Double.NaN, Double.NaN, Double.NaN)
     internal var sizeInPixels: Int = 0
 
     /**
@@ -62,7 +36,6 @@ abstract class ImageObject : Serializable {
         internal set
 
     internal var maxIntensityZCoordByChannel: IntArray? = null
-
     internal var xValues: DoubleArray? = null
     internal var yValues: DoubleArray? = null
     internal var zValues: DoubleArray? = null
@@ -82,33 +55,32 @@ abstract class ImageObject : Serializable {
      * Gets the fitted parameters, one set per channel in the original image of the object.
      * @return  A List containing FitParameters objects, one for each channel in the original object.
      */
-    var fitParametersByChannel: List<FitParameters>? = null
+    var fitParametersByChannel: MutableList<FitParameters>? = null
         internal set
     /**
      * Gets the R^2 values for the fit in each channel.
      * @return  a List containing one R^2 value for the fit in each channel.
      */
-    var fitR2ByChannel: List<Double>? = null
+    var fitR2ByChannel: MutableList<Double>? = null
         internal set
     /**
      * Gets an error estimate for the fitting of the position of the object in each channel.
      * @return  a List containing one fit error estimate for each channel.
      */
-    var fitErrorByChannel: List<Double>? = null
+    var fitErrorByChannel: MutableList<Double>? = null
         internal set
 
     /**
      * Gets the number of photons above background from the object in each channel.
      * @return    a List containing the number of photons collected in each channel.
      */
-    var nPhotonsByChannel: List<Double>? = null
+    var nPhotonsByChannel: MutableList<Double>? = null
         internal set
 
-    internal var positionsByChannel: List<RealVector>
-    internal var correctedPositionsByChannel: MutableMap<Int, RealVector>
-    internal var vectorDifferencesBetweenChannels: MutableMap<Int, RealVector>
-    internal var scalarDifferencesBetweenChannels: MutableMap<Int, Double>
-
+    internal var positionsByChannel: MutableList<RealVector> = mutableListOf()
+    internal var correctedPositionsByChannel: MutableMap<Int, RealVector> = mutableMapOf()
+    internal var vectorDifferencesBetweenChannels: MutableMap<Int, RealVector> = mutableMapOf()
+    internal var scalarDifferencesBetweenChannels: MutableMap<Int, Double> = mutableMapOf()
     internal var parentBoxMin: ImageCoordinate? = null
     internal var parentBoxMax: ImageCoordinate? = null
 
@@ -188,45 +160,29 @@ abstract class ImageObject : Serializable {
      * @param p         A [ParameterDictionary] containing the parameters for the current analysis.  In particular, this routine makes use of the various box size parameters.
      */
     protected fun init(label: Int, mask: Image, parent: Image, p: ParameterDictionary) {
-
         this.fitParametersByChannel = null
         this.fitR2ByChannel = null
         this.fitErrorByChannel = null
         this.nPhotonsByChannel = null
-
         this.positionsByChannel = java.util.ArrayList<RealVector>()
         this.correctedPositionsByChannel = java.util.HashMap<Int, RealVector>()
-
         this.vectorDifferencesBetweenChannels = java.util.HashMap<Int, RealVector>()
         this.scalarDifferencesBetweenChannels = java.util.HashMap<Int, Double>()
-
-        //this.parent = new Image(parent);
-        //this.mask = new Image(mask);
-
         this.parent = parent
         this.mask = mask
-
         this.label = label
-
         this.sizeInPixels = 0
-
         this.centroidInMask = Vector3D(0.0, 0.0, 0.0)
-
         this.imageID = null
-
         this.hadFittingError = true
-
         this.numberOfChannels = p.getIntValueForKey("num_wavelengths") // use this so that if there's extra wavelengths not to be quantified at the end, these won't skew the initial guess
 
         for (i in mask) {
-
             if (mask.getValue(i) == label.toFloat()) {
                 sizeInPixels++
-
-                this.centroidInMask = this.centroidInMask.add(Vector3D(i.get(ImageCoordinate.X).toDouble(), i.get(ImageCoordinate.Y).toDouble(), i.get(ImageCoordinate.Z).toDouble()))
-
+                this.centroidInMask = this.centroidInMask.add(
+                        Vector3D(i[ImageCoordinate.X].toDouble(), i[ImageCoordinate.Y].toDouble(), i[ImageCoordinate.Z].toDouble()))
             }
-
         }
 
         if (this.sizeInPixels == 0) {
@@ -235,80 +191,63 @@ abstract class ImageObject : Serializable {
 
         this.centroidInMask = this.centroidInMask.scalarMultiply(1.0 / sizeInPixels)
 
-        //System.out.println("for object " + label + " centroid is: " + this.centroidInMask.toString());
-
         var xcoord = Math.round(this.centroidInMask.x - p.getIntValueForKey("half_box_size")).toInt()
         var ycoord = Math.round(this.centroidInMask.y - p.getIntValueForKey("half_box_size")).toInt()
-
         if (xcoord < 0) {
             xcoord = 0
         }
         if (ycoord < 0) {
             ycoord = 0
         }
-
         this.parentBoxMin = ImageCoordinate.createCoordXYZCT(xcoord, ycoord, 0, 0, 0)
 
         xcoord = Math.round(this.centroidInMask.x + p.getIntValueForKey("half_box_size")).toInt() + 1
         ycoord = Math.round(this.centroidInMask.y + p.getIntValueForKey("half_box_size")).toInt() + 1
-
-        if (xcoord > mask.dimensionSizes.get(ImageCoordinate.X)) {
-            xcoord = mask.dimensionSizes.get(ImageCoordinate.X)
+        if (xcoord > mask.dimensionSizes[ImageCoordinate.X]) {
+            xcoord = mask.dimensionSizes[ImageCoordinate.X]
         }
-        if (ycoord > mask.dimensionSizes.get(ImageCoordinate.Y)) {
-            ycoord = mask.dimensionSizes.get(ImageCoordinate.Y)
+        if (ycoord > mask.dimensionSizes[ImageCoordinate.Y]) {
+            ycoord = mask.dimensionSizes[ImageCoordinate.Y]
         }
 
-        this.parentBoxMax = ImageCoordinate.createCoordXYZCT(xcoord, ycoord, parent.dimensionSizes.get(ImageCoordinate.Z), parent.dimensionSizes.get(ImageCoordinate.C), parent.dimensionSizes.get(ImageCoordinate.T))
+        this.parentBoxMax = ImageCoordinate.createCoordXYZCT(
+                xcoord, ycoord,
+                parent.dimensionSizes[ImageCoordinate.Z],
+                parent.dimensionSizes[ImageCoordinate.C],
+                parent.dimensionSizes[ImageCoordinate.T])
 
         //handle either 2D or 3D masks
 
         //2D case:
-
-        if (mask.dimensionSizes.get(ImageCoordinate.Z) == 1) {
-
-
+        if (mask.dimensionSizes[ImageCoordinate.Z] == 1) {
             //find the max intensity pixel in each channel and use this to refine the box
-
-            this.maxIntensityZCoordByChannel = IntArray(parent.dimensionSizes.get(ImageCoordinate.C))
-
-            var minZOverall = parent.dimensionSizes.get(ImageCoordinate.Z)
+            this.maxIntensityZCoordByChannel = IntArray(parent.dimensionSizes[ImageCoordinate.C])
+            var minZOverall = parent.dimensionSizes[ImageCoordinate.Z]
             var maxZOverall = 0
-
-            //for (int c = 0; c < parent.getDimensionSizes().getC(); c++) {
-
             for (c in 0..this.numberOfChannels - 1) {
-                this.parentBoxMin!!.set(ImageCoordinate.C, c)
-                this.parentBoxMax!!.set(ImageCoordinate.C, c + 1)
-
-                parent.setBoxOfInterest(this.parentBoxMin, this.parentBoxMax)
-
+                this.parentBoxMin!![ImageCoordinate.C] = c
+                this.parentBoxMax!![ImageCoordinate.C] = c + 1
+                parent.setBoxOfInterest(this.parentBoxMin!!, this.parentBoxMax!!)
                 var maxValue = 0.0
                 var maxCoord: ImageCoordinate? = null
-
                 for (ic in parent) {
-
-                    if (ic.get(ImageCoordinate.X) != Math.round(this.centroidInMask.x).toInt() || ic.get(ImageCoordinate.Y) != Math.round(this.centroidInMask.y).toInt()) {
+                    if (ic[ImageCoordinate.X] != Math.round(this.centroidInMask.x).toInt() ||
+                            ic.get(dimensionConstant = ImageCoordinate.Y) != Math.round(this.centroidInMask.y).toInt()) {
                         continue
                     }
-
                     if (parent.getValue(ic) > maxValue) {
                         maxValue = parent.getValue(ic).toDouble()
                         if (maxCoord != null) maxCoord.recycle()
                         maxCoord = ImageCoordinate.cloneCoord(ic)
                     }
-
                 }
 
                 if (maxCoord == null) continue
+                if (maxCoord[ImageCoordinate.Z] > maxZOverall) maxZOverall = maxCoord[ImageCoordinate.Z]
+                if (maxCoord[ImageCoordinate.Z] < minZOverall) minZOverall = maxCoord[ImageCoordinate.Z]
 
-                if (maxCoord.get(ImageCoordinate.Z) > maxZOverall) maxZOverall = maxCoord.get(ImageCoordinate.Z)
-                if (maxCoord.get(ImageCoordinate.Z) < minZOverall) minZOverall = maxCoord.get(ImageCoordinate.Z)
-
-                this.maxIntensityZCoordByChannel[c] = maxCoord.get(ImageCoordinate.Z)
-
+                this.maxIntensityZCoordByChannel!![c] = maxCoord[ImageCoordinate.Z]
                 maxCoord.recycle()
-
                 parent.clearBoxOfInterest()
             }
 
@@ -319,32 +258,26 @@ abstract class ImageObject : Serializable {
             }
 
             val zAverage = (minZOverall + maxZOverall) / 2
-
             var zcoord = 0
 
-            this.parentBoxMin!!.set(ImageCoordinate.C, 0)
+            this.parentBoxMin!![ImageCoordinate.C] = 0
             zcoord = zAverage - p.getIntValueForKey("half_z_size")
             if (zcoord < 0) zcoord = 0
-            this.parentBoxMin!!.set(ImageCoordinate.Z, zcoord)
+            this.parentBoxMin!![ImageCoordinate.Z] = zcoord
 
-            this.parentBoxMax!!.set(ImageCoordinate.C, parent.dimensionSizes.get(ImageCoordinate.C))
+            this.parentBoxMax!![ImageCoordinate.C] = parent.dimensionSizes[ImageCoordinate.C]
             zcoord = zAverage + p.getIntValueForKey("half_z_size") + 1
-            if (zcoord > parent.dimensionSizes.get(ImageCoordinate.Z)) zcoord = parent.dimensionSizes.get(ImageCoordinate.Z)
-            this.parentBoxMax!!.set(ImageCoordinate.Z, zcoord)
+            if (zcoord > parent.dimensionSizes[ImageCoordinate.Z]) zcoord = parent.dimensionSizes[ImageCoordinate.Z]
+            this.parentBoxMax!![ImageCoordinate.Z] = zcoord
 
         } else { //3D mask
-
             var zcoord = Math.round(this.centroidInMask.z - p.getIntValueForKey("half_z_size")).toInt()
             if (zcoord < 0) {
                 zcoord = 0
             }
-
-            this.parentBoxMin!!.set(ImageCoordinate.Z, zcoord)
-
+            this.parentBoxMin!![ImageCoordinate.Z] = zcoord
             zcoord = Math.round(this.centroidInMask.z + p.getIntValueForKey("half_z_size").toDouble() + 1.0).toInt()
-
-            this.parentBoxMax!!.set(ImageCoordinate.Z, zcoord)
-
+            this.parentBoxMax!![ImageCoordinate.Z] = zcoord
         }
     }
 
@@ -354,7 +287,6 @@ abstract class ImageObject : Serializable {
      * @param p     The parameters for the current analysis.
      */
     abstract fun fitPosition(p: ParameterDictionary)
-
 
     /**
      * Nullifies the references to the parent and mask image, and the internal storage of the image data and coordinates to free them for garbage collection.
@@ -377,7 +309,7 @@ abstract class ImageObject : Serializable {
      * @throws Throwable
      */
     @Throws(Throwable::class)
-    override fun finalize() {
+    protected fun finalize() {
         if (this.parentBoxMin != null) {
             this.parentBoxMin!!.recycle()
             this.parentBoxMin = null
@@ -386,8 +318,7 @@ abstract class ImageObject : Serializable {
             this.parentBoxMax!!.recycle()
             this.parentBoxMax = null
         }
-
-        super.finalize()
+        // super.finalize() // TODO(colin): why can't I call super.finalize()?
     }
 
 
@@ -395,8 +326,8 @@ abstract class ImageObject : Serializable {
      * Sets the relevant region of interest in the parent image to be the region that boxes this object.
      */
     fun boxImages() {
-        this.parent!!.setBoxOfInterest(this.parentBoxMin, this.parentBoxMax)
-        this.mask!!.setBoxOfInterest(this.parentBoxMin, this.parentBoxMax)
+        this.parent!!.setBoxOfInterest(this.parentBoxMin!!, this.parentBoxMax!!)
+        this.mask!!.setBoxOfInterest(this.parentBoxMin!!, this.parentBoxMax!!)
     }
 
     /**
@@ -409,40 +340,33 @@ abstract class ImageObject : Serializable {
 
     /**
      * Gets the internal array containing the x-coordinates of the pixels in the box containing this object.
-
      * No specific order is guaranteed beyond that it must be the same order as the y- and z- coordinates and function values.
-
      * @return  An array containing the x-coordinates of each pixel in this object's box.
      */
     fun getxValues(): DoubleArray {
-        return xValues
+        return xValues!!
     }
 
     /**
      * Gets the internal array containing the y-coordinates of the pixels in the box containing this object.
-
      * No specific order is guaranteed beyond that it must be the same order as the x- and z- coordinates and function values.
-
      * @return  An array containing the x-coordinates of each pixel in this object's box.
      */
     fun getyValues(): DoubleArray {
-        return yValues
+        return yValues!!
     }
 
     /**
      * Gets the internal array containing the z-coordinates of the pixels in the box containing this object.
-
      * No specific order is guaranteed beyond that it must be the same order as the x- and y- coordinates and function values.
-
      * @return  An array containing the x-coordinates of each pixel in this object's box.
      */
     fun getzValues(): DoubleArray {
-        return zValues
+        return zValues!!
     }
 
     /**
      * Gets information on whether this object has finished fitting with no errors.
-
      * @return  true if fitting finished normally, false if there was an error or the object was not yet fit.
      */
     fun finishedFitting(): Boolean {
@@ -451,141 +375,91 @@ abstract class ImageObject : Serializable {
 
     /**
      * Gets the position of this object in the specified channel.
-
      * Do not modify the returned RealVector, as it is a reference to the internally stored vector.
-
      * @param channel    The index of the channel, either by order in the original multiwavelength image, or in the order specified for split wavelength images.
-     * *
-     * *
      * @return    A RealVector containing the x,y,and z coordinates of the position, or null if it has not yet been determined, or the channel is out of range.
      */
     fun getPositionForChannel(channel: Int): RealVector? {
-
         if (channel >= this.positionsByChannel.size) {
             return null
         }
-
         return this.positionsByChannel[channel]
-
     }
 
     /**
      * Gets the corrected position of this object in the specified channel (if there is a corrected position).
-
      * Do not modify the returned RealVector, as it is a reference to the internally stored vector.
-
      * @param channel    The index of the channel, either by order in the original multiwavelength image, or in the order specified for split wavelength images.
-     * *
-     * *
      * @return    A RealVector containing the x,y,and z coordinates of the position, or null if it has not yet been determined, or the channel is out of range.
      */
     fun getCorrectedPositionForChannel(channel: Int): RealVector? {
-
         if (!this.correctedPositionsByChannel.containsKey(channel)) {
             return null
         }
-
         return this.correctedPositionsByChannel[channel]
-
     }
 
     /**
      * Applies the specified correction vector to the position of the object to generate a corrected position that can be accessed using [.getCorrectedPositionForChannel].
-
      * @param channel    The index of the channel, either by order in the original multiwavelength image, or in the order specified for split wavelength images.
-     * *
      * @param correction a RealVector containing a correction that will be subtracted from the position of the object in the specified channel.
      */
     fun applyCorrectionVectorToChannel(channel: Int, correction: RealVector) {
-
         this.correctedPositionsByChannel.put(channel, this.getPositionForChannel(channel)!!.subtract(correction))
-
     }
 
     /**
      * Gets the vector difference between the position of the object in two channels.
-
      * Note that there is no unit conversion here, and the distance is returned in image units of pixels or sections.
-
      * @param channel0    The index of one channel to use for the difference.
-     * *
      * @param channel1    The index of the other channel to use for the difference.
-     * *
      * @return            The vector difference between the two channels, as channel1 - channel0, or null if either channel is out of range or has not yet been fit.
      */
     fun getVectorDifferenceBetweenChannels(channel0: Int, channel1: Int): RealVector? {
-
         val key = this.numberOfChannels * channel0 + channel1
 
         if (!this.vectorDifferencesBetweenChannels.containsKey(key)) {
-
             val ch0 = this.getPositionForChannel(channel0)
             val ch1 = this.getPositionForChannel(channel1)
-
             if (ch0 == null || ch1 == null) {
                 return null
             }
-
             this.vectorDifferencesBetweenChannels.put(key, ch1.subtract(ch0))
         }
-
         return this.vectorDifferencesBetweenChannels[key]
-
     }
 
     /**
      * Gets the vector difference between the corrected positions of the object in two channels.
-
      * If there is no corrected position for a channel, its uncorrected position is used.
-
      * Note that there is no unit conversion here, and the distance is returned in image units of pixels or sections.
-
      * @param channel0    The index of one channel to use for the difference.
-     * *
      * @param channel1    The index of the other channel to use for the difference.
-     * *
      * @return            The vector difference between the two channels, as channel1 - channel0, or null if either channel is out of range or has not yet been fit.
      */
     fun getCorrectedVectorDifferenceBetweenChannels(channel0: Int, channel1: Int): RealVector {
-
         var c0: RealVector? = this.correctedPositionsByChannel[channel0]
         var c1: RealVector? = this.correctedPositionsByChannel[channel1]
-
         if (c0 == null) c0 = this.positionsByChannel[channel0]
         if (c1 == null) c1 = this.positionsByChannel[channel1]
-
         return c1.subtract(c0)
-
     }
-
 
     /**
      * Gets the scalar difference between the position of the object in two channels.
-
      * Units are converted from image units to real units using the supplied vector of conversions.
-
      * @param channel0    The index of one channel to use for the difference.
-     * *
      * @param channel1    The index of the other channel to use for the difference.
-     * *
      * @param pixelToDistanceConversions    A vector containing the number of realspace distance units per pixel or section, one element per dimension.
-     * *
      * @return            The scalar distance between the position of the object in each channel (that is, the length of the vector representing the vector distance), or null if either channel is out of range or has not yet been fit.
      */
     fun getScalarDifferenceBetweenChannels(channel0: Int, channel1: Int, pixelToDistanceConversions: RealVector): Double? {
-
         val key = this.numberOfChannels * channel0 + channel1
-
         if (!this.scalarDifferencesBetweenChannels.containsKey(key)) {
-
             val vecDifference = this.getVectorDifferenceBetweenChannels(channel0, channel1) ?: return null
-
             this.scalarDifferencesBetweenChannels.put(key, vecDifference.ebeMultiply(pixelToDistanceConversions).norm)
-
         }
-
         return this.scalarDifferencesBetweenChannels[key]
-
     }
 
     fun writeToXMLString(): String {
@@ -601,25 +475,22 @@ abstract class ImageObject : Serializable {
     }
 
     fun writeToXML(xsw: XMLStreamWriter) {
-
         try {
-
             xsw.writeStartElement(OBJECT_ELEMENT)
             xsw.writeAttribute(LABEL_ATTR, Integer.toString(this.label))
             xsw.writeAttribute(IMAGE_ATTR, this.imageID)
             xsw.writeCharacters("\n")
             for (i in 0..this.numberOfChannels - 1) {
-
                 xsw.writeStartElement(CHANNEL_ELEMENT)
                 xsw.writeAttribute(CH_ID_ATTR, Integer.toString(i))
                 xsw.writeCharacters("\n")
                 xsw.writeStartElement(FIT_ELEMENT)
-                xsw.writeAttribute(R2_ATTR, java.lang.Double.toString(this.fitR2ByChannel.get(i)))
-                xsw.writeAttribute(ERROR_ATTR, java.lang.Double.toString(this.fitErrorByChannel.get(i)))
-                xsw.writeAttribute(N_PHOTONS_ATTR, java.lang.Double.toString(this.nPhotonsByChannel.get(i)))
+                xsw.writeAttribute(R2_ATTR, java.lang.Double.toString(this.fitR2ByChannel!![i]))
+                xsw.writeAttribute(ERROR_ATTR, java.lang.Double.toString(this.fitErrorByChannel!![i]))
+                xsw.writeAttribute(N_PHOTONS_ATTR, java.lang.Double.toString(this.nPhotonsByChannel!![i]))
                 xsw.writeCharacters("\n")
                 xsw.writeStartElement(PARAMETERS_ELEMENT)
-                xsw.writeCharacters(this.fitParametersByChannel.get(i).toString().replace(";", ",").replace("}", "").replace("{", ""))
+                xsw.writeCharacters(this.fitParametersByChannel!![i].toString().replace(";", ",").replace("}", "").replace("{", ""))
                 xsw.writeEndElement() //parameters
                 xsw.writeCharacters("\n")
                 xsw.writeStartElement(POSITION_ELEMENT)
@@ -633,43 +504,25 @@ abstract class ImageObject : Serializable {
             }
             xsw.writeStartElement(SERIAL_ELEMENT)
             xsw.writeAttribute(ENCODING_ATTR, ENCODING_NAME)
-
             val bytesOutput = ByteArrayOutputStream()
-
             try {
-
                 val oos = ObjectOutputStream(bytesOutput)
-
                 oos.writeObject(this)
-
             } catch (e: java.io.IOException) {
                 LoggingUtilities.logger.severe("Exception encountered while serializing ImageObject: " + e.message)
-
             }
-
             val adapter = Base64BinaryAdapter()
             xsw.writeCharacters(adapter.marshal(bytesOutput.toByteArray()))
-
             xsw.writeEndElement() //serial
-
-
             xsw.writeCharacters("\n")
-
             xsw.writeEndElement() //object
-
             xsw.writeCharacters("\n")
-
-
         } catch (e: XMLStreamException) {
-
             LoggingUtilities.logger.severe("Exception encountered while writing XML correction output: " + e.message)
-
         }
-
     }
 
     companion object {
-
         //TODO: maintain the notion that the ImageObject has some location in real space, but reduce
         //dependence on 5D images.
 
@@ -689,5 +542,4 @@ abstract class ImageObject : Serializable {
         val ENCODING_ATTR = "encoding"
         val ENCODING_NAME = "base64"
     }
-
 }

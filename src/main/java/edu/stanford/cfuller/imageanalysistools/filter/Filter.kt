@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.filter
 
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary
@@ -44,20 +20,8 @@ import edu.stanford.cfuller.imageanalysistools.image.Image
  */
 
 abstract class Filter {
-
-    //fields
-
-    protected var referenceImage: Image? = null
-    protected var params: ParameterDictionary? = null
-    //methods
-
-    /**
-     * Constructs a new filter with fields initialized to null.
-     */
-    init {
-        this.referenceImage = null
-        this.params = null
-    }
+    var referenceImage: Image? = null
+    var params: ParameterDictionary? = null
 
     /**
      * Applies the Filter to the supplied Image.
@@ -66,19 +30,10 @@ abstract class Filter {
     abstract fun apply(im: WritableImage)
 
     /**
-     * Sets the reference image for this filter to the specified Image.
-     * @param im    The reference Image.
-     */
-    fun setReferenceImage(im: Image) {
-        referenceImage = im
-    }
-
-    /**
      * Sets the parameters for this filter to the specified ParameterDictionary.
      * @param params    The ParameterDictionary used for the analysis.
      */
     fun setParameters(params: ParameterDictionary) {
         this.params = params
     }
-
 }

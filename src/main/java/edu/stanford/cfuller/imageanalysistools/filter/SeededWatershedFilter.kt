@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.filter
 
 import edu.stanford.cfuller.imageanalysistools.image.Histogram
@@ -36,20 +12,11 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
 
  * @author Colin J. Fuller
  */
-
 class SeededWatershedFilter : WatershedFilter(), SeededFilter {
-
     internal var maxSeedLabel = 0
-
     internal var flaggedForMerge: Boolean = false
-
-    internal var mergeTable: java.util.HashMap<Int, Int>
-    internal var mergeRegions: java.util.HashSet<Int>
-
-    init {
-        this.mergeTable = java.util.HashMap<Int, Int>()
-        this.mergeRegions = java.util.HashSet<Int>()
-    }
+    internal var mergeTable: java.util.HashMap<Int, Int> = java.util.HashMap<Int, Int>()
+    internal var mergeRegions: java.util.HashSet<Int> = java.util.HashSet<Int>()
 
     /**
      * Sets the seed Image to the specified Image.  This will not be modified.
@@ -60,26 +27,26 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
         val h = Histogram(im)
         this.maxSeedLabel = h.maxValue
         this.flaggedForMerge = false
-
     }
 
-    protected fun isOnBoundary(neighbor: Int, tempNeighbor: Int): Boolean {
-        return neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor && neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel
+    private fun isOnBoundary(neighbor: Int, tempNeighbor: Int): Boolean {
+        return neighbor > 0 && tempNeighbor > 0 && neighbor != tempNeighbor &&
+                neighbor <= this.maxSeedLabel && tempNeighbor <= this.maxSeedLabel
     }
 
-    protected fun needsMerge(neighbor: Int, tempNeighbor: Int): Boolean {
+    private fun needsMerge(neighbor: Int, tempNeighbor: Int): Boolean {
         return neighbor != tempNeighbor && neighbor > 0 && tempNeighbor > 0
     }
 
-    protected fun followMergeChain(toChain: Int): Int {
-        if (!this.mergeTable.containsKey(toChain) || this.mergeTable[toChain] === toChain) {
+    private fun followMergeChain(toChain: Int): Int {
+        if (!this.mergeTable.containsKey(toChain) || this.mergeTable[toChain] == toChain) {
             return toChain
         } else {
-            return followMergeChain(this.mergeTable[toChain])
+            return followMergeChain(this.mergeTable[toChain]!!)
         }
     }
 
-    protected fun doMerge(processing: WritableImage, toMerge: java.util.HashSet<Int>) {
+    private fun doMerge(processing: WritableImage, toMerge: java.util.HashSet<Int>) {
         var min = Integer.MAX_VALUE
         for (i in toMerge) {
             if (i < min) {
@@ -106,12 +73,9 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
      * *                      if it belongs in that region, or nextLabel if it should start a new region.
      */
     override fun getCorrectLabel(ic: ImageCoordinate, processing: WritableImage, nextLabel: Int): Int {
-
         mergeRegions.clear()
-
-        val x = ic.get(ImageCoordinate.X)
-        val y = ic.get(ImageCoordinate.Y)
-
+        val x = ic[ImageCoordinate.X]
+        val y = ic[ImageCoordinate.Y]
         val currValue = processing.getValue(ic).toDouble()
 
         if (currValue > 0) {
@@ -119,16 +83,14 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
         }
 
         //check 8-connected neighbors in the plane
-
         var neighbor = 0
-
         val ic2 = ImageCoordinate.cloneCoord(ic)
         var lowerInBounds = false
         var upperInBounds = false
         val bothInBounds = lowerInBounds && upperInBounds
 
-        ic2.set(ImageCoordinate.X, x - 1)
-        ic2.set(ImageCoordinate.Y, y - 1)
+        ic2[ImageCoordinate.X] = x - 1
+        ic2[ImageCoordinate.Y] = y - 1
 
         if (processing.inBounds(ic2)) {
             lowerInBounds = true
@@ -142,11 +104,11 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
                 mergeRegions.add(neighbor)
                 mergeRegions.add(tempNeighbor)
             }
-            if (neighbor <= 0 || tempNeighbor < neighbor && tempNeighbor > 0) neighbor = tempNeighbor
+            if (neighbor <= 0 || tempNeighbor in 1..(neighbor - 1)) neighbor = tempNeighbor
         }
 
-        ic2.set(ImageCoordinate.X, x + 1)
-        ic2.set(ImageCoordinate.Y, y + 1)
+        ic2[ImageCoordinate.X] = x + 1
+        ic2[ImageCoordinate.Y] = y + 1
 
         if (processing.inBounds(ic2)) {
             upperInBounds = true
@@ -160,11 +122,11 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
                 mergeRegions.add(neighbor)
                 mergeRegions.add(tempNeighbor)
             }
-            if (neighbor <= 0 || tempNeighbor < neighbor && tempNeighbor > 0) neighbor = tempNeighbor
+            if (neighbor <= 0 || tempNeighbor in 1..(neighbor - 1)) neighbor = tempNeighbor
         }
 
-        ic2.set(ImageCoordinate.X, x - 1)
-        ic2.set(ImageCoordinate.Y, y)
+        ic2[ImageCoordinate.X] = x - 1
+        ic2[ImageCoordinate.Y] = y
 
         if (lowerInBounds || processing.inBounds(ic2)) {
             val tempNeighbor = followMergeChain(processing.getValue(ic2).toInt())
@@ -177,11 +139,11 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
                 mergeRegions.add(neighbor)
                 mergeRegions.add(tempNeighbor)
             }
-            if (neighbor <= 0 || tempNeighbor < neighbor && tempNeighbor > 0) neighbor = tempNeighbor
+            if (neighbor <= 0 || tempNeighbor in 1..(neighbor - 1)) neighbor = tempNeighbor
         }
 
-        ic2.set(ImageCoordinate.X, x - 1)
-        ic2.set(ImageCoordinate.Y, y + 1)
+        ic2[ImageCoordinate.X] = x - 1
+        ic2[ImageCoordinate.Y] = y + 1
 
         if (bothInBounds || processing.inBounds(ic2)) {
             val tempNeighbor = followMergeChain(processing.getValue(ic2).toInt())
@@ -194,11 +156,11 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
                 mergeRegions.add(neighbor)
                 mergeRegions.add(tempNeighbor)
             }
-            if (neighbor <= 0 || tempNeighbor < neighbor && tempNeighbor > 0) neighbor = tempNeighbor
+            if (neighbor <= 0 || tempNeighbor in 1..(neighbor - 1)) neighbor = tempNeighbor
         }
 
-        ic2.set(ImageCoordinate.X, x)
-        ic2.set(ImageCoordinate.Y, y - 1)
+        ic2[ImageCoordinate.X] = x
+        ic2[ImageCoordinate.Y] = y - 1
 
         if (lowerInBounds || processing.inBounds(ic2)) {
             val tempNeighbor = followMergeChain(processing.getValue(ic2).toInt())
@@ -211,11 +173,11 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
                 mergeRegions.add(neighbor)
                 mergeRegions.add(tempNeighbor)
             }
-            if (neighbor <= 0 || tempNeighbor < neighbor && tempNeighbor > 0) neighbor = tempNeighbor
+            if (neighbor <= 0 || tempNeighbor in 1..(neighbor - 1)) neighbor = tempNeighbor
         }
 
-        ic2.set(ImageCoordinate.X, x)
-        ic2.set(ImageCoordinate.Y, y + 1)
+        ic2[ImageCoordinate.X] = x
+        ic2[ImageCoordinate.Y] = y + 1
 
         if (upperInBounds || processing.inBounds(ic2)) {
             val tempNeighbor = followMergeChain(processing.getValue(ic2).toInt())
@@ -228,11 +190,11 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
                 mergeRegions.add(neighbor)
                 mergeRegions.add(tempNeighbor)
             }
-            if (neighbor <= 0 || tempNeighbor < neighbor && tempNeighbor > 0) neighbor = tempNeighbor
+            if (neighbor <= 0 || tempNeighbor in 1..(neighbor - 1)) neighbor = tempNeighbor
         }
 
-        ic2.set(ImageCoordinate.X, x + 1)
-        ic2.set(ImageCoordinate.Y, y - 1)
+        ic2[ImageCoordinate.X] = x + 1
+        ic2[ImageCoordinate.Y] = y - 1
 
         if (bothInBounds || processing.inBounds(ic2)) {
             val tempNeighbor = followMergeChain(processing.getValue(ic2).toInt())
@@ -245,11 +207,11 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
                 mergeRegions.add(neighbor)
                 mergeRegions.add(tempNeighbor)
             }
-            if (neighbor <= 0 || tempNeighbor < neighbor && tempNeighbor > 0) neighbor = tempNeighbor
+            if (neighbor <= 0 || tempNeighbor in 1..(neighbor - 1)) neighbor = tempNeighbor
         }
 
-        ic2.set(ImageCoordinate.X, x + 1)
-        ic2.set(ImageCoordinate.Y, y)
+        ic2[ImageCoordinate.X] = x + 1
+        ic2[ImageCoordinate.Y] = y
 
         if (upperInBounds || processing.inBounds(ic2)) {
             val tempNeighbor = followMergeChain(processing.getValue(ic2).toInt())
@@ -262,7 +224,7 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
                 mergeRegions.add(neighbor)
                 mergeRegions.add(tempNeighbor)
             }
-            if (neighbor <= 0 || tempNeighbor < neighbor && tempNeighbor > 0) neighbor = tempNeighbor
+            if (neighbor <= 0 || tempNeighbor in 1..(neighbor - 1)) neighbor = tempNeighbor
         }
 
         if (neighbor > 0) {
@@ -272,11 +234,7 @@ class SeededWatershedFilter : WatershedFilter(), SeededFilter {
             }
             return neighbor
         }
-
         ic2.recycle()
         return nextLabel
-
     }
-
-
 }
