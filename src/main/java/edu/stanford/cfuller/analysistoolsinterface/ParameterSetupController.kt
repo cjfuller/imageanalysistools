@@ -17,7 +17,6 @@ import javax.swing.filechooser.FileNameExtensionFilter
  * @author cfuller
  */
 class ParameterSetupController : TaskController() {
-
     internal var pw: ParameterWindow = ParameterWindow(this)
     internal val availableParameters: MutableList<Parameter> = Vector<Parameter>()
     internal var parametersInUse: Vector<Parameter> = Vector<Parameter>()
@@ -32,11 +31,7 @@ class ParameterSetupController : TaskController() {
             pdKnown.getParameterForKey(key, 0)?.let { availableParameters.add(it) }
         }
 
-        val objectParameters = java.util.LinkedList<Any>()
-        objectParameters.addAll(availableParameters)
-
-        pw.setAvailableParameters(objectParameters)
-
+        pw.setAvailableParameters(availableParameters.map(Parameter::toString))
         var startingDir = Preferences.userNodeForPackage(this.javaClass).get("parameterFile", "")
 
         if (startingDir !== "" && File(startingDir).exists()) {
@@ -44,22 +39,18 @@ class ParameterSetupController : TaskController() {
         } else {
             startingDir = ""
         }
-
         pw.parameterFile = startingDir
-
         pw.isVisible = true
-
         pw.addWindowListener(this)
-
     }
 
     fun addSelectedFilter(name: String, classname: String) {
-        val p = Parameter(P_FILTER_ALL, name, ParameterType.STRING_T, classname, null)
+        val p = Parameter(P_FILTER_ALL, name, ParameterType.STRING_T, classname, "")
         this.useParameter(p)
     }
 
     fun addSelectedMetric(name: String, classname: String) {
-        val p = Parameter(P_METRIC, name, ParameterType.STRING_T, classname, null)
+        val p = Parameter(P_METRIC, name, ParameterType.STRING_T, classname, "")
         this.useParameter(p)
     }
 
@@ -79,9 +70,8 @@ class ParameterSetupController : TaskController() {
         }
 
         val dlm = pw.inUseParametersModel
-        dlm.addElement(Parameter(p))
+        dlm.addElement(Parameter(p).toString())
         pw.selectMostRecentlyAddedInUseParameter()
-
     }
 
     fun shouldUpdateCurrentlyUsedParameter(o: Any) {

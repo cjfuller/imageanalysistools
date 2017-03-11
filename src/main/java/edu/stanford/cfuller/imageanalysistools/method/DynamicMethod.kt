@@ -2,9 +2,7 @@ package edu.stanford.cfuller.imageanalysistools.method
 
 import edu.stanford.cfuller.imageanalysistools.filter.Filter
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities
-import edu.stanford.cfuller.imageanalysistools.image.Image
 import edu.stanford.cfuller.imageanalysistools.image.ImageFactory
-import edu.stanford.cfuller.imageanalysistools.image.WritableImage
 import edu.stanford.cfuller.imageanalysistools.metric.Metric
 import edu.stanford.cfuller.imageanalysistools.metric.ZeroMetric
 
@@ -28,25 +26,17 @@ class DynamicMethod : Method() {
         val filters = java.util.ArrayList<Filter>()
 
         if (this.parameters.hasKey(P_FILTER_ALL)) {
-            val filterNames = this.parameters.getValueForKey(P_FILTER_ALL).split(" ".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
-            for (fn in filterNames) {
-                val f = this.getFilter(fn)
-                if (f != null) {
-                    filters.add(f)
-                }
-            }
+            val filterNames = this.parameters.getValueForKey(P_FILTER_ALL)!!.split(" ".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
+            filterNames.mapNotNullTo(filters) { this.getFilter(it) }
         } else {
             if (!this.parameters.hasKey(P_NUM_FILTERS)) {
                 return
             }
-            for (i in 0..this.parameters.getIntValueForKey(P_NUM_FILTERS) - 1) {
-                val currParamName = P_FILTER_BASE + Integer.toString(i)
-                val filterName = this.parameters.getValueForKey(currParamName)
-                val f = this.getFilter(filterName)
-                if (f != null) {
-                    filters.add(f)
-                }
-            }
+            (0..this.parameters.getIntValueForKey(P_NUM_FILTERS) - 1)
+                    .asSequence()
+                    .map { P_FILTER_BASE + Integer.toString(it) }
+                    .map { this.parameters.getValueForKey(it) }
+                    .mapNotNullTo(filters) { this.getFilter(it!!) }
         }
 
         for (f in filters) {
@@ -54,8 +44,8 @@ class DynamicMethod : Method() {
             f.referenceImage = this.imageSet.markerImageOrDefault
         }
 
-        var m: Metric = this.getMetric(this.parameters.getValueForKey(P_METRIC_NAME)) ?: ZeroMetric()
-        iterateOnFiltersAndStoreResult(filters, ImageFactory.createWritable(this.imageSet.markerImageOrDefault), m)
+        val m: Metric = this.getMetric(this.parameters.getValueForKey(P_METRIC_NAME)!!) ?: ZeroMetric()
+        iterateOnFiltersAndStoreResult(filters, ImageFactory.createWritable(this.imageSet.markerImageOrDefault!!), m)
     }
 
     /**

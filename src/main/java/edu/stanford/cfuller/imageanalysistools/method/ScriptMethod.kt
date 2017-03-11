@@ -30,7 +30,7 @@ class ScriptMethod : Method() {
         sc.runScriptlet(scriptToRun!!.scriptString)
 
         if (this.parameters.hasKey(PARAM_METHOD_DISPLAY_NAME)) {
-            this.displayName = this.parameters.getValueForKey(PARAM_METHOD_DISPLAY_NAME)
+            this.displayName = this.parameters.getValueForKey(PARAM_METHOD_DISPLAY_NAME)!!
         }
     }
 

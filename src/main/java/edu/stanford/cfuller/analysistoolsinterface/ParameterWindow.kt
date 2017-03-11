@@ -1,6 +1,5 @@
 package edu.stanford.cfuller.analysistoolsinterface
 
-import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter
 import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterType
 import javax.swing.DefaultListModel
 import javax.swing.DropMode
@@ -14,7 +13,7 @@ import javax.swing.LayoutStyle
 class ParameterWindow
 /** Creates new form ParameterWindow  */
 (internal var controller: ParameterSetupController) : javax.swing.JFrame() {
-    var inUseParametersModel: DefaultListModel<*>
+    var inUseParametersModel: DefaultListModel<String>
         internal set
     var objectBeingEdited: Any? = null
         internal set
@@ -24,7 +23,7 @@ class ParameterWindow
         for (o in parameters) {
             dlm.addElement(o)
         }
-        this.availableParameterList!!.setModel(dlm)
+        this.availableParameterList!!.model = (dlm)
     }
 
     val currentlySelectedInUseParameterIndex: Int
@@ -120,7 +119,7 @@ class ParameterWindow
 
         jScrollPane1!!.horizontalScrollBar = null
 
-        availableParameterList!!.setModel(object : javax.swing.AbstractListModel<String>() {
+        availableParameterList!!.model = (object : javax.swing.AbstractListModel<String>() {
             internal val serialVersionUID = 1L
             internal var strings = arrayOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
             override fun getSize(): Int {
@@ -137,7 +136,7 @@ class ParameterWindow
 
         jScrollPane2!!.horizontalScrollBar = null
 
-        usedParameterList!!.setModel(object : javax.swing.AbstractListModel<String>() {
+        usedParameterList!!.model = (object : javax.swing.AbstractListModel<String>() {
             internal val serialVersionUID = 1L
             internal var strings = arrayOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
             override fun getSize(): Int {
@@ -157,7 +156,7 @@ class ParameterWindow
         })
         usedParameterList!!.addKeyListener(object : java.awt.event.KeyAdapter() {
             override fun keyTyped(evt: java.awt.event.KeyEvent?) {
-                usedParameterListKeyTyped(evt)
+                evt?.let { usedParameterListKeyTyped(it) }
             }
         })
         jScrollPane2!!.setViewportView(usedParameterList)
@@ -502,7 +501,7 @@ class ParameterWindow
     init {
         this.inUseParametersModel = DefaultListModel<String>()
         initComponents()
-        this.usedParameterList!!.setModel(this.inUseParametersModel)
+        this.usedParameterList!!.model = this.inUseParametersModel
         this.availableParameterList!!.dragEnabled = true
         this.usedParameterList!!.dropMode = DropMode.ON_OR_INSERT
         this.availableParameterList!!.transferHandler = ParameterTransferHandler(this.controller)

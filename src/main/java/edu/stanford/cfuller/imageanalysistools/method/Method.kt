@@ -20,7 +20,7 @@ import edu.stanford.cfuller.imageanalysistools.frontend.StatusUpdater
 abstract class Method : Runnable {
     var parameters: ParameterDictionary = ParameterDictionary.emptyDictionary()
     protected var metadata: AnalysisMetadata? = null
-    protected var storedImages: MutableList<Image> = mutableListOf()
+    var storedImages: MutableList<Image> = mutableListOf()
     protected var images: MutableList<Image> = mutableListOf()
     protected var imageSet: ImageSet = ImageSet(this.parameters)
     var storedDataOutput: Quantification? = null

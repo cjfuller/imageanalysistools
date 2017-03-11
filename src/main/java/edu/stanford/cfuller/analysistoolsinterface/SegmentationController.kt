@@ -1,28 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
-
 package edu.stanford.cfuller.analysistoolsinterface
 
 import edu.stanford.cfuller.imageanalysistools.frontend.AnalysisController
@@ -232,12 +207,9 @@ class SegmentationController : TaskController(), OmeroListener {
                 sw.status = STATUS_READY
             }).start()
         })
-
-
     }
 
-
-    protected class MethodInfo(displayName: String, className: String?) {
+    private class MethodInfo(displayName: String, className: String?) {
         var displayName: String
             internal set
         var methodClass: Class<*>? = null
@@ -264,7 +236,7 @@ class SegmentationController : TaskController(), OmeroListener {
 
     }
 
-    protected fun initializeMethods() {
+    private fun initializeMethods() {
         val model = sw.methodComboBoxModel
         val methodResourceLocation = this.javaClass.classLoader.getResource(METHOD_XML_FILENAME)!!.toString()
         var methodNodes: NodeList? = null
@@ -286,7 +258,7 @@ class SegmentationController : TaskController(), OmeroListener {
             val n = methodNodes.item(i)
             val displayName = n.attributes.getNamedItem(DISPLAY_ATTR_NAME)
             val className = n.attributes.getNamedItem(CLASS_ATTR_NAME)
-            model.addElement(MethodInfo(displayName?.nodeValue, className?.nodeValue))
+            model.addElement(MethodInfo(displayName?.nodeValue!!, className?.nodeValue).toString())
         }
     }
 

@@ -49,7 +49,7 @@ class MainWindow
 
         val comboBoxModel = this.controller.populateTaskComboBoxModel()
         if (comboBoxModel != null) {
-            taskSelectorComboBox!!.setModel(comboBoxModel)
+            taskSelectorComboBox!!.model = comboBoxModel
         }
 
         goButton!!.text = "Go"

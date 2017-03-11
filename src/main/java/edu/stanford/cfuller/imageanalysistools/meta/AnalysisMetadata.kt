@@ -225,7 +225,7 @@ class AnalysisMetadata : java.io.Serializable {
      * Gets the names of all non-image output files.
      * @return a List containing the filenames.
      */
-    val outputFiles: List<String>
+    val outputFiles: MutableList<String>
         get() = this.outputFilenames
 
     /**

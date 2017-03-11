@@ -1,27 +1,3 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * 
- * Copyright (c) 2011 Colin J. Fuller
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- * 
- * ***** END LICENSE BLOCK ***** */
-
 package edu.stanford.cfuller.imageanalysistools.image.io.omero
 
 import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities
@@ -41,11 +17,6 @@ import java.io.*
 //TODO: add functionality to have it remember login information, and redefine the read method to use this information, so this can be passed as an ImageReader and still function.
 
 class OmeroServerImageReader : ImageReader() {
-
-    //    ServiceFactoryPrx serviceFactory;
-    //    client readerClient;
-    //    GatewayPrx gateway;
-
     internal var connection: OmeroServerConnection? = null
 
     /**
@@ -55,19 +26,14 @@ class OmeroServerImageReader : ImageReader() {
         this.connection = null
     }
 
-
     /**
      * Attempts a connection to the server at the specified address using the provided username and password.
-
      * Logs any errors in connecting, but returns normally regardless of whether the connection succeeded.
-
      * @param info     An OmeroServerInfo object containing the hostname, usenname, and password to use for the connection.
      */
-    protected fun connectToServer(info: OmeroServerInfo) {
-
+    private fun connectToServer(info: OmeroServerInfo) {
         this.connection = OmeroServerConnection(info)
         this.connection!!.connect()
-
     }
 
     /**
@@ -89,122 +55,79 @@ class OmeroServerImageReader : ImageReader() {
      */
     @Throws(IOException::class)
     fun readImageFromOmeroServer(omeroserverImageId: Long, info: OmeroServerInfo): Image? {
-        val temporaryImageFilename = this.loadImageFromOmeroServer(omeroserverImageId, info)
-        if (temporaryImageFilename == null || temporaryImageFilename[1] == null) return null
-        return this.read(temporaryImageFilename[1])
+        val temporaryImageFilename = this.loadImageFromOmeroServer(omeroserverImageId, info) ?: return null
+        return this.read(temporaryImageFilename[1]!!)
     }
-
 
     /**
      * Reads the name of an Image on the OMERO server given its Id.
      * @param omeroserverImageId    The ID that the OMERO server as assigned to the desired image; this image will be retrieved.
-     * *
      * @param info                    An OmeroServerInfo object containing the hostname, usenname, and password to use for the connection.
-     * *
      * @return                      A String containing the name of the Image.
-     * *
      * @throws IOException         if the Image cannnot be accessed on the server.
      */
     @Throws(IOException::class)
     fun getImageNameForOmeroId(omeroserverImageId: Long, info: OmeroServerInfo): String {
-
         try {
             if (this.connection == null || !this.connection!!.isConnected) {
-
                 this.connectToServer(info)
             }
-
-            return this.connection!!.gateway.getImage(omeroserverImageId).name.value
+            return this.connection!!.gateway!!.getImage(omeroserverImageId).name.value
         } catch (e: ServerError) {
             throw IOException(e)
         }
-
     }
-
 
     /**
      * Asynchronously loads the Image with the specified Id on the OMERO server using the provided address, username, and password, and stores it to a temporary file on disk.
-
      * @param omeroserverImageId    The ID that the OMERO server as assigned to the desired image; this image will be retrieved.
-     * *
      * @param info                    An OmeroServerInfo object containing the hostname, usenname, and password to use for the connection.
-     * *
      * @return                      An array containing two elements: first, the original name of the image on the OMERO server; second, the temporary filename to which the image is being stored.
      */
-    fun loadImageFromOmeroServer(omeroserverImageId: Long, info: OmeroServerInfo): Array<String>? {
-
+    fun loadImageFromOmeroServer(omeroserverImageId: Long, info: OmeroServerInfo): Array<String?>? {
         var tempfile: File? = null
-
         var originalName: String? = null
-
         try {
-
             if (this.connection == null || !this.connection!!.isConnected) {
-
                 this.connectToServer(info)
             }
-
             originalName = this.getImageNameForOmeroId(omeroserverImageId, info)
-
             this.closeConnection()
-
             tempfile = File.createTempFile("omerodownload", ".ome.tif")
             tempfile!!.deleteOnExit()
-
             val fos = FileOutputStream(tempfile)
-
             val out = BufferedOutputStream(fos)
-
             val lockFilename = tempfile.absolutePath
-
             val lockingThread = Thread(Runnable {
                 try {
-
                     if (connection == null || !connection!!.isConnected) {
                         try {
                             while (OmeroServerImageReader.numberOfConnections >= MAX_CONNECTIONS) {
                                 Thread.sleep(SLEEP_TIME_MS)
                             }
-
                         } catch (e: InterruptedException) {
                             LoggingUtilities.logger.warning("interrupted while waiting on omero server connection")
                             return@Runnable
                         }
-
                         OmeroServerImageReader.incrementConnections()
-
                         connectToServer(info)
                     }
 
-
-                    val exporter = connection!!.serviceFactory.createExporter()
-
-
+                    val exporter = connection!!.serviceFactory!!.createExporter()
                     exporter.addImage(omeroserverImageId)
-
-
                     val lengthOfFile = exporter.generateTiff()
-
                     var currPos: Long = 0
                     val chunkSize = 524288
 
                     while (currPos < lengthOfFile) {
-
                         val data = exporter.read(currPos, chunkSize)
-
                         currPos += data.size.toLong()
-
                         out.write(data)
-
                     }
-
                     exporter.close()
-
                     release(lockFilename, Thread.currentThread())
-
-
                 } catch (serverError: ServerError) {
-                    LoggingUtilities.logger.severe("Unable to retrieve image from omero server.  " + serverError.message)
+                    LoggingUtilities.logger.severe("Unable to retrieve image from omero server.  " + serverError.toString())
                     serverError.printStackTrace()
                 } catch (e: IOException) {
                     LoggingUtilities.logger.severe("Exception while writing temporary image file to disk.")
@@ -221,78 +144,51 @@ class OmeroServerImageReader : ImageReader() {
                 LoggingUtilities.logger.severe("interrupted while locking image file")
                 return null
             }
-
-
             lockingThread.start()
-
-
         } catch (e: IOException) {
             LoggingUtilities.logger.severe("Exception while processing omero server images")
         }
-
         val toReturn = arrayOfNulls<String>(2)
-
         toReturn[0] = originalName
         toReturn[1] = if (tempfile != null) tempfile.absolutePath else null
-
         return toReturn
-
-
     }
 
     companion object {
-
         internal val MAX_CONNECTIONS = 10
         internal val SLEEP_TIME_MS: Long = 10000
         @Volatile internal var currentConnections: Int = 0
 
-
         init {
             currentConnections = 0
         }
-
         /**
          * Adds a connection to the count of current connections to the OMERO server.
-
          * Ensures that the server is not overloaded with connection requests.
          */
-        protected fun incrementConnections() {
+        private fun incrementConnections() {
             synchronized(OmeroServerImageReader::class.java) {
-
                 OmeroServerImageReader.currentConnections += 1
-
-
             }
         }
 
-
         /**
          * Removes a connection from the count of current connections to the OMERO server.
-
          * Ensures that the server is not overloaded with connection requests.
          */
-        protected fun decrementConnections() {
-
+        private fun decrementConnections() {
             synchronized(OmeroServerImageReader::class.java) {
-
                 OmeroServerImageReader.currentConnections -= 1
-
-
             }
         }
 
         /**
          * Gets the number of current connections to the OMERO server.
-
          * @return  The current number of connections.
          */
-        protected val numberOfConnections: Int
+        private val numberOfConnections: Int
             get() = synchronized(OmeroServerImageReader::class.java) {
-
                 return OmeroServerImageReader.currentConnections
-
             }
     }
-
-
 }

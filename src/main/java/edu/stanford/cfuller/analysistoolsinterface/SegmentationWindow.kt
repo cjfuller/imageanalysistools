@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities
 class SegmentationWindow
 /** Creates new form SegmentationWindow  */
 (internal var controller: SegmentationController) : javax.swing.JFrame() {
-    var methodComboBoxModel: DefaultComboBoxModel<*>
+    var methodComboBoxModel: DefaultComboBoxModel<String>
         internal set
     private var handler: TextAreaLogHandler
 
@@ -100,7 +100,7 @@ class SegmentationWindow
         defaultCloseOperation = javax.swing.WindowConstants.DISPOSE_ON_CLOSE
         title = "Segmentation and Quantification"
 
-        methodComboBox!!.setModel(javax.swing.DefaultComboBoxModel<String>(arrayOf("Item 1", "Item 2", "Item 3", "Item 4")))
+        methodComboBox!!.model = javax.swing.DefaultComboBoxModel<String>(arrayOf("Item 1", "Item 2", "Item 3", "Item 4"))
         methodComboBox!!.addActionListener { evt -> methodComboBoxActionPerformed(evt) }
 
         jLabel2!!.text = "Method:"
@@ -286,7 +286,7 @@ class SegmentationWindow
     init {
         initComponents()
         methodComboBoxModel = DefaultComboBoxModel<String>()
-        this.methodComboBox!!.setModel(methodComboBoxModel)
+        this.methodComboBox!!.model = methodComboBoxModel
         this.handler = TextAreaLogHandler(this.loggingTextArea)
     }
 }

@@ -6,12 +6,9 @@ import edu.stanford.cfuller.imageanalysistools.image.WritableImage
 /**
  * A Filter representing a binary morphological filter in an arbitrary (i.e. up to 5) number of dimensions.
  *
- *
  * A MorphologicalFilter processes an [Image][edu.stanford.cfuller.imageanalysistools.image.Image] using a [StructuringElement] for the morphological operation.
  *
- *
  * Eventually MorphologicalFilters will implement processing greyscale images, but only binary filters are currently implemented.
-
  */
 abstract class MorphologicalFilter() : Filter() {
     var strel: StructuringElement? = null

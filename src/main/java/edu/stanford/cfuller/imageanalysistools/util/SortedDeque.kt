@@ -18,18 +18,10 @@ import java.util.NoSuchElementException
  * end and element is removed; addFirst pushes an element off the end; addLast pushes an element off the front.
  * @author Colin J. Fuller
  */
-class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
+class SortedDeque<E : Comparable<E>>(internal var capacity: Int, internal var isFixedCapacity: Boolean) : Deque<E>, MutableList<E> {
     internal var storage: ArrayList<E> = ArrayList<E>()
-    internal var capacity: Int = Integer.MAX_VALUE
-    internal var isFixedCapacity: Boolean = false
     override val size: Int
         get() = this.storage.size
-
-    constructor(capacity: Int, isFixedCapacity: Boolean) {
-        this.capacity = capacity
-        this.isFixedCapacity = isFixedCapacity
-        this.storage = ArrayList<E>(capacity)
-    }
 
     private class ReversingIterator<E>(internal var it: ListIterator<E>) : Iterator<E> {
         override fun hasNext(): Boolean {
@@ -59,11 +51,11 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
     /* (non-Javadoc)
 	 * @see java.util.Collection#addAll(java.util.Collection)
 	 */
-    override fun addAll(c: Collection<E>): Boolean {
-        for (e in c) {
+    override fun addAll(elements: Collection<E>): Boolean {
+        for (e in elements) {
             this.add(e)
         }
-        if (!c.isEmpty()) return true
+        if (!elements.isEmpty()) return true
         return false
     }
 
@@ -77,8 +69,8 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
     /* (non-Javadoc)
 	 * @see java.util.Collection#containsAll(java.util.Collection)
 	 */
-    override fun containsAll(c: Collection<E>): Boolean {
-        return this.storage.containsAll(c)
+    override fun containsAll(elements: Collection<E>): Boolean {
+        return this.storage.containsAll(elements)
     }
 
     /* (non-Javadoc)
@@ -91,22 +83,22 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
     /* (non-Javadoc)
 	 * @see java.util.Collection#removeAll(java.util.Collection)
 	 */
-    override fun removeAll(c: Collection<E>): Boolean {
-        return this.storage.removeAll(c)
+    override fun removeAll(elements: Collection<E>): Boolean {
+        return this.storage.removeAll(elements)
     }
 
     /* (non-Javadoc)
 	 * @see java.util.Collection#retainAll(java.util.Collection)
 	 */
-    override fun retainAll(c: Collection<E>): Boolean {
-        return this.storage.retainAll(c)
+    override fun retainAll(elements: Collection<E>): Boolean {
+        return this.storage.retainAll(elements)
     }
 
     /* (non-Javadoc)
 	 * @see java.util.Deque#add(java.lang.Object)
 	 */
-    override fun add(e: E): Boolean {
-        this.addLast(e)
+    override fun add(element: E): Boolean {
+        this.addLast(element)
         return true
     }
 
@@ -127,8 +119,8 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
     /* (non-Javadoc)
 	 * @see java.util.Deque#contains(java.lang.Object)
 	 */
-    override operator fun contains(o: E): Boolean {
-        return this.storage.contains(o)
+    override operator fun contains(element: E): Boolean {
+        return this.storage.contains(element)
         //TODO: better performance for contains method, given that the list is sorted.
     }
 
@@ -271,15 +263,15 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
         return this.removeFirst()
     }
 
-    override fun removeAt(i: Int): E {
-        return this.storage.removeAt(i)
+    override fun removeAt(index: Int): E {
+        return this.storage.removeAt(index)
     }
 
     /* (non-Javadoc)
 	 * @see java.util.Deque#remove(java.lang.Object)
 	 */
-    override fun remove(o: E): Boolean {
-        return this.storage.remove(o)
+    override fun remove(element: E): Boolean {
+        return this.storage.remove(element)
     }
 
     /* (non-Javadoc)
@@ -327,15 +319,15 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
     /* (non-Javadoc)
 	 * @see java.util.List#add(int, java.lang.Object)
 	 */
-    override fun add(arg0: Int, arg1: E) {
+    override fun add(index: Int, element: E) {
         var upperBound = this.size
         var lowerBound = 0
         var currentGuess = this.size shr 1
         val previousIndex = currentGuess - 1
-        val conditionLower = arg0 <= currentGuess && (previousIndex < 0 || this[previousIndex] < arg1 && this[currentGuess] >= arg1)
-        val conditionUpper = arg0 > currentGuess && (previousIndex < 0 || this[previousIndex] <= arg1 && this[currentGuess] > arg1)
+        val conditionLower = index <= currentGuess && (previousIndex < 0 || this[previousIndex] < element && this[currentGuess] >= element)
+        val conditionUpper = index > currentGuess && (previousIndex < 0 || this[previousIndex] <= element && this[currentGuess] > element)
         while (!(conditionLower || conditionUpper)) {
-            if (this[currentGuess] < arg1) {
+            if (this[currentGuess] < element) {
                 //case0: .get(currentGuess) < arg1  -> increase currentGuess halfway between current and upper bound
                 var increment = upperBound - currentGuess shr 1
                 if (increment < 1) increment = 1
@@ -345,7 +337,7 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
                     currentGuess = this.size
                     break
                 }
-            } else if (this[currentGuess] > arg1) {
+            } else if (this[currentGuess] > element) {
                 //case1: .get(currentGuess) > arg1 -> decrease currentGuess halfway between current and lower bound
                 var increment = currentGuess - lowerBound shr 1
                 if (increment < 1) increment = 1
@@ -360,9 +352,9 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
                 break
             }
         }
-        this.storage.add(currentGuess, arg1)
+        this.storage.add(currentGuess, element)
         if (this.isFixedCapacity && this.size > this.capacity) {
-            if (arg0 < currentGuess || arg0 == 0) {
+            if (index < currentGuess || index == 0) {
                 this.removeAt(this.size)
             } else {
                 this.removeAt(0)
@@ -373,12 +365,12 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
     /* (non-Javadoc)
 	 * @see java.util.List#addAll(int, java.util.Collection)
 	 */
-    override fun addAll(arg0: Int, arg1: Collection<E>): Boolean {
-        if (arg1.isEmpty()) {
+    override fun addAll(index: Int, elements: Collection<E>): Boolean {
+        if (elements.isEmpty()) {
             return false
         }
-        for (e in arg1) {
-            this.add(arg0, e)
+        for (e in elements) {
+            this.add(index, e)
         }
         return true
     }
@@ -386,22 +378,22 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
     /* (non-Javadoc)
 	 * @see java.util.List#get(int)
 	 */
-    override fun get(arg0: Int): E {
-        return this.storage[arg0]
+    override fun get(index: Int): E {
+        return this.storage[index]
     }
 
     /* (non-Javadoc)
 	 * @see java.util.List#indexOf(java.lang.Object)
 	 */
-    override fun indexOf(arg0: E): Int {
-        return this.storage.indexOf(arg0)
+    override fun indexOf(element: E): Int {
+        return this.storage.indexOf(element)
     }
 
     /* (non-Javadoc)
 	 * @see java.util.List#lastIndexOf(java.lang.Object)
 	 */
-    override fun lastIndexOf(arg0: E): Int {
-        return this.storage.lastIndexOf(arg0)
+    override fun lastIndexOf(element: E): Int {
+        return this.storage.lastIndexOf(element)
     }
 
     /* (non-Javadoc)
@@ -414,23 +406,27 @@ class SortedDeque<E : Comparable<E>> : Deque<E>, MutableList<E> {
     /* (non-Javadoc)
 	 * @see java.util.List#listIterator(int)
 	 */
-    override fun listIterator(arg0: Int): MutableListIterator<E> {
-        return this.storage.listIterator(arg0)
+    override fun listIterator(index: Int): MutableListIterator<E> {
+        return this.storage.listIterator(index)
     }
 
     /* (non-Javadoc)
 	 * @see java.util.List#set(int, java.lang.Object)
 	 */
-    override operator fun set(arg0: Int, arg1: E): E {
+    override operator fun set(index: Int, element: E): E {
         throw UnsupportedOperationException("Set is not supported by SortedDeque.")
     }
 
     /* (non-Javadoc)
 	 * @see java.util.List#subList(int, int)
 	 */
-    override fun subList(arg0: Int, arg1: Int): MutableList<E> {
-        val sub = SortedDeque<E>(arg1 - arg0, this.isFixedCapacity)
-        sub.addAll(this.storage.subList(arg0, arg1))
+    override fun subList(fromIndex: Int, toIndex: Int): MutableList<E> {
+        val sub = SortedDeque<E>(toIndex - fromIndex, this.isFixedCapacity)
+        sub.addAll(this.storage.subList(fromIndex, toIndex))
         return sub
+    }
+
+    init {
+        this.storage = ArrayList<E>(capacity)
     }
 }

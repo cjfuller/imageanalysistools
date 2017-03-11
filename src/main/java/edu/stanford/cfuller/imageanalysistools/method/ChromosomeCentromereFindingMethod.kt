@@ -43,8 +43,8 @@ class ChromosomeCentromereFindingMethod : Method() {
         val oldMin = this.parameters.getIntValueForKey("min_size")
 
         if (this.parameters.hasKey("cen_max_size") && this.parameters.hasKey("cen_min_size")) {
-            this.parameters.setValueForKey("max_size", this.parameters.getValueForKey("cen_max_size"))
-            this.parameters.setValueForKey("min_size", this.parameters.getValueForKey("cen_min_size"))
+            this.parameters.setValueForKey("max_size", this.parameters.getValueForKey("cen_max_size")!!)
+            this.parameters.setValueForKey("min_size", this.parameters.getValueForKey("cen_min_size")!!)
         }
 
         ch1_method.go()

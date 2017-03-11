@@ -41,8 +41,9 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
 
  * @author Colin J. Fuller
  */
-class ErosionFilter() : MorphologicalFilter() {
+class ErosionFilter : MorphologicalFilter {
 
+    constructor() : super()
     /**
      * Constructs a new ErosionFilter, copying the structuring element and settings from another
      * MorphologicalFilter.
@@ -55,42 +56,26 @@ class ErosionFilter() : MorphologicalFilter() {
      * @see edu.stanford.cfuller.imageanalysistools.filter.morph.MorphologicalFilter#apply(edu.stanford.cfuller.imageanalysistools.image.Image)
      */
     override fun apply(im: WritableImage) {
-
         if (this.strel == null) return
-
         val origCopy = ImageFactory.create(im)
 
         for (ic in im) {
-
             if (im.getValue(ic) <= 0.0f) {
                 im.setValue(ic, 0.0f)
                 continue
             }
-
             this.strel!!.boxImageToElement(ic, origCopy)
-
-            var included = true
-
-            for (boxedCoord in origCopy) {
-                if (this.strel!!.get(ic, boxedCoord) <= 0.0f || origCopy.getValue(boxedCoord) <= 0.0f) {
-                    included = false
-                    break
-                }
-            }
+            val included = origCopy.none { this.strel!![ic, it] <= 0.0f || origCopy.getValue(it) <= 0.0f }
 
             if (included) {
                 im.setValue(ic, 1.0f)
             } else {
                 im.setValue(ic, 0.0f)
             }
-
         }
-
-
     }
 
     companion object {
-
         private val defaultSize = 3
 
         /**
@@ -104,17 +89,12 @@ class ErosionFilter() : MorphologicalFilter() {
         fun getDefaultElement(dimList: IntArray): StructuringElement {
             val strelSize = ImageCoordinate.createCoordXYZCT(1, 1, 1, 1, 1)
             for (i in dimList) {
-                strelSize.set(i, defaultSize)
+                strelSize[i] = defaultSize
             }
-
             val toReturn = StructuringElement(strelSize)
-
             toReturn.setAll(1.0f)
-
             strelSize.recycle()
-
             return toReturn
         }
     }
-
 }

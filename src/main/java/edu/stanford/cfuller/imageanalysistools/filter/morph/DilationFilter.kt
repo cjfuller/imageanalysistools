@@ -16,7 +16,8 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate
 
  * @author Colin J. Fuller
  */
-class DilationFilter() : MorphologicalFilter() {
+class DilationFilter : MorphologicalFilter {
+    constructor() : super()
     /**
      * Constructs a new DilationFilter, copying the structuring element and settings from another
      * MorphologicalFilter.

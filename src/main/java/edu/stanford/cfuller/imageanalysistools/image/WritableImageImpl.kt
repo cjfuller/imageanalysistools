@@ -75,8 +75,10 @@ class WritableImageImpl : ReadOnlyImageImpl, WritableImage {
         val oldPixelData = this.pixelData
         val oldDimensionSizes = this.dimensionSizes
         this.dimensionSizes = ImageCoordinate.cloneCoord(newSize)
-        this.writablePixelData = PixelDataFactory.createPixelData(newSize, loci.formats.FormatTools.FLOAT, "XYZCT")
-        this.pixelData = this.writablePixelData
+        PixelDataFactory.createPixelData(newSize, loci.formats.FormatTools.FLOAT, "XYZCT").let {
+            this.writablePixelData = it
+            this.pixelData = it
+        }
         this.setMetadataPixelCharacteristics(this.pixelData!!)
         this.setMetadataDimensionSizes(newSize)
 

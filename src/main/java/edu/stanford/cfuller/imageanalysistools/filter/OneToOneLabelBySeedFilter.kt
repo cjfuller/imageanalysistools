@@ -45,7 +45,7 @@ class OneToOneLabelBySeedFilter : Filter() {
         for (c in im) {
             val currValue = im.getValue(c).toInt()
             if (hasSeedSet.containsKey(currValue) && currValue > 0) {
-                im.setValue(c, hasSeedSet[currValue].toFloat())
+                im.setValue(c, hasSeedSet[currValue]!!.toFloat())
             }
             if (referenceImage.getValue(c) > 0 && seedIsMapped.contains(referenceImage.getValue(c).toInt())) {
                 im.setValue(c, referenceImage.getValue(c))
