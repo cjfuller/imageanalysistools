@@ -11,13 +11,15 @@ import edu.stanford.cfuller.imageanalysistools.filter.morph.ErosionFilter
 
 /**
  * A metric that takes each region in a mask and calculates its area and perimeter.
-
+ *
  * For regions with holes, the perimeter will be the total boundary size both to the
  * outside of the region and to the holes.
-
+ *
  * Area and perimeter are both calculated in units of pixels (# of pixels in the
  * region and # of pixels on the border, respectively)
-
+ *
+ * TODO(colin): # of pixels on the border is very odd for small regions (e.g. a 2x2 box has a
+ * perimeter of 4...). Consider fixing.
  * @author Colin J. Fuller
  */
 class AreaAndPerimeterMetric : Metric {
@@ -43,7 +45,7 @@ class AreaAndPerimeterMetric : Metric {
                             measurement = h.getCounts(it + 1).toDouble(),
                             name = "area",
                             type = Measurement.TYPE_SIZE,
-                            image = images.markerImageName!!)
+                            image = images.markerImageName ?: "Marker image")
                 }
                 .forEach { q.addMeasurement(it) }
 
@@ -71,10 +73,8 @@ class AreaAndPerimeterMetric : Metric {
                             measurement = hPerim.getCounts(it + 1).toDouble(),
                             name = "perimeter",
                             type = Measurement.TYPE_SIZE,
-                            image = images.markerImageName!!) }
+                            image = images.markerImageName ?: "Marker image") }
                 .forEach { q.addMeasurement(it) }
         return q
     }
 }
-
-

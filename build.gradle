@@ -64,3 +64,7 @@ jar {
         attributes "Main-Class": mainClassName
     }
 }
+
+test {
+    environment "PROJECT_ROOT", "$projectDir"
+}

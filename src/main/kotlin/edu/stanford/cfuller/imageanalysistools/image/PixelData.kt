@@ -54,42 +54,6 @@ abstract class PixelData : java.io.Serializable {
     open var dimensionOrder: String = "XYZCT"
         internal set
 
-    protected constructor() {}
-
-    /**
-     * Constructs a new pixeldata object using an [ImageCoordinate] to specify the size of the pixeldata.
-     * @param sizes     An ImageCoordinate that specifies the size of the pixeldata in all 5 (XYZCT) dimensions.
-     * @param dimensionOrder    A string made up of the characters "XYZCT" in any order that specifies the order of the dimensions in the on-disk representation.
-     */
-    constructor(sizes: ImageCoordinate, dimensionOrder: String) {
-        init(sizes[ImageCoordinate.X], sizes[ImageCoordinate.Y], sizes[ImageCoordinate.Z], sizes[ImageCoordinate.C], sizes[ImageCoordinate.T], dimensionOrder)
-    }
-
-    /**
-     * Convenience constructor for creating a PixelData object with individual dimension sizes instead of the sizes lumped into an ImageCoordinate.
-     * @param size_x    Size of the pixel data in the X-dimension.
-     * @param size_y    Size of the pixel data in the Y-dimension.
-     * @param size_z    Size of the pixel data in the Z-dimension.
-     * @param size_c    Size of the pixel data in the C-dimension.
-     * @param size_t    Size of the pixel data in the T-dimension.
-     * @param dimensionOrder    A string made up of the characters "XYZCT" in any order that specifies the order of the dimensions in the on-disk representation.
-     */
-    constructor(size_x: Int, size_y: Int, size_z: Int, size_c: Int, size_t: Int, dimensionOrder: String) {
-        init(size_x, size_y, size_z, size_c, size_t, dimensionOrder)
-    }
-
-    /**
-     * Initializes the internals of the PixelData object using the specified parameters.
-     * @param size_x    The size of the PixelData in the x-dimension (in pixels).
-     * @param size_y    The size of the PixelData in the y-dimension (in pixels).
-     * @param size_z    The size of the PixelData in the z-dimension (in pixels).
-     * @param size_c    The size of the PixelData in the c-dimension (in pixels).
-     * @param size_t    The size of the PixelData in the t-dimension (in pixels).
-     * @param dimensionOrder    A string containing the 5 characters "XYZCT" in some order specifying the order in which the dimensions
-     *                          are stored in the underlying byte representation.
-     */
-    protected abstract fun init(size_x: Int, size_y: Int, size_z: Int, size_c: Int, size_t: Int, dimensionOrder: String)
-
     /**
      * Queries whether the PixelData object has a non-singleton Z dimension.
      * @return  true if the Z-dimension size is greater than 1, false otherwise.

@@ -31,22 +31,22 @@ open class ReadOnlyImageImpl(m: loci.formats.meta.IMetadata, p: PixelData) : Ima
      * @param p     A PixelData object containing the actual values at each pixel in the Image.
      */
 
-    internal val defaultDimensionOrder = "xyzct"
+    internal final val defaultDimensionOrder = "xyzct"
 
     /**
      * Gets the metadata associated with this Image.  (The object returned is an [loci.formats.meta.IMetadata] to facilitate
      * use with the LOCI bio-formats library.
      * @return  The metadata object associated with the Image.
      */
-    override var metadata: loci.formats.meta.IMetadata = m
+    override final var metadata: loci.formats.meta.IMetadata = m
         protected set
 
     /**
      * Gets a PixelData instance that holds the image data.
      */
-    override var pixelData: PixelData = p
+    override final var pixelData: PixelData = p
         protected set
-    protected var writablePixelData: WritablePixelData? = null // this is null if it can be written, and the same as pixelData otherwise
+    var writablePixelData: WritablePixelData? = null // this is null if it can be written, and the same as pixelData otherwise
 
     /**
      * Returns an ImageCoordinate that contains the size of each dimension of the Image.
@@ -54,7 +54,7 @@ open class ReadOnlyImageImpl(m: loci.formats.meta.IMetadata, p: PixelData) : Ima
      * This ImageCoordinate should not be modified by users, nor should it be recycled by users.
      * @return      An ImageCoordinate containing the size of each dimension of the Image.
      */
-    override var dimensionSizes: ImageCoordinate = ImageCoordinate.createCoordXYZCT(p.sizeX, p.sizeY, p.sizeZ, p.sizeC, p.sizeT)
+    override final var dimensionSizes: ImageCoordinate = ImageCoordinate.createCoordXYZCT(p.sizeX, p.sizeY, p.sizeZ, p.sizeC, p.sizeT)
         protected set
 
     /**
@@ -65,7 +65,7 @@ open class ReadOnlyImageImpl(m: loci.formats.meta.IMetadata, p: PixelData) : Ima
      * As per the specification in [ImageCoordinate], users should *not* recycle the ImageCoordinate returned.
      * @return  The ImageCoordinate whose components are the lower bound on the region of interest, or null if there is no region of interest.
      */
-    override var boxMin: ImageCoordinate? = null
+    override final var boxMin: ImageCoordinate? = null
         protected set
     /**
      * Gets the (exclusive) upper bound of any region of interest currently set on this Image, or null if no region is currently
@@ -75,14 +75,14 @@ open class ReadOnlyImageImpl(m: loci.formats.meta.IMetadata, p: PixelData) : Ima
      * As per the specification in [ImageCoordinate], users should *not* recycle the ImageCoordinate returned.
      * @return  The ImageCoordinate whose components are the upper bound on the region of interest, or null if there is no region of interest.
      */
-    override var boxMax: ImageCoordinate? = null
+    override final var boxMax: ImageCoordinate? = null
         protected set
 
     /**
      * Queries whether the Image is currently boxed with a region of interest.
      * @return  true if there is currently a region of interest set, false otherwise.
      */
-    override var isBoxed: Boolean = false
+    override final var isBoxed: Boolean = false
         protected set
 
     protected var coordinateArrayStorage: Array<ImageCoordinate>? = null
@@ -190,11 +190,13 @@ open class ReadOnlyImageImpl(m: loci.formats.meta.IMetadata, p: PixelData) : Ima
         dimensionSizes.recycle()
     }
 
+    // TODO(colin): this should be an ImageFactory.createEmpty() method instead of a constructor I
+    // think
     protected constructor() : this(
         loci.common.services.ServiceFactory()
                 .getInstance(loci.formats.services.OMEXMLService::class.java)
                 .createOMEXMLMetadata(),
-        PixelDataFactory.createPixelData(ImageCoordinate.createCoord())
+        PixelDataFactory.createPixelData(ImageCoordinate.createCoordXYZCT(1, 1, 1, 1, 1))
     ) { }
 
     /**

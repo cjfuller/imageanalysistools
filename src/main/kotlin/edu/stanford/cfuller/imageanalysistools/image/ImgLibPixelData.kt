@@ -12,7 +12,7 @@ import net.imglib2.RandomAccess
  * A type of WritablePixelData that uses an ImgLib2 ImgPlus as its underlying representation.
  * @author Colin J. Fuller
  */
-class ImgLibPixelData : WritablePixelData {
+class ImgLibPixelData private constructor() : WritablePixelData() {
     /**
      * Gets the underlying ImgLib Img object.
      * @return the Img object that is used to store the pixel data (not a copy).
@@ -42,7 +42,7 @@ class ImgLibPixelData : WritablePixelData {
     internal var ci: Int = 0
     internal var ti: Int = 0
 
-    override fun init(size_x: Int, size_y: Int, size_z: Int, size_c: Int, size_t: Int, dimensionOrder: String) {
+    fun init(size_x: Int, size_y: Int, size_z: Int, size_c: Int, size_t: Int, dimensionOrder: String) {
         var size_x = size_x
         var size_y = size_y
         var size_z = size_z
@@ -132,28 +132,12 @@ class ImgLibPixelData : WritablePixelData {
         this.ra = this.img!!.randomAccess()
     }
 
-    private constructor() {}
-
-    /* (non-Javadoc)
-	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#PixelData(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate, int, String)
-	 */
-    constructor(sizes: ImageCoordinate, dimensionOrder: String) : super(sizes, dimensionOrder) {
-        this.initNewImgPlus()
-    }
-
-    /* (non-Javadoc)
-	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#PixelData(int, int, int, int, int, String)
-	 */
-    constructor(size_x: Int, size_y: Int, size_z: Int, size_c: Int, size_t: Int, dimensionOrder: String) : super(size_x, size_y, size_z, size_c, size_t, dimensionOrder) {
-        this.initNewImgPlus()
-    }
-
     /**
      * Creates a new ImgLibPixelData from an existing ImgPlus and a specified dimension order.
      * @param imPl    The ImgPlus to use.  This will not be copied, but used and potentially modified in place.
      * @param dimensionOrder    a String containing the five characters XYZCT in the order they are in the image (if some dimensions are not present, the can be specified in any order)
      */
-    constructor(imPl: ImgPlus<FloatType>, dimensionOrder: String) {
+    constructor(imPl: ImgPlus<FloatType>, dimensionOrder: String) : this() {
         this.img = imPl
         this.init(1, 1, 1, 1, 1, dimensionOrder)
         this.fixDimensionOrder()

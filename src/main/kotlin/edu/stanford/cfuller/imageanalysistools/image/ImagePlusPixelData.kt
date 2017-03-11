@@ -8,11 +8,11 @@ import ij.process.FloatProcessor
  * A type of WritablePixelData that uses an ImageJ ImagePlus as its underlying representation.
  * @author Colin J. Fuller
  */
-class ImagePlusPixelData : WritablePixelData {
+class ImagePlusPixelData private constructor() : WritablePixelData() {
     private var imPl: ImagePlus? = null
     internal var currentStackIndex: Int = 0
     internal val dimensionSizes: MutableMap<String, Int> = mutableMapOf()
-    override val dataType: Int = loci.formats.FormatTools.FLOAT
+    override var dataType: Int = loci.formats.FormatTools.FLOAT
     internal var x_offset: Int = 0
     internal var y_offset: Int = 0
     internal var z_offset: Int = 0
@@ -21,7 +21,7 @@ class ImagePlusPixelData : WritablePixelData {
     internal val offsetSizes: MutableMap<String, Int> = mutableMapOf()
     internal var byteOrder: java.nio.ByteOrder = java.nio.ByteOrder.BIG_ENDIAN
 
-    override fun init(size_x: Int, size_y: Int, size_z: Int, size_c: Int, size_t: Int, dimensionOrder: String) {
+    fun init(size_x: Int, size_y: Int, size_z: Int, size_c: Int, size_t: Int, dimensionOrder: String) {
         var dimensionOrder = dimensionOrder
         dimensionOrder = dimensionOrder.toUpperCase()
 
@@ -72,32 +72,17 @@ class ImagePlusPixelData : WritablePixelData {
         this.imPl = imPl
     }
 
-    /* (non-Javadoc)
-	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#PixelData(edu.stanford.cfuller.imageanalysistools.image.ImageCoordinate, int, String)
-	 */
-    constructor(sizes: ImageCoordinate, data_type: Int, dimensionOrder: String) : super(sizes, dimensionOrder) {
-        if (data_type != this.dataType) {
-            throw UnsupportedOperationException("Data type must be float.")
-        }
-        this.initNewImagePlus()
-    }
-
-    /* (non-Javadoc)
-	 * @see edu.stanford.cfuller.imageanalysistools.image.PixelData#PixelData(int, int, int, int, int, int, String)
-	 */
-    constructor(size_x: Int, size_y: Int, size_z: Int, size_c: Int, size_t: Int, data_type: Int, dimensionOrder: String) : super(size_x, size_y, size_z, size_c, size_t, dimensionOrder) {
-        if (data_type != this.dataType) {
-            throw UnsupportedOperationException("Data type must be float.")
-        }
+    constructor(size_x: Int, size_y: Int, size_z: Int, size_c: Int, size_t: Int, data_type: Int, dimensionOrder: String) : this() {
+        init(size_x, size_y, size_z, size_c, size_t, dimensionOrder)
+        this.dataType = data_type
         this.initNewImagePlus()
     }
 
     /**
      * Creates a new ImagePlusPixelData from an existing ImagePlus.
-
      * @param imPl    The ImagePlus to use.  This will not be copied, but used and potentially modified in place.
      */
-    constructor(imPl: ImagePlus) {
+    constructor(imPl: ImagePlus) : this() {
         this.imPl = imPl
         this.init(imPl.width, imPl.height, imPl.nSlices, imPl.nChannels, imPl.nFrames, imagePlusDimensionOrder)
     }

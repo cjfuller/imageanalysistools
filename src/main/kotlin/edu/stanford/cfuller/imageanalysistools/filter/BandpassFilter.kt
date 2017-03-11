@@ -157,7 +157,7 @@ class BandpassFilter : Filter() {
                 return PlugInFilter.DONE
             }
             stackSize = imp.stackSize
-            fht = imp.getProperty("FHT") as FHT
+            fht = imp.getProperty("FHT") as FHT?
             if (fht != null) {
                 IJ.error("FFT Filter", "Spatial domain image required")
                 return PlugInFilter.DONE
