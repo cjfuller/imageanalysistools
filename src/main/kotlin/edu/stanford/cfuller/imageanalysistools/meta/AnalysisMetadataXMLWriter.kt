@@ -1,14 +1,13 @@
 package edu.stanford.cfuller.imageanalysistools.meta
 
+import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities
+import edu.stanford.cfuller.imageanalysistools.image.ImageSet
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter
+import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary
 import java.io.PrintWriter
 import javax.xml.stream.XMLOutputFactory
 import javax.xml.stream.XMLStreamException
 import javax.xml.stream.XMLStreamWriter
-
-import edu.stanford.cfuller.imageanalysistools.frontend.LoggingUtilities
-import edu.stanford.cfuller.imageanalysistools.meta.parameters.ParameterDictionary
-import edu.stanford.cfuller.imageanalysistools.meta.parameters.Parameter
-import edu.stanford.cfuller.imageanalysistools.image.ImageSet
 
 /**
  * Utilites for writing existing analysis parameters to XML files.
@@ -17,13 +16,14 @@ import edu.stanford.cfuller.imageanalysistools.image.ImageSet
  */
 class AnalysisMetadataXMLWriter : AnalysisMetadataXMLParser() {
     /**
-     * Writes the parameters in a ParameterDictionary to an XML file that can be read at a later time by a ParameterXMLParser.
-     * @param pd            The ParameterDictionary to write to XML.
-     * @param filename      The full path and filename to the XML file that will be written.
+     * Writes the parameters in a ParameterDictionary to an XML file that can be read at a later
+     * time by a ParameterXMLParser.
+     * @param pd The ParameterDictionary to write to XML.
+     * @param filename The full path and filename to the XML file that will be written.
      */
     fun writeParameterDictionaryToXMLFile(pd: ParameterDictionary, filename: String) {
         try {
-            val xsw = XMLOutputFactory.newFactory().createXMLStreamWriter(PrintWriter(filename))
+            val xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(PrintWriter(filename))
             xsw.writeStartDocument()
             xsw.writeCharacters("\n")
             xsw.writeStartElement(AnalysisMetadataXMLParser.TAG_ANALYSIS_METADATA)
@@ -42,12 +42,12 @@ class AnalysisMetadataXMLWriter : AnalysisMetadataXMLParser() {
 
     /**
      * Writes the data in an AnalysisMetadata object to an XML file.
-     * @param am           The AnalysisMetadata to write to XML.
-     * @param filename      The full path and filename to the XML file that will be written.
+     * @param am The AnalysisMetadata to write to XML.
+     * @param filename The full path and filename to the XML file that will be written.
      */
     fun writeAnalysisMetadataToXMLFile(am: AnalysisMetadata, filename: String) {
         try {
-            val xsw = XMLOutputFactory.newFactory().createXMLStreamWriter(PrintWriter(filename))
+            val xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(PrintWriter(filename))
             xsw.writeStartDocument()
             xsw.writeCharacters("\n")
             xsw.writeStartElement(AnalysisMetadataXMLParser.TAG_ANALYSIS_METADATA)
@@ -67,16 +67,16 @@ class AnalysisMetadataXMLWriter : AnalysisMetadataXMLParser() {
     }
 
     /**
-     * Writes the parameters in a ParameterDictionary to an XML String representation.
-     * The ordering of all parameters with the same name will be preserved, but otherwise ordering
-     * is not guaranteed.
-     * @param pd            ParameterDictionary to write to XML
-     * @return            A String containing the XML representation of the ParameterDictionary
+     * Writes the parameters in a ParameterDictionary to an XML String representation. The ordering
+     * of all parameters with the same name will be preserved, but otherwise ordering is not
+     * guaranteed.
+     * @param pd ParameterDictionary to write to XML
+     * @return A String containing the XML representation of the ParameterDictionary
      */
     fun writeParameterDictionaryToXMLString(pd: ParameterDictionary): String {
         val sw = java.io.StringWriter()
         try {
-            val xsw = XMLOutputFactory.newFactory().createXMLStreamWriter(sw)
+            val xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(sw)
             this.writeParameterDictionaryToXMLStream(pd, xsw)
         } catch (e: XMLStreamException) {
             LoggingUtilities.logger.severe("Exception while writing parameter to XML: " + e.message)
@@ -86,13 +86,13 @@ class AnalysisMetadataXMLWriter : AnalysisMetadataXMLParser() {
 
     /**
      * Writes a single parameter to an XML String representation.
-     * @param p            ParameterDictionary to write to XML
-     * @return            A String containing the XML representation of the ParameterDictionary
+     * @param p ParameterDictionary to write to XML
+     * @return A String containing the XML representation of the ParameterDictionary
      */
     fun writeParameterToXMLString(p: Parameter): String {
         val sw = java.io.StringWriter()
         try {
-            val xsw = XMLOutputFactory.newFactory().createXMLStreamWriter(sw)
+            val xsw = XMLOutputFactory.newInstance().createXMLStreamWriter(sw)
             this.writeParameterToXMLStream(p, xsw)
         } catch (e: XMLStreamException) {
             LoggingUtilities.logger.severe("Exception while writing parameter to XML: " + e.message)
@@ -150,8 +150,14 @@ class AnalysisMetadataXMLWriter : AnalysisMetadataXMLParser() {
             }
             xsw.writeAttribute(AnalysisMetadataXMLParser.ATTR_FILENAME, filename)
             if (`is`.getImageHashAlgorithmForIndex(i) != null) {
-                xsw.writeAttribute(AnalysisMetadataXMLParser.ATTR_HASH_ALG, `is`.getImageHashAlgorithmForIndex(i))
-                xsw.writeAttribute(AnalysisMetadataXMLParser.ATTR_HASH, `is`.getImageHashForIndex(i))
+                xsw.writeAttribute(
+                        AnalysisMetadataXMLParser.ATTR_HASH_ALG,
+                        `is`.getImageHashAlgorithmForIndex(i)
+                )
+                xsw.writeAttribute(
+                        AnalysisMetadataXMLParser.ATTR_HASH,
+                        `is`.getImageHashForIndex(i)
+                )
             }
             xsw.writeEndElement()
             xsw.writeCharacters("\n")
@@ -190,7 +196,10 @@ class AnalysisMetadataXMLWriter : AnalysisMetadataXMLParser() {
         for (f in outputFilenames) {
             xsw.writeStartElement(AnalysisMetadataXMLParser.TAG_DATAFILE)
             xsw.writeAttribute(AnalysisMetadataXMLParser.ATTR_FILENAME, f)
-            xsw.writeAttribute(AnalysisMetadataXMLParser.ATTR_HASH_ALG, am.getOutputFileHashAlgorithm(f))
+            xsw.writeAttribute(
+                    AnalysisMetadataXMLParser.ATTR_HASH_ALG,
+                    am.getOutputFileHashAlgorithm(f)
+            )
             xsw.writeAttribute(AnalysisMetadataXMLParser.ATTR_HASH, am.getOutputFileHash(f))
             xsw.writeEndElement()
             xsw.writeCharacters("\n")
